@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+
+import Image from 'next/image';
 export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState('Home');
@@ -17,7 +19,7 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const links = ['Home', 'Service Center', 'Nearby Services', 'Popular Services', 'More'];
+  const links = ['Home', 'Popular Services', 'Nearby Service Centers', 'Sell Old Things' ];
 
   return (
     <motion.nav
@@ -90,6 +92,13 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
               whileTap={{ scale: 0.95 }}
               className="px-5 py-2.5 text-sm font-medium text-white/90 hover:text-white rounded-full border border-white/10 hover:border-[#037166]/50 backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all duration-300"
             >
+              <Image
+  src="/android1.png"
+  alt="Android App"
+  width={20}
+  height={20}
+  priority
+/>
               Contact Us
             </motion.button>
             <motion.button
@@ -97,8 +106,13 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
               whileTap={{ scale: 0.95 }}
               className="px-6 py-2.5 text-sm font-medium text-white rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] hover:from-[#048a7e] hover:to-[#05bfb0] transition-all duration-300 shadow-lg shadow-[#037166]/20"
             >
-              Sign In
-            </motion.button>
+<Image
+  src="/andriod1.png"
+  alt="Android App"
+  width={40}
+  height={40}
+  priority
+/>            </motion.button>
           </div>
 
           {/* Mobile Menu Button & Cart */}

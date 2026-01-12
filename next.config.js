@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+
+   basePath: "",
   images: {
     domains: ['images.unsplash.com', 'api.dicebear.com', 'api.doorstephub.com'],
     remotePatterns: [

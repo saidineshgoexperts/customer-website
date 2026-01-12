@@ -45,19 +45,55 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            {['Appliance Services', 'Spa & Salon', 'PG & Hostels', 'Religious Services'].map((item) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s/g, '-')}`}
-                className="text-gray-300 hover:text-[#037166] transition-colors relative group"
-                whileHover={{ y: -2 }}
-              >
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#037166] to-[#02b39a] group-hover:w-full transition-all duration-300" />
-              </motion.a>
-            ))}
-          </nav>
+      <nav className="hidden lg:flex items-center space-x-8">
+  {['Appliance Services', 'Religious Services', 'PG & Hostels'].map((item) => (
+    <motion.a
+      key={item}
+      href={`#${item.toLowerCase().replace(/\s/g, '-')}`}
+      className="text-gray-300 hover:text-[#037166] transition-colors relative group"
+      whileHover={{ y: -2 }}
+    >
+      {item}
+      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#037166] to-[#02b39a] group-hover:w-full transition-all duration-300" />
+    </motion.a>
+  ))}
+
+  {/* MORE DROPDOWN */}
+  <div className="relative group">
+    <motion.button
+      whileHover={{ y: -2 }}
+      className="text-gray-300 hover:text-[#037166] transition-colors relative"
+    >
+      More
+      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#037166] to-[#02b39a] group-hover:w-full transition-all duration-300" />
+    </motion.button>
+
+    {/* Dropdown */}
+    <div className="absolute top-full left-0 mt-3 w-48 bg-[#0f0f0f]/90 backdrop-blur-xl border border-[#037166]/20 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+      <a
+        href="#spa-&-salon"
+        className="block px-4 py-3 text-sm text-gray-300 hover:text-[#037166] hover:bg-[#037166]/10 rounded-xl transition"
+      >
+        Spa & Salon
+      </a>
+
+
+        <a
+        href="#spa-&-salon"
+        className="block px-4 py-3 text-sm text-gray-300 hover:text-[#037166] hover:bg-[#037166]/10 rounded-xl transition"
+      >
+        Share Ride  
+      </a>
+       <a
+        href="#spa-&-salon"
+        className="block px-4 py-3 text-sm text-gray-300 hover:text-[#037166] hover:bg-[#037166]/10 rounded-xl transition"
+      >
+        Order Medicine
+      </a>
+    </div>
+  </div>
+</nav>
+
 
           {/* Right Actions */}
           <div className="flex items-center space-x-4">
@@ -110,7 +146,7 @@ export function Header() {
             className="lg:hidden bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-[#037166]/20"
           >
             <div className="px-4 py-6 space-y-4">
-              {['Services', 'Booking', 'Spa & Salon', 'PG & Hostels', 'Religious'].map((item) => (
+              {['Services', 'Booking', 'Spa & Saloons', 'PG & Hostels', 'Religious Services','More'].map((item) => (
                 <motion.a
                   key={item}
                   href={`#${item.toLowerCase().replace(/\s/g, '-')}`}

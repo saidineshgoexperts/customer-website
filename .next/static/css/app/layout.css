@@ -561,6 +561,9 @@ video {
 .visible {
   visibility: visible;
 }
+.invisible {
+  visibility: hidden;
+}
 .fixed {
   position: fixed;
 }
@@ -684,6 +687,9 @@ video {
 .top-6 {
   top: 1.5rem;
 }
+.top-full {
+  top: 100%;
+}
 .-z-10 {
   z-index: -10;
 }
@@ -756,6 +762,9 @@ video {
 }
 .mt-20 {
   margin-top: 5rem;
+}
+.mt-3 {
+  margin-top: 0.75rem;
 }
 .mt-4 {
   margin-top: 1rem;
@@ -1329,6 +1338,9 @@ video {
 }
 .bg-\[\#0a0a0a\]\/95 {
   background-color: rgb(10 10 10 / 0.95);
+}
+.bg-\[\#0f0f0f\]\/90 {
+  background-color: rgb(15 15 15 / 0.9);
 }
 .bg-\[\#1a1a1a\] {
   --tw-bg-opacity: 1;
@@ -2597,6 +2609,10 @@ html {
 .focus\:outline-none:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
+}
+
+.group:hover .group-hover\:visible {
+  visibility: visible;
 }
 
 .group:hover .group-hover\:w-full {
