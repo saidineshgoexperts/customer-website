@@ -88,9 +88,7 @@ function ServiceCardsSection({ services, loading }) {
               
               {/* Service Name Overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-3">
-                <p className="text-white text-xs font-medium text-center line-clamp-2 group-hover:text-[#04a99d] transition-colors">
-                  {service.name}
-                </p>
+              
               </div>
 
               {/* Hover Glow */}
@@ -100,6 +98,12 @@ function ServiceCardsSection({ services, loading }) {
                 className="absolute inset-0 bg-gradient-to-t from-[#037166]/30 to-transparent"
               />
             </div>
+
+
+
+              <p className="text-white text-xs font-medium text-center line-clamp-2 group-hover:text-[#04a99d] transition-colors">
+                  {service.name}
+                </p>
           </motion.div>
         ))}
       </div>
