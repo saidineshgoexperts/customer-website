@@ -46,7 +46,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            {['Services', 'Booking', 'Spa & Salon', 'PG & Hostels', 'Religious'].map((item) => (
+            {['Appliance Services', 'Spa & Salon', 'PG & Hostels', 'Religious Services'].map((item) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase().replace(/\s/g, '-')}`}
