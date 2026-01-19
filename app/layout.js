@@ -1,4 +1,7 @@
-import '../src/styles/globals.css';
+import './globals.css';
+import { LocationProvider } from './context/LocationContext';
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
 
 export const metadata = {
   title: 'Next-Gen Dark Mode Super App',
@@ -9,7 +12,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
-        {children}
+        <LocationProvider>
+          <AuthProvider>
+            <CartProvider>
+              {children}
+            </CartProvider>
+          </AuthProvider>
+        </LocationProvider>
       </body>
     </html>
   );

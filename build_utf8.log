@@ -1,0 +1,87 @@
+﻿
+> Next-Gen Dark Mode Super App@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.35
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+node.exe : Failed to 
+compile.
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (Failed    
+ to compile.:Stri    
+ng) [], RemoteEx    
+ception
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+
+./app/components/land
+ing/AppDownload.jsx:1
+99:17
+Type error: JSX 
+elements cannot have 
+multiple attributes 
+with the same name.
+
+[0m [90m 197 
+|[39m               
+    
+rotate[33m:[39m [[
+35m0[39m[33m,[39m 
+[35m5[39m[33m,[39
+m [35m0[39m][33m,
+[39m[0m
+[0m [90m 198 
+|[39m               
+  }}[0m
+[0m[31m[1m>[22m[
+39m[90m 199 |[39m  
+               transi
+tion[33m=[39m{{[0m
+[0m [90m     
+|[39m               
+  [31m[1m^[22m[39
+m[0m
+[0m [90m 200 
+|[39m               
+    y[33m:[39m { 
+duration[33m:[39m 
+[35m2[39m 
+[33m+[39m 
+index[33m,[39m 
+repeat[33m:[39m 
+[33mInfinity[39m 
+}[33m,[39m[0m
+[0m [90m 201 
+|[39m               
+    
+rotate[33m:[39m { 
+duration[33m:[39m 
+[35m3[39m 
+[33m+[39m 
+index[33m,[39m 
+repeat[33m:[39m 
+[33mInfinity[39m 
+}[33m,[39m[0m
+[0m [90m 202 
+|[39m               
+  }}[0m
+Next.js build worker 
+exited with code: 1 
+and signal: null

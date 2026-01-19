@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Search, User, Home, Briefcase, Calendar, MapPin, Tag, ChevronRight } from 'lucide-react';
 
@@ -37,11 +38,10 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs }) {
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
             ? 'bg-[#0a0a0a]/90 backdrop-blur-2xl shadow-lg'
             : 'bg-[#0a0a0a]/60 backdrop-blur-xl'
-        }`}
+          }`}
         style={{
           borderBottom: isScrolled ? '1px solid rgba(3, 113, 102, 0.2)' : '1px solid transparent',
           boxShadow: isScrolled ? '0 4px 20px rgba(3, 113, 102, 0.1)' : 'none',
@@ -59,13 +59,18 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs }) {
               whileHover={{ scale: 1.05 }}
               className="flex items-center space-x-2 relative group"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-[#037166] to-[#025951] rounded-xl flex items-center justify-center shadow-lg shadow-[#037166]/30">
-                <span className="text-white font-bold text-xl">S</span>
-              </div>
+              <Image
+                src="/d-hub-logo.png"
+                alt="Doorstep Hub"
+                width={90}
+                height={90}
+                className="object-contain"
+                priority
+              />
               <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 SuperHub
               </span>
-              
+
               {/* Animated Sketch Underline */}
               <svg className="absolute -bottom-1 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <motion.path
@@ -101,7 +106,7 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs }) {
                         {item.name}
                       </span>
                     </div>
-                    
+
                     {/* Active Tab Indicator */}
                     {isActive && (
                       <motion.div
@@ -111,7 +116,7 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs }) {
                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                       />
                     )}
-                    
+
                     {/* Hover Glow */}
                     <motion.div
                       className="absolute inset-0 bg-[#037166]/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity -z-10"
@@ -160,11 +165,10 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs }) {
                         handleNavigation(crumb.href);
                       }}
                       whileHover={{ x: 2 }}
-                      className={`whitespace-nowrap ${
-                        index === breadcrumbs.length - 1
+                      className={`whitespace-nowrap ${index === breadcrumbs.length - 1
                           ? 'text-[#037166] font-medium'
                           : 'text-gray-400 hover:text-[#037166]'
-                      } transition-colors relative group`}
+                        } transition-colors relative group`}
                     >
                       {crumb.label}
                       {/* Sketch underline on hover */}
@@ -209,7 +213,7 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs }) {
               onClick={() => setMobileMenuOpen(false)}
               className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             />
-            
+
             {/* Menu Panel */}
             <motion.div
               initial={{ x: '100%' }}
@@ -240,11 +244,10 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs }) {
                         transition={{ delay: index * 0.05 }}
                         whileTap={{ scale: 0.98, x: 5 }}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center space-x-3 p-4 rounded-xl transition-all ${
-                          isActive
+                        className={`flex items-center space-x-3 p-4 rounded-xl transition-all ${isActive
                             ? 'bg-gradient-to-r from-[#037166]/20 to-[#025951]/20 border border-[#037166]'
                             : 'bg-[#1a1a1a]/50 border border-[#037166]/20 hover:border-[#037166]/40'
-                        }`}
+                          }`}
                       >
                         <item.icon className={`w-5 h-5 ${isActive ? 'text-[#037166]' : 'text-gray-400'}`} />
                         <span className={`font-medium ${isActive ? 'text-[#037166]' : 'text-white'}`}>

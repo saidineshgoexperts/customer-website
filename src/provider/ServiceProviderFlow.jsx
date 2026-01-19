@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -68,7 +69,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
     setCartItems(prev => {
       const existingItem = prev.find(i => i.id === item.id);
       if (existingItem) {
-        return prev.map(i => 
+        return prev.map(i =>
           i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
@@ -85,7 +86,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
       handleRemoveFromCart(itemId);
       return;
     }
-    setCartItems(prev => 
+    setCartItems(prev =>
       prev.map(item => item.id === itemId ? { ...item, quantity } : item)
     );
   };
@@ -160,7 +161,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
-      <Toaster 
+      <Toaster
         position="top-right"
         toastOptions={{
           style: {
@@ -179,34 +180,34 @@ export default function ServiceProviderFlow({ serviceType = null }) {
         }}
       />
 
-      <Navigation 
+      <Navigation
         onLogoClick={handleBackToHome}
         onCartClick={handleGoToCart}
         cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
       />
-      
+
       {currentPage === 'home' && (
         <>
-          <Hero 
+          <Hero
             onViewServices={handleGoToAllServices}
             onBookService={handleViewAllCategories}
           />
-          <TopCategories 
+          <TopCategories
             onCategoryClick={handleCategoryClick}
             onViewAll={handleViewAllCategories}
           />
-          <FeaturedServices 
+          <FeaturedServices
             onServiceClick={handleServiceClick}
             onViewAll={handleViewAllFeatured}
           />
           <RecentlyBooked />
           <PromoBanner />
           <DownloadApp />
-          <NearbyStores 
+          <NearbyStores
             onStoreClick={handleStoreClick}
             onViewAll={handleViewAllStores}
           />
-          <PopularCenters 
+          <PopularCenters
             onStoreClick={handleStoreClick}
           />
           <KnowledgeSpace />
@@ -215,7 +216,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
       )}
 
       {currentPage === 'category' && selectedCategory && (
-        <CategoryPage 
+        <CategoryPage
           category={selectedCategory}
           onSubCategoryClick={handleSubCategoryClick}
           onBack={handleBackToHome}
@@ -223,7 +224,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
       )}
 
       {currentPage === 'services' && selectedCategory && selectedSubCategory && (
-        <ServicesListingPage 
+        <ServicesListingPage
           category={selectedCategory}
           subCategory={selectedSubCategory}
           onBack={handleBackToCategory}

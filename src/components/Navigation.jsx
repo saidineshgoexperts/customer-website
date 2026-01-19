@@ -19,28 +19,38 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const links = ['Home', 'Popular Services', 'Nearby Service Centers', 'Sell Old Things' ];
+  const links = ['Home', 'Popular Services', 'Nearby Service Centers', 'Sell Old Things'];
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? 'bg-black/40 backdrop-blur-xl border-b border-white/5 shadow-2xl'
-          : 'bg-transparent'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
+        ? 'bg-black/40 backdrop-blur-xl border-b border-white/5 shadow-2xl'
+        : 'bg-transparent'
+        }`}
     >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <motion.button
+          <motion.div
             onClick={onLogoClick}
             whileHover={{ scale: 1.05 }}
-            className="text-2xl font-bold bg-gradient-to-r from-[#037166] to-[#04a99d] bg-clip-text text-transparent cursor-pointer"
+            className="cursor-pointer flex items-center gap-2"
           >
-            Doorstep Hub
-          </motion.button>
+            <Image
+              src="/d-hub-logo.png"
+              alt="Doorstep Hub"
+              width={90}
+              height={90}
+              className="object-contain"
+              priority
+            />
+            <span className="text-xl font-bold bg-gradient-to-r from-[#037166] to-[#04a99d] bg-clip-text text-transparent hidden sm:inline">
+              Doorstep Hub
+            </span>
+          </motion.div>
+
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
@@ -86,19 +96,19 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
                 )}
               </div>
             </motion.button>
-            
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-5 py-2.5 text-sm font-medium text-white/90 hover:text-white rounded-full border border-white/10 hover:border-[#037166]/50 backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all duration-300"
             >
               <Image
-  src="/android1.png"
-  alt="Android App"
-  width={20}
-  height={20}
-  priority
-/>
+                src="/android1.png"
+                alt="Android App"
+                width={20}
+                height={20}
+                priority
+              />
               Contact Us
             </motion.button>
             <motion.button
@@ -106,13 +116,13 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
               whileTap={{ scale: 0.95 }}
               className="px-6 py-2.5 text-sm font-medium text-white rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] hover:from-[#048a7e] hover:to-[#05bfb0] transition-all duration-300 shadow-lg shadow-[#037166]/20"
             >
-<Image
-  src="/andriod1.png"
-  alt="Android App"
-  width={40}
-  height={40}
-  priority
-/>            </motion.button>
+              <Image
+                src="/andriod1.png"
+                alt="Android App"
+                width={40}
+                height={40}
+                priority
+              />            </motion.button>
           </div>
 
           {/* Mobile Menu Button & Cart */}
@@ -155,11 +165,10 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
                     setActiveLink(link);
                     setMobileMenuOpen(false);
                   }}
-                  className={`block w-full text-left px-4 py-3 rounded-lg transition-all ${
-                    activeLink === link
-                      ? 'bg-[#037166]/20 text-[#04a99d]'
-                      : 'text-white/80 hover:bg-white/5'
-                  }`}
+                  className={`block w-full text-left px-4 py-3 rounded-lg transition-all ${activeLink === link
+                    ? 'bg-[#037166]/20 text-[#04a99d]'
+                    : 'text-white/80 hover:bg-white/5'
+                    }`}
                 >
                   {link}
                 </button>
