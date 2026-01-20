@@ -23,6 +23,7 @@ import { BookingConfirmationPage } from '@/components/services/BookingConfirmati
 import { AllServicesPage } from '@/components/services/AllServicesPage';
 import { StoreDetailPage } from '@/components/services/StoreDetailPage';
 import { ViewAllPage } from '@/components/services/ViewAllPage';
+import { ServiceCartCheckoutPage } from '@/components/services/ServiceCartCheckoutPage';
 import { GlobalNav } from '@/components/layout/GlobalNav';
 import { Toaster } from 'sonner';
 
@@ -274,7 +275,22 @@ export default function ServiceProviderFlow({ serviceType = null }) {
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          onProceedToAddress={handleGoToAddress}
+          onProceedToAddress={() => {
+            // Set flag to indicate service cart flow
+            localStorage.setItem('service_cart_flow', 'true');
+            setCurrentPage('address');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      )}
+
+      {currentPage === 'service-cart-checkout' && (
+        <ServiceCartCheckoutPage
+          selectedAddress={selectedAddress}
+          onBack={() => setCurrentPage('address')}
+          onSuccess={() => {
+            handleBackToHome();
+          }}
         />
       )}
 
@@ -290,7 +306,22 @@ export default function ServiceProviderFlow({ serviceType = null }) {
               setCurrentPage('cart');
             }
           }}
-          onContinue={handleGoToBooking}
+          onContinue={() => {
+            const isServiceCartFlow = localStorage.getItem('service_cart_flow');
+            console.log('🔍 AddressPage Continue - Service Cart Flow:', isServiceCartFlow);
+            if (isServiceCartFlow) {
+              // Service cart flow: go to service cart checkout
+              console.log('✅ Navigating to service-cart-checkout');
+              setCurrentPage('service-cart-checkout');
+              // Remove flag after navigation
+              setTimeout(() => localStorage.removeItem('service_cart_flow'), 100);
+            } else {
+              // Regular service flow: go to booking confirmation
+              console.log('✅ Navigating to booking confirmation');
+              handleGoToBooking();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
         />
       )}
 

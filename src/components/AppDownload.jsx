@@ -11,7 +11,7 @@ export function AppDownload() {
       {/* Dynamic Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a1412] to-[#0a0a0a]" />
-        
+
         {/* Animated Waves */}
         <svg className="absolute bottom-0 w-full h-64 opacity-10">
           <motion.path
@@ -150,7 +150,7 @@ export function AppDownload() {
               <div className="relative w-72 h-[580px] bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-[3rem] border-8 border-[#2a2a2a] shadow-2xl overflow-hidden">
                 {/* Notch */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-[#0a0a0a] rounded-b-3xl z-20" />
-                
+
                 {/* Screen */}
                 <div className="relative w-full h-full bg-gradient-to-b from-[#0a0a0a] to-[#0d1410] p-4">
                   <ImageWithFallback
@@ -158,7 +158,7 @@ export function AppDownload() {
                     alt="App Preview"
                     className="w-full h-full object-cover rounded-3xl"
                   />
-                  
+
                   {/* Glow Effect */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#037166]/20 via-transparent to-transparent rounded-3xl" />
                 </div>
@@ -191,12 +191,13 @@ export function AppDownload() {
                 initial={{ opacity: 0, scale: 0 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.5 + index * 0.1 }}
                 animate={{
                   y: [0, -10, 0],
                   rotate: [0, 5, 0],
                 }}
                 transition={{
+                  opacity: { delay: 0.5 + index * 0.1 },
+                  scale: { delay: 0.5 + index * 0.1 },
                   y: { duration: 2 + index, repeat: Infinity },
                   rotate: { duration: 3 + index, repeat: Infinity },
                 }}

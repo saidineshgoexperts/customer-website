@@ -6,31 +6,16 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useLocation } from '@/hooks/useLocation';
 
 export function LocationBar() {
-    const { location, detectLocation, searchLocation, setManualLocation, loading, error } = useLocation();
+    const { location, detectWithGPS, searchLocation, setManualLocation, loading, error } = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [isDetecting, setIsDetecting] = useState(false);
 
-    // Auto-detect on first load if no location (optional, matches requirement "when user opens website asks for permission")
-    // React.useEffect(() => {
-    //   if (!location && !loading) {
-    //     detectLocation();
-    //   }
-    // }, []); 
-    // Commented out to prevent annoying jumps, put logic in useLocation or trigger manually. 
-    // Let's stick to the requirement: "when user opens website asks for permission" --> 
-    // We can trigger this validly here if we want.
-
-    React.useEffect(() => {
-        // Small delay to ensure client-side hydration
-        const timer = setTimeout(() => {
-            if (!location && !localStorage.getItem('user_location_data')) {
-                detectLocation();
-            }
-        }, 1000);
-        return () => clearTimeout(timer);
-    }, []); // Run once
+    // REMOVED: Auto-detect on page load (violates UX best practices)
+    // Why: GPS permission should ONLY be requested on explicit user action
+    // LocationContext now handles silent IP detection as fallback
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -43,19 +28,33 @@ export function LocationBar() {
     };
 
     const handleSelectLocation = async (place) => {
-        setIsSearching(true); // Show loading while fetching details
-        await setManualLocation(place.place_id);
-        setIsOpen(false);
-        setSearchQuery('');
-        setSearchResults([]);
-        setIsSearching(false);
+        setIsSearching(true);
+        try {
+            await setManualLocation(place.place_id);
+            setIsOpen(false);
+            setSearchQuery('');
+            setSearchResults([]);
+        } catch (error) {
+            console.error('Failed to set location:', error);
+        } finally {
+            setIsSearching(false);
+        }
     };
 
     const handleDetectCurrent = async () => {
-        setIsOpen(false); // Close modal during detection to show loading state elsewhere or keep open? 
-        // Better to keep open or show loading toast.
-        await detectLocation();
-        setIsOpen(false);
+        setIsDetecting(true);
+        try {
+            await detectWithGPS();
+            // Keep modal open to show result, then close after brief delay
+            setTimeout(() => {
+                setIsOpen(false);
+            }, 500);
+        } catch (error) {
+            console.error('GPS detection failed:', error);
+            // Error is handled in context, fallback to IP already attempted
+        } finally {
+            setIsDetecting(false);
+        }
     };
 
     return (
@@ -70,10 +69,10 @@ export function LocationBar() {
                 <MapPin className="w-4 h-4 text-[#037166] group-hover:text-[#04a99d]" />
                 <div className="flex flex-col items-start min-w-[100px] max-w-[160px]">
                     <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">
-                        {location ? 'Delivering to' : 'Set Location'}
+                        {location ? 'Delivering to' : 'Location'}
                     </span>
                     <span className="text-xs font-medium text-white truncate w-full text-left">
-                        {location ? location.shortAddress : 'Auto-detecting...'}
+                        {loading ? 'Detecting...' : location ? location.shortAddress : 'Select location'}
                     </span>
                 </div>
                 <ChevronDown className="w-3 h-3 text-gray-500 group-hover:text-[#037166]" />
@@ -133,13 +132,20 @@ export function LocationBar() {
                                 {/* Detect Button */}
                                 <button
                                     onClick={handleDetectCurrent}
-                                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-[#037166]/10 transition-colors group text-left border border-transparent hover:border-[#037166]/20"
+                                    disabled={isDetecting}
+                                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-[#037166]/10 transition-colors group text-left border border-transparent hover:border-[#037166]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <div className="w-10 h-10 rounded-full bg-[#037166]/20 flex items-center justify-center group-hover:bg-[#037166] transition-colors">
-                                        <Crosshair className="w-5 h-5 text-[#037166] group-hover:text-white" />
+                                        {isDetecting ? (
+                                            <Loader2 className="w-5 h-5 text-[#037166] group-hover:text-white animate-spin" />
+                                        ) : (
+                                            <Crosshair className="w-5 h-5 text-[#037166] group-hover:text-white" />
+                                        )}
                                     </div>
                                     <div>
-                                        <div className="text-[#037166] font-semibold group-hover:text-[#04a99d]">Detect current location</div>
+                                        <div className="text-[#037166] font-semibold group-hover:text-[#04a99d]">
+                                            {isDetecting ? 'Detecting location...' : 'Use current location'}
+                                        </div>
                                         <div className="text-xs text-gray-500">Using GPS</div>
                                     </div>
                                 </button>

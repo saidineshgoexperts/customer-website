@@ -4,7 +4,16 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Home, Briefcase, MapPin, Plus, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Address } from '@/app/page';
+
+export interface Address {
+  id: string;
+  type: 'home' | 'office' | 'other';
+  label: string;
+  street: string;
+  city: string;
+  zipCode: string;
+  isDefault: boolean;
+}
 
 interface AddressPageProps {
   selectedAddress: Address | null;
@@ -148,19 +157,17 @@ export function AddressPage({
                   transition={{ delay: index * 0.1 }}
                   layout
                   onClick={() => onSelectAddress(address)}
-                  className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${
-                    isSelected
-                      ? 'bg-gradient-to-br from-[#037166]/20 to-[#04a99d]/10 border-2 border-[#037166]'
-                      : 'bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-white/20'
-                  }`}
+                  className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${isSelected
+                    ? 'bg-gradient-to-br from-[#037166]/20 to-[#04a99d]/10 border-2 border-[#037166]'
+                    : 'bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-white/20'
+                    }`}
                 >
                   <div className="flex gap-6">
                     {/* Icon */}
-                    <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      isSelected
-                        ? 'bg-gradient-to-br from-[#037166] to-[#04a99d]'
-                        : 'bg-white/5'
-                    }`}>
+                    <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${isSelected
+                      ? 'bg-gradient-to-br from-[#037166] to-[#04a99d]'
+                      : 'bg-white/5'
+                      }`}>
                       <Icon className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-[#04a99d]'}`} />
                     </div>
 
@@ -252,11 +259,10 @@ export function AddressPage({
                           <button
                             key={type}
                             onClick={() => setNewAddress({ ...newAddress, type })}
-                            className={`flex-1 px-4 py-3 rounded-lg font-medium capitalize transition-all ${
-                              newAddress.type === type
-                                ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white'
-                                : 'bg-white/5 text-white/70 hover:bg-white/10'
-                            }`}
+                            className={`flex-1 px-4 py-3 rounded-lg font-medium capitalize transition-all ${newAddress.type === type
+                              ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white'
+                              : 'bg-white/5 text-white/70 hover:bg-white/10'
+                              }`}
                           >
                             {type}
                           </button>

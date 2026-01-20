@@ -147,11 +147,11 @@ export function FeaturedServices({ onServiceClick, onViewAll }) {
                   </p>
 
                   {/* Price & CTA */}
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex items-center justify-end">
+                    {/* <div>
                       <p className="text-xs text-white/50 mb-1">Starting from</p>
                       <p className="text-2xl font-bold text-white">₹{service.serviceCharge}</p>
-                    </div>
+                    </div> */}
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}

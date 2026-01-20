@@ -1,0 +1,149 @@
+'use client';
+
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useAuth } from './AuthContext';
+import { toast } from 'sonner';
+
+const ServiceCartContext = createContext();
+
+export const useServiceCart = () => useContext(ServiceCartContext);
+
+export const ServiceCartProvider = ({ children }) => {
+    const { token, isAuthenticated } = useAuth();
+    const [cartItems, setCartItems] = useState([]);
+    const [cartData, setCartData] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const fetchCart = useCallback(async () => {
+        if (!isAuthenticated) return;
+        setLoading(true);
+        try {
+            const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/service-cart/get', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setCartItems(data.cart?.items || []);
+                setCartData(data.cart || null);
+            }
+        } catch (error) {
+            console.error('Error fetching service cart:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [token, isAuthenticated]);
+
+    useEffect(() => {
+        fetchCart();
+    }, [fetchCart]);
+
+    const addToCart = async (providerId, itemId, itemType = 'service', quantity = 1, parentServiceId = null) => {
+        if (!isAuthenticated) {
+            toast.error('Please login to add items to cart');
+            return false;
+        }
+        try {
+            const body = {
+                providerId,
+                itemId,
+                itemType, // 'service' or 'addon'
+                providerType: 'regular',
+                quantity
+            };
+
+            // Add parentServiceId for addons
+            if (itemType === 'addon' && parentServiceId) {
+                body.parentServiceId = parentServiceId;
+            }
+
+            console.log('🛒 Service Cart API Request:', body);
+
+            const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/service-cart/add', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+            const data = await response.json();
+            console.log('🛒 Service Cart API Response:', data);
+
+            if (data.success) {
+                await fetchCart();
+                return true;
+            } else {
+                toast.error(data.message || 'Failed to add to cart');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error adding to service cart:', error);
+            toast.error('Failed to add to cart');
+            return false;
+        }
+    };
+
+    const removeFromCart = async (itemId) => {
+        if (!isAuthenticated) return;
+        try {
+            const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/service-cart/remove', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    itemId,
+                    itemType: 'service'
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                toast.success('Removed from cart');
+                await fetchCart();
+            }
+        } catch (error) {
+            console.error('Error removing from service cart:', error);
+            toast.error('Failed to remove from cart');
+        }
+    };
+
+    const clearCart = async () => {
+        if (!isAuthenticated) return;
+        try {
+            const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/service-cart/clear', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setCartItems([]);
+                setCartData(null);
+                toast.success('Cart cleared');
+            }
+        } catch (error) {
+            console.error('Error clearing service cart:', error);
+            toast.error('Failed to clear cart');
+        }
+    };
+
+    return (
+        <ServiceCartContext.Provider value={{
+            cartItems,
+            cartData,
+            loading,
+            fetchCart,
+            addToCart,
+            removeFromCart,
+            clearCart
+        }}>
+            {children}
+        </ServiceCartContext.Provider>
+    );
+};

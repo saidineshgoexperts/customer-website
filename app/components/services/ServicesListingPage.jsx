@@ -32,7 +32,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, onBa
 
       setLoading(true);
       try {
-        // Fetch services
+        // Fetch services and nearby centers from single API
         const servicesResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/services_by_subcategory', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -43,33 +43,23 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, onBa
           })
         });
 
-        // Fetch professional services (centers)
-        const centersResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lattitude: location.lat.toString(),
-            longitude: location.lng.toString(),
-            subcategoryId: subCategoryId
-          })
-        });
-
-        if (!servicesResponse.ok || !centersResponse.ok) {
+        if (!servicesResponse.ok) {
           throw new Error('Failed to fetch data');
         }
 
         const servicesData = await servicesResponse.json();
-        const centersData = await centersResponse.json();
 
         if (servicesData.success) {
+          // Set services from dhubServices array
           setServices(servicesData.dhubServices || []);
+
+          // Set centers from nearByServiceCenters array (same API response)
+          setCenters(servicesData.nearByServiceCenters || []);
+
+          console.log('Fetched services:', servicesData.dhubServices?.length || 0);
+          console.log('Fetched nearby centers:', servicesData.nearByServiceCenters?.length || 0);
         } else {
           setServices([]);
-        }
-
-        if (centersData.success) {
-          setCenters(centersData.professionalServices || []);
-        } else {
           setCenters([]);
         }
 

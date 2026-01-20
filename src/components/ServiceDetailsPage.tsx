@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Star, Clock, Shield, CheckCircle, Award, ThumbsUp, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import type { CartItem } from '@/app/page';
+import type { CartItem } from './BookingConfirmationPage';
 
 interface ServiceDetailsPageProps {
   serviceId: number;
@@ -107,23 +107,23 @@ const relatedServices = [
   },
 ];
 
-export function ServiceDetailsPage({ 
-  serviceId, 
-  category, 
-  subCategory, 
-  onBack, 
+export function ServiceDetailsPage({
+  serviceId,
+  category,
+  subCategory,
+  onBack,
   onAddToCart,
-  onGoToCart 
+  onGoToCart
 }: ServiceDetailsPageProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const accentColor = serviceAccents[category] || '#5a8b9d';
-  
+
   const service = serviceData[serviceId as keyof typeof serviceData] || serviceData[1];
 
   const handleSelectCard = (cardId: string) => {
-    setSelectedCards(prev => 
-      prev.includes(cardId) 
+    setSelectedCards(prev =>
+      prev.includes(cardId)
         ? prev.filter(id => id !== cardId)
         : [...prev, cardId]
     );
@@ -173,13 +173,13 @@ export function ServiceDetailsPage({
     >
       {/* Hero Section with Service Accent Color */}
       <section className="relative py-12 overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 opacity-30"
           style={{
             background: `linear-gradient(135deg, #025a51 0%, ${accentColor} 50%, #037166 100%)`,
           }}
         />
-        
+
         {/* Animated glow orb */}
         <motion.div
           animate={{
@@ -228,7 +228,7 @@ export function ServiceDetailsPage({
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                  
+
                   {/* Navigation Arrows */}
                   <button
                     onClick={prevImage}
@@ -250,11 +250,10 @@ export function ServiceDetailsPage({
                     <button
                       key={idx}
                       onClick={() => setCurrentImageIndex(idx)}
-                      className={`relative w-20 h-20 rounded-lg overflow-hidden transition-all ${
-                        currentImageIndex === idx 
-                          ? 'ring-2 ring-[#037166] scale-105' 
+                      className={`relative w-20 h-20 rounded-lg overflow-hidden transition-all ${currentImageIndex === idx
+                          ? 'ring-2 ring-[#037166] scale-105'
                           : 'opacity-60 hover:opacity-100'
-                      }`}
+                        }`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" />
                     </button>
@@ -298,7 +297,7 @@ export function ServiceDetailsPage({
                     key={idx}
                     className="flex items-center gap-3 p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10"
                   >
-                    <div 
+                    <div
                       className="w-10 h-10 rounded-lg flex items-center justify-center"
                       style={{ backgroundColor: `${accentColor}40` }}
                     >
@@ -340,11 +339,10 @@ export function ServiceDetailsPage({
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -8 }}
                 onClick={() => handleSelectCard(card.id)}
-                className={`relative cursor-pointer rounded-2xl p-8 transition-all duration-300 ${
-                  selectedCards.includes(card.id)
+                className={`relative cursor-pointer rounded-2xl p-8 transition-all duration-300 ${selectedCards.includes(card.id)
                     ? 'bg-gradient-to-br from-[#037166]/20 to-[#04a99d]/10 border-2 border-[#037166]'
                     : 'bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-white/20'
-                }`}
+                  }`}
               >
                 {/* Popular Badge */}
                 {card.popular && (

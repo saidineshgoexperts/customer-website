@@ -1,15 +1,18 @@
 'use client';
 
-import React, { createContext, useState, useEffect, useRef, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { locationManager } from '@/services/locationManager';
+import { LOCATION_CONFIG } from '@/config/locationConfig';
 
 const LocationContext = createContext(null);
 
-const STORAGE_KEY = 'user_location_data';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
-// Helper to load Google Maps Script
+/**
+ * Helper to load Google Maps Script
+ * Why: Required for geocoding and places services
+ */
 const loadGoogleMapsScript = (callback) => {
+    if (typeof window === 'undefined') return;
+
     if (typeof window.google !== 'undefined' && window.google.maps) {
         callback();
         return;
@@ -27,222 +30,188 @@ const loadGoogleMapsScript = (callback) => {
 
     const script = document.createElement('script');
     script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${LOCATION_CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => callback();
     document.head.appendChild(script);
 };
 
+/**
+ * LocationProvider - Production-grade location management
+ * 
+ * CRITICAL RULES:
+ * 1. Never auto-trigger GPS on page load
+ * 2. Always read from localStorage first
+ * 3. Never block UI rendering for location
+ * 4. Ask GPS permission ONLY on explicit user action
+ * 5. Never override a saved location automatically
+ */
 export function LocationProvider({ children }) {
     const [location, setLocation] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isMapsLoaded, setIsMapsLoaded] = useState(false);
 
-    // Refs for services
-    const geocoderRef = useRef(null);
-    const autocompleteServiceRef = useRef(null);
-    const placesServiceRef = useRef(null);
-
     useEffect(() => {
-        // 1. Load Google Maps
-        if (GOOGLE_API_KEY) {
+        // 1. Load Google Maps (non-blocking)
+        if (LOCATION_CONFIG.GOOGLE_MAPS_API_KEY) {
             loadGoogleMapsScript(() => {
                 setIsMapsLoaded(true);
-                try {
-                    geocoderRef.current = new window.google.maps.Geocoder();
-                    autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
-                    const dummyNode = document.createElement('div');
-                    placesServiceRef.current = new window.google.maps.places.PlacesService(dummyNode);
-                } catch (e) {
-                    console.error("Error initializing Google Maps services:", e);
-                }
+                locationManager.initializeGoogleServices();
             });
         } else {
-            setError('Google Maps API Key missing');
-            setLoading(false);
+            console.warn('Google Maps API Key missing');
         }
 
-        // 2. Check Cache
-        const checkCache = () => {
+        // 2. Check localStorage first (instant, no async)
+        const savedLocation = locationManager.getSavedLocation();
+        if (savedLocation) {
+            setLocation(savedLocation);
+            return; // Exit early, we have a valid cached location
+        }
+
+        // 3. Silent IP-based detection as fallback (only if no saved location)
+        // Why: Provide city-level location without asking permission
+        const detectIPLocation = async () => {
             try {
-                const stored = localStorage.getItem(STORAGE_KEY);
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    const age = Date.now() - parsed.timestamp;
-                    if (age < CACHE_DURATION) {
-                        setLocation(parsed);
-                        setLoading(false);
-                        return true;
-                    }
-                }
+                setLoading(true);
+                const ipLocation = await locationManager.detectWithIP();
+                setLocation(ipLocation);
             } catch (err) {
-                console.error('Error reading location cache:', err);
+                console.error('IP detection failed:', err);
+                // Don't show error to user, just log it
+                // User can manually search or use GPS button
+            } finally {
+                setLoading(false);
             }
-            return false;
         };
 
-        if (!checkCache()) {
-            setLoading(false);
-        }
+        // Small delay to ensure client-side hydration complete
+        const timer = setTimeout(() => {
+            detectIPLocation();
+        }, 1000);
+
+        return () => clearTimeout(timer);
     }, []);
 
-    const saveLocation = (data) => {
-        const locationData = { ...data, timestamp: Date.now() };
-        setLocation(locationData);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(locationData));
-    };
-
-    const reverseGeocode = (lat, lng) => {
-        return new Promise((resolve, reject) => {
-            if (!geocoderRef.current) {
-                reject(new Error('Google Maps not loaded'));
-                return;
-            }
-
-            const latlng = { lat, lng };
-            geocoderRef.current.geocode({ location: latlng }, (results, status) => {
-                if (status === 'OK' && results[0]) {
-                    const result = results[0];
-                    let city = '';
-                    let area = '';
-
-                    for (const component of result.address_components) {
-                        if (component.types.includes('locality')) {
-                            city = component.long_name;
-                        }
-                        if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
-                            area = component.long_name;
-                        }
-                    }
-
-                    const shortAddress = area ? `${area}, ${city}` : city || result.formatted_address.split(',')[0];
-
-                    const data = {
-                        lat,
-                        lng,
-                        address: result.formatted_address,
-                        shortAddress: shortAddress
-                    };
-                    resolve(data);
-                } else {
-                    reject(new Error('Geocoder failed: ' + status));
-                }
-            });
-        });
-    };
-
-    const detectLocation = async () => {
+    /**
+     * User-initiated GPS detection
+     * Why: Only triggered by explicit button click
+     */
+    const detectWithGPS = async () => {
         setLoading(true);
         setError(null);
 
-        if (!('geolocation' in navigator)) {
-            setError('Geolocation is not supported');
+        try {
+            const gpsLocation = await locationManager.detectWithGPS();
+            setLocation(gpsLocation);
+            return gpsLocation;
+        } catch (err) {
+            console.error('GPS detection failed:', err);
+
+            // Fallback to IP detection on GPS failure
+            try {
+                const ipLocation = await locationManager.detectWithIP();
+                setLocation(ipLocation);
+                return ipLocation;
+            } catch (ipErr) {
+                setError('Unable to detect location. Please search manually.');
+                throw err;
+            }
+        } finally {
             setLoading(false);
-            return;
+        }
+    };
+
+    /**
+     * Manual IP detection (if user wants to retry)
+     * Why: Allow explicit IP-based detection
+     */
+    const detectWithIP = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const ipLocation = await locationManager.detectWithIP();
+            setLocation(ipLocation);
+            return ipLocation;
+        } catch (err) {
+            console.error('IP detection failed:', err);
+            setError('Unable to detect location via IP');
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /**
+     * Search for locations
+     * Why: Enable manual location selection
+     */
+    const searchLocation = async (query) => {
+        if (!isMapsLoaded) {
+            console.warn('Google Maps not loaded yet');
+            return [];
         }
 
-        return new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    try {
-                        const { latitude, longitude } = position.coords;
-                        const data = await reverseGeocode(latitude, longitude);
-                        saveLocation(data);
-                        setLoading(false);
-                        resolve(data);
-                    } catch (err) {
-                        console.error(err);
-                        setError(typeof err === 'string' ? err : err.message || 'Failed to detect location');
-                        setLoading(false);
-                        reject(err);
-                    }
-                },
-                (err) => {
-                    setError(err.message);
-                    setLoading(false);
-                    reject(err);
-                }
-            );
-        });
+        try {
+            return await locationManager.searchLocation(query);
+        } catch (err) {
+            console.error('Search failed:', err);
+            return [];
+        }
     };
 
-    const searchLocation = async (query) => {
-        if (!query || !autocompleteServiceRef.current) return [];
-
-        return new Promise((resolve, reject) => {
-            const request = {
-                input: query,
-                componentRestrictions: { country: 'in' },
-            };
-
-            autocompleteServiceRef.current.getPlacePredictions(request, (predictions, status) => {
-                if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-                    resolve(predictions.map(p => ({
-                        description: p.description,
-                        place_id: p.place_id,
-                        main_text: p.structured_formatting.main_text,
-                        secondary_text: p.structured_formatting.secondary_text
-                    })));
-                } else {
-                    resolve([]);
-                }
-            });
-        });
-    };
-
+    /**
+     * Set location from manual selection
+     * Why: Allow users to override auto-detection
+     */
     const setManualLocation = async (placeId) => {
-        return new Promise((resolve, reject) => {
-            if (!placesServiceRef.current) {
-                reject('Maps service not loaded');
-                return;
-            }
+        if (!isMapsLoaded) {
+            throw new Error('Google Maps not loaded yet');
+        }
 
-            placesServiceRef.current.getDetails({ placeId: placeId, fields: ['name', 'formatted_address', 'geometry', 'address_components'] }, (place, status) => {
-                if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
-                    const lat = place.geometry.location.lat();
-                    const lng = place.geometry.location.lng();
+        setLoading(true);
+        setError(null);
 
-                    let city = '';
-                    let area = '';
-                    if (place.address_components) {
-                        for (const component of place.address_components) {
-                            if (component.types.includes('locality')) {
-                                city = component.long_name;
-                            }
-                            if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
-                                area = component.long_name;
-                            }
-                        }
-                    }
-                    const shortAddress = area ? `${area}, ${city}` : city || place.name;
+        try {
+            const manualLocation = await locationManager.setManualLocation(placeId);
+            setLocation(manualLocation);
+            return manualLocation;
+        } catch (err) {
+            console.error('Manual location setting failed:', err);
+            setError('Failed to set location');
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
 
-                    const data = {
-                        lat,
-                        lng,
-                        address: place.formatted_address,
-                        shortAddress: shortAddress
-                    };
-                    saveLocation(data);
-                    resolve(data);
-                } else {
-                    reject('Failed to get place details');
-                }
-            });
-        });
+    /**
+     * Clear saved location
+     * Why: Allow users to reset and choose new location
+     */
+    const clearLocation = () => {
+        locationManager.clearLocation();
+        setLocation(null);
+        setError(null);
     };
 
     return (
-        <LocationContext.Provider value={{
-            location,
-            loading,
-            error,
-            detectLocation,
-            searchLocation,
-            setManualLocation,
-            isMapsLoaded
-        }}>
+        <LocationContext.Provider
+            value={{
+                location,
+                loading,
+                error,
+                detectWithGPS,
+                detectWithIP,
+                searchLocation,
+                setManualLocation,
+                clearLocation,
+                isMapsLoaded
+            }}
+        >
             {children}
         </LocationContext.Provider>
     );

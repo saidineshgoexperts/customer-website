@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Search, User, Home, Briefcase, Calendar, MapPin, Tag, ChevronRight, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
+import { LocationBar } from '@/components/location/LocationBar';
 
 export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
   const { cartItems } = useCart();
@@ -85,6 +86,9 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
                 />
               </svg>
             </motion.a>
+
+            {/* Location Bar */}
+            <LocationBar />
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-1">

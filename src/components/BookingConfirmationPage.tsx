@@ -4,7 +4,19 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Calendar, Clock, MapPin, User, CheckCircle, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import type { CartItem, Address } from '@/app/page';
+import type { Address } from './AddressPage';
+
+export interface CartItem {
+  id: string;
+  serviceId?: number;
+  serviceName: string;
+  packageName: string;
+  price: number;
+  quantity: number;
+  duration?: string;
+  category?: string;
+  subCategory?: string;
+}
 
 interface BookingConfirmationPageProps {
   cartItems: CartItem[];
@@ -129,11 +141,10 @@ export function BookingConfirmationPage({
                   <button
                     key={date.value}
                     onClick={() => setSelectedDate(date.value)}
-                    className={`p-4 rounded-xl font-medium transition-all ${
-                      selectedDate === date.value
-                        ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg shadow-[#037166]/30'
-                        : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-                    }`}
+                    className={`p-4 rounded-xl font-medium transition-all ${selectedDate === date.value
+                      ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg shadow-[#037166]/30'
+                      : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                      }`}
                   >
                     {date.label}
                   </button>
@@ -157,11 +168,10 @@ export function BookingConfirmationPage({
                   <button
                     key={time}
                     onClick={() => setSelectedTime(time)}
-                    className={`p-4 rounded-xl font-medium transition-all ${
-                      selectedTime === time
-                        ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg shadow-[#037166]/30'
-                        : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-                    }`}
+                    className={`p-4 rounded-xl font-medium transition-all ${selectedTime === time
+                      ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg shadow-[#037166]/30'
+                      : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                      }`}
                   >
                     {time}
                   </button>
@@ -189,11 +199,10 @@ export function BookingConfirmationPage({
                   <button
                     key={option.value}
                     onClick={() => setTechnicianPreference(option.value)}
-                    className={`p-4 rounded-xl font-medium transition-all ${
-                      technicianPreference === option.value
-                        ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white'
-                        : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-                    }`}
+                    className={`p-4 rounded-xl font-medium transition-all ${technicianPreference === option.value
+                      ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white'
+                      : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                      }`}
                   >
                     {option.label}
                   </button>
@@ -285,11 +294,10 @@ export function BookingConfirmationPage({
                 whileTap={{ scale: 0.98 }}
                 onClick={handleConfirm}
                 disabled={isConfirming}
-                className={`w-full px-6 py-4 rounded-xl font-medium text-lg transition-all ${
-                  isConfirming
-                    ? 'bg-white/20 text-white/60 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white hover:shadow-lg hover:shadow-[#037166]/40'
-                }`}
+                className={`w-full px-6 py-4 rounded-xl font-medium text-lg transition-all ${isConfirming
+                  ? 'bg-white/20 text-white/60 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white hover:shadow-lg hover:shadow-[#037166]/40'
+                  }`}
               >
                 {isConfirming ? (
                   <div className="flex items-center justify-center gap-2">

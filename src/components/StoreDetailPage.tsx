@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ArrowLeft, 
-  Star, 
-  MapPin, 
-  Clock, 
-  Phone, 
-  Award, 
-  ChevronLeft, 
+import {
+  ArrowLeft,
+  Star,
+  MapPin,
+  Clock,
+  Phone,
+  Award,
+  ChevronLeft,
   ChevronRight,
   CheckCircle,
   Shield,
@@ -18,275 +18,237 @@ import {
   X,
   Check,
   Sparkles,
-  ThumbsUp
+  ThumbsUp,
+  Image as ImageIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
-import type { CartItem } from '@/app/page';
 
-interface StoreDetailPageProps {
-  storeId: number;
-  onBack: () => void;
-  onAddToCart: (item: CartItem) => void;
-  onGoToCart: () => void;
-  onServiceClick: (serviceId: number) => void;
-}
-
-// Dynamic center data based on ID
-const centerData: Record<number, {
-  name: string;
-  location: string;
-  city: string;
-  rating: number;
-  reviews: number;
-  jobsDone: string;
-  startingPrice: number;
-  phone: string;
-  hours: string;
-  description: string[];
-  address: string;
-  mapUrl: string;
-}> = {
-  1: {
-    name: 'TechFix Pro Center',
-    location: 'Downtown, San Francisco',
-    city: 'San Francisco',
-    rating: 4.9,
-    reviews: 1250,
-    jobsDone: '2.5K+',
-    startingPrice: 49,
-    phone: '(555) 123-4567',
-    hours: 'Mon-Sat: 9AM - 7PM',
-    description: [
-      'TechFix Pro Center is San Francisco\'s premier appliance and electronics repair service provider. With over 10 years of experience and a team of certified technicians, we specialize in fast, reliable repairs for all major brands and models.',
-      'Our commitment to excellence and customer satisfaction has made us the trusted choice for thousands of satisfied customers. We offer transparent pricing, same-day service availability, and a comprehensive 90-day warranty on all repairs.',
-      'From refrigerators to washing machines, ovens to air conditioners, our expert team handles it all with precision and care. We use only genuine parts and follow manufacturer guidelines to ensure lasting results.',
-    ],
-    address: '1234 Market Street\nDowntown, San Francisco\nCA 94103, United States',
-    mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.0867827834843!2d-122.40641668468194!3d37.78579897975836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085809c6c8f4459%3A0xb10ed6d9b5050fa5!2sTwitter%20HQ!5e0!3m2!1sen!2sus!4v1649876543210!5m2!1sen!2sus',
-  },
-  2: {
-    name: 'Smart Repair Hub',
-    location: 'Tech Park Area, San Jose',
-    city: 'San Jose',
-    rating: 4.8,
-    reviews: 987,
-    jobsDone: '1.8K+',
-    startingPrice: 45,
-    phone: '(555) 234-5678',
-    hours: 'Mon-Sun: 8AM - 8PM',
-    description: [
-      'Smart Repair Hub brings cutting-edge technology to appliance repair. Our certified technicians use advanced diagnostic tools to quickly identify and fix issues with precision.',
-      'Specializing in smart home devices and modern appliances, we stay ahead of the curve with continuous training on the latest technologies. Our same-day service guarantee ensures minimal disruption to your daily routine.',
-      'With transparent pricing and no hidden fees, we\'ve built a reputation for honesty and quality workmanship. All repairs come with a comprehensive warranty for your peace of mind.',
-    ],
-    address: '5678 Innovation Blvd\nTech Park Area, San Jose\nCA 95110, United States',
-    mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3168.639290926582!2d-121.88954568468278!3d37.33463197983907!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fcca1b5b2d5e5%3A0x8825f6a7e0d8e64!2sApple%20Park!5e0!3m2!1sen!2sus!4v1649876543210!5m2!1sen!2sus',
-  },
-  3: {
-    name: 'Elite Appliance Care',
-    location: 'Central Plaza, Oakland',
-    city: 'Oakland',
-    rating: 4.9,
-    reviews: 1568,
-    jobsDone: '3.2K+',
-    startingPrice: 55,
-    phone: '(555) 345-6789',
-    hours: 'Mon-Fri: 8AM - 6PM, Sat: 9AM - 5PM',
-    description: [
-      'Elite Appliance Care is Oakland\'s most trusted name in appliance repair. For over 15 years, we\'ve provided premium service to residential and commercial clients throughout the Bay Area.',
-      'Our master technicians are factory-trained and certified to work on all major brands. We maintain the largest inventory of genuine parts in the region, ensuring fast repairs without delays.',
-      'From emergency repairs to preventive maintenance, we offer comprehensive solutions tailored to your needs. Our customer-first approach and lifetime workmanship guarantee set us apart.',
-    ],
-    address: '9012 Central Plaza Dr\nCentral Plaza, Oakland\nCA 94612, United States',
-    mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3152.5463516347!2d-122.27155268468!3d37.80500007975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808f80b0b0b0b0b0%3A0x0!2sOakland!5e0!3m2!1sen!2sus!4v1649876543210!5m2!1sen!2sus',
-  },
-  4: {
-    name: 'Rapid Fix Solutions',
-    location: 'Market Street, Fremont',
-    city: 'Fremont',
-    rating: 4.7,
-    reviews: 756,
-    jobsDone: '1.5K+',
-    startingPrice: 39,
-    phone: '(555) 456-7890',
-    hours: 'Mon-Sat: 7AM - 9PM',
-    description: [
-      'Rapid Fix Solutions lives up to its name with the fastest turnaround times in the industry. Our express service gets most repairs done within 24 hours, with emergency same-day options available.',
-      'We specialize in quick diagnostics and efficient repairs without compromising quality. Our streamlined process and experienced team ensure you\'re back up and running in no time.',
-      'Serving the Fremont community with pride, we offer competitive pricing and flexible scheduling to fit your busy lifestyle. Customer satisfaction is our top priority.',
-    ],
-    address: '3456 Market Street\nFremont, CA 94538\nUnited States',
-    mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3165.736284!2d-121.98862468468!3d37.54827497981!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fc0c0c0c0c0c0%3A0x0!2sFremont!5e0!3m2!1sen!2sus!4v1649876543210!5m2!1sen!2sus',
-  },
-};
-
-const storeImages = [
-  'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200',
-  'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1200',
-  'https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=1200',
-  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200',
-];
-
-const storeServices = [
-  { 
-    id: 'basic', 
-    title: 'Basic Appliance Repair', 
-    price: 49, 
-    duration: '1-2 hours', 
-    features: [
-      'Diagnostic check',
-      'Basic repairs',
-      '30-day warranty',
-      'Standard parts included',
-    ]
-  },
-  { 
-    id: 'standard', 
-    title: 'Standard Service Package', 
-    price: 69, 
-    duration: '1-1.5 hours',
-    popular: true,
-    features: [
-      'Full diagnostic',
-      'Complete repair',
-      '90-day warranty',
-      'Premium parts included',
-      'Deep cleaning',
-    ]
-  },
-  { 
-    id: 'premium', 
-    title: 'Premium Maintenance', 
-    price: 99, 
-    duration: '2-3 hours', 
-    features: [
-      'Complete diagnostic',
-      'Full repair & maintenance',
-      '1-year warranty',
-      'Premium parts & accessories',
-      'Deep cleaning & sanitization',
-      'Performance optimization',
-    ]
-  },
-  { 
-    id: 'emergency', 
-    title: 'Emergency Repair', 
-    price: 129, 
-    duration: '30-60 min',
-    features: [
-      'Same-day service',
-      'Priority booking',
-      '24/7 availability',
-      'Express diagnostic',
-      '90-day warranty',
-    ]
-  },
-  { 
-    id: 'cleaning', 
-    title: 'Deep Cleaning Service', 
-    price: 79, 
-    duration: '2 hours',
-    features: [
-      'Thorough cleaning',
-      'Sanitization',
-      'Polish & shine',
-      'Maintenance tips',
-      '30-day warranty',
-    ]
-  },
-  { 
-    id: 'installation', 
-    title: 'Installation Service', 
-    price: 89, 
-    duration: '1-2 hours',
-    features: [
-      'Professional setup',
-      'Testing & calibration',
-      'User training',
-      'Documentation',
-      '60-day warranty',
-    ]
-  },
-];
-
-const portfolioImages = [
-  'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600',
-  'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600',
-  'https://images.unsplash.com/photo-1581092918484-8313e1f7e8c6?w=600',
-  'https://images.unsplash.com/photo-1585128792335-a1c13c7b3d6c?w=600',
-  'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600',
-  'https://images.unsplash.com/photo-1581092583537-20d51876f6f7?w=600',
-];
-
-const reviews = [
-  { id: 1, name: 'Sarah Johnson', rating: 5, date: 'Jan 8, 2026', comment: 'Excellent service! The technician was very professional and fixed my appliance quickly. Highly recommend!', avatar: 'https://i.pravatar.cc/150?img=1' },
-  { id: 2, name: 'Michael Chen', rating: 5, date: 'Jan 5, 2026', comment: 'Great experience from start to finish. Booking was easy and the repair was done perfectly.', avatar: 'https://i.pravatar.cc/150?img=2' },
-  { id: 3, name: 'Emily Rodriguez', rating: 4, date: 'Jan 3, 2026', comment: 'Very satisfied with the service. The price was fair and the work quality was top-notch.', avatar: 'https://i.pravatar.cc/150?img=3' },
-  { id: 4, name: 'David Thompson', rating: 5, date: 'Dec 28, 2025', comment: 'They went above and beyond! Fixed the issue and gave me maintenance tips. Will definitely use again.', avatar: 'https://i.pravatar.cc/150?img=4' },
-  { id: 5, name: 'Lisa Martinez', rating: 5, date: 'Dec 25, 2025', comment: 'Professional, punctual, and friendly. The technician explained everything clearly.', avatar: 'https://i.pravatar.cc/150?img=5' },
-];
-
-export function StoreDetailPage({
-  storeId,
-  onBack,
-  onAddToCart,
-  onGoToCart,
-}: StoreDetailPageProps) {
-  const [activeTab, setActiveTab] = useState<'about' | 'services' | 'portfolio' | 'location' | 'reviews'>('services');
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+export default function StoreDetailPage({ storeId, onBack, onAddToCart, onGoToCart }) {
+  const [activeTab, setActiveTab] = useState('services');
+  const [lightboxImage, setLightboxImage] = useState(null);
   const [reviewsToShow, setReviewsToShow] = useState(3);
-  const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
+  const [selectedPackages, setSelectedPackages] = useState([]);
 
-  // Get center data or use default for ID 1
-  const center = centerData[storeId] || centerData[1];
+  // API data state
+  const [loading, setLoading] = useState(true);
+  const [apiData, setApiData] = useState(null);
 
-  // Auto-slide carousel
+  // Addons popup state
+  const [showAddonsPopup, setShowAddonsPopup] = useState(false);
+  const [currentService, setCurrentService] = useState(null);
+  const [addonsData, setAddonsData] = useState(null);
+  const [selectedAddons, setSelectedAddons] = useState([]);
+  const [loadingAddons, setLoadingAddons] = useState(false);
+
+  // Fetch service center details from API
   useEffect(() => {
-    if (!isAutoPlaying) return;
-    
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % storeImages.length);
-    }, 5000);
+    const fetchCenterDetails = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/single_provider_screen',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              providerId: storeId
+            })
+          }
+        );
 
-    return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+        if (!response.ok) {
+          throw new Error('Failed to fetch service center details');
+        }
 
-  const handleSelectPackage = (packageId: string) => {
-    setSelectedPackages(prev => 
-      prev.includes(packageId)
-        ? prev.filter(id => id !== packageId)
-        : [...prev, packageId]
+        const data = await response.json();
+
+        if (data.success) {
+          setApiData(data);
+          console.log('Service center data loaded:', data);
+        }
+      } catch (error) {
+        console.error('Error fetching service center details:', error);
+        toast.error('Failed to load service center details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (storeId) {
+      fetchCenterDetails();
+    }
+  }, [storeId]);
+
+  // Derived data from API response
+  const center = apiData?.storeData?.[0] || {
+    firstName: 'Loading',
+    lastName: '',
+    logo: '',
+    address: 'Loading address...',
+    avgRating: 0,
+    totalRatings: 0,
+    totalOrders: 0,
+    BasePrice: 0,
+    inspectionCost: 0,
+    serviceBookingCost: 0,
+    updateTime: ''
+  };
+
+  const services = apiData?.provider_rate_cards || [];
+  const reviews = apiData?.customerRatings || [];
+  const teamMembers = apiData?.teamMembers || [];
+  const portfolioImages = apiData?.serviceImages?.map((img) =>
+    `https://api.doorstephub.com${img}`
+  ) || [];
+  const bannerImage = center.logo
+    ? `https://api.doorstephub.com/${center.logo}`
+    : '';
+  const aboutUs = apiData?.aboutUs || 'Professional service center providing quality services';
+
+  const handleSelectPackage = (serviceId) => {
+    setSelectedPackages(prev =>
+      prev.includes(serviceId)
+        ? prev.filter(id => id !== serviceId)
+        : [...prev, serviceId]
     );
   };
 
-  const handleAddToCart = (service: typeof storeServices[0]) => {
+  // Fetch service addons
+  const fetchServiceAddons = async (serviceId) => {
+    setLoadingAddons(true);
+    try {
+      const response = await fetch(
+        'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/service-addons',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            serviceIds: [serviceId],
+            providerId: storeId
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch addons');
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.data && data.data.length > 0) {
+        return data.data[0]; // Return first item with addons
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching addons:', error);
+      return null;
+    } finally {
+      setLoadingAddons(false);
+    }
+  };
+
+  const handleAddToCart = async (service) => {
+    // Store current service
+    setCurrentService(service);
+
+    // Check for addons
+    const addons = await fetchServiceAddons(service._id);
+
+    if (addons && addons.addons && addons.addons.length > 0) {
+      // Show popup if addons exist
+      setAddonsData(addons);
+      setSelectedAddons([]); // Reset selected addons
+      setShowAddonsPopup(true);
+    } else {
+      // No addons, add directly to cart
+      addServiceToCart(service, []);
+    }
+  };
+
+  const addServiceToCart = (service, addons = []) => {
+    // Add parent service
     onAddToCart({
-      id: `store-${storeId}-service-${service.id}`,
-      serviceId: storeId,
-      serviceName: service.title,
-      packageName: 'TechFix Pro Center',
+      id: `store-${storeId}-service-${service._id}`,
+      serviceId: parseInt(service._id),
+      serviceName: service.name,
+      packageName: `${center.firstName} ${center.lastName}`,
       price: service.price,
-      duration: service.duration,
+      duration: 'N/A',
       quantity: 1,
       category: 'Store Service',
       subCategory: 'Professional',
     });
-    toast.success(`${service.title} added to cart!`, {
+
+    // Add selected addons
+    addons.forEach((addon) => {
+      onAddToCart({
+        id: `store-${storeId}-addon-${addon._id}`,
+        serviceId: parseInt(addon._id),
+        serviceName: addon.childServiceName,
+        packageName: `${center.firstName} ${center.lastName}`,
+        price: addon.price,
+        duration: 'N/A',
+        quantity: 1,
+        category: 'Addon Service',
+        subCategory: 'Professional',
+      });
+    });
+
+    toast.success(`${service.name}${addons.length > 0 ? ` + ${addons.length} addon(s)` : ''} added to cart!`, {
       description: 'Continue shopping or proceed to checkout',
     });
+
+    // Close popup and navigate to cart
+    setShowAddonsPopup(false);
+    onGoToCart();
   };
 
-  const nextImage = () => {
-    setIsAutoPlaying(false);
-    setCurrentImageIndex((prev) => (prev + 1) % storeImages.length);
+  const handleContinueWithAddons = () => {
+    if (currentService) {
+      const selected = addonsData.addons.filter(addon =>
+        selectedAddons.includes(addon._id)
+      );
+      addServiceToCart(currentService, selected);
+    }
   };
 
-  const prevImage = () => {
-    setIsAutoPlaying(false);
-    setCurrentImageIndex((prev) => (prev - 1 + storeImages.length) % storeImages.length);
+  const handleSkipAddons = () => {
+    if (currentService) {
+      addServiceToCart(currentService, []);
+    }
   };
+
+  const toggleAddonSelection = (addonId) => {
+    setSelectedAddons(prev =>
+      prev.includes(addonId)
+        ? prev.filter(id => id !== addonId)
+        : [...prev, addonId]
+    );
+  };
+
+  // Generate Google Maps URL from address
+  const getMapUrl = () => {
+    if (center.address) {
+      const encodedAddress = encodeURIComponent(center.address);
+      return `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY'}&q=${encodedAddress}`;
+    }
+    return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3807.5!2d78.45094882422221!3d17.430236671802923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDI1JzQ4LjkiTiA3OMKwMjcnMDMuNCJF!5e0!3m2!1sen!2sin!4v1630000000000';
+  };
+
+  if (loading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen pt-24 pb-20 bg-gradient-to-b from-[#0a0a0a] via-[#0f1614] to-[#0a0a0a] flex items-center justify-center"
+      >
+        <div className="text-center">
+          <div className="inline-block w-12 h-12 border-4 border-[#037166] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white/60 text-lg">Loading service center details...</p>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -312,80 +274,43 @@ export function StoreDetailPage({
           animate={{ opacity: 1, y: 0 }}
           className="relative h-[500px] rounded-3xl overflow-hidden mb-8 shadow-2xl"
         >
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentImageIndex}
-              src={storeImages[currentImageIndex]}
-              alt="Store"
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.7 }}
-              className="w-full h-full object-cover"
-            />
-          </AnimatePresence>
+          <img
+            src={bannerImage || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200'}
+            alt={`${center.firstName} ${center.lastName}`}
+            className="w-full h-full object-cover"
+          />
 
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-          {/* Navigation Arrows */}
-          <button
-            onClick={prevImage}
-            className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all"
-          >
-            <ChevronLeft className="w-6 h-6 text-white" />
-          </button>
-          <button
-            onClick={nextImage}
-            className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all"
-          >
-            <ChevronRight className="w-6 h-6 text-white" />
-          </button>
-
-          {/* Dot Indicators */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            {storeImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setCurrentImageIndex(index);
-                  setIsAutoPlaying(false);
-                }}
-                className={`h-2 rounded-full transition-all ${
-                  index === currentImageIndex 
-                    ? 'w-8 bg-[#037166]' 
-                    : 'w-2 bg-white/40 hover:bg-white/60'
-                }`}
-              />
-            ))}
-          </div>
-
           {/* Store Info Overlay */}
           <div className="absolute bottom-8 left-8 right-8">
             <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-              <h1 className="text-4xl font-bold text-white mb-3">{center.name}</h1>
-              
+              <h1 className="text-4xl font-bold text-white mb-3">
+                {center.firstName} {center.lastName}
+              </h1>
+
               <div className="flex flex-wrap items-center gap-6 mb-4">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-[#037166]" />
-                  <span className="text-white/80">{center.location}</span>
+                  <span className="text-white/80 max-w-xs truncate">{center.address}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     <Star className="w-5 h-5 fill-[#037166] text-[#037166]" />
-                    <span className="text-white font-semibold">{center.rating}</span>
+                    <span className="text-white font-semibold">{center.avgRating?.toFixed(1) || '0.0'}</span>
                   </div>
-                  <span className="text-white/60">({center.reviews.toLocaleString()} reviews)</span>
+                  <span className="text-white/60">({center.totalRatings || 0} reviews)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-[#037166]" />
-                  <span className="text-white/80">{center.jobsDone} Jobs Done</span>
+                  <span className="text-white/80">{center.totalOrders || 0}+ Jobs Done</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
                 <div className="px-4 py-2 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold">
-                  Starting from ${center.startingPrice}
+                  Starting from ₹{center.BasePrice || center.serviceBookingCost || 0}
                 </div>
                 <div className="flex gap-2">
                   <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2">
@@ -406,13 +331,14 @@ export function StoreDetailPage({
         <div className="sticky top-20 z-40 mb-8 bg-[#0a0a0a]/80 backdrop-blur-xl border-y border-white/5 -mx-6 px-6 lg:-mx-8 lg:px-8">
           <div className="max-w-[1400px] mx-auto">
             <div className="flex gap-2 overflow-x-auto py-1">
-              {(['services', 'about', 'portfolio', 'location', 'reviews'] as const).map((tab) => (
+              {['services', 'about', 'portfolio', 'location', 'reviews'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`relative px-6 py-4 text-sm font-medium capitalize transition-all whitespace-nowrap ${
-                    activeTab === tab ? 'text-[#037166]' : 'text-white/60 hover:text-white/80'
-                  }`}
+                  className={`relative px-6 py-4 text-sm font-medium capitalize transition-all whitespace-nowrap ${activeTab === tab
+                    ? 'text-[#037166]'
+                    : 'text-white/60 hover:text-white/80'
+                    }`}
                 >
                   {tab}
                   {activeTab === tab && (
@@ -443,83 +369,87 @@ export function StoreDetailPage({
               {/* Header */}
               <div className="mb-8">
                 <h2 className="text-3xl font-bold text-white mb-2">Available Services</h2>
-                <p className="text-white/60 text-lg">Choose from our professional repair packages</p>
+                <p className="text-white/60 text-lg">
+                  {services.length} professional {services.length === 1 ? 'service' : 'services'} available
+                </p>
               </div>
 
-              {/* Service Rate Cards - Reusing exact same pattern as ServiceDetailsPage */}
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {storeServices.map((service, index) => (
-                  <motion.div
-                    key={service.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    onClick={() => handleSelectPackage(service.id)}
-                    className={`relative bg-white/5 backdrop-blur-sm border-2 rounded-3xl p-6 cursor-pointer transition-all hover:scale-105 ${
-                      selectedPackages.includes(service.id)
+              {/* Service Cards */}
+              {services.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {services.map((service, index) => (
+                    <motion.div
+                      key={service._id || index}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => handleSelectPackage(service._id)}
+                      className={`relative bg-white/5 backdrop-blur-sm border-2 rounded-3xl p-6 cursor-pointer transition-all hover:scale-105 group ${selectedPackages.includes(service._id)
                         ? 'border-[#037166] shadow-xl shadow-[#037166]/20'
                         : 'border-white/10 hover:border-white/20'
-                    }`}
-                  >
-                    {/* Popular Badge */}
-                    {service.popular && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-semibold flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" />
-                        Most Popular
-                      </div>
-                    )}
-
-                    {/* Selection Indicator */}
-                    {selectedPackages.includes(service.id) && (
-                      <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#037166] flex items-center justify-center">
-                        <Check className="w-5 h-5 text-white" />
-                      </div>
-                    )}
-
-                    <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
-                    
-                    <div className="flex items-baseline gap-2 mb-4">
-                      <span className="text-4xl font-bold text-[#037166]">${service.price}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-white/60 mb-6">
-                      <Clock className="w-4 h-4 text-[#037166]" />
-                      <span className="text-sm">{service.duration}</span>
-                    </div>
-
-                    {/* Features */}
-                    <div className="space-y-3 mb-6">
-                      {service.features.map((feature, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-[#037166] mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-white/70">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* CTA Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddToCart(service);
-                      }}
-                      className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold hover:shadow-xl hover:shadow-[#037166]/30 transition-all"
+                        }`}
                     >
-                      Add to Cart
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
+                      {/* Selection Indicator */}
+                      {selectedPackages.includes(service._id) && (
+                        <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#037166] flex items-center justify-center">
+                          <Check className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+
+                      {/* Service Image */}
+                      {service.image && (
+                        <div className="w-full h-32 rounded-xl overflow-hidden mb-4 bg-white/10">
+                          <img
+                            src={`https://api.doorstephub.com/${service.image}`}
+                            alt={service.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+
+                      <h3 className="text-xl font-bold text-white mb-2">{service.name}</h3>
+
+                      <div className="flex items-baseline gap-2 mb-4">
+                        <span className="text-3xl font-bold text-[#037166]">
+                          ₹{service.price.toFixed(2)}
+                        </span>
+                        <span className="text-sm text-white/60">{service.priceUnit}</span>
+                      </div>
+
+                      <p className="text-white/60 text-sm mb-6 line-clamp-3">{service.description}</p>
+
+                      {/* CTA Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(service);
+                        }}
+                        className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold hover:shadow-xl hover:shadow-[#037166]/30 transition-all"
+                      >
+                        Add to Cart
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <ImageIcon className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                  <p className="text-white/60 text-lg mb-4">No services available at this center yet.</p>
+                  <p className="text-white/40 text-sm">Please check back later or contact the service center directly.</p>
+                </div>
+              )}
 
               {/* Action Buttons */}
-              <div className="flex gap-4">
-                <button
-                  onClick={onGoToCart}
-                  className="px-8 py-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-[#037166]/50 transition-all"
-                >
-                  View Cart ({selectedPackages.length})
-                </button>
-              </div>
+              {services.length > 0 && (
+                <div className="flex gap-4 justify-center">
+                  <button
+                    onClick={onGoToCart}
+                    className="px-8 py-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-[#037166]/50 transition-all"
+                  >
+                    View Cart ({selectedPackages.length})
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -532,68 +462,39 @@ export function StoreDetailPage({
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-3xl font-bold text-white mb-6">About {center.name}</h2>
-              
+              <h2 className="text-3xl font-bold text-white mb-6">About Us</h2>
+
               {/* Description */}
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 mb-8">
-                {center.description.map((paragraph, index) => (
-                  <p key={index} className="text-white/70 text-lg leading-relaxed mb-6 last:mb-0">
-                    {paragraph}
-                  </p>
-                ))}
+                <p className="text-white/70 text-lg leading-relaxed">
+                  {aboutUs}
+                </p>
               </div>
 
-              {/* Trust Indicators - Same pattern as existing */}
+              {/* Stats */}
               <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-[#037166]/50 transition-all">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mb-4">
-                    <Users className="w-7 h-7 text-white" />
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-[#037166]/50 transition-all text-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Expert Technicians</h3>
-                  <p className="text-white/60">Certified professionals with years of experience</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">{center.totalOrders || 0}+</h3>
+                  <p className="text-white/60">Jobs Completed</p>
                 </div>
 
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-[#037166]/50 transition-all">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mb-4">
-                    <Shield className="w-7 h-7 text-white" />
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-[#037166]/50 transition-all text-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mx-auto mb-4">
+                    <Star className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">90-Day Warranty</h3>
-                  <p className="text-white/60">All repairs backed by our guarantee</p>
+                  <h3 className="text-2xl font-bold text-white mb-2">{center.avgRating?.toFixed(1) || '0.0'}</h3>
+                  <p className="text-white/60">Average Rating</p>
                 </div>
 
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-[#037166]/50 transition-all">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mb-4">
-                    <Clock className="w-7 h-7 text-white" />
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-[#037166]/50 transition-all text-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mx-auto mb-4">
+                    <Award className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Same-Day Service</h3>
-                  <p className="text-white/60">Fast turnaround for urgent repairs</p>
-                </div>
-              </div>
-
-              {/* Contact Info */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#037166]/20 flex items-center justify-center">
-                      <Phone className="w-6 h-6 text-[#037166]" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/50 mb-1">Phone</p>
-                      <p className="text-lg font-semibold text-white">{center.phone}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#037166]/20 flex items-center justify-center">
-                      <Clock className="w-6 h-6 text-[#037166]" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-white/50 mb-1">Working Hours</p>
-                      <p className="text-lg font-semibold text-white">{center.hours}</p>
-                    </div>
-                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">{center.totalRatings || 0}</h3>
+                  <p className="text-white/60">Total Reviews</p>
                 </div>
               </div>
             </motion.div>
@@ -608,28 +509,37 @@ export function StoreDetailPage({
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-3xl font-bold text-white mb-2">Our Work</h2>
-              <p className="text-white/60 mb-8 text-lg">See examples of our repair and service projects</p>
+              <h2 className="text-3xl font-bold text-white mb-2">Portfolio</h2>
+              <p className="text-white/60 mb-8 text-lg">Examples of our work</p>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {portfolioImages.map((image, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => setLightboxImage(image)}
-                    className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group"
-                  >
-                    <img
-                      src={image}
-                      alt={`Portfolio ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </motion.div>
-                ))}
+                {portfolioImages.length > 0 ? (
+                  portfolioImages.map((image, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                      whileHover={{ scale: 1.05 }}
+                      onClick={() => setLightboxImage(image)}
+                      className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group bg-white/5 border border-white/10"
+                    >
+                      <img
+                        src={image}
+                        alt={`Portfolio ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-lg font-semibold">View</span>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12 text-white/60">
+                    <ImageIcon className="w-16 h-16 mx-auto mb-4" />
+                    No portfolio images available yet
+                  </div>
+                )}
               </div>
 
               {/* Lightbox */}
@@ -671,20 +581,21 @@ export function StoreDetailPage({
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-3xl font-bold text-white mb-2">Our Location</h2>
-              <p className="text-white/60 mb-8 text-lg">Visit us at our service center</p>
+              <h2 className="text-3xl font-bold text-white mb-2">Location</h2>
+              <p className="text-white/60 mb-8 text-lg">Find us easily</p>
 
               {/* Map */}
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden mb-8">
-                <div className="relative h-[500px] bg-gray-900">
+                <div className="relative h-[500px]">
                   <iframe
-                    src={center.mapUrl}
+                    src={getMapUrl()}
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
-                    title="Store Location"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Service Center Location"
                   />
                   {/* Custom Marker */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full pointer-events-none">
@@ -708,9 +619,7 @@ export function StoreDetailPage({
                     </div>
                     <div>
                       <h3 className="font-semibold text-white mb-2 text-lg">Address</h3>
-                      <p className="text-white/60 leading-relaxed">
-                        {center.address}
-                      </p>
+                      <p className="text-white/80 leading-relaxed">{center.address}</p>
                     </div>
                   </div>
                 </div>
@@ -718,20 +627,18 @@ export function StoreDetailPage({
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-full bg-[#037166]/20 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-6 h-6 text-[#037166]" />
+                      <Clock className="w-6 h-6 text-[#037166]" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-white mb-2 text-lg">Get Directions</h3>
-                      <p className="text-white/60 leading-relaxed mb-3">
-                        Located in the heart of Downtown San Francisco, easily accessible by public transport.
-                      </p>
-                      <a 
-                        href="https://maps.google.com"
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white mb-2 text-lg">Last Updated</h3>
+                      <p className="text-white/80">{center.updateTime}</p>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(center.address)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-[#037166] font-semibold hover:text-[#04a99d] transition-colors"
+                        className="inline-flex items-center gap-2 mt-4 text-[#037166] font-semibold hover:text-[#04a99d] transition-colors"
                       >
-                        Open in Maps
+                        Get Directions
                         <ChevronRight className="w-4 h-4" />
                       </a>
                     </div>
@@ -754,54 +661,52 @@ export function StoreDetailPage({
               <div className="flex items-end justify-between mb-8">
                 <div>
                   <h2 className="text-3xl font-bold text-white mb-2">Customer Reviews</h2>
-                  <p className="text-white/60 text-lg">What our customers say about us</p>
+                  <p className="text-white/60 text-lg">Hear from our satisfied customers</p>
                 </div>
                 <div className="text-right">
                   <div className="flex items-center gap-2 mb-1">
                     <Star className="w-6 h-6 fill-[#037166] text-[#037166]" />
-                    <span className="text-3xl font-bold text-white">4.9</span>
+                    <span className="text-3xl font-bold text-white">{center.avgRating?.toFixed(1) || '0.0'}</span>
                   </div>
-                  <p className="text-sm text-white/50">Based on 1,250 reviews</p>
+                  <p className="text-sm text-white/50">Based on {center.totalRatings || 0} reviews</p>
                 </div>
               </div>
 
-              {/* Reviews List - Same pattern as existing */}
+              {/* Reviews List */}
               <div className="space-y-6 mb-8">
                 {reviews.slice(0, reviewsToShow).map((review, index) => (
                   <motion.div
-                    key={review.id}
+                    key={index}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                     className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-white/20 transition-all"
                   >
                     <div className="flex items-start gap-4">
-                      <img
-                        src={review.avatar}
-                        alt={review.name}
-                        className="w-14 h-14 rounded-full object-cover flex-shrink-0"
-                      />
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+                        {review.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
 
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <h3 className="font-semibold text-white text-lg">{review.name}</h3>
-                            <p className="text-sm text-white/50">{review.date}</p>
                           </div>
                           <div className="flex gap-1">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-5 h-5 ${
-                                  i < review.rating
-                                    ? 'fill-[#037166] text-[#037166]'
+                                className={`w-5 h-5 transition-colors ${i < Math.floor(review.rating)
+                                  ? 'fill-[#037166] text-[#037166]'
+                                  : i < review.rating
+                                    ? 'text-[#037166]'
                                     : 'text-white/20'
-                                }`}
+                                  }`}
                               />
                             ))}
                           </div>
                         </div>
-                        <p className="text-white/70 leading-relaxed">{review.comment}</p>
+                        <p className="text-white/70 leading-relaxed">{review.description}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -812,10 +717,10 @@ export function StoreDetailPage({
               {reviewsToShow < reviews.length && (
                 <div className="text-center">
                   <button
-                    onClick={() => setReviewsToShow(prev => prev + 2)}
+                    onClick={() => setReviewsToShow(prev => Math.min(prev + 3, reviews.length))}
                     className="px-8 py-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-[#037166]/50 transition-all"
                   >
-                    Show More Reviews
+                    Show More Reviews ({reviews.length - reviewsToShow} more)
                   </button>
                 </div>
               )}
@@ -823,6 +728,149 @@ export function StoreDetailPage({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Addons Popup */}
+      <AnimatePresence>
+        {showAddonsPopup && addonsData && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowAddonsPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#0f1614] border border-white/10 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Add Related Services</h2>
+                <button
+                  onClick={() => setShowAddonsPopup(false)}
+                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                >
+                  <X className="w-5 h-5 text-white/60" />
+                </button>
+              </div>
+
+              {/* Parent Service (Auto-selected) */}
+              <div className="mb-6">
+                <p className="text-white/60 text-sm mb-3">Selected Service:</p>
+                <div className="bg-white/5 border border-[#037166]/30 rounded-2xl p-4 flex items-center gap-4">
+                  {addonsData.parentServiceImage && (
+                    <img
+                      src={`https://api.doorstephub.com/${addonsData.parentServiceImage}`}
+                      alt={addonsData.parentServiceName}
+                      className="w-16 h-16 rounded-xl object-cover"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <h3 className="text-white font-semibold mb-1">{addonsData.parentServiceName}</h3>
+                    <p className="text-[#037166] font-bold">₹{addonsData.parentServicePrice.toFixed(2)}</p>
+                  </div>
+                  <div className="w-6 h-6 rounded-full bg-[#037166] flex items-center justify-center">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Addons List */}
+              {addonsData.addons && addonsData.addons.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-white/60 text-sm mb-3">
+                    Additional Services ({addonsData.addons.length} available):
+                  </p>
+                  <div className="space-y-3">
+                    {addonsData.addons.map((addon) => (
+                      <div
+                        key={addon._id}
+                        onClick={() => toggleAddonSelection(addon._id)}
+                        className={`bg-white/5 border-2 rounded-2xl p-4 cursor-pointer transition-all hover:bg-white/10 ${selectedAddons.includes(addon._id)
+                            ? 'border-[#037166] shadow-lg shadow-[#037166]/20'
+                            : 'border-white/10'
+                          }`}
+                      >
+                        <div className="flex items-start gap-4">
+                          {/* Checkbox */}
+                          <div
+                            className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 mt-1 transition-colors ${selectedAddons.includes(addon._id)
+                                ? 'bg-[#037166] border-[#037166]'
+                                : 'border-white/30'
+                              }`}
+                          >
+                            {selectedAddons.includes(addon._id) && (
+                              <Check className="w-4 h-4 text-white" />
+                            )}
+                          </div>
+
+                          {/* Addon Info */}
+                          <div className="flex-1">
+                            <h4 className="text-white font-semibold mb-1">{addon.childServiceName}</h4>
+                            {addon.description && (
+                              <p className="text-white/60 text-sm mb-2">{addon.description}</p>
+                            )}
+                            <div className="flex items-center gap-2">
+                              <span className="text-[#037166] font-bold">₹{addon.price.toFixed(2)}</span>
+                              <span className="text-white/40 text-sm">/ {addon.priceUnit}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Total Price */}
+              <div className="bg-white/5 rounded-2xl p-4 mb-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-white/60">Total Price:</span>
+                  <span className="text-2xl font-bold text-[#037166]">
+                    ₹
+                    {(
+                      addonsData.parentServicePrice +
+                      (addonsData.addons
+                        ?.filter((addon) => selectedAddons.includes(addon._id))
+                        .reduce((sum, addon) => sum + addon.price, 0) || 0)
+                    ).toFixed(2)}
+                  </span>
+                </div>
+                <p className="text-white/40 text-sm mt-2">
+                  {1 + selectedAddons.length} item{selectedAddons.length !== 0 ? 's' : ''} selected
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <button
+                  onClick={handleSkipAddons}
+                  className="flex-1 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-semibold hover:bg-white/10 transition-all"
+                >
+                  Skip Addons
+                </button>
+                <button
+                  onClick={handleContinueWithAddons}
+                  className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold hover:shadow-xl hover:shadow-[#037166]/30 transition-all"
+                >
+                  Continue ({1 + selectedAddons.length} item{selectedAddons.length !== 0 ? 's' : ''})
+                </button>
+              </div>
+
+              {/* Loading Overlay */}
+              {loadingAddons && (
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm rounded-3xl flex items-center justify-center">
+                  <div className="w-12 h-12 border-4 border-[#037166] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

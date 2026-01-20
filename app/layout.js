@@ -2,6 +2,7 @@ import './globals.css';
 import { LocationProvider } from './context/LocationContext';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { ServiceCartProvider } from './context/ServiceCartContext';
 
 export const metadata = {
   title: 'Next-Gen Dark Mode Super App',
@@ -15,7 +16,9 @@ export default function RootLayout({ children }) {
         <LocationProvider>
           <AuthProvider>
             <CartProvider>
-              {children}
+              <ServiceCartProvider>
+                {children}
+              </ServiceCartProvider>
             </CartProvider>
           </AuthProvider>
         </LocationProvider>

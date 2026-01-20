@@ -2,18 +2,18 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Trash2, Plus, Minus, ShoppingCart, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, Trash2, ShoppingCart, Loader2, Tag } from 'lucide-react';
 import { toast } from 'sonner';
-import { useCart } from '@/context/CartContext';
+import { useServiceCart } from '@/context/ServiceCartContext';
 
 export function CartPage({
   onBack,
   onProceedToAddress,
 }) {
-  const { cartItems, cartTotal, loading, removeFromCart, clearCart, addToCart } = useCart();
+  const { cartItems, cartData, loading, removeFromCart, clearCart } = useServiceCart();
 
-  const handleRemove = async (productId) => {
-    await removeFromCart(productId);
+  const handleRemove = async (serviceId) => {
+    await removeFromCart(serviceId);
   };
 
   const handleClear = async () => {
@@ -104,7 +104,7 @@ export function CartPage({
               <AnimatePresence mode="popLayout">
                 {cartItems.map((item, index) => (
                   <motion.div
-                    key={item.productId}
+                    key={item.itemId}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -100 }}
@@ -116,60 +116,56 @@ export function CartPage({
                       {/* Image */}
                       <div className="w-24 h-24 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
                         <img
-                          src={item.image ? `https://api.doorstephub.com/${item.image}` : `https://api.doorstephub.com/uploads/thumbn_ph_image/default_image.jpg`}
-                          alt={item.name}
+                          src={item.itemImage ? `https://api.doorstephub.com/${item.itemImage}` : `https://api.doorstephub.com/uploads/thumbn_ph_image/default_image.jpg`}
+                          alt={item.itemName}
                           className="w-full h-full object-cover"
                         />
                       </div>
 
                       {/* Service Info */}
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white mb-2">
-                          {item.name}
-                        </h3>
-                        <p className="text-white/60 text-sm mb-3">Service Code: {item.serviceCode || 'N/A'}</p>
-
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-1">
+                              {item.itemName}
+                            </h3>
+                            {item.itemType === 'addon' && item.parentServiceName && (
+                              <p className="text-white/50 text-sm flex items-center gap-1">
+                                <Tag className="w-3 h-3" />
+                                Addon for: {item.parentServiceName}
+                              </p>
+                            )}
+                          </div>
                           <button
-                            onClick={() => {
-                              if (item.quantity > 1) {
-                                addToCart(item.productId, item.storeId, -1);
-                              } else {
-                                handleRemove(item.productId);
-                              }
-                            }}
-                            className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+                            onClick={() => handleRemove(item.itemId)}
+                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors"
                           >
-                            <Minus className="w-4 h-4 text-white" />
-                          </button>
-                          <span className="text-white font-bold min-w-[1.5rem] text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => addToCart(item.productId, item.storeId, 1)}
-                            className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#037166]/20 hover:border-[#037166]/50 transition-colors"
-                          >
-                            <Plus className="w-4 h-4 text-[#04a99d]" />
+                            <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
-                      </div>
 
-                      {/* Price & Delete */}
-                      <div className="flex flex-col items-end justify-between">
-                        <button
-                          onClick={() => handleRemove(item.productId)}
-                          className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                        {item.description && (
+                          <p className="text-white/60 text-sm mb-3 line-clamp-2">{item.description}</p>
+                        )}
 
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-white">
-                            ₹{item.price * item.quantity}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="px-3 py-1 rounded-full bg-[#037166]/20 border border-[#037166]/30 text-[#04a99d] text-xs font-semibold">
+                              {item.itemType === 'service' ? 'Service' : 'Add-on'}
+                            </span>
+                            <span className="text-white/60 text-sm">
+                              Qty: {item.quantity}
+                            </span>
                           </div>
-                          {item.quantity > 1 && (
-                            <div className="text-sm text-white/60">
-                              ₹{item.price} each
+
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-white">
+                              ₹{item.subtotal.toFixed(2)}
                             </div>
-                          )}
+                            <div className="text-sm text-white/60">
+                              ₹{item.price} {item.priceUnit}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -190,17 +186,25 @@ export function CartPage({
 
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-white/80">
-                    <span>Subtotal</span>
-                    <span>₹{cartTotal}</span>
+                    <span>Service Cost</span>
+                    <span>₹{(cartData?.totalServiceCost || 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-white/80">
-                    <span>Tax & Fees</span>
-                    <span>₹0.00</span>
+                    <span>Platform Fee</span>
+                    <span>₹{(cartData?.platformFee || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-white/80">
+                    <span>Consultation Fee</span>
+                    <span>₹{(cartData?.consultationFee || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-white/80">
+                    <span>GST</span>
+                    <span>₹{(cartData?.gstAmount || 0).toFixed(2)}</span>
                   </div>
                   <div className="h-px bg-white/10" />
                   <div className="flex justify-between text-xl font-bold text-white">
                     <span>Total</span>
-                    <span>₹{cartTotal}</span>
+                    <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -215,7 +219,7 @@ export function CartPage({
 
                 <div className="mt-6 p-4 rounded-lg bg-[#037166]/10 border border-[#037166]/20">
                   <p className="text-white/80 text-sm text-center">
-                    <span className="font-medium text-[#04a99d]">✓</span> All prices include service guarantee
+                    <span className="font-medium text-[#04a99d]"></span> This is the online booking fee
                   </p>
                 </div>
               </motion.div>
@@ -233,7 +237,7 @@ export function CartPage({
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-white/80">Total</span>
-            <span className="text-2xl font-bold text-white">₹{cartTotal}</span>
+            <span className="text-2xl font-bold text-white">₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
           </div>
           <button
             onClick={onProceedToAddress}

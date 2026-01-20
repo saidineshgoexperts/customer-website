@@ -50,7 +50,7 @@ export function Footer() {
               viewport={{ once: true }}
             >
               <h3 className="text-2xl font-bold bg-gradient-to-r from-[#037166] to-[#04a99d] bg-clip-text text-transparent mb-4">
-                ServiceHub
+                Doorstep Hub
               </h3>
               <p className="text-white/60 mb-6 leading-relaxed max-w-sm">
                 Your trusted partner for all home service needs. Connecting you with verified professionals for quick, reliable, and affordable solutions.
@@ -68,13 +68,13 @@ export function Footer() {
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <span className="text-sm">support@servicehub.com</span>
+                  <span className="text-sm">support@doorstephub.com</span>
                 </div>
                 <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4" />
                   </div>
-                  <span className="text-sm">123 Service Street, Tech City</span>
+                  <span className="text-sm">Hyderabad, Telangana</span>
                 </div>
               </div>
             </motion.div>
