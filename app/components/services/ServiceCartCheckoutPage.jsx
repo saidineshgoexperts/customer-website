@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, MapPin, Calendar, Clock, CreditCard, Wallet, Banknote, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Clock, CreditCard, Wallet, Truck, Sparkles, CheckCircle, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -17,6 +17,7 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
     const [paymentMethod, setPaymentMethod] = useState('COD');
     const [loading, setLoading] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [technicianPreference, setTechnicianPreference] = useState('any');
 
     // Check authentication on mount
     useEffect(() => {
@@ -24,6 +25,79 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
             setShowAuthModal(true);
         }
     }, [isAuthenticated]);
+
+    // Service window: 9 AM to 9 PM (9:00 to 21:00)
+    const SERVICE_START_HOUR = 9;
+    const SERVICE_END_HOUR = 21;
+    const BUFFER_HOURS = 3;
+
+    // Smart date availability logic
+    const getAvailableDates = () => {
+        const now = new Date();
+        const dates = [];
+        let startDate = new Date(now);
+
+        // Check if today is still available (current time + 3hr buffer < 9 PM)
+        const todayCutoff = new Date();
+        todayCutoff.setHours(SERVICE_END_HOUR - BUFFER_HOURS, 0, 0, 0); // 6 PM cutoff
+
+        if (now > todayCutoff) {
+            // Skip today, start from tomorrow
+            startDate.setDate(startDate.getDate() + 1);
+        }
+
+        for (let i = (now > todayCutoff ? 1 : 0); i < 7; i++) {
+            const date = new Date(startDate);
+            date.setDate(date.getDate() + i);
+            dates.push({
+                value: date.toISOString().split('T')[0],
+                label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                }),
+            });
+        }
+        return dates;
+    };
+
+    // Smart time slot availability based on selected date
+    const getAvailableTimes = (selectedDateValue) => {
+        const now = new Date();
+        const selectedDate = new Date(selectedDateValue);
+
+        // Time slots (2-hour windows)
+        const allTimeSlots = [
+            { label: '09:00 AM - 11:00 AM', value: '09:00', startHour: 9, endHour: 11 },
+            { label: '11:00 AM - 01:00 PM', value: '11:00', startHour: 11, endHour: 13 },
+            { label: '01:00 PM - 03:00 PM', value: '13:00', startHour: 13, endHour: 15 },
+            { label: '03:00 PM - 05:00 PM', value: '15:00', startHour: 15, endHour: 17 },
+            { label: '05:00 PM - 07:00 PM', value: '17:00', startHour: 17, endHour: 19 },
+            { label: '07:00 PM - 09:00 PM', value: '19:00', startHour: 19, endHour: 21 },
+        ];
+
+        // If today and past cutoff time, filter available slots
+        if (selectedDate.toDateString() === now.toDateString()) {
+            const currentHour = now.getHours();
+            const cutoffHour = SERVICE_END_HOUR - BUFFER_HOURS; // 6 PM cutoff
+
+            if (currentHour >= cutoffHour) {
+                return []; // No slots available today
+            }
+
+            return allTimeSlots.filter(slot => slot.startHour > currentHour);
+        }
+
+        return allTimeSlots;
+    };
+
+    const availableDates = getAvailableDates();
+    const availableTimesForSelectedDate = getAvailableTimes(bookedDate);
+
+    // Reset time when date changes
+    useEffect(() => {
+        setBookedTime('');
+    }, [bookedDate]);
 
     const handleCheckout = async () => {
         if (!selectedAddress) {
@@ -86,17 +160,12 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
         }
     };
 
-    const timeSlots = [
-        '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
-        '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM',
-        '05:00 PM', '06:00 PM'
-    ];
-
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="min-h-screen pt-20 pb-32 bg-gradient-to-b from-[#0a0a0a] via-[#0f1614] to-[#0a0a0a]"
+            exit={{ opacity: 0 }}
+            className="min-h-screen pt-20 pb-32"
         >
             {/* Header */}
             <section className="sticky top-20 z-40 bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] border-b border-white/10 shadow-lg">
@@ -105,79 +174,137 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         onClick={onBack}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm mb-4"
+                        className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Address
                     </motion.button>
 
-                    <h1 className="text-3xl md:text-4xl font-bold text-white">Checkout</h1>
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3"
+                    >
+                        <Sparkles className="w-8 h-8" />
+                        Confirm Your Booking
+                    </motion.h1>
+                </div>
+
+                {/* Progress Indicator */}
+                <div className="max-w-[1400px] mx-auto px-6 lg:px-8 pb-6">
+                    <div className="flex items-center gap-2">
+                        {['Service', 'Cart', 'Address', 'Confirm'].map((step, index) => (
+                            <React.Fragment key={step}>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center">
+                                        <CheckCircle className="w-5 h-5 text-white" />
+                                    </div>
+                                    <span className="text-white/90 text-sm font-medium hidden sm:inline">{step}</span>
+                                </div>
+                                {index < 3 && <div className="h-0.5 flex-1 bg-white/30" />}
+                            </React.Fragment>
+                        ))}
+                    </div>
                 </div>
             </section>
 
-            <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-8">
+            <div className="max-w-[1200px] mx-auto px-6 lg:px-8 py-8">
                 <div className="grid lg:grid-cols-3 gap-8">
-                    {/* Left Column - Form */}
+                    {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Selected Address Display */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 rounded-2xl p-6"
-                        >
-                            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <MapPin className="w-5 h-5 text-[#037166]" />
-                                Service Address
-                            </h2>
-                            <div className="p-4 rounded-xl bg-[#037166]/10 border border-[#037166]/30">
-                                <p className="text-white font-semibold mb-1">{selectedAddress?.type || 'Home'}</p>
-                                <p className="text-white/80 text-sm mb-1">{selectedAddress?.flat}, {selectedAddress?.area}</p>
-                                <p className="text-white/60 text-xs">{selectedAddress?.cityName}, {selectedAddress?.postalCode}</p>
-                            </div>
-                        </motion.div>
-
                         {/* Date Selection */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 rounded-2xl p-6"
+                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-[#037166]" />
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <Calendar className="w-5 h-5 text-[#04a99d]" />
                                 Select Date
-                            </h2>
-                            <input
-                                type="date"
-                                value={bookedDate}
-                                onChange={(e) => setBookedDate(e.target.value)}
-                                min={new Date().toISOString().split('T')[0]}
-                                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-[#037166] focus:outline-none"
-                            />
+                            </h3>
+                            {availableDates.length === 0 ? (
+                                <p className="text-white/70 text-sm">No dates available at this time</p>
+                            ) : (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {availableDates.map((date) => (
+                                        <button
+                                            key={date.value}
+                                            onClick={() => setBookedDate(date.value)}
+                                            className={`p-4 rounded-xl font-medium transition-all ${bookedDate === date.value
+                                                ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg shadow-[#037166]/30'
+                                                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                                                }`}
+                                        >
+                                            {date.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </motion.div>
 
                         {/* Time Selection */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 rounded-2xl p-6"
+                            transition={{ delay: 0.1 }}
+                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <Clock className="w-5 h-5 text-[#037166]" />
-                                Select Time
-                            </h2>
-                            <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                                {timeSlots.map((time) => (
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <Clock className="w-5 h-5 text-[#04a99d]" />
+                                Select Time Slot
+                            </h3>
+                            {availableTimesForSelectedDate.length === 0 ? (
+                                <p className="text-white/70 text-sm">
+                                    {bookedDate
+                                        ? 'No time slots available for selected date'
+                                        : 'Please select a date first'
+                                    }
+                                </p>
+                            ) : (
+                                <div className="grid md:grid-cols-2 gap-3">
+                                    {availableTimesForSelectedDate.map((time) => (
+                                        <button
+                                            key={time.value}
+                                            onClick={() => setBookedTime(time.value)}
+                                            className={`p-4 rounded-xl font-medium transition-all ${bookedTime === time.value
+                                                ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg shadow-[#037166]/30'
+                                                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                                                }`}
+                                        >
+                                            {time.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+
+                        {/* Technician Preference */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
+                        >
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <User className="w-5 h-5 text-[#04a99d]" />
+                                Technician Preference (Optional)
+                            </h3>
+                            <div className="grid md:grid-cols-3 gap-3">
+                                {[
+                                    { value: 'any', label: 'Any Available' },
+                                    { value: 'senior', label: 'Senior Technician' },
+                                    { value: 'same', label: 'Same as Last Time' },
+                                ].map((option) => (
                                     <button
-                                        key={time}
-                                        onClick={() => setBookedTime(time)}
-                                        className={`px-4 py-3 rounded-xl border-2 transition-all ${bookedTime === time
-                                            ? 'border-[#037166] bg-[#037166]/10 text-white'
-                                            : 'border-white/10 text-white/60 hover:border-white/20'
+                                        key={option.value}
+                                        onClick={() => setTechnicianPreference(option.value)}
+                                        className={`p-4 rounded-xl font-medium transition-all ${technicianPreference === option.value
+                                            ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white'
+                                            : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
                                             }`}
                                     >
-                                        {time}
+                                        {option.label}
                                     </button>
                                 ))}
                             </div>
@@ -188,74 +315,71 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 rounded-2xl p-6"
+                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-[#037166]" />
-                                Payment Method
-                            </h2>
-                            <div className="space-y-3">
-                                <div
-                                    onClick={() => setPaymentMethod('COD')}
-                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-3 ${paymentMethod === 'COD'
-                                        ? 'border-[#037166] bg-[#037166]/10'
-                                        : 'border-white/10 hover:border-white/20'
-                                        }`}
-                                >
-                                    <Banknote className="w-6 h-6 text-[#037166]" />
-                                    <div>
-                                        <p className="text-white font-semibold">Cash on Delivery</p>
-                                        <p className="text-white/60 text-sm">Pay when service is completed</p>
-                                    </div>
-                                </div>
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <CreditCard className="w-5 h-5 text-[#04a99d]" />
+                                Select Payment Method
+                            </h3>
+                            <div className="grid md:grid-cols-3 gap-3">
+                                {[
+                                    { id: 'COD', label: 'Cash on Delivery', icon: Truck },
+                                    { id: 'WALLET', label: 'Wallet Pay', icon: Wallet },
+                                    { id: 'ONLINE', label: 'Online Payment', icon: CreditCard },
+                                ].map((method) => (
+                                    <button
+                                        key={method.id}
+                                        onClick={() => setPaymentMethod(method.id)}
+                                        className={`p-5 rounded-xl flex flex-col items-center gap-2 transition-all ${paymentMethod === method.id
+                                            ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg'
+                                            : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                                            }`}
+                                    >
+                                        <method.icon className={`w-6 h-6 ${paymentMethod === method.id ? 'text-white' : 'text-[#04a99d]'}`} />
+                                        <span className="text-sm font-medium">{method.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </motion.div>
 
-                                <div
-                                    onClick={() => setPaymentMethod('WALLET')}
-                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-3 ${paymentMethod === 'WALLET'
-                                        ? 'border-[#037166] bg-[#037166]/10'
-                                        : 'border-white/10 hover:border-white/20'
-                                        }`}
-                                >
-                                    <Wallet className="w-6 h-6 text-[#037166]" />
-                                    <div>
-                                        <p className="text-white font-semibold">Wallet</p>
-                                        <p className="text-white/60 text-sm">Pay using your wallet balance</p>
-                                    </div>
-                                </div>
-
-                                <div
-                                    onClick={() => setPaymentMethod('ONLINE')}
-                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-3 ${paymentMethod === 'ONLINE'
-                                        ? 'border-[#037166] bg-[#037166]/10'
-                                        : 'border-white/10 hover:border-white/20'
-                                        }`}
-                                >
-                                    <CreditCard className="w-6 h-6 text-[#037166]" />
-                                    <div>
-                                        <p className="text-white font-semibold">Online Payment</p>
-                                        <p className="text-white/60 text-sm">Pay via UPI, Card, Net Banking</p>
-                                    </div>
-                                </div>
+                        {/* Service Address */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
+                        >
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <MapPin className="w-5 h-5 text-[#04a99d]" />
+                                Service Address
+                            </h3>
+                            <div className="p-4 rounded-lg bg-white/5">
+                                <p className="text-white font-medium mb-1">{selectedAddress?.name}</p>
+                                <p className="text-white/80">{selectedAddress?.flat}, {selectedAddress?.area}</p>
+                                <p className="text-white/60">{selectedAddress?.cityName}, {selectedAddress?.postalCode}</p>
                             </div>
                         </motion.div>
                     </div>
 
-                    {/* Right Column - Summary */}
+                    {/* Summary Sidebar */}
                     <div className="lg:col-span-1">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="sticky top-48 bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 rounded-2xl p-6"
+                            className="sticky top-48 p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h3 className="text-xl font-bold text-white mb-6">Order Summary</h3>
+                            <h3 className="text-xl font-bold text-white mb-6">Booking Summary</h3>
 
                             {/* Cart Items */}
                             <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
                                 {cartItems.map((item) => (
                                     <div key={item.itemId} className="flex justify-between text-sm">
-                                        <span className="text-white/80">{item.itemName}</span>
-                                        <span className="text-white">₹{item.subtotal.toFixed(2)}</span>
+                                        <div className="flex-1">
+                                            <p className="text-white/90 font-bold">{item.itemName}</p>
+                                            <p className="text-white/40 text-[10px]">Qty: {item.quantity || 1}</p>
+                                        </div>
+                                        <span className="text-white/90 font-medium">₹{item.subtotal.toFixed(2)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -263,7 +387,7 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             <div className="h-px bg-white/10 mb-4" />
 
                             {/* Pricing */}
-                            <div className="space-y-3 mb-6">
+                            <div className="space-y-2 mb-4">
                                 <div className="flex justify-between text-white/80">
                                     <span>Service Cost</span>
                                     <span>₹{(cartData?.totalServiceCost || 0).toFixed(2)}</span>
@@ -280,30 +404,51 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                                     <span>GST</span>
                                     <span>₹{(cartData?.gstAmount || 0).toFixed(2)}</span>
                                 </div>
-                                <div className="h-px bg-white/10" />
-                                <div className="flex justify-between text-xl font-bold text-white">
-                                    <span>Total</span>
-                                    <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
-                                </div>
                             </div>
 
-                            <button
+                            <div className="h-px bg-white/10 mb-4" />
+
+                            <div className="flex justify-between text-xl font-bold text-white mb-6">
+                                <span>Total</span>
+                                <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
+                            </div>
+
+                            {/* Selected Date/Time Preview */}
+                            {bookedDate && bookedTime && (
+                                <div className="p-4 rounded-lg bg-[#037166]/10 border border-[#037166]/20 mb-6">
+                                    <p className="text-white/80 text-sm mb-2">Scheduled for:</p>
+                                    <p className="text-white font-medium">
+                                        {availableDates.find(d => d.value === bookedDate)?.label}
+                                    </p>
+                                    <p className="text-white font-medium">
+                                        {availableTimesForSelectedDate.find(t => t.value === bookedTime)?.label}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Confirm Button */}
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={handleCheckout}
-                                disabled={loading || !selectedAddress || !bookedDate || !bookedTime}
-                                className="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium text-lg hover:shadow-lg hover:shadow-[#037166]/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                disabled={loading || !bookedDate || !bookedTime}
+                                className={`w-full px-6 py-4 rounded-xl font-medium text-lg transition-all ${loading || !bookedDate || !bookedTime
+                                    ? 'bg-white/20 text-white/60 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white hover:shadow-lg hover:shadow-[#037166]/40'
+                                    }`}
                             >
                                 {loading ? (
-                                    <>
+                                    <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-5 h-5 animate-spin" />
                                         Processing...
-                                    </>
+                                    </div>
                                 ) : (
                                     `Pay ₹${(cartData?.finalAmount || 0).toFixed(2)}`
                                 )}
-                            </button>
+                            </motion.button>
 
                             <p className="text-white/60 text-xs text-center mt-4">
-                                This is the consultationFee
+                                You'll receive a confirmation email and SMS
                             </p>
                         </motion.div>
                     </div>

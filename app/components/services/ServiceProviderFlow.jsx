@@ -24,6 +24,7 @@ import { AllServicesPage } from '@/components/services/AllServicesPage';
 import { StoreDetailPage } from '@/components/services/StoreDetailPage';
 import { ViewAllPage } from '@/components/services/ViewAllPage';
 import { ServiceCartCheckoutPage } from '@/components/services/ServiceCartCheckoutPage';
+import { ThankYouPage } from '@/components/services/ThankYouPage';
 import { GlobalNav } from '@/components/layout/GlobalNav';
 import { Toaster } from 'sonner';
 
@@ -40,6 +41,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
   const [selectedServiceId, setSelectedServiceId] = useState(null);
   const [selectedStoreId, setSelectedStoreId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [bookingDetails, setBookingDetails] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -288,8 +290,15 @@ export default function ServiceProviderFlow({ serviceType = null }) {
         <ServiceCartCheckoutPage
           selectedAddress={selectedAddress}
           onBack={() => setCurrentPage('address')}
-          onSuccess={() => {
-            handleBackToHome();
+          onSuccess={(data) => {
+            // Save booking details for thank you page
+            setBookingDetails({
+              date: data.bookedDate || 'Confirmed',
+              time: data.bookedTime || '',
+              address: `${selectedAddress?.flat}, ${selectedAddress?.area}, ${selectedAddress?.cityName}`
+            });
+            setCurrentPage('thankYou');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         />
       )}
@@ -330,10 +339,15 @@ export default function ServiceProviderFlow({ serviceType = null }) {
           cartItems={cartItems}
           address={selectedAddress}
           onBack={() => setCurrentPage('address')}
-          onConfirmBooking={() => {
-            setCartItems([]);
-            setSelectedAddress(null);
-            handleBackToHome();
+          onConfirmBooking={(data) => {
+            // Save booking details for thank you page
+            setBookingDetails({
+              date: data?.bookedDate || 'Confirmed',
+              time: data?.bookedTime || '',
+              address: `${selectedAddress?.flat}, ${selectedAddress?.area}, ${selectedAddress?.cityName}`
+            });
+            setCurrentPage('thankYou');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         />
       )}
@@ -381,6 +395,10 @@ export default function ServiceProviderFlow({ serviceType = null }) {
           onBack={handleBackToHome}
           onCategoryClick={handleCategoryClick}
         />
+      )}
+
+      {currentPage === 'thankYou' && (
+        <ThankYouPage bookingDetails={bookingDetails} />
       )}
 
       <Footer />

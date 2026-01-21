@@ -152,14 +152,18 @@ export function BookingConfirmationPage({
         totalAmount: total.toString()
       };
 
-      if (paymentMethod === 'COD') {
+      if (paymentMethod === 'COD' || paymentMethod === 'wallet') {
+        // Use provider-flow/BookService for both COD and wallet
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/provider-flow/BookService', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(bookingData)
+          body: JSON.stringify({
+            ...bookingData,
+            paymentMethod: paymentMethod === 'COD' ? 'COD' : 'wallet'
+          })
         });
 
         const data = await response.json();
@@ -170,12 +174,9 @@ export function BookingConfirmationPage({
         } else {
           throw new Error(data.message || 'Booking failed');
         }
-      } else if (paymentMethod === 'wallet' || paymentMethod === 'online') {
-        const paymentEndpoint = paymentMethod === 'wallet'
-          ? 'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/initiate-wallet-payment'
-          : 'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/initiate-service-booking-payment';
-
-        const response = await fetch(paymentEndpoint, {
+      } else if (paymentMethod === 'online') {
+        // Online payment uses separate payment gateway endpoint
+        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/initiate-service-booking-payment', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -187,7 +188,7 @@ export function BookingConfirmationPage({
         const data = await response.json();
 
         if (data.success && data.access_key) {
-          toast.success(`${paymentMethod === 'wallet' ? 'Redirecting to wallet...' : 'Redirecting to payment gateway...'}`, {
+          toast.success('Redirecting to payment gateway...', {
             duration: 2000
           });
 
@@ -196,7 +197,7 @@ export function BookingConfirmationPage({
           cleanup();
           window.location.href = easebuzzUrl;
         } else {
-          throw new Error(data.message || `Failed to initiate ${paymentMethod} payment`);
+          throw new Error(data.message || 'Failed to initiate online payment');
         }
       }
     } catch (error) {
