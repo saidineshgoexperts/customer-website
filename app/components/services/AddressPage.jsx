@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Home, Briefcase, MapPin, Plus, Check, X, Trash2, Edit2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { AuthModal } from '@/components/auth/AuthModal';
 
 export function AddressPage({
   selectedAddress,
@@ -18,7 +17,6 @@ export function AddressPage({
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [newAddress, setNewAddress] = useState({
     name: '',
     phone: '',
@@ -64,9 +62,6 @@ export function AddressPage({
   useEffect(() => {
     if (isAuthenticated) {
       fetchAddresses();
-    } else {
-      // Show auth modal if user is not authenticated
-      setShowAuthModal(true);
     }
   }, [isAuthenticated, fetchAddresses]);
 
@@ -457,18 +452,6 @@ export function AddressPage({
           </motion.div>
         )}
       </div>
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => {
-          setShowAuthModal(false);
-          // Navigate back if user closes without logging in
-          if (!isAuthenticated) {
-            onBack();
-          }
-        }}
-      />
     </motion.div>
   );
 }
