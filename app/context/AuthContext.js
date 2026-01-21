@@ -78,26 +78,44 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const loginWithGoogle = async (idToken) => {
+
+    const loginWithGoogle = async () => {
         try {
+            // Import Firebase sign-in function dynamically
+            const { signInWithGoogle } = await import('@/config/firebase');
+
+            // Sign in with Google using Firebase
+            const { user, idToken } = await signInWithGoogle();
+
+            console.log('🔥 Firebase Google Sign-In successful, calling backend API...');
+
+            // Call backend API with the idToken
             const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/auth/loginWithGoogle', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken, fcmtoken: '1234' })
             });
+
             const data = await response.json();
+            console.log('📡 Backend API response:', data);
+
             if (data.success && data.token) {
                 setToken(data.token);
                 localStorage.setItem('auth_token', data.token);
                 await fetchProfile(data.token);
                 toast.success('Login successful!');
+                return data;
+            } else {
+                toast.error(data.message || 'Google Sign-in failed');
+                return data;
             }
-            return data;
         } catch (error) {
+            console.error('❌ Google Sign-in error:', error);
             toast.error('Google Sign-in failed');
             throw error;
         }
     };
+
 
     const updateProfile = async (formData) => {
         try {

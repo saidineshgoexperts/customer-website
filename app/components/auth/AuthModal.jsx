@@ -59,11 +59,13 @@ export function AuthModal({ isOpen, onClose }) {
     const handleGoogleLogin = async () => {
         setLoading(true);
         try {
-            // Logic for getting google idToken would go here
-            // const data = await loginWithGoogle(idToken);
-            toast.info('Google login integration coming soon');
+            const data = await loginWithGoogle();
+            if (data.success || data.status === 'success') {
+                onClose();
+            }
         } catch (error) {
-            console.error(error);
+            console.error('Google login error:', error);
+            // Error toast is already shown in AuthContext
         } finally {
             setLoading(false);
         }
