@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   Star,
@@ -21,13 +22,8 @@ import {
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 
-export function StoreDetailPage({
-  storeId,
-  onBack,
-  onAddToCart,
-  onGoToCart,
-  onServiceClick
-}) {
+export function StoreDetailPage({ storeId, serviceId }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('services');
   const [lightboxImage, setLightboxImage] = useState(null);
   const [reviewsToShow, setReviewsToShow] = useState(3);
@@ -234,7 +230,7 @@ export function StoreDetailPage({
 
       // Close popup and navigate to cart
       setShowAddonsPopup(false);
-      onGoToCart();
+      router.push('/services/cart');
     } catch (error) {
       console.error('Error adding to cart:', error);
       toast.error('Failed to add items to cart');
@@ -275,7 +271,7 @@ export function StoreDetailPage({
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          onClick={onBack}
+          onClick={() => router.back()}
           className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white/80 hover:bg-white/10 hover:border-[#037166]/50 transition-all"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -494,7 +490,7 @@ export function StoreDetailPage({
               {services && services.length > 0 && (
                 <div className="flex gap-4">
                   <button
-                    onClick={onGoToCart}
+                    onClick={() => router.push('/services/cart')}
                     className="px-8 py-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-[#037166]/50 transition-all"
                   >
                     View Cart ({selectedPackages.length})

@@ -252,14 +252,16 @@ export function RecommendedSpaSalon() {
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold shadow-lg shadow-[#037166]/40 hover:shadow-xl hover:shadow-[#037166]/50 transition-all"
+                      onClick={() => window.location.href = '/spa-salon'}
+                      className="py-3 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] rounded-xl text-white font-semibold shadow-lg shadow-[#C06C84]/40 hover:shadow-xl hover:shadow-[#C06C84]/50 transition-all"
                     >
                       Book Now
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="py-3 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#037166]/30 rounded-xl text-white font-semibold hover:bg-[#037166]/10 transition-all"
+                      onClick={() => window.location.href = '/spa-salon'}
+                      className="py-3 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#C06C84]/30 rounded-xl text-white font-semibold hover:bg-[#C06C84]/10 transition-all"
                     >
                       View Details
                     </motion.button>

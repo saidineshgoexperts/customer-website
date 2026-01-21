@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Star, MapPin, Clock, DollarSign, Filter, X, Zap } from 'lucide-react';
 import { useLocationContext } from '@/context/LocationContext';
 
-export function ServicesListingPage({ category, subCategory, subCategoryId, onBack, onServiceClick, onStoreClick }) {
+export function ServicesListingPage({ category, subCategory, subCategoryId }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('services');
   const [filterOpen, setFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 1000]);
@@ -89,7 +91,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, onBa
           <motion.button
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            onClick={onBack}
+            onClick={() => router.back()}
             className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -308,7 +310,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, onBa
 
                             {/* CTA Button */}
                             <button
-                              onClick={() => onServiceClick?.(service._id)}
+                              onClick={() => router.push(`/services/detail/${service._id}?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}`)}
                               className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all"
                             >
                               Book Now
@@ -403,7 +405,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, onBa
                               </div>
 
                               <button
-                                onClick={() => onStoreClick?.(center._id)}
+                                onClick={() => router.push(`/services/store/${center._id}?serviceId=${subCategoryId}`)}
                                 className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all"
                               >
                                 View Center

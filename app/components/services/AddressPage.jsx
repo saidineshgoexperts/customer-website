@@ -170,10 +170,8 @@ export function AddressPage({
       toast.error('Please select an address');
       return;
     }
-    // Storage of serviceId is handled in ServiceDetailsPage usually, 
-    // but the user said "store the serviceid in local storage in address page"
-    const storedServiceId = localStorage.getItem('last_service_id');
-    console.log('Continuing with serviceId:', storedServiceId);
+    // Save address to sessionStorage for other pages
+    sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
     onContinue();
   };
 

@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Building2, Wifi, Coffee, Shield, Bed, Users } from 'lucide-react';
+import { Building2, Wifi, Coffee, Shield, Bed, Users, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
+import { useRouter } from 'next/navigation';
 
 export function PremiumPGHostels() {
+  const router = useRouter();
   const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -172,9 +174,20 @@ export function PremiumPGHostels() {
             </span>
           </h2>
 
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-6">
             Discover your perfect home away from home with modern amenities and comfort
           </p>
+
+          {/* Explore All Button */}
+          <motion.button
+            onClick={() => router.push('/pghostels')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-xl font-semibold shadow-lg shadow-[#037166]/30 hover:shadow-xl hover:shadow-[#037166]/40 transition-all"
+          >
+            <span>Explore All PG & Hostels</span>
+            <ArrowRight className="w-5 h-5" />
+          </motion.button>
         </motion.div>
 
         {/* Content or Skeleton */}

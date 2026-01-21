@@ -1,9 +1,13 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
 import { Star, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
 import { fetchFeaturedServices, imageLoader } from '@/lib/api';
 
-export function FeaturedServices({ onServiceClick, onViewAll }) {
+export function FeaturedServices() {
+  const router = useRouter();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -95,7 +99,7 @@ export function FeaturedServices({ onServiceClick, onViewAll }) {
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8 }}
               className="group cursor-pointer"
-              onClick={() => onServiceClick?.(service._id)}
+              onClick={() => router.push(`/services/detail/${service._id}`)}
             >
               <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
                 {/* Featured Badge */}
@@ -184,7 +188,7 @@ export function FeaturedServices({ onServiceClick, onViewAll }) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 text-white font-medium transition-all duration-300 flex items-center gap-2 group"
-            onClick={onViewAll}
+            onClick={() => router.push('/services')}
           >
             View All Services
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   ChevronRight,
@@ -54,7 +55,8 @@ function CategorySkeleton() {
   );
 }
 
-export function CategoryPage({ category, categoryId, onSubCategoryClick, onBack }) {
+export function CategoryPage({ category, categoryId }) {
+  const router = useRouter();
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,6 +69,14 @@ export function CategoryPage({ category, categoryId, onSubCategoryClick, onBack 
 
   // Use default theme settings
   const theme = defaultTheme;
+
+  const handleSubCategoryClick = (subCategory) => {
+    router.push(`/services/listing/${subCategory._id}?category=${encodeURIComponent(category)}&name=${encodeURIComponent(subCategory.name)}`);
+  };
+
+  const handleBack = () => {
+    router.push('/services');
+  };
 
   useEffect(() => {
     const fetchSubCategories = async () => {
@@ -164,7 +174,7 @@ export function CategoryPage({ category, categoryId, onSubCategoryClick, onBack 
             className="flex items-center gap-3 mb-6"
           >
             <button
-              onClick={onBack}
+              onClick={handleBack}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white/80 hover:bg-white/10 hover:border-[#037166]/50 transition-all"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -173,7 +183,7 @@ export function CategoryPage({ category, categoryId, onSubCategoryClick, onBack 
 
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-sm text-white/50">
-              <button onClick={onBack} className="hover:text-white/80 transition-colors">Home</button>
+              <button onClick={handleBack} className="hover:text-white/80 transition-colors">Home</button>
               <ChevronRight className="w-4 h-4" />
               <span className="text-white/80">Services</span>
               <ChevronRight className="w-4 h-4" />
@@ -312,7 +322,7 @@ export function CategoryPage({ category, categoryId, onSubCategoryClick, onBack 
                         whileHover={{ y: -8 }}
                         onHoverStart={() => setHoveredIndex(index)}
                         onHoverEnd={() => setHoveredIndex(null)}
-                        onClick={() => onSubCategoryClick(subCategory)}
+                        onClick={() => handleSubCategoryClick(subCategory)}
                         className="group cursor-pointer relative"
                       >
                         <div className="relative h-full p-8 rounded-3xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border-2 border-white/10 hover:border-[#037166]/50 backdrop-blur-sm transition-all duration-300 overflow-hidden">
@@ -434,7 +444,7 @@ export function CategoryPage({ category, categoryId, onSubCategoryClick, onBack 
                           whileHover={{ y: -4 }}
                           onHoverStart={() => setHoveredIndex(absoluteIndex)}
                           onHoverEnd={() => setHoveredIndex(null)}
-                          onClick={() => onSubCategoryClick(subCategory)}
+                          onClick={() => handleSubCategoryClick(subCategory)}
                           className="group cursor-pointer"
                         >
                           <div className="relative h-full p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-[#037166]/50 backdrop-blur-sm transition-all duration-300 overflow-hidden">

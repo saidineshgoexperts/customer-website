@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Star, Clock, Shield, CheckCircle, Award, ThumbsUp, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -41,10 +42,9 @@ const relatedServices = [
 export function ServiceDetailsPage({
   serviceId,
   category,
-  subCategory,
-  onBack,
-  onBookNow
+  subCategory
 }) {
+  const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [serviceDetails, setServiceDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -91,7 +91,7 @@ export function ServiceDetailsPage({
     return (
       <div className="min-h-screen pt-20 flex flex-col items-center justify-center text-white">
         <h2 className="text-2xl font-bold mb-4">Service Not Found</h2>
-        <button onClick={onBack} className="px-6 py-2 bg-white/10 rounded-full">Go Back</button>
+        <button onClick={() => router.back()} className="px-6 py-2 bg-white/10 rounded-full">Go Back</button>
       </div>
     );
   }
@@ -145,7 +145,7 @@ export function ServiceDetailsPage({
           <motion.button
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            onClick={onBack}
+            onClick={() => router.back()}
             className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -301,7 +301,7 @@ export function ServiceDetailsPage({
                   }];
 
                   localStorage.setItem('booking_package_details', JSON.stringify(itemsToBook));
-                  onBookNow?.();
+                  router.push('/services/address');
                 }}
                 className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-xl hover:shadow-2xl hover:shadow-[#037166]/40 transition-all flex items-center justify-center gap-3 group"
               >

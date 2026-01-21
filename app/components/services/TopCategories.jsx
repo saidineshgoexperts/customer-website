@@ -2,9 +2,11 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 
-export function TopCategories({ onCategoryClick, onViewAll }) {
+export function TopCategories() {
+  const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const sectionRef = useRef(null);
@@ -152,7 +154,7 @@ export function TopCategories({ onCategoryClick, onViewAll }) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="hidden md:flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 transition-all duration-300 group"
-            onClick={onViewAll}
+            onClick={() => router.push('/services')}
           >
             <span>View All</span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -175,7 +177,7 @@ export function TopCategories({ onCategoryClick, onViewAll }) {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -12 }}
-                    onClick={() => onCategoryClick?.(category)}
+                    onClick={() => router.push(`/services/category/${category._id}?name=${encodeURIComponent(category.title)}`)}
                     className="group cursor-pointer"
                   >
                     <div className="relative w-72 h-80 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">

@@ -1,4 +1,9 @@
 {
   "/(landing)/page": "app/(landing)/page.js",
-  "/(services)/[serviceSlug]/page": "app/(services)/[serviceSlug]/page.js"
+  "/spa-salon/page": "app/spa-salon/page.js",
+  "/spa-salon/detail/[id]/page": "app/spa-salon/detail/[id]/page.js",
+  "/spa-salon/booking/success/page": "app/spa-salon/booking/success/page.js",
+  "/spa-salon/results/page": "app/spa-salon/results/page.js",
+  "/pg-hostel/page": "app/pg-hostel/page.js",
+  "/pghostels/page": "app/pghostels/page.js"
 }
