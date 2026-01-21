@@ -1,4 +1,4 @@
 {
-  "/(services)/[serviceSlug]/page": "app/(services)/[serviceSlug]/page.js",
-  "/(landing)/page": "app/(landing)/page.js"
+  "/(landing)/page": "app/(landing)/page.js",
+  "/(services)/[serviceSlug]/page": "app/(services)/[serviceSlug]/page.js"
 }
