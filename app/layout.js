@@ -1,8 +1,10 @@
 import './globals.css';
 import { LocationProvider } from './context/LocationContext';
 import { AuthProvider } from './context/AuthContext';
+import { AuthModalProvider } from './context/AuthModalContext';
 import { CartProvider } from './context/CartContext';
 import { ServiceCartProvider } from './context/ServiceCartContext';
+import { ClientProviders } from './components/providers/ClientProviders';
 
 export const metadata = {
   title: 'Next-Gen Dark Mode Super App',
@@ -15,11 +17,15 @@ export default function RootLayout({ children }) {
       <body className="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
         <LocationProvider>
           <AuthProvider>
-            <CartProvider>
-              <ServiceCartProvider>
-                {children}
-              </ServiceCartProvider>
-            </CartProvider>
+            <AuthModalProvider>
+              <CartProvider>
+                <ServiceCartProvider>
+                  <ClientProviders>
+                    {children}
+                  </ClientProviders>
+                </ServiceCartProvider>
+              </CartProvider>
+            </AuthModalProvider>
           </AuthProvider>
         </LocationProvider>
       </body>

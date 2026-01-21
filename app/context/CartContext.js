@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { useAuthModal } from './AuthModalContext';
 import { toast } from 'sonner';
 
 const CartContext = createContext();
@@ -10,6 +11,7 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
     const { token, isAuthenticated } = useAuth();
+    const { openAuthModal } = useAuthModal();
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -42,6 +44,7 @@ export const CartProvider = ({ children }) => {
     const addToCart = async (productId, storeId, quantity = 1) => {
         if (!isAuthenticated) {
             toast.error('Please login to add items to cart');
+            openAuthModal(); // Trigger the auth modal
             return false;
         }
         try {

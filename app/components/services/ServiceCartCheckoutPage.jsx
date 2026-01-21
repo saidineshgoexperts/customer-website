@@ -1,20 +1,29 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, MapPin, Calendar, Clock, CreditCard, Wallet, Banknote, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 import { useAuth } from '@/context/AuthContext';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) {
     const { cartData, cartItems } = useServiceCart();
-    const { token } = useAuth();
+    const { token, isAuthenticated } = useAuth();
 
     const [bookedDate, setBookedDate] = useState('');
     const [bookedTime, setBookedTime] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('COD');
     const [loading, setLoading] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+
+    // Check authentication on mount
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setShowAuthModal(true);
+        }
+    }, [isAuthenticated]);
 
     const handleCheckout = async () => {
         if (!selectedAddress) {
@@ -300,6 +309,18 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                     </div>
                 </div>
             </div>
+
+            {/* Auth Modal */}
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => {
+                    setShowAuthModal(false);
+                    // Navigate back if user closes without logging in
+                    if (!isAuthenticated) {
+                        onBack();
+                    }
+                }}
+            />
         </motion.div>
     );
 }
