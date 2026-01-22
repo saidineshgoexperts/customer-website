@@ -76,7 +76,7 @@ const amenityIcons = {
     Gym: TrendingUp,
 };
 
-export default function PGResultsPage() {
+function PGResultsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const categoryName = searchParams.get('categoryName');
@@ -352,5 +352,15 @@ export default function PGResultsPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+import { Suspense } from 'react';
+
+export default function PGResultsPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+            <PGResultsContent />
+        </Suspense>
     );
 }

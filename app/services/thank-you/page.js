@@ -4,7 +4,7 @@ import { ThankYouPage } from '@/components/services/ThankYouPage';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function ThankYouRoute() {
+function ThankYouContent() {
     const searchParams = useSearchParams();
     const [bookingDetails, setBookingDetails] = useState(null);
 
@@ -20,4 +20,14 @@ export default function ThankYouRoute() {
     }, [searchParams]);
 
     return <ThankYouPage bookingDetails={bookingDetails} />;
+}
+
+import { Suspense } from 'react';
+
+export default function ThankYouRoute() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+            <ThankYouContent />
+        </Suspense>
+    );
 }

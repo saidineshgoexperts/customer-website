@@ -9,94 +9,11 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/pghostels/ui/input';
 import { QuestionnaireModal } from '@/components/pghostels/QuestionnaireModal';
+import { useLocationContext } from '@/context/LocationContext';
+import { NearbyHostelsSection } from './NearbyHostelsSection';
 
-const categories = [
-    {
-        id: 'coliving',
-        title: 'Co-living Spaces',
-        desc: 'Modern shared living for professionals',
-        image: 'https://images.unsplash.com/photo-1707598973296-255b29445512?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xpdmluZyUyMHdvcmtzcGFjZSUyMGxvdW5nZXxlbnwxfHx8fDE3Njg2NDY3MTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        icon: Users,
-    },
-    {
-        id: 'student',
-        title: 'Student PGs',
-        desc: 'Budget-friendly near colleges',
-        image: 'https://images.unsplash.com/photo-1554730670-4b6f9fff8988?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3b21hbiUyMHN0dWRlbnQlMjBkb3JtaXRvcnl8ZW58MXx8fHwxNzY4NjQ2NzEyfDA&ixlib=rb-4.1.0&q=80&w=1080',
-        icon: Home,
-    },
-    {
-        id: 'women',
-        title: 'Women\'s Hostels',
-        desc: 'Safe & secure accommodation',
-        image: 'https://images.unsplash.com/photo-1617430690223-3e165b390e25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3N0ZWwlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2NDU4OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        icon: Shield,
-    },
-    {
-        id: 'men',
-        title: 'Men\'s Hostels',
-        desc: 'Comfortable stays for men',
-        image: 'https://images.unsplash.com/photo-1592901147824-212145b050cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW4lMjBob3N0ZWwlMjBiZWRyb29tfGVufDF8fHx8MTc2ODY0NjcxM3ww&ixlib=rb-4.1.0&q=80&w=1080',
-        icon: Bed,
-    },
-    {
-        id: 'dorm',
-        title: 'Dormitory Rooms',
-        desc: 'Shared spaces, great savings',
-        image: 'https://images.unsplash.com/photo-1709805619372-40de3f158e83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3N0ZWwlMjBiZWRyb29tJTIwZG9ybWl0b3J5fGVufDF8fHx8MTc2ODY0NTg5M3ww&ixlib=rb-4.1.0&q=80&w=1080',
-        icon: Users,
-    },
-    {
-        id: 'premium',
-        title: 'Premium Stays',
-        desc: 'Luxury PG experience',
-        image: 'https://images.unsplash.com/photo-1760067538068-03d10481bacb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcmVtaXVtJTIwaG9zdGVsJTIwcm9vbSUyMG1vZGVybnxlbnwxfHx8fDE3Njg2NDY3MTF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        icon: Sparkles,
-    },
-];
-
-const nearbyListings = [
-    {
-        id: 1,
-        name: 'Green Valley PG',
-        area: 'Koramangala',
-        rating: 4.8,
-        reviews: 142,
-        price: 8500,
-        distance: 0.8,
-        image: 'https://images.unsplash.com/photo-1617430690223-3e165b390e25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3N0ZWwlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2NDU4OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    },
-    {
-        id: 2,
-        name: 'Urban Nest Co-Living',
-        area: 'Whitefield',
-        rating: 4.6,
-        reviews: 89,
-        price: 12000,
-        distance: 1.2,
-        image: 'https://images.unsplash.com/photo-1707598973296-255b29445512?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xpdmluZyUyMHdvcmtzcGFjZSUyMGxvdW5nZXxlbnwxfHx8fDE3Njg2NDY3MTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    },
-    {
-        id: 3,
-        name: 'Elite Women\'s Hostel',
-        area: 'Indiranagar',
-        rating: 4.9,
-        reviews: 201,
-        price: 10000,
-        distance: 2.1,
-        image: 'https://images.unsplash.com/photo-1760067538068-03d10481bacb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcmVtaXVtJTIwaG9zdGVsJTIwcm9vbSUyMG1vZGVybnxlbnwxfHx8fDE3Njg2NDY3MTF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    },
-    {
-        id: 4,
-        name: 'Premium Living Spaces',
-        area: 'HSR Layout',
-        rating: 4.7,
-        reviews: 156,
-        price: 15000,
-        distance: 1.8,
-        image: 'https://images.unsplash.com/photo-1638454668466-e8dbd5462f20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2MjY5Nzl8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    },
-];
+const API_BASE_URL = 'https://api.doorstephub.com/v1/dhubApi/app';
+const SERVICE_ID = '69524fb157bb211ca094e5ee'; // PG Hostels Service ID
 
 const testimonials = [
     { name: 'Priya Sharma', role: 'Software Engineer', review: 'Found my perfect PG in just 2 days! The verification process gave me confidence.', avatar: '👩‍💼', rating: 5 },
@@ -109,6 +26,10 @@ export function PremiumHomePage() {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState({ id: '', name: '' });
+    const [featuredHostels, setFeaturedHostels] = useState([]);
+    const [apiCategories, setApiCategories] = useState([]);
+    const [serviceBanners, setServiceBanners] = useState([]);
+    const [loading, setLoading] = useState(true);
     const { scrollY } = useScroll();
     const heroRef = useRef(null);
     const categoriesRef = useRef(null);
@@ -121,6 +42,64 @@ export function PremiumHomePage() {
         };
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
+    // Fetch Featured Hostels
+    useEffect(() => {
+        const fetchFeaturedHostels = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/products/featured_pg_hostels`);
+                const data = await response.json();
+                if (data.success && data.hostels) {
+                    setFeaturedHostels(data.hostels);
+                }
+            } catch (error) {
+                console.error('Error fetching featured hostels:', error);
+            }
+        };
+        fetchFeaturedHostels();
+    }, []);
+
+    // Fetch Categories
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                // Get service ID from localStorage
+                const selectedService = localStorage.getItem('selectedService');
+                let serviceId = SERVICE_ID; // Default fallback
+
+                if (selectedService) {
+                    try {
+                        const serviceData = JSON.parse(selectedService);
+                        serviceId = serviceData.id || SERVICE_ID;
+                    } catch (e) {
+                        console.log('Using default service ID');
+                    }
+                }
+
+                const response = await fetch(`${API_BASE_URL}/professional-services-flow/public/categories`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        serviceId: serviceId
+                    })
+                });
+                const data = await response.json();
+                if (data.success && data.category) {
+                    setApiCategories(data.category);
+                    if (data.serviceBanners) {
+                        setServiceBanners(data.serviceBanners);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCategories();
     }, []);
 
     const parallaxY = useTransform(scrollY, [0, 500], [0, 150]);
@@ -391,45 +370,58 @@ export function PremiumHomePage() {
                     </motion.div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {categories.map((cat, i) => (
-                            <motion.div
-                                key={cat.id}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                whileHover={{ y: -8, scale: 1.02 }}
-                                onClick={() => handleCategoryClick(cat.id, cat.title)}
-                                className="group cursor-pointer relative h-80 rounded-3xl overflow-hidden"
-                            >
-                                {/* Image */}
-                                <div
-                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                    style={{ backgroundImage: `url(${cat.image})` }}
-                                />
-
-                                {/* Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
-
-                                {/* Content */}
-                                <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                                    <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#037166] transition-colors">
-                                        <cat.icon className="w-7 h-7 text-white" />
+                        {loading ? (
+                            // Shimmer skeleton for categories
+                            [...Array(6)].map((_, i) => (
+                                <div key={i} className="relative h-80 rounded-3xl overflow-hidden bg-gray-200 animate-pulse">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-gray-300 to-gray-200" />
+                                    <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                                        <div className="w-14 h-14 bg-gray-300 rounded-2xl mb-4" />
+                                        <div className="h-8 bg-gray-300 rounded w-3/4 mb-2" />
+                                        <div className="h-4 bg-gray-300 rounded w-1/2" />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">{cat.title}</h3>
-                                    <p className="text-white/80 text-sm">{cat.desc}</p>
                                 </div>
+                            ))
+                        ) : (
+                            apiCategories.map((cat, i) => (
+                                <motion.div
+                                    key={cat._id}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: i * 0.1 }}
+                                    whileHover={{ y: -8, scale: 1.02 }}
+                                    onClick={() => handleCategoryClick(cat._id, cat.name)}
+                                    className="group cursor-pointer relative h-80 rounded-3xl overflow-hidden"
+                                >
+                                    {/* Image */}
+                                    <div
+                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                                        style={{ backgroundImage: `url("https://api.doorstephub.com/${cat.image}")` }}
+                                    />
 
-                                {/* Hover Border Glow */}
-                                <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#037166] rounded-3xl transition-colors" />
-                            </motion.div>
-                        ))}
+                                    {/* Gradient Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
+
+                                    {/* Content */}
+                                    <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                                        <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#037166] transition-colors">
+                                            <Users className="w-7 h-7 text-white" />
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-white mb-2">{cat.name}</h3>
+                                    </div>
+
+                                    {/* Hover Border Glow */}
+                                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#037166] rounded-3xl transition-colors" />
+                                </motion.div>
+                            ))
+                        )}
                     </div>
                 </div>
             </section>
 
-            {/* Near You Carousel */}
-            <NearYouSection listings={nearbyListings} router={router} />
+            {/* Near You Section */}
+            <NearbyHostelsSection router={router} />
 
             {/* Top Deals Section */}
             <TopDealsSection router={router} />
@@ -441,7 +433,7 @@ export function PremiumHomePage() {
             <TestimonialsSection testimonials={testimonials} />
 
             {/* Featured Hostels */}
-            <FeaturedHostelsSection listings={nearbyListings} router={router} />
+            <FeaturedHostelsSection listings={featuredHostels} loading={loading} router={router} />
 
             {/* Questionnaire Modal */}
             <QuestionnaireModal
@@ -517,7 +509,7 @@ function NearYouSection({ listings, router }) {
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <span className="text-3xl font-bold text-gray-900">₹{listing.price.toLocaleString()}</span>
-                                            <span className="text-gray-500 text-sm">/mo</span>
+                                            <span className="text-gray-500 text-sm">/month</span>
                                         </div>
                                         <button className="px-6 py-2 bg-[#037166] text-white rounded-xl font-medium hover:bg-[#025951] transition-colors">
                                             View
@@ -557,7 +549,7 @@ function TopDealsSection({ router }) {
     ];
 
     return (
-        <section className="py-24">
+        <section className="py-20">
             <div className="max-w-7xl mx-auto px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -565,7 +557,7 @@ function TopDealsSection({ router }) {
                     viewport={{ once: true }}
                     className="mb-12"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white-900 mb-2">
                         Top Deals
                     </h2>
                     <p className="text-xl text-gray-600">Exclusive offers just for you</p>
@@ -668,7 +660,7 @@ function TestimonialsSection({ testimonials }) {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white-900 mb-4">
                         Why users love us
                     </h2>
                 </motion.div>
@@ -712,7 +704,7 @@ function TestimonialsSection({ testimonials }) {
 }
 
 // Featured Hostels Section
-function FeaturedHostelsSection({ listings, router }) {
+function FeaturedHostelsSection({ listings, loading, router }) {
     return (
         <section className="py-24 bg-gray-50/50">
             <div className="max-w-7xl mx-auto px-4">
@@ -729,58 +721,87 @@ function FeaturedHostelsSection({ listings, router }) {
                 </motion.div>
 
                 <div className="grid md:grid-cols-2 gap-8">
-                    {listings.slice(0, 4).map((listing, i) => (
-                        <motion.div
-                            key={listing.id}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: i * 0.1 }}
-                            whileHover={{ scale: 1.02, y: -5 }}
-                            onClick={() => router.push(`/pghostels/hostel-detail/${listing.id}`)}
-                            className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all border border-gray-100"
-                        >
-                            <div className="relative h-72">
-                                <div
-                                    className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-                                    style={{ backgroundImage: `url(${listing.image})` }}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-                                <button className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors border border-white/30">
-                                    <Heart className="w-5 h-5 text-white" />
-                                </button>
-
-                                <div className="absolute bottom-4 left-4 right-4">
-                                    <h3 className="text-2xl font-bold text-white mb-2">{listing.name}</h3>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-white/90 flex items-center">
-                                            <MapPin className="w-4 h-4 mr-1" />
-                                            {listing.area}
-                                        </span>
-                                        <div className="flex items-center space-x-2">
-                                            {[Wifi, Utensils, Shirt].map((Icon, j) => (
-                                                <div key={j} className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                                                    <Icon className="w-4 h-4 text-white" />
-                                                </div>
-                                            ))}
-                                        </div>
+                    {loading ? (
+                        // Shimmer skeleton for featured hostels
+                        [...Array(4)].map((_, i) => (
+                            <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 animate-pulse">
+                                <div className="relative h-72 bg-gray-200" />
+                                <div className="p-6 flex items-center justify-between">
+                                    <div className="flex-1">
+                                        <div className="h-10 bg-gray-200 rounded w-32 mb-2" />
+                                        <div className="h-4 bg-gray-200 rounded w-24" />
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-5 h-5 bg-gray-200 rounded" />
+                                        <div className="h-6 bg-gray-200 rounded w-12" />
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-6 flex items-center justify-between">
-                                <div>
-                                    <span className="text-3xl font-bold text-gray-900">₹{listing.price.toLocaleString()}</span>
-                                    <span className="text-gray-500">/mo</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
-                                    <span className="font-semibold">{listing.rating}</span>
-                                    <span className="text-gray-500 text-sm">({listing.reviews})</span>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                        ))
+                    ) : (
+                        listings.slice(0, 4).map((listing, i) => {
+                            const hostelId = listing._id;
+                            const hostelName = listing.hostelName;
+                            const hostelArea = listing.address || listing.cityName;
+                            const hostelPrice = parseInt(listing.defaultPrice);
+                            const hostelImage = `https://api.doorstephub.com/${listing.image}`;
+                            const hostelRating = listing.rating || 4.5;
+                            const hostelReviews = listing.reviews || 0;
+
+                            return (
+                                <motion.div
+                                    key={hostelId}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: i * 0.1 }}
+                                    whileHover={{ scale: 1.02, y: -5 }}
+                                    onClick={() => router.push(`/pghostels/hostel-detail/${hostelId}`)}
+                                    className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all border border-gray-100"
+                                >
+                                    <div className="relative h-72">
+                                        <div
+                                            className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                                            style={{ backgroundImage: `url("${hostelImage}")` }}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+                                        <button className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors border border-white/30">
+                                            <Heart className="w-5 h-5 text-white" />
+                                        </button>
+
+                                        <div className="absolute bottom-4 left-4 right-4">
+                                            <h3 className="text-2xl font-bold text-white mb-2">{hostelName}</h3>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-white/90 flex items-center">
+                                                    <MapPin className="w-4 h-4 mr-1" />
+                                                    {hostelArea}
+                                                </span>
+                                                <div className="flex items-center space-x-2">
+                                                    {[Wifi, Utensils, Shirt].map((Icon, j) => (
+                                                        <div key={j} className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                                                            <Icon className="w-4 h-4 text-white" />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-6 flex items-center justify-between">
+                                        <div>
+                                            <span className="text-3xl font-bold text-gray-900">₹{hostelPrice.toLocaleString()}</span>
+                                            <span className="text-gray-500">/mo</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
+                                            <span className="font-semibold">{hostelRating}</span>
+                                            {hostelReviews > 0 && <span className="text-gray-500 text-sm">({hostelReviews})</span>}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            );
+                        })
+                    )}
                 </div>
             </div>
         </section>

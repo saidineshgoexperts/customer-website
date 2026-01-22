@@ -410,11 +410,17 @@ export function BookingConfirmationPage({
                 <MapPin className="w-5 h-5 text-[#04a99d]" />
                 Service Address
               </h3>
-              <div className="p-4 rounded-lg bg-white/5">
-                <p className="text-white font-medium mb-1">{address.name}</p>
-                <p className="text-white/80">{address.flat}, {address.area}</p>
-                <p className="text-white/60">{address.cityName || address.city}, {address.postalCode}</p>
-              </div>
+              {address ? (
+                <div className="p-4 rounded-lg bg-white/5">
+                  <p className="text-white font-medium mb-1">{address.name}</p>
+                  <p className="text-white/80">{address.flat}, {address.area}</p>
+                  <p className="text-white/60">{address.cityName || address.city}, {address.postalCode}</p>
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg bg-white/5">
+                  <p className="text-white/60">No address selected</p>
+                </div>
+              )}
             </motion.div>
           </div>
 

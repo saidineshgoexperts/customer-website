@@ -100,23 +100,21 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
-                    {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
-                    />
-
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={onClose}
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] flex items-center justify-center p-4"
+                >
                     {/* Modal */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-[600px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-gray-200 z-[9999] overflow-hidden flex flex-col"
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full max-w-[600px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col"
                     >
                         {/* Header */}
                         <div className="relative bg-gradient-to-r from-[#037166] to-[#025951] text-white p-6">
@@ -226,7 +224,7 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }
                             </div>
                         </div>
                     </motion.div>
-                </>
+                </motion.div>
             )}
         </AnimatePresence>
     );

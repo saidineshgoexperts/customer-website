@@ -4,9 +4,8 @@ import { BookingConfirmationPage } from '@/components/services/BookingConfirmati
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function BookingRoute() {
+function BookingContent() {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const [address, setAddress] = useState(null);
 
     useEffect(() => {
@@ -25,5 +24,15 @@ export default function BookingRoute() {
                 router.push(`/services/thank-you?date=${data?.bookedDate || ''}&time=${data?.bookedTime || ''}`);
             }}
         />
+    );
+}
+
+import { Suspense } from 'react';
+
+export default function BookingRoute() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+            <BookingContent />
+        </Suspense>
     );
 }

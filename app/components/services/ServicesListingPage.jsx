@@ -15,15 +15,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
   const [services, setServices] = useState([]);
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { location, detectLocation } = useLocationContext();
-
-
-
-  useEffect(() => {
-    if (!location) {
-      detectLocation();
-    }
-  }, [location, detectLocation]);
+  const { location } = useLocationContext();
 
   useEffect(() => {
     const fetchServices = async () => {
