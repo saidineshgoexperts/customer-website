@@ -13,7 +13,7 @@ export default function AppliancesPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center">
-            <div className="text-white">Redirecting to services...</div>
+            <div className="text-white"></div>
         </div>
     );
 }

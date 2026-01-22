@@ -6,6 +6,19 @@
 
 :root {
   --font-size: 16px;
+
+  /* Religious & Sacred Color Palette */
+  --saffron: #FF9933;
+  --warm-gold: #FFB84D;
+  --temple-red: #D84315;
+  --vermilion: #FF6B35;
+  --sacred-teal: #26A69A;
+  --soft-cream: #FFF8E7;
+  --off-white: #FFFEF7;
+  --warm-beige: #F5E6D3;
+  --deep-charcoal: #2C2C2C;
+  --light-grey: #F5F5F5;
+
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
