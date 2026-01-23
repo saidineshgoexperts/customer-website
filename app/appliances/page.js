@@ -11,9 +11,9 @@ export default function AppliancesPage() {
         router.replace('/services');
     }, [router]);
 
-    return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="text-white"></div>
-        </div>
-    );
+    // return (
+    //     <div className="min-h-screen flex items-center justify-center">
+    //         <div className="text-white"></div>
+    //     </div>
+    // );
 }

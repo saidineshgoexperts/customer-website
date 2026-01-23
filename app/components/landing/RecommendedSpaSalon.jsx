@@ -35,9 +35,10 @@ export function RecommendedSpaSalon() {
           }));
           setFeatured(mappedStores);
         } else {
-          // Fallback to original hardcoded data
+          // Fallback to original hardcoded data - expanded to 4 items
           setFeatured([
             {
+              id: '1',
               name: 'Royal Glow Spa',
               category: 'Premium Spa',
               rating: 4.9,
@@ -48,6 +49,7 @@ export function RecommendedSpaSalon() {
               highlights: ['VIP Lounge', 'Expert Therapists', 'Premium Products'],
             },
             {
+              id: '2',
               name: 'Elegance Hair Studio',
               category: 'Luxury Salon',
               rating: 4.8,
@@ -56,14 +58,37 @@ export function RecommendedSpaSalon() {
               image: 'https://images.unsplash.com/photo-1675034741696-fa9551c31bb4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzYWxvbiUyMGhhaXJjdXQlMjBiZWF1dHl8ZW58MXx8fHwxNzY4MDI2NzQ1fDA&ixlib=rb-4.1.0&q=80&w=1080',
               badge: 'Trending',
               highlights: ['Celebrity Stylists', 'Latest Trends', 'Exclusive Brands'],
+            },
+            {
+              id: '3',
+              name: 'Zenith Wellness Retreat',
+              category: 'Luxury Spa',
+              rating: 4.9,
+              reviews: '1.5K',
+              price: '$$$',
+              image: 'https://images.unsplash.com/photo-1578631618866-c4e99113bbce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjByZXRyZWF0fGVufDF8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
+              badge: 'Top Rated',
+              highlights: ['Holistic Treatments', 'Organic Products', 'Private Suites'],
+            },
+            {
+              id: '4',
+              name: 'Velvet Touch Salon',
+              category: 'Premium Salon',
+              rating: 4.7,
+              reviews: '850',
+              price: '$$',
+              image: 'https://images.unsplash.com/photo-1606851732918-bfec4a081ec8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHNiYWxheSUyMGhhaXJ8ZW58MXx8fHwxNzY4MDI2NzQ1fDA&ixlib=rb-4.1.0&q=80&w=1080',
+              badge: 'Trending',
+              highlights: ['Signature Styles', 'Premium Colors', 'Express Services'],
             }
           ]);
         }
       } catch (err) {
         console.error('Error fetching featured spa stores:', err);
-        // Fallback to original hardcoded data
+        // Fallback to original hardcoded data - expanded to 4 items
         setFeatured([
           {
+            id: '1',
             name: 'Royal Glow Spa',
             category: 'Premium Spa',
             rating: 4.9,
@@ -74,6 +99,7 @@ export function RecommendedSpaSalon() {
             highlights: ['VIP Lounge', 'Expert Therapists', 'Premium Products'],
           },
           {
+            id: '2',
             name: 'Elegance Hair Studio',
             category: 'Luxury Salon',
             rating: 4.8,
@@ -82,6 +108,28 @@ export function RecommendedSpaSalon() {
             image: 'https://images.unsplash.com/photo-1675034741696-fa9551c31bb4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzYWxvbiUyMGhhaXJjdXQlMjBiZWF1dHl8ZW58MXx8fHwxNzY4MDI2NzQ1fDA&ixlib=rb-4.1.0&q=80&w=1080',
             badge: 'Trending',
             highlights: ['Celebrity Stylists', 'Latest Trends', 'Exclusive Brands'],
+          },
+          {
+            id: '3',
+            name: 'Zenith Wellness Retreat',
+            category: 'Luxury Spa',
+            rating: 4.9,
+            reviews: '1.5K',
+            price: '$$$',
+            image: 'https://images.unsplash.com/photo-1578631618866-c4e99113bbce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjByZXRyZWF0fGVufDF8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
+            badge: 'Top Rated',
+            highlights: ['Holistic Treatments', 'Organic Products', 'Private Suites'],
+          },
+          {
+            id: '4',
+            name: 'Velvet Touch Salon',
+            category: 'Premium Salon',
+            rating: 4.7,
+            reviews: '850',
+            price: '$$',
+            image: 'https://images.unsplash.com/photo-1606851732918-bfec4a081ec8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHNiYWxheSUyMGhhaXJ8ZW58MXx8fHwxNzY4MDI2NzQ1fDA&ixlib=rb-4.1.0&q=80&w=1080',
+            badge: 'Trending',
+            highlights: ['Signature Styles', 'Premium Colors', 'Express Services'],
           }
         ]);
       } finally {
@@ -101,8 +149,8 @@ export function RecommendedSpaSalon() {
               Recommended Spa & Salon
             </h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            {[1, 2].map((i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
               <div key={i} className="animate-pulse">
                 <div className="bg-gray-800 h-80 rounded-3xl" />
               </div>
@@ -157,15 +205,15 @@ export function RecommendedSpaSalon() {
           </p>
         </motion.div>
 
-        {/* Featured Cards - Original 2 column layout preserved */}
-        <div className="grid md:grid-cols-2 gap-8">
+        {/* Featured Cards - Changed to 4 per row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featured.map((place, index) => (
             <motion.div
               key={place.id || index}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.2, duration: 0.7 }}
+              transition={{ delay: index * 0.1, duration: 0.7 }}
               className="group relative"
             >
               {/* Premium Card - Original sizing preserved */}
@@ -237,7 +285,7 @@ export function RecommendedSpaSalon() {
                           initial={{ opacity: 0, x: -20 }}
                           whileInView={{ opacity: 1, x: 0 }}
                           viewport={{ once: true }}
-                          transition={{ delay: index * 0.2 + idx * 0.1 }}
+                          transition={{ delay: index * 0.1 + idx * 0.05 }}
                           className="flex items-center space-x-2"
                         >
                           <div className="w-1.5 h-1.5 bg-[#037166] rounded-full" />

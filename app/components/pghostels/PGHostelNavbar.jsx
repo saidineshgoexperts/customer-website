@@ -59,15 +59,15 @@ export function PGHostelNavbar({ selectedLocation = 'Bangalore, Koramangala', on
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
-                        ? 'bg-white/80 backdrop-blur-xl shadow-sm'
-                        : 'bg-white'
+                    ? 'bg-white/80 backdrop-blur-xl shadow-sm'
+                    : 'bg-white'
                     }`}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo & Location */}
                         <div className="flex items-center space-x-4">
-                            <Link href="/pghostels" className="flex items-center space-x-2">
+                            <Link href="/" className="flex items-center space-x-2">
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#037166] to-[#0B0F14] flex items-center justify-center">
                                     <span className="text-white font-bold text-xl">PG</span>
                                 </div>
@@ -159,8 +159,8 @@ export function PGHostelNavbar({ selectedLocation = 'Bangalore, Koramangala', on
                                     key={location}
                                     onClick={() => handleLocationChange(location)}
                                     className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${selectedLocation === location
-                                            ? 'bg-[#037166]/10 text-[#037166] font-medium'
-                                            : 'hover:bg-gray-50'
+                                        ? 'bg-[#037166]/10 text-[#037166] font-medium'
+                                        : 'hover:bg-gray-50'
                                         }`}
                                 >
                                     <div className="flex items-center space-x-3">
