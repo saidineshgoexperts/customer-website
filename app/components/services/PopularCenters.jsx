@@ -67,16 +67,60 @@ export function PopularCenters({ onStoreClick }) {
     fetchCenters();
   }, [location?.lat, location?.lng]);
 
+  // Shimmer Skeleton Card
+  const ShimmerCenterCard = () => (
+    <div className="w-80 rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
+      {/* Shimmer Image */}
+      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 animate-shimmer" />
+
+      {/* Shimmer Content */}
+      <div className="p-5">
+        {/* Title Shimmer */}
+        <div className="h-6 w-3/4 mb-2 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+
+        {/* Location Shimmer */}
+        <div className="h-4 w-1/2 mb-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+
+        {/* Speciality Badge Shimmer */}
+        <div className="h-6 w-1/3 mb-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-shimmer" />
+
+        {/* Rating & CTA Shimmer */}
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-16 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-shimmer" />
+          <div className="h-10 w-24 rounded-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer" />
+        </div>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
       <section className="py-20 relative overflow-hidden">
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-8">
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4">
+              <Award className="w-3 h-3 text-[#04a99d]" />
+              <span className="text-xs font-medium text-[#04a99d]">TOP RATED</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-3">Explore Popular Services Center</h2>
+            <p className="text-white/60">Most trusted and highly-rated service providers in your area</p>
+          </div>
           <div className="flex gap-6 overflow-hidden">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="w-80 h-[400px] rounded-2xl bg-white/5 animate-pulse" />
+            {[1, 2, 3, 4].map((i) => (
+              <ShimmerCenterCard key={i} />
             ))}
           </div>
         </div>
+        <style jsx>{`
+          @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+          }
+          .animate-shimmer {
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+          }
+        `}</style>
       </section>
     );
   }

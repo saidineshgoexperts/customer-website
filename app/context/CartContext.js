@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
                 }
             });
             const data = await response.json();
-            if (data.success) {
+            if (data.success && data.data) {
                 setCartItems(data.data.items || []);
                 setCartTotal(data.data.totalAmount || 0);
             }

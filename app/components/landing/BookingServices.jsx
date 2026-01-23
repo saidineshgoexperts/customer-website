@@ -61,8 +61,11 @@ export function BookingServices() {
     fetchServices();
   }, []);
 
-  const handleServiceClick = (serviceId) => {
-    router.push(`/service?id=${serviceId}`);
+  const handleServiceClick = (service) => {
+    // Construct the URL with service ID and query parameters
+    const categoryParam = encodeURIComponent(service.category);
+    const subCategoryParam = encodeURIComponent(service.title);
+    router.push(`/services/detail/${service.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
   };
 
   return (
@@ -146,7 +149,7 @@ export function BookingServices() {
                     </div>
 
                     <motion.button
-                      onClick={() => handleServiceClick(service.id)}
+                      onClick={() => handleServiceClick(service)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-medium flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-[#037166]/40 transition-all"

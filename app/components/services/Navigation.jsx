@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
+import { LocationBar } from '@/components/location/LocationBar';
 
 export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -45,9 +46,9 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
               priority
               className="object-contain"
             />
-            <span className="bg-gradient-to-r from-[#037166] to-[#04a99d] bg-clip-text text-transparent leading-none">
+            {/* <span className="bg-gradient-to-r from-[#037166] to-[#04a99d] bg-clip-text text-transparent leading-none">
               Doorstep Hub
-            </span>
+            </span> */}
           </motion.button>
 
           {/* Desktop Navigation */}
@@ -74,6 +75,8 @@ export function Navigation({ onLogoClick, onCartClick, cartItemCount = 0 }) {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
+            {/* Location Bar */}
+            <LocationBar />
             {/* Cart Button */}
             <motion.button
               onClick={onCartClick}

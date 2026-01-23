@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { useRouter } from 'next/navigation';
 import { Star, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
 import { fetchFeaturedServices, imageLoader } from '@/lib/api';
 
-export function FeaturedServices() {
-  const router = useRouter();
+export function FeaturedServices({ onViewAll, onServiceClick }) {
+
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,12 +28,72 @@ export function FeaturedServices() {
     loadServices();
   }, []);
 
+  // Shimmer Skeleton Card
+  const ShimmerServiceCard = () => (
+    <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
+      {/* Shimmer Badge */}
+      <div className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer h-7 w-20" />
+
+      {/* Shimmer Image */}
+      <div className="relative h-56 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 animate-shimmer">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      </div>
+
+      {/* Shimmer Content */}
+      <div className="p-6">
+        {/* Rating Shimmer */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="h-8 w-20 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-shimmer" />
+          <div className="h-4 w-12 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+        </div>
+
+        {/* Title Shimmer */}
+        <div className="h-6 w-3/4 mb-2 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+
+        {/* Description Shimmer */}
+        <div className="space-y-2 mb-4">
+          <div className="h-4 w-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+          <div className="h-4 w-2/3 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+        </div>
+
+        {/* Button Shimmer */}
+        <div className="flex items-center justify-end">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer" />
+        </div>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="py-20 flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-10 h-10 text-[#037166] animate-spin" />
-        <p className="text-white/60">Loading featured services...</p>
-      </div>
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f1614]/30 to-transparent" />
+        <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-8">
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4">
+              <div className="w-3 h-3 bg-[#04a99d]/50 rounded-full" />
+              <span className="text-xs font-medium text-[#04a99d]">FEATURED</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-3">Explore Our Featured Service</h2>
+            <p className="text-white/60">Top-rated services trusted by thousands of customers</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <ShimmerServiceCard key={`shimmer-${index}`} />
+            ))}
+          </div>
+        </div>
+        <style jsx>{`
+          @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+          }
+          .animate-shimmer {
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+          }
+        `}</style>
+      </section>
     );
   }
 
@@ -99,7 +158,7 @@ export function FeaturedServices() {
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8 }}
               className="group cursor-pointer"
-              onClick={() => router.push(`/services/detail/${service._id}`)}
+              onClick={() => onServiceClick?.(service._id)}
             >
               <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
                 {/* Featured Badge */}
@@ -188,7 +247,7 @@ export function FeaturedServices() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 text-white font-medium transition-all duration-300 flex items-center gap-2 group"
-            onClick={() => router.push('/services')}
+            onClick={onViewAll}
           >
             View All Services
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

@@ -37,23 +37,25 @@ export function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            {/* 🎯 PERFECT SQUARE LOGO 40x40 */}
+            {/* Logo */}
             <Link href="/">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="flex items-center space-x-2"
+                className="flex items-center relative group flex-shrink-0"
               >
-                <Image
-                  src="/d-hub-logo.png"
-                  alt="Doorstep Hub Logo"
-                  width={40}
-                  height={40}
-                  className="object-contain flex-shrink-0"
-                  priority
-                />
-                <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-tight">
+                <div className="relative w-48 h-14 overflow-hidden flex-shrink-0">
+                  <Image
+                    src="/d-hub-logo.png"
+                    alt="Doorstep Hub Logo"
+                    fill
+                    sizes="192px"
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                {/* <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent whitespace-nowrap -ml-2 mr-6">
                   Doorstep Hub
-                </span>
+                </span> */}
               </motion.div>
             </Link>
 
@@ -61,7 +63,7 @@ export function Header() {
             <nav className="hidden lg:flex items-center space-x-8">
               <Link href="/appliances">
                 <motion.span
-                  className="text-gray-300 hover:text-[#037166] transition-colors relative group cursor-pointer font-medium"
+                  className="text-gray-300 hover:text-[#037166] transition-colors relative group cursor-pointer font-medium whitespace-nowrap"
                   whileHover={{ y: -2 }}
                 >
                   Appliance Services
@@ -73,7 +75,7 @@ export function Header() {
                 <motion.a
                   key={item}
                   href={`#${item.toLowerCase().replace(/\s/g, '-')}`}
-                  className="text-gray-300 hover:text-[#037166] transition-colors relative group font-medium"
+                  className="text-gray-300 hover:text-[#037166] transition-colors relative group font-medium whitespace-nowrap"
                   whileHover={{ y: -2 }}
                 >
                   {item}
@@ -85,7 +87,7 @@ export function Header() {
               <div className="relative group">
                 <motion.button
                   whileHover={{ y: -2 }}
-                  className="text-gray-300 hover:text-[#037166] transition-colors relative font-medium"
+                  className="text-gray-300 hover:text-[#037166] transition-colors relative font-medium whitespace-nowrap"
                 >
                   More
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#037166] to-[#02b39a] group-hover:w-full transition-all duration-300" />

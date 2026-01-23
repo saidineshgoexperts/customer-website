@@ -55,16 +55,87 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
     fetchRecentServices();
   }, []);
 
+  // Shimmer Skeleton Card (Carousel Item)
+  const ShimmerRecentCard = () => (
+    <div className="flex-shrink-0 w-80">
+      <div className="relative w-full h-[380px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
+        {/* Shimmer Badge */}
+        <div className="absolute top-4 left-4 z-20 h-8 w-36 rounded-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer" />
+
+        {/* Shimmer Image */}
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 animate-shimmer">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        </div>
+
+        {/* Shimmer Content */}
+        <div className="p-5">
+          {/* Title Shimmer */}
+          <div className="h-6 w-3/4 mb-3 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+
+          {/* Description Shimmer */}
+          <div className="space-y-2 mb-6">
+            <div className="h-4 w-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+            <div className="h-4 w-2/3 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+          </div>
+
+          {/* Price & CTA Shimmer */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="h-3 w-10 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+              <div className="h-8 w-20 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-shimmer" />
+            </div>
+            <div className="h-12 w-28 rounded-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   // Loading state
   if (loading) {
     return (
       <section className="py-20 relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
-          <div className="text-center py-20">
-            <div className="inline-block w-12 h-12 border-4 border-[#037166]/20 border-t-[#04a99d] rounded-full animate-spin mb-4"></div>
-            <p className="text-white/60">Loading popular services...</p>
+          {/* Section Header */}
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4">
+              <TrendingUp className="w-3 h-3 text-[#04a99d]" />
+              <span className="text-xs font-medium text-[#04a99d]">TRENDING NOW</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-3">Explore Our Recently Booked Services</h2>
+            <p className="text-white/60">See what services your neighbors are booking right now</p>
+          </div>
+
+          <div className="relative">
+            <div className="overflow-x-auto scrollbar-hide pb-4">
+              <div className="flex gap-6 min-w-max">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <ShimmerRecentCard key={`shimmer-recent-${index}`} />
+                ))}
+              </div>
+            </div>
+            {/* Fade Edges */}
+            <div className="absolute left-0 top-0 bottom-4 w-20 bg-gradient-to-r from-[#0a0a0a] to-transparent pointer-events-none z-10" />
+            <div className="absolute right-0 top-0 bottom-4 w-20 bg-gradient-to-l from-[#0a0a0a] to-transparent pointer-events-none z-10" />
           </div>
         </div>
+        <style jsx>{`
+          @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+          }
+          .animate-shimmer {
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+          }
+          .scrollbar-hide {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
       </section>
     );
   }

@@ -50,7 +50,7 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <motion.a
               href="/"
@@ -59,19 +59,20 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
                 handleNavigation('/');
               }}
               whileHover={{ scale: 1.05 }}
-              className="flex items-center space-x-1 relative group"
+              className="flex items-center relative group flex-shrink-0"
             >
-              <div className="relative w-40 h-10 overflow-hidden">
+              <div className="relative w-48 h-14 overflow-hidden flex-shrink-0">
                 <Image
                   src="/d-hub-logo.png"
                   alt="Doorstep Hub Logo"
                   fill
+                  sizes="192px"
                   className="object-contain "
                 />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              {/* <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent whitespace-nowrap -ml-2 mr-6">
                 Doorstep Hub
-              </span>
+              </span> */}
 
               {/* Animated Sketch Underline */}
               <svg className="absolute -bottom-1 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -86,9 +87,6 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
                 />
               </svg>
             </motion.a>
-
-            {/* Location Bar */}
-            <LocationBar />
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-1">
@@ -106,8 +104,8 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
                     whileHover={{ y: -2 }}
                   >
                     <div className="flex items-center space-x-2">
-                      <item.icon className={`w-4 h-4 ${isActive ? 'text-[#037166]' : 'text-gray-400 group-hover:text-[#037166]'} transition-colors`} />
-                      <span className={`text-sm font-medium ${isActive ? 'text-[#037166]' : 'text-gray-300 group-hover:text-[#037166]'} transition-colors`}>
+                      <item.icon className={`w-5 h-5 ${isActive ? 'text-[#037166]' : 'text-gray-400 group-hover:text-[#037166]'} transition-colors`} />
+                      <span className={`text-sm font-medium ${isActive ? 'text-[#037166]' : 'text-gray-300 group-hover:text-[#037166]'} transition-colors whitespace-nowrap`}>
                         {item.name}
                       </span>
                     </div>
@@ -133,6 +131,8 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
 
             {/* Right Actions */}
             <div className="flex items-center space-x-3">
+              {/* Location Bar */}
+              <LocationBar />
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}

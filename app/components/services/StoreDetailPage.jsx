@@ -260,6 +260,32 @@ export function StoreDetailPage({ storeId, serviceId }) {
     );
   };
 
+  const ShimmerServiceCard = () => (
+    <div className="h-80 rounded-2xl bg-[#1a1a1a] border border-white/10 overflow-hidden relative">
+      <div className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+      <div className="h-48 bg-gray-800" />
+      <div className="p-6 space-y-3">
+        <div className="h-6 w-3/4 bg-gray-700 rounded animate-pulse" />
+        <div className="h-4 w-full bg-gray-700/50 rounded animate-pulse" />
+        <div className="h-10 w-full bg-gray-700 rounded-lg animate-pulse" />
+      </div>
+    </div>
+  );
+
+  const ShimmerCenterCard = () => (
+    <div className="h-48 rounded-2xl bg-[#1a1a1a] border border-white/10 overflow-hidden relative">
+      <div className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+      <div className="flex">
+        <div className="w-64 h-48 bg-gray-800" />
+        <div className="flex-1 p-6 space-y-4">
+          <div className="h-8 w-1/2 bg-gray-700 rounded animate-pulse" />
+          <div className="h-4 w-3/4 bg-gray-700/50 rounded animate-pulse" />
+          <div className="h-10 w-32 bg-gray-700 rounded-lg animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -382,9 +408,19 @@ export function StoreDetailPage({ storeId, serviceId }) {
 
               {/* Service Cards - Using API data */}
               {loading ? (
-                <div className="col-span-full text-center py-12">
-                  <div className="inline-block w-8 h-8 border-4 border-[#037166] border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-white/60 mt-4">Loading services...</p>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="h-96 rounded-3xl bg-[#1a1a1a] border border-white/10 overflow-hidden relative">
+                      <div className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                      <div className="h-48 bg-gray-800" />
+                      <div className="p-6 space-y-4">
+                        <div className="h-6 w-3/4 bg-gray-700 rounded animate-pulse" />
+                        <div className="h-4 w-full bg-gray-700/50 rounded animate-pulse" />
+                        <div className="h-8 w-24 bg-gray-700 rounded-lg animate-pulse" />
+                        <div className="h-12 w-full bg-gray-700 rounded-xl animate-pulse" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : services && services.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -935,6 +971,17 @@ export function StoreDetailPage({ storeId, serviceId }) {
           </motion.div>
         )}
       </AnimatePresence>
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .animate-shimmer {
+          background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+          background-size: 200% 100%;
+          animation: shimmer 2s infinite;
+        }
+      `}</style>
     </motion.div>
   );
 }

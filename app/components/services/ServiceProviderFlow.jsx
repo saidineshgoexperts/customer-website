@@ -177,6 +177,11 @@ export default function ServiceProviderFlow({ serviceType = null }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleViewAllRecent = () => {
+    setCurrentPage('viewAllRecent');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
       <Toaster
@@ -221,7 +226,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
           />
           <RecentlyBooked
             onServiceClick={handleServiceClick}
-            onViewAll={handleGoToAllServices}
+            onViewAll={handleViewAllRecent}
           />
           <PromoBanner />
           <DownloadApp />
@@ -394,6 +399,14 @@ export default function ServiceProviderFlow({ serviceType = null }) {
           type="categories"
           onBack={handleBackToHome}
           onCategoryClick={handleCategoryClick}
+        />
+      )}
+
+      {currentPage === 'viewAllRecent' && (
+        <ViewAllPage
+          type="recent"
+          onBack={handleBackToHome}
+          onServiceClick={handleServiceClick}
         />
       )}
 

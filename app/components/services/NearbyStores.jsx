@@ -31,7 +31,7 @@ const options = {
   ]
 };
 
-export function NearbyServiceCenters() {
+export function NearbyServiceCenters({ onViewAll }) {
   const { location, detectLocation } = useLocation();
   const [selectedService, setSelectedService] = useState(null);
   const [services, setServices] = useState([]);
@@ -149,24 +149,25 @@ export function NearbyServiceCenters() {
 
   // Skeleton
   const SkeletonService = () => (
-    <div className="p-6 rounded-2xl bg-[#1a1a1a]/50 backdrop-blur-sm border border-[#037166]/20 animate-pulse">
-      <div className="flex items-start justify-between mb-3">
+    <div className="p-6 rounded-2xl bg-[#1a1a1a]/50 backdrop-blur-sm border border-[#037166]/20 overflow-hidden relative">
+      <div className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none" />
+      <div className="flex items-start justify-between mb-3 relative z-10">
         <div className="flex-1 space-y-2">
-          <div className="h-5 w-32 bg-[#2a2a2a] rounded" />
+          <div className="h-5 w-32 bg-[#2a2a2a] rounded animate-pulse" />
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
-              <div className="w-4 h-4 bg-[#2a2a2a] rounded-full" />
-              <div className="h-3 w-12 bg-[#2a2a2a] rounded" />
+              <div className="w-4 h-4 bg-[#2a2a2a] rounded-full animate-pulse" />
+              <div className="h-3 w-12 bg-[#2a2a2a] rounded animate-pulse" />
             </div>
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-[#2a2a2a] rounded-full" />
-          <div className="h-4 w-20 bg-[#2a2a2a] rounded" />
+          <div className="w-4 h-4 bg-[#2a2a2a] rounded-full animate-pulse" />
+          <div className="h-4 w-20 bg-[#2a2a2a] rounded animate-pulse" />
         </div>
-        <div className="h-10 w-20 bg-[#2a2a2a] rounded-lg" />
+        <div className="h-10 w-20 bg-[#2a2a2a] rounded-lg animate-pulse" />
       </div>
     </div>
   );
@@ -288,8 +289,8 @@ export function NearbyServiceCenters() {
                   onClick={() => setSelectedService(index)}
                   whileHover={{ scale: 1.02 }}
                   className={`p-6 rounded-2xl cursor-pointer transition-all duration-300 group ${selectedService === index
-                      ? 'bg-gradient-to-r from-[#037166]/30 to-[#04a99d]/20 border-2 border-[#037166] shadow-2xl shadow-[#037166]/40'
-                      : 'bg-[#1a1a1a]/70 border border-[#037166]/20 hover:border-[#037166]/40 hover:bg-[#1a1a1a]/90'
+                    ? 'bg-gradient-to-r from-[#037166]/30 to-[#04a99d]/20 border-2 border-[#037166] shadow-2xl shadow-[#037166]/40'
+                    : 'bg-[#1a1a1a]/70 border border-[#037166]/20 hover:border-[#037166]/40 hover:bg-[#1a1a1a]/90'
                     }`}
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -310,8 +311,8 @@ export function NearbyServiceCenters() {
 
                   <div className="flex items-center justify-between pt-3 border-t border-white/10">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${service.status === 'Open Now'
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                        : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                      : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                       }`}>
                       {service.status}
                     </span>
@@ -345,7 +346,36 @@ export function NearbyServiceCenters() {
             )}
           </motion.div>
         </div>
+
+        {/* View All Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex justify-center mt-16"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 text-white font-medium transition-all duration-300 flex items-center gap-2 group"
+            onClick={onViewAll}
+          >
+            View All Stores
+            <Navigation className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+          </motion.button>
+        </motion.div>
       </div>
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .animate-shimmer {
+          background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+          background-size: 200% 100%;
+          animation: shimmer 2s infinite;
+        }
+      `}</style>
     </section>
   );
 }

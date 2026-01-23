@@ -62,13 +62,13 @@ export function Footer() {
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                     <Phone className="w-4 h-4" />
                   </div>
-                  <span className="text-sm">+1 (555) 123-4567</span>
+                  <span className="text-sm">8886688666</span>
                 </div>
                 <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <span className="text-sm">support@doorstephub.com</span>
+                  <span className="text-sm">help@doorstephub.com</span>
                 </div>
                 <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
@@ -157,7 +157,7 @@ export function Footer() {
               viewport={{ once: true }}
               className="text-white/40 text-sm"
             >
-              © {new Date().getFullYear()} ServiceHub. All rights reserved.
+              © {new Date().getFullYear()} DoorstepHub. All rights reserved.
             </motion.p>
 
             {/* Social Links */}

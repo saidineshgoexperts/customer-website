@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Star, MapPin, Zap, Loader2 } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Zap, Loader2, Navigation, ArrowRight } from 'lucide-react';
 import { fetchFeaturedServices, imageLoader } from '@/lib/api';
+import { useLocation } from '@/hooks/useLocation';
 
 export function ViewAllPage({
   type,
@@ -12,7 +13,27 @@ export function ViewAllPage({
 }) {
   const [categories, setCategories] = useState([]);
   const [featuredServices, setFeaturedServices] = useState([]);
+  const [stores, setStores] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { location, detectLocation } = useLocation();
+
+  const ShimmerGrid = () => {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="group">
+            <div className="relative h-80 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 shadow-lg">
+              <div className="w-full h-full bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 animate-shimmer" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
+              <div className="absolute inset-0 flex items-end p-8">
+                <div className="h-8 w-48 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (type === 'categories') {
@@ -53,6 +74,48 @@ export function ViewAllPage({
       };
 
       fetchCategories();
+    } else if (type === 'stores') {
+      const fetchStores = async () => {
+        try {
+          setIsLoading(true);
+          // Use location if available, otherwise try to detect
+          let currentLoc = location;
+          if (!currentLoc) {
+            // Default to Hyderabad if detection fails or is pending
+            currentLoc = { lat: 17.3850, lng: 78.4867 };
+          }
+
+          const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/nearest_service_centers', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              lattitude: currentLoc.lat,
+              longitude: currentLoc.lng,
+            }),
+          });
+
+          if (!response.ok) throw new Error('Failed to fetch stores');
+          const result = await response.json();
+
+          if (result.success && result.nearestServiceCenters) {
+            setStores(result.nearestServiceCenters.map(item => ({
+              id: item._id,
+              name: item.name || `${item.firstName} ${item.lastName}`,
+              address: item.address || item.cityName || 'Location not specified',
+              rating: item.rating || 4.5,
+              image: item.image ? `https://api.doorstephub.com/${item.image}` : 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400',
+              reviews: item.reviews || 'New'
+            })));
+          }
+        } catch (error) {
+          console.error('Error fetching stores:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchStores();
     } else if (type === 'featured') {
       const loadFeatured = async () => {
         try {
@@ -66,10 +129,42 @@ export function ViewAllPage({
         }
       };
       loadFeatured();
+    } else if (type === 'recent') {
+      const fetchRecentServices = async () => {
+        try {
+          setIsLoading(true);
+          const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/latest_bookings_services', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) throw new Error('Failed to fetch recent services');
+          const data = await response.json();
+          if (data.success && data.services) {
+            setRecentServices(data.services.map(service => ({
+              id: service._id,
+              image: service.mainImage ? `https://api.doorstephub.com/${service.mainImage}` : 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=400',
+              title: service.serviceName,
+              description: `${service.categoryName} - ${service.subcategoryName}`,
+              price: '₹999+',
+              bookings: Math.floor(Math.random() * 200) + 50,
+              categoryName: service.categoryName,
+              subcategoryName: service.subcategoryName,
+            })));
+          }
+        } catch (error) {
+          console.error('Error fetching recent services:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchRecentServices();
     } else {
       setIsLoading(false);
     }
-  }, [type]);
+  }, [type, location]);
 
   const getTitle = () => {
     switch (type) {
@@ -79,6 +174,8 @@ export function ViewAllPage({
         return 'All Nearby Stores';
       case 'categories':
         return 'All Categories';
+      case 'recent':
+        return 'Recently Booked Services';
       default:
         return '';
     }
@@ -107,9 +204,19 @@ export function ViewAllPage({
       {/* Grid Content */}
       <section className="max-w-[1400px] mx-auto px-6 lg:px-8 py-12">
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-10 h-10 text-[#037166] animate-spin" />
-          </div>
+          <>
+            <ShimmerGrid />
+            <style jsx>{`
+              @keyframes shimmer {
+                0% { background-position: -200% 0; }
+                100% { background-position: 200% 0; }
+              }
+              .animate-shimmer {
+                background-size: 200% 100%;
+                animation: shimmer 1.5s infinite;
+              }
+            `}</style>
+          </>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {type === 'categories' && categories.map((category, index) => (
@@ -181,40 +288,80 @@ export function ViewAllPage({
               </motion.div>
             ))}
 
-            {type === 'stores' && [1, 2, 3, 4, 5, 6].map((id) => (
+            {type === 'stores' && stores.map((store, index) => (
               <motion.div
-                key={id}
+                key={store.id || index}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: id * 0.05 }}
+                transition={{ delay: index * 0.05 }}
                 whileHover={{ y: -8 }}
-                onClick={() => onStoreClick?.(id)}
+                onClick={() => onStoreClick?.(store.id)}
                 className="group cursor-pointer"
               >
-                <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-[#1a1a1a] border border-white/10">
+                <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-[#1a1a1a] border border-white/10 h-full">
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"
-                      alt="Store"
+                      src={store.image}
+                      alt={store.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
-                      Service Center {id}
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                      {store.name}
                     </h3>
-                    <p className="text-white/60 text-sm mb-4 flex items-center gap-2">
+                    <p className="text-white/60 text-sm mb-4 flex items-center gap-2 line-clamp-1">
                       <MapPin className="w-4 h-4 text-[#04a99d]" />
-                      123 Main Street, City
+                      {store.address}
                     </p>
                     <div className="flex items-center gap-1 mb-4">
                       <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
-                      <span className="text-white font-medium">4.8</span>
-                      <span className="text-white/40">(890 reviews)</span>
+                      <span className="text-white font-medium">{store.rating}</span>
+                      <span className="text-white/40">({store.reviews} reviews)</span>
                     </div>
-                    <button className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all">
+                    <button className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all flex items-center justify-center gap-2">
                       View Center
+                      <ArrowRight className="w-4 h-4" />
                     </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+
+            {type === 'recent' && recentServices.map((service, index) => (
+              <motion.div
+                key={service.id || index}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="group cursor-pointer h-full"
+                onClick={() => onServiceClick?.(service.id, service.categoryName, service.subcategoryName)}
+              >
+                <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 shadow-lg">
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                      <Star className="w-4 h-4 text-[#04a99d] fill-[#04a99d]" />
+                      <span className="text-sm font-medium text-white">4.8</span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                      {service.title}
+                    </h3>
+                    <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
+                    <div className="flex items-center justify-between mt-auto">
+                      <p className="text-2xl font-bold text-white">₹999+</p>
+                      <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg transition-all text-sm flex items-center gap-2">
+                        Book Now
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
