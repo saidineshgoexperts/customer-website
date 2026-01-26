@@ -27,6 +27,7 @@ export const ServiceCartProvider = ({ children }) => {
                 }
             });
             const data = await response.json();
+            console.log("🛒 fetchCart Response:", data);
             if (data.success) {
                 setCartItems(data.cart?.items || []);
                 setCartData(data.cart || null);
@@ -42,7 +43,7 @@ export const ServiceCartProvider = ({ children }) => {
         fetchCart();
     }, [fetchCart]);
 
-    const addToCart = async (providerId, itemId, itemType = 'service', quantity = 1, parentServiceId = null) => {
+    const addToCart = async (providerId, itemId, itemType = 'service', quantity = 1, parentServiceId = null, providerType = 'regular') => {
         if (!isAuthenticated) {
             toast.error('Please login to add items to cart');
             openAuthModal(); // Trigger the auth modal
@@ -52,8 +53,8 @@ export const ServiceCartProvider = ({ children }) => {
             const body = {
                 providerId,
                 itemId,
-                itemType, // 'service' or 'addon'
-                providerType: 'regular',
+                itemType, // 'service', 'addon', 'professional_service', 'professional_addon'
+                providerType, // 'regular' or 'professional'
                 quantity
             };
 

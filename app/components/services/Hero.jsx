@@ -1,20 +1,78 @@
-'use client';
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Sparkles, Shield, Clock } from 'lucide-react';
 import { ServicePreviewCard } from '@/components/services/ServicePreviewCard';
 
-const services = [
-  { image: 'https://images.unsplash.com/photo-1715591780947-2784b54e5bfa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvdmVuJTIwcmVwYWlyJTIwdGVjaG5pY2lhbnxlbnwxfHx8fDE3NjgwMzgwNTd8MA&ixlib=rb-4.1.0&q=80&w=1080', title: 'Oven Repair' },
-  { image: 'https://images.unsplash.com/photo-1762329405381-fe8014d280d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZWxldmlzaW9uJTIwcmVwYWlyfGVufDF8fHx8MTc2ODAzODA1N3ww&ixlib=rb-4.1.0&q=80&w=1080', title: 'TV Repair' },
-  { image: 'https://images.unsplash.com/photo-1686178827149-6d55c72d81df?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob21lJTIwY2xlYW5pbmclMjBzZXJ2aWNlfGVufDF8fHx8MTc2Nzk3ODg1Nnww&ixlib=rb-4.1.0&q=80&w=1080', title: 'Home Cleaning' },
-  { image: 'https://images.unsplash.com/photo-1716193696093-9c54b6a290e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWZyaWdlcmF0b3IlMjByZXBhaXJ8ZW58MXx8fHwxNzY4MDM4MDU4fDA&ixlib=rb-4.1.0&q=80&w=1080', title: 'Refrigerator Repair' },
-  { image: 'https://images.unsplash.com/photo-1696546761269-a8f9d2b80512?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3YXNoaW5nJTIwbWFjaGluZSUyMHJlcGFpcnxlbnwxfHx8fDE3Njc5OTYyMTR8MA&ixlib=rb-4.1.0&q=80&w=1080', title: 'Washing Machine' },
-  { image: 'https://images.unsplash.com/photo-1721332154191-ba5f1534266e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb21wdXRlciUyMGxhcHRvcCUyMHJlcGFpcnxlbnwxfHx8fDE3NjgwMzgwNTh8MA&ixlib=rb-4.1.0&q=80&w=1080', title: 'Computer Repair' },
-  { image: 'https://images.unsplash.com/photo-1746005718004-1f992c399428?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzbWFydHBob25lJTIwcmVwYWlyJTIwdGVjaG5pY2lhbnxlbnwxfHx8fDE3NjgwMzgwNTl8MA&ixlib=rb-4.1.0&q=80&w=1080', title: 'Mobile Repair' },
-];
-
 export function Hero({ onViewServices, onBookService }) {
+  const router = useRouter();
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const { latitude, longitude } = position.coords;
+              await fetchCategoriesFromAPI(latitude.toString(), longitude.toString());
+            },
+            () => {
+              fetchWithDefaultLocation();
+            }
+          );
+        } else {
+          fetchWithDefaultLocation();
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setIsLoading(false);
+      }
+    };
+
+    const fetchCategoriesFromAPI = async (lattitude, longitude) => {
+      try {
+        const body = lattitude && longitude ? { lattitude, longitude } : {};
+        const response = await fetch(
+          'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getallcategorys',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: Object.keys(body).length > 0 ? JSON.stringify(body) : undefined,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch categories');
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.data && result.data.length > 0) {
+          const mappedCategories = result.data.map((item) => ({
+            title: item.name,
+            image: `https://api.doorstephub.com/${item.image}`,
+            _id: item._id,
+            status: item.status,
+          }));
+          setCategories(mappedCategories);
+        }
+      } catch (error) {
+        console.error('API Error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const fetchWithDefaultLocation = async () => {
+      await fetchCategoriesFromAPI('17.4391296', '78.4433152'); // Hyderabad
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
     <section className="relative min-h-screen pt-32 pb-20 overflow-hidden">
       {/* Animated Background */}
@@ -33,7 +91,7 @@ export function Hero({ onViewServices, onBookService }) {
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight text-white">
             Expert Home Services
             <br />
             <span className="bg-gradient-to-r from-[#037166] via-[#04a99d] to-[#037166] bg-clip-text text-transparent">
@@ -92,11 +150,19 @@ export function Hero({ onViewServices, onBookService }) {
         <div className="mt-20">
           <div className="relative">
             <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {services.map((service, i) => (
-                <div key={service.title} className="flex-shrink-0">
-                  <ServicePreviewCard service={service} index={i} />
-                </div>
-              ))}
+              {isLoading
+                ? Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex-shrink-0 w-48 h-64 rounded-2xl bg-white/5 animate-pulse" />
+                ))
+                : categories.map((category, i) => (
+                  <div
+                    key={category._id || i}
+                    className="flex-shrink-0"
+                    onClick={() => router.push(`/services/category/${category._id}?name=${encodeURIComponent(category.title)}`)}
+                  >
+                    <ServicePreviewCard service={category} index={i} />
+                  </div>
+                ))}
             </div>
 
             {/* Fade gradient on sides */}
@@ -105,6 +171,16 @@ export function Hero({ onViewServices, onBookService }) {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .scrollbar-hide {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 }

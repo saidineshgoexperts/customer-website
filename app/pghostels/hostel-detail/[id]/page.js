@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useRouter, useParams } from 'next/navigation';
 import {
@@ -11,65 +11,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/pghostels
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { AddonsModal } from '@/components/pghostels/AddonsModal';
+import { useServiceCart } from '@/context/ServiceCartContext';
 
-const mockHostelData = {
-    id: '1',
-    name: 'MAHENDRA A',
-    location: 'Koramangala, Bangalore',
-    address: '123, 5th Main Road, Koramangala 1st Block, Bangalore - 560034',
-    rating: 4.3,
-    orders: 8,
-    basePrice: 175,
-    monthlyPrice: 6500,
-    logo: 'https://images.unsplash.com/photo-1730096081994-73f1fa5f189a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3N0ZWwlMjByZWNlcHRpb24lMjBkZXNrfGVufDF8fHx8MTc2ODY0NjcxNHww&ixlib=rb-4.1.0&q=80&w=1080',
-    images: [
-        'https://images.unsplash.com/photo-1617430690223-3e165b390e25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3N0ZWwlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2NDU4OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        'https://images.unsplash.com/photo-1760067538068-03d10481bacb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcmVtaXVtJTIwaG9zdGVsJTIwcm9vbSUyMG1vZGVybnxlbnwxfHx8fDE3Njg2NDY3MTF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        'https://images.unsplash.com/photo-1707598973296-255b29445512?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xpdmluZyUyMHdvcmtzcGFjZSUyMGxvdW5nZXxlbnwxfHx8fDE3Njg2NDY3MTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        'https://images.unsplash.com/photo-1758523417133-41f21fb9f058?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaGFyZWQlMjBhcGFydG1lbnQlMjBraXRjaGVufGVufDF8fHx8MTc2ODY0NjcxM3ww&ixlib=rb-4.1.0&q=80&w=1080',
-        'https://images.unsplash.com/photo-1638454668466-e8dbd5462f20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2MjY5Nzl8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        'https://images.unsplash.com/photo-1709805619372-40de3f158e83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3N0ZWwlMjBiZWRyb29tJTIwZG9ybWl0b3J5fGVufDF8fHx8MTc2ODY0NTg5M3ww&ixlib=rb-4.1.0&q=80&w=1080',
-    ],
-    amenities: [
-        { icon: Wifi, label: 'High-Speed WiFi', available: true },
-        { icon: Utensils, label: '3 Meals Daily', available: true },
-        { icon: Shirt, label: 'Laundry Service', available: true },
-        { icon: Zap, label: 'Power Backup', available: true },
-        { icon: Car, label: 'Parking', available: true },
-        { icon: Shield, label: '24/7 Security', available: true },
-        { icon: Sparkles, label: 'AC Rooms', available: false },
-        { icon: Camera, label: 'CCTV', available: true },
-    ],
-    reviews: [
-        {
-            name: 'Priya Sharma',
-            avatar: '👩‍💼',
-            rating: 5,
-            date: '2 days ago',
-            comment: 'Excellent PG with great facilities. The food is amazing and the staff is very friendly. Highly recommended for working professionals.'
-        },
-        {
-            name: 'Rahul Kumar',
-            avatar: '👨‍💻',
-            rating: 4,
-            date: '1 week ago',
-            comment: 'Very clean and well-maintained. Good WiFi speed. Only issue is parking can be tight during peak hours.'
-        },
-        {
-            name: 'Sneha Patel',
-            avatar: '👩‍🎓',
-            rating: 5,
-            date: '2 weeks ago',
-            comment: 'Perfect location near my office. The rooms are spacious and the management is responsive to any issues.'
-        },
-    ],
-    about: 'MAHENDRA A is a premium PG accommodation located in the heart of Koramangala. We provide comfortable, safe, and affordable living spaces for students and working professionals. Our facility offers modern amenities, home-cooked meals, and a friendly community atmosphere.',
-    rules: [
-        { rule: 'Entry time: 11:00 PM', allowed: true },
-        { rule: 'Visitors allowed with prior notice', allowed: true },
-        { rule: 'No smoking inside premises', allowed: false },
-        { rule: 'Monthly payment in advance', allowed: true },
-    ],
+const amenityIcons = {
+    Wifi: Wifi,
+    Food: Utensils,
+    Laundry: Shirt,
+    PowerBackup: Zap,
+    Parking: Car,
+    Security: Shield,
+    AC: Sparkles,
+    CCTV: Camera,
+    WiFi: Wifi, // handle variations
+    "High-Speed WiFi": Wifi,
 };
 
 export default function NewHostelDetailPage() {
@@ -80,6 +35,11 @@ export default function NewHostelDetailPage() {
     const { scrollY } = useScroll();
     const headerOpacity = useTransform(scrollY, [0, 300], [1, 0.8]);
 
+    const [hostelData, setHostelData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [selectedPackage, setSelectedPackage] = useState(null);
+    const [showAddonsModal, setShowAddonsModal] = useState(false);
+
     const sliderSettings = {
         dots: true,
         infinite: true,
@@ -89,6 +49,114 @@ export default function NewHostelDetailPage() {
         autoplay: true,
         autoplaySpeed: 4000,
     };
+
+    useEffect(() => {
+        const fetchHostelData = async () => {
+            if (!id) return;
+
+            setLoading(true);
+            try {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/single-professional-provider', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        providerId: id
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success && data.storeData && data.storeData.length > 0) {
+                    const store = data.storeData[0];
+
+                    // Map API Data to UI Model
+                    const mappedData = {
+                        id: id,
+                        name: store.business_name || `${store.firstName} ${store.lastName}`,
+                        location: store.address || 'Location not available',
+                        address: store.address || 'Address not available',
+                        rating: parseFloat(store.avgRating || 4.5).toFixed(1),
+                        orders: store.totalOrders || 0,
+                        basePrice: store.BasePrice || 0,
+                        monthlyPrice: store.BasePrice * 30 || 5000, // Roughly estimating if not provided directly
+                        logo: store.logo ? `https://api.doorstephub.com/${store.logo}` : 'https://images.unsplash.com/photo-1730096081994-73f1fa5f189a?fit=max&fm=jpg&w=200',
+                        images: data.serviceImages && data.serviceImages.length > 0
+                            ? data.serviceImages.map(img => `https://api.doorstephub.com${img}`)
+                            : ['https://images.unsplash.com/photo-1617430690223-3e165b390e25?fit=max&fm=jpg&w=1080'],
+
+                        amenities: [
+                            ...(Array.isArray(data.amenities) ? data.amenities : []),
+                            ...(data.otherAmenities ? data.otherAmenities.split(',').map(a => a.trim()) : [])
+                        ].map(amenity => ({
+                            icon: amenityIcons[amenity] || Sparkles,
+                            label: amenity,
+                            available: true
+                        })),
+
+                        reviews: data.customerRatings ? data.customerRatings.map(review => ({
+                            name: review.name || 'Anonymous',
+                            avatar: review.image || '👤',
+                            rating: review.rating,
+                            date: review.date ? new Date(review.date).toLocaleDateString() : 'Recently',
+                            comment: review.comment || 'No comment provided.'
+                        })) : [],
+
+                        packages: data.provider_rate_cards || [],
+                        about: data.aboutUs || store.bio || 'Premium PG accommodation with all modern amenities.',
+                        rules: [
+                            { rule: 'Entry time: 11:00 PM', allowed: true },
+                            { rule: 'No smoking inside premises', allowed: false },
+                        ] // defaulting rules for now as not in API sample provided
+                    };
+
+                    setHostelData(mappedData);
+                    // Select first package by default if available
+                    if (mappedData.packages.length > 0) {
+                        setSelectedPackage(mappedData.packages[0]);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching hostel data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchHostelData();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#037166]"></div>
+            </div>
+        );
+    }
+
+    const handleContinueToBook = () => {
+        if (!selectedPackage) {
+            alert("Please select a package from the Portfolio tab.");
+            setActiveTab('portfolio');
+            // smooth scroll to tabs
+            window.scrollTo({ top: 500, behavior: 'smooth' });
+            return;
+        }
+        setShowAddonsModal(true);
+    };
+
+    const handleAddonsContinue = (selectedAddons) => {
+        setShowAddonsModal(false);
+        const addonIds = selectedAddons.map(a => a._id).join(',');
+        // Navigate to address page with package details and selected addons
+        router.push(`/pghostels/booking/address?providerId=${id}&packageId=${selectedPackage._id}&addons=${addonIds}`);
+    };
+
+    if (!hostelData) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <p className="text-gray-500 text-lg">Hostel details not found.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pb-32">
@@ -108,7 +176,7 @@ export default function NewHostelDetailPage() {
                 className="relative h-[500px] overflow-hidden"
             >
                 <Slider {...sliderSettings}>
-                    {mockHostelData.images.map((image, index) => (
+                    {hostelData.images.map((image, index) => (
                         <div key={index} className="relative h-[500px]">
                             <div
                                 className="absolute inset-0 bg-cover bg-center"
@@ -132,18 +200,18 @@ export default function NewHostelDetailPage() {
                         <div className="flex items-start space-x-4">
                             <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-gray-200 flex-shrink-0">
                                 <img
-                                    src={mockHostelData.logo}
-                                    alt={mockHostelData.name}
+                                    src={hostelData.logo}
+                                    alt={hostelData.name}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
                             <div>
                                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                                    {mockHostelData.name}
+                                    {hostelData.name}
                                 </h1>
                                 <div className="flex items-center text-gray-600">
                                     <MapPin className="w-4 h-4 mr-1" />
-                                    <span>{mockHostelData.location}</span>
+                                    <span>{hostelData.location}</span>
                                 </div>
                             </div>
                         </div>
@@ -154,7 +222,7 @@ export default function NewHostelDetailPage() {
                             <div className="bg-gradient-to-br from-[#F59E0B]/10 to-[#F59E0B]/5 rounded-2xl p-4 border border-[#F59E0B]/20 min-w-[120px]">
                                 <div className="flex items-center justify-center mb-1">
                                     <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B] mr-1" />
-                                    <span className="text-2xl font-bold text-gray-900">{mockHostelData.rating}</span>
+                                    <span className="text-2xl font-bold text-gray-900">{hostelData.rating}</span>
                                 </div>
                                 <div className="text-xs text-gray-500 text-center">Rating</div>
                             </div>
@@ -163,7 +231,7 @@ export default function NewHostelDetailPage() {
                             <div className="bg-gradient-to-br from-[#037166]/10 to-[#037166]/5 rounded-2xl p-4 border border-[#037166]/20 min-w-[120px]">
                                 <div className="flex items-center justify-center mb-1">
                                     <TrendingUp className="w-5 h-5 text-[#037166] mr-1" />
-                                    <span className="text-2xl font-bold text-gray-900">{mockHostelData.orders}</span>
+                                    <span className="text-2xl font-bold text-gray-900">{hostelData.orders}</span>
                                 </div>
                                 <div className="text-xs text-gray-500 text-center">Orders</div>
                             </div>
@@ -172,7 +240,7 @@ export default function NewHostelDetailPage() {
                             <div className="bg-gradient-to-br from-[#037166]/10 to-[#037166]/5 rounded-2xl p-4 border border-[#037166]/20 min-w-[120px]">
                                 <div className="flex items-center justify-center mb-1">
                                     <DollarSign className="w-5 h-5 text-[#037166] mr-1" />
-                                    <span className="text-2xl font-bold text-gray-900">₹{mockHostelData.basePrice}</span>
+                                    <span className="text-2xl font-bold text-gray-900">₹{hostelData.basePrice}</span>
                                 </div>
                                 <div className="text-xs text-gray-500 text-center">Base Price</div>
                             </div>
@@ -220,131 +288,151 @@ export default function NewHostelDetailPage() {
 
                     {/* Portfolio Tab */}
                     <TabsContent value="portfolio" className="space-y-4">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="grid md:grid-cols-2 gap-4"
-                        >
-                            {mockHostelData.images.map((image, index) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: index * 0.1 }}
-                                    whileHover={{ scale: 1.02 }}
-                                    className="relative h-80 rounded-2xl overflow-hidden cursor-pointer group shadow-lg"
-                                >
+                        <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-[#037166]" />
+                            Please select a package to proceed:
+                        </div>
+                        {hostelData.packages.length > 0 ? (
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {hostelData.packages.map((pkg, index) => (
                                     <div
-                                        className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-                                        style={{ backgroundImage: `url(${image})` }}
-                                    />
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                                        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Camera className="w-6 h-6 text-white" />
+                                        key={pkg._id || index}
+                                        onClick={() => setSelectedPackage(pkg)}
+                                        className={`bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer relative ${selectedPackage?._id === pkg._id
+                                            ? 'border-2 border-[#037166] ring-2 ring-[#037166]/10'
+                                            : 'border-gray-100'
+                                            }`}
+                                    >
+                                        {selectedPackage?._id === pkg._id && (
+                                            <div className="absolute top-3 right-3 z-10 bg-[#037166] text-white p-1 rounded-full shadow-lg">
+                                                <Check className="w-4 h-4" />
+                                            </div>
+                                        )}
+                                        <div className="h-48 bg-gray-100 relative">
+                                            {pkg.image ? (
+                                                <img src={`https://api.doorstephub.com/${pkg.image}`} alt={pkg.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
+                                            )}
+                                        </div>
+                                        <div className="p-4">
+                                            <h3 className="font-bold text-gray-900 mb-1">{pkg.name}</h3>
+                                            <p className="text-gray-600 text-sm mb-3 line-clamp-2">{pkg.description}</p>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[#037166] font-bold text-lg">₹{pkg.price}</span>
+                                                <span className="text-xs text-gray-500">{pkg.priceUnit}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-10 text-gray-500">No packages/portfolio available.</div>
+                        )}
                     </TabsContent>
 
                     {/* Reviews Tab */}
                     <TabsContent value="reviews" className="space-y-4">
-                        {mockHostelData.reviews.map((review, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
-                            >
-                                <div className="flex items-start space-x-4">
-                                    {/* Avatar */}
-                                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#037166] to-[#025951] flex items-center justify-center text-2xl flex-shrink-0">
-                                        {review.avatar}
-                                    </div>
+                        {hostelData.reviews.length > 0 ? (
+                            hostelData.reviews.map((review, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+                                >
+                                    <div className="flex items-start space-x-4">
+                                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#037166] to-[#025951] flex items-center justify-center text-2xl flex-shrink-0 text-white">
+                                            {review.avatar || review.name.charAt(0)}
+                                        </div>
 
-                                    <div className="flex-1">
-                                        {/* Header */}
-                                        <div className="flex items-start justify-between mb-2">
-                                            <div>
-                                                <h4 className="font-bold text-gray-900">{review.name}</h4>
-                                                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                                                    <Clock className="w-3.5 h-3.5" />
-                                                    <span>{review.date}</span>
+                                        <div className="flex-1">
+                                            <div className="flex items-start justify-between mb-2">
+                                                <div>
+                                                    <h4 className="font-bold text-gray-900">{review.name}</h4>
+                                                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                                        <Clock className="w-3.5 h-3.5" />
+                                                        <span>{review.date}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center space-x-1">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <Star
+                                                            key={i}
+                                                            className={`w-4 h-4 ${i < Math.floor(review.rating)
+                                                                ? 'fill-[#F59E0B] text-[#F59E0B]'
+                                                                : 'text-gray-300'
+                                                                }`}
+                                                        />
+                                                    ))}
                                                 </div>
                                             </div>
 
-                                            {/* Rating Stars */}
-                                            <div className="flex items-center space-x-1">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star
-                                                        key={i}
-                                                        className={`w-4 h-4 ${i < review.rating
-                                                            ? 'fill-[#F59E0B] text-[#F59E0B]'
-                                                            : 'text-gray-300'
-                                                            }`}
-                                                    />
-                                                ))}
-                                            </div>
+                                            <p className="text-gray-700 leading-relaxed">{review.comment}</p>
                                         </div>
-
-                                        {/* Comment */}
-                                        <p className="text-gray-700 leading-relaxed">{review.comment}</p>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            ))
+                        ) : (
+                            <div className="text-center py-10 text-gray-500">No reviews yet.</div>
+                        )}
+
                     </TabsContent>
 
                     {/* Amenities Tab */}
                     <TabsContent value="amenities">
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {mockHostelData.amenities.map((amenity, index) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: index * 0.05 }}
-                                    className={`rounded-2xl p-6 border-2 transition-all ${amenity.available
-                                        ? 'bg-gradient-to-br from-[#037166]/10 to-[#037166]/5 border-[#037166]/30 hover:border-[#037166]'
-                                        : 'bg-gray-50 border-gray-200'
-                                        }`}
-                                >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div
-                                            className={`w-12 h-12 rounded-xl flex items-center justify-center ${amenity.available
-                                                ? 'bg-[#037166]/20'
-                                                : 'bg-gray-200'
-                                                }`}
-                                        >
-                                            <amenity.icon
-                                                className={`w-6 h-6 ${amenity.available ? 'text-[#037166]' : 'text-gray-400'
-                                                    }`}
-                                            />
-                                        </div>
-                                        <div
-                                            className={`w-6 h-6 rounded-full flex items-center justify-center ${amenity.available
-                                                ? 'bg-[#22C55E]/20'
-                                                : 'bg-red-100'
-                                                }`}
-                                        >
-                                            {amenity.available ? (
-                                                <Check className="w-4 h-4 text-[#22C55E]" />
-                                            ) : (
-                                                <X className="w-4 h-4 text-red-500" />
-                                            )}
-                                        </div>
-                                    </div>
-                                    <h4
-                                        className={`font-semibold ${amenity.available ? 'text-gray-900' : 'text-gray-400'
+                        {hostelData.amenities.length > 0 ? (
+                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {hostelData.amenities.map((amenity, index) => (
+                                    <motion.div
+                                        key={index}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        className={`rounded-2xl p-6 border-2 transition-all ${amenity.available
+                                            ? 'bg-gradient-to-br from-[#037166]/10 to-[#037166]/5 border-[#037166]/30 hover:border-[#037166]'
+                                            : 'bg-gray-50 border-gray-200'
                                             }`}
                                     >
-                                        {amenity.label}
-                                    </h4>
-                                </motion.div>
-                            ))}
-                        </div>
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div
+                                                className={`w-12 h-12 rounded-xl flex items-center justify-center ${amenity.available
+                                                    ? 'bg-[#037166]/20'
+                                                    : 'bg-gray-200'
+                                                    }`}
+                                            >
+                                                <amenity.icon
+                                                    className={`w-6 h-6 ${amenity.available ? 'text-[#037166]' : 'text-gray-400'
+                                                        }`}
+                                                />
+                                            </div>
+                                            <div
+                                                className={`w-6 h-6 rounded-full flex items-center justify-center ${amenity.available
+                                                    ? 'bg-[#22C55E]/20'
+                                                    : 'bg-red-100'
+                                                    }`}
+                                            >
+                                                {amenity.available ? (
+                                                    <Check className="w-4 h-4 text-[#22C55E]" />
+                                                ) : (
+                                                    <X className="w-4 h-4 text-red-500" />
+                                                )}
+                                            </div>
+                                        </div>
+                                        <h4
+                                            className={`font-semibold ${amenity.available ? 'text-gray-900' : 'text-gray-400'
+                                                }`}
+                                        >
+                                            {amenity.label}
+                                        </h4>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-10 text-gray-500">No amenities listed.</div>
+                        )}
                     </TabsContent>
 
                     {/* About Tab */}
@@ -357,7 +445,7 @@ export default function NewHostelDetailPage() {
                             {/* Description */}
                             <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">About the PG</h3>
-                                <p className="text-gray-700 leading-relaxed text-lg">{mockHostelData.about}</p>
+                                <p className="text-gray-700 leading-relaxed text-lg">{hostelData.about}</p>
                             </div>
 
                             {/* Address */}
@@ -366,14 +454,14 @@ export default function NewHostelDetailPage() {
                                     <MapPin className="w-5 h-5 mr-2 text-[#037166]" />
                                     Address
                                 </h3>
-                                <p className="text-gray-700 text-lg">{mockHostelData.address}</p>
+                                <p className="text-gray-700 text-lg">{hostelData.address}</p>
                             </div>
 
                             {/* Rules */}
                             <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
                                 <h3 className="text-2xl font-bold text-gray-900 mb-6">House Rules</h3>
                                 <div className="space-y-4">
-                                    {mockHostelData.rules.map((item, index) => (
+                                    {hostelData.rules.map((item, index) => (
                                         <div
                                             key={index}
                                             className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl"
@@ -411,23 +499,36 @@ export default function NewHostelDetailPage() {
                         <div className="text-sm text-gray-500 mb-1">Monthly Price</div>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-3xl font-bold text-gray-900">
-                                ₹{mockHostelData.monthlyPrice.toLocaleString()}
+                                {selectedPackage
+                                    ? `₹${selectedPackage.price.toLocaleString()}`
+                                    : `₹${hostelData.monthlyPrice.toLocaleString()}`}
                             </span>
-                            <span className="text-sm text-gray-500">/month</span>
+                            <span className="text-sm text-gray-500">
+                                {selectedPackage ? `/${selectedPackage.priceUnit}` : '/month'}
+                            </span>
                         </div>
                         <div className="text-xs text-gray-400 mt-1">
-                            ₹{mockHostelData.basePrice}/day base price
+                            {selectedPackage ? 'Selected Package' : `₹${hostelData.basePrice}/day base price`}
                         </div>
                     </div>
 
                     <button
-                        onClick={() => router.push('/pghostels/booking/address')}
+                        onClick={handleContinueToBook}
                         className="px-12 py-4 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-[#037166]/40 transition-all transform hover:scale-105"
                     >
                         Continue to Book
                     </button>
                 </div>
             </motion.div>
+
+            {/* Add-ons Modal */}
+            <AddonsModal
+                isOpen={showAddonsModal}
+                onClose={() => setShowAddonsModal(false)}
+                providerId={id}
+                selectedPackageId={selectedPackage?._id}
+                onContinue={handleAddonsContinue}
+            />
         </div>
     );
 }

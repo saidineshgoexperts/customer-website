@@ -1,72 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
     MapPin, Star, Search, Sliders, Heart, TrendingUp, X, Wifi, Utensils,
-    Shirt, Zap, Award, Sparkles, ChevronRight
+    Shirt, Zap, Award, Sparkles, ChevronRight, Check
 } from 'lucide-react';
 import { Input } from '@/components/pghostels/ui/input';
-
-const mockListings = [
-    {
-        id: '1',
-        name: 'MAHENDRA A',
-        location: 'Koramangala, Bangalore',
-        rating: 4.3,
-        orders: 8,
-        monthlyPrice: 6500,
-        image: 'https://images.unsplash.com/photo-1617430690223-3e165b390e25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3N0ZWwlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2NDU4OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        distance: 0.6,
-        matchScore: 92,
-        badges: ['Verified', 'Best for Students'],
-        amenities: ['WiFi', 'Food', 'AC', 'Laundry'],
-        availableBeds: 3,
-    },
-    {
-        id: '2',
-        name: 'GREEN VALLEY PG',
-        location: 'Whitefield, Bangalore',
-        rating: 4.8,
-        orders: 142,
-        monthlyPrice: 8500,
-        image: 'https://images.unsplash.com/photo-1760067538068-03d10481bacb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcmVtaXVtJTIwaG9zdGVsJTIwcm9vbSUyMG1vZGVybnxlbnwxfHx8fDE3Njg2NDY3MTF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        distance: 0.8,
-        matchScore: 95,
-        badges: ['Verified', 'Near Metro'],
-        amenities: ['WiFi', 'Food', 'AC', 'Laundry'],
-        availableBeds: 2,
-    },
-    {
-        id: '3',
-        name: 'URBAN NEST CO-LIVING',
-        location: 'Indiranagar, Bangalore',
-        rating: 4.6,
-        orders: 89,
-        monthlyPrice: 12000,
-        image: 'https://images.unsplash.com/photo-1707598973296-255b29445512?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xpdmluZyUyMHdvcmtzcGFjZSUyMGxvdW5nZXxlbnwxfHx8fDE3Njg2NDY3MTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        distance: 1.2,
-        matchScore: 88,
-        badges: ['Verified', 'Premium'],
-        amenities: ['WiFi', 'Food', 'AC', 'Gym'],
-        availableBeds: 5,
-    },
-    {
-        id: '4',
-        name: 'ELITE WOMEN\'S HOSTEL',
-        location: 'Koramangala, Bangalore',
-        rating: 4.9,
-        orders: 201,
-        monthlyPrice: 10000,
-        image: 'https://images.unsplash.com/photo-1638454668466-e8dbd5462f20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2MjY5Nzl8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        distance: 0.5,
-        matchScore: 97,
-        badges: ['Verified', 'Top Rated', 'Near Metro'],
-        amenities: ['WiFi', 'Food', 'AC', 'Laundry'],
-        availableBeds: 1,
-    },
-];
+import { useLocationContext } from '@/context/LocationContext';
 
 const amenityIcons = {
     WiFi: Wifi,
@@ -79,12 +21,93 @@ const amenityIcons = {
 function PGResultsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { location, detectWithIP } = useLocationContext();
+
+    // Params
     const categoryName = searchParams.get('categoryName');
+    const subcategoryId = searchParams.get('subcategoryId');
     const roomType = searchParams.get('roomType');
     const budget = searchParams.get('budget');
+    const duration = searchParams.get('duration');
+    const food = searchParams.get('food');
+    const moveIn = searchParams.get('moveIn');
 
+    // State
+    const [listings, setListings] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [savedItems, setSavedItems] = useState([]);
     const [showNearby, setShowNearby] = useState(false);
+    const [error, setError] = useState(null);
+
+    // Initial load
+    useEffect(() => {
+        // If no location, try to detect it
+        if (!location) {
+            detectWithIP().catch(err => console.log("Auto detect failed", err));
+        }
+    }, [location]);
+
+    // Fetch listings
+    useEffect(() => {
+        const fetchListings = async () => {
+            if (!subcategoryId) return; // Wait for subcategoryId (or handle 'all' case later)
+
+            setLoading(true);
+            try {
+                // Default to Hyderabad coords if location is missing (or handle gracefully)
+                const lat = location?.latitude || "17.3850";
+                const lng = location?.longitude || "78.4867";
+
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        lattitude: lat, // Note: API uses 'lattitude' with double 't'
+                        longitude: lng,
+                        subcategoryId: subcategoryId,
+                        // Include questionnaire responses
+                        roomType,
+                        budget,
+                        duration,
+                        food,
+                        moveIn
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.professionalServices) {
+                    // map API data to our UI model
+                    const mappedListings = data.professionalServices.map(service => ({
+                        id: service._id,
+                        name: service.business_name || `${service.firstName} ${service.lastName}`,
+                        location: service.address, // simpler location for card
+                        address: service.address,
+                        rating: service.rating || 4.5,
+                        orders: service.totalOrders || 0,
+                        monthlyPrice: service.minFare || 5000, // Fallback if not available
+                        image: service.logo ? `https://api.doorstephub.com/${service.logo}` : 'https://images.unsplash.com/photo-1617430690223-3e165b390e25?auto=format&fit=crop&q=80',
+                        distance: 0.0, // Calculate if needed, or get from API if available
+                        matchScore: 90 + Math.floor(Math.random() * 10), // Mock match score for now
+                        badges: ['Verified'],
+                        amenities: service.amenities && service.amenities.length > 0 ? service.amenities : ['WiFi', 'Food', 'AC'],
+                        availableBeds: Math.floor(Math.random() * 5) + 1, // Mock
+                        bio: service.bio
+                    }));
+                    setListings(mappedListings);
+                } else {
+                    setListings([]);
+                }
+            } catch (err) {
+                console.error("Error fetching listings", err);
+                setError("Failed to load listings. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchListings();
+    }, [subcategoryId, location]); // Re-fetch if location updates
 
     const toggleSave = (id) => {
         setSavedItems(prev =>
@@ -96,8 +119,11 @@ function PGResultsContent() {
     if (roomType) filterChips.push(roomType.replace('-', ' '));
     if (budget) filterChips.push(budget);
 
-    const sortedListings = [...mockListings].sort((a, b) => b.matchScore - a.matchScore);
+    const sortedListings = [...listings].sort((a, b) => b.matchScore - a.matchScore);
     const recommendedListings = sortedListings.slice(0, 3);
+    const displayListings = showNearby
+        ? [...sortedListings] // In real app, re-sort by distance
+        : sortedListings;
 
     const PGCard = ({ listing, isNearby }) => {
         const isSaved = savedItems.includes(listing.id);
@@ -174,12 +200,12 @@ function PGResultsContent() {
                     <div className="p-6" onClick={() => router.push(`/pghostels/hostel-detail/${listing.id}`)}>
                         {/* PG Name & Location */}
                         <div className="mb-4">
-                            <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-[#037166] transition-colors">
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-[#037166] transition-colors line-clamp-1">
                                 {listing.name}
                             </h3>
-                            <div className="flex items-center text-gray-600">
-                                <MapPin className="w-4 h-4 mr-1" />
-                                <span>{listing.location}</span>
+                            <div className="flex items-center text-gray-600 overflow-hidden">
+                                <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                                <span className="truncate">{listing.location}</span>
                             </div>
                         </div>
 
@@ -187,7 +213,7 @@ function PGResultsContent() {
                         <div className="flex items-center space-x-4 mb-4">
                             <div className="flex items-center space-x-1">
                                 <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
-                                <span className="font-bold text-gray-900">{listing.rating}</span>
+                                <span className="font-bold text-gray-900">{listing.rating.toFixed(1)}</span>
                             </div>
                             <div className="flex items-center space-x-1 text-gray-600">
                                 <TrendingUp className="w-4 h-4" />
@@ -202,15 +228,15 @@ function PGResultsContent() {
                         </div>
 
                         {/* Amenities */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {listing.amenities.map((amenity, i) => {
-                                const Icon = amenityIcons[amenity];
+                        <div className="flex flex-wrap gap-2 mb-4 h-8 overflow-hidden">
+                            {listing.amenities.slice(0, 3).map((amenity, i) => {
+                                const Icon = amenityIcons[amenity] || Check;
                                 return (
                                     <div
                                         key={i}
                                         className="px-3 py-1.5 bg-gray-100 rounded-lg flex items-center space-x-1.5 text-sm text-gray-700"
                                     >
-                                        {Icon && <Icon className="w-4 h-4" />}
+                                        <Icon className="w-4 h-4" />
                                         <span>{amenity}</span>
                                     </div>
                                 );
@@ -223,7 +249,7 @@ function PGResultsContent() {
                                 <div className="text-sm text-gray-500 mb-1">Starting from</div>
                                 <div className="flex items-baseline space-x-1">
                                     <span className="text-3xl font-bold text-gray-900">₹{listing.monthlyPrice.toLocaleString()}</span>
-                                    <span className="text-sm text-gray-500">/month</span>
+                                    {/* <span className="text-sm text-gray-500">/month</span> */}
                                 </div>
                             </div>
 
@@ -238,10 +264,6 @@ function PGResultsContent() {
         );
     };
 
-    const displayListings = showNearby
-        ? [...sortedListings].sort((a, b) => a.distance - b.distance)
-        : sortedListings;
-
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pb-16">
             {/* Header */}
@@ -253,7 +275,7 @@ function PGResultsContent() {
                         className="text-white"
                     >
                         <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                            PGs matched for you
+                            {categoryName ? `${categoryName} Results` : 'PGs matched for you'}
                         </h1>
                         <p className="text-white/90 text-lg mb-4">
                             Based on your preferences + location
@@ -300,66 +322,78 @@ function PGResultsContent() {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 py-8">
-                {/* Recommended Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-12"
-                >
-                    <div className="flex items-center space-x-3 mb-6">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#037166] to-[#025951] rounded-xl flex items-center justify-center">
-                            <Sparkles className="w-6 h-6 text-white" />
+
+                {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#037166]"></div>
+                    </div>
+                ) : listings.length === 0 ? (
+                    <div className="text-center py-20">
+                        <h2 className="text-2xl font-bold text-gray-600">No listings found in this category.</h2>
+                        <p className="text-gray-500 mt-2">Try changing location or filters.</p>
+                    </div>
+                ) : (
+                    <>
+                        {/* Recommended Section (show first 3) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mb-12"
+                        >
+                            <div className="flex items-center space-x-3 mb-6">
+                                <div className="w-10 h-10 bg-gradient-to-br from-[#037166] to-[#025951] rounded-xl flex items-center justify-center">
+                                    <Sparkles className="w-6 h-6 text-white" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900">Recommended for you</h2>
+                            </div>
+
+                            <div className="grid md:grid-cols-3 gap-6">
+                                {recommendedListings.map((listing) => (
+                                    <PGCard key={listing.id} listing={listing} />
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        {/* Tabs */}
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center space-x-2 bg-white border border-gray-200 p-1 rounded-xl shadow-sm">
+                                <button
+                                    onClick={() => setShowNearby(false)}
+                                    className={`px-6 py-2 rounded-lg font-medium transition-all ${!showNearby
+                                        ? 'bg-gradient-to-r from-[#037166] to-[#025951] text-white'
+                                        : 'text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    All PGs ({sortedListings.length})
+                                </button>
+                                <button
+                                    onClick={() => setShowNearby(true)}
+                                    className={`px-6 py-2 rounded-lg font-medium transition-all ${showNearby
+                                        ? 'bg-gradient-to-r from-[#037166] to-[#025951] text-white'
+                                        : 'text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    Nearby PGs
+                                </button>
+                            </div>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900">Recommended for you</h2>
-                    </div>
 
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {recommendedListings.map((listing) => (
-                            <PGCard key={listing.id} listing={listing} />
-                        ))}
-                    </div>
-                </motion.div>
-
-                {/* Tabs */}
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center space-x-2 bg-white border border-gray-200 p-1 rounded-xl shadow-sm">
-                        <button
-                            onClick={() => setShowNearby(false)}
-                            className={`px-6 py-2 rounded-lg font-medium transition-all ${!showNearby
-                                ? 'bg-gradient-to-r from-[#037166] to-[#025951] text-white'
-                                : 'text-gray-700 hover:bg-gray-50'
-                                }`}
-                        >
-                            All PGs ({sortedListings.length})
-                        </button>
-                        <button
-                            onClick={() => setShowNearby(true)}
-                            className={`px-6 py-2 rounded-lg font-medium transition-all ${showNearby
-                                ? 'bg-gradient-to-r from-[#037166] to-[#025951] text-white'
-                                : 'text-gray-700 hover:bg-gray-50'
-                                }`}
-                        >
-                            Nearby PGs
-                        </button>
-                    </div>
-                </div>
-
-                {/* Listings Grid */}
-                <div className="grid md:grid-cols-2 gap-6">
-                    {displayListings.map((listing) => (
-                        <PGCard key={listing.id} listing={listing} isNearby={showNearby} />
-                    ))}
-                </div>
+                        {/* Listings Grid */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {displayListings.map((listing) => (
+                                <PGCard key={listing.id} listing={listing} isNearby={showNearby} />
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
 }
 
-import { Suspense } from 'react';
-
 export default function PGResultsPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+        <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>}>
             <PGResultsContent />
         </Suspense>
     );

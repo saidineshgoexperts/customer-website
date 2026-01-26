@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ChevronRight, ChevronLeft, Bed, Utensils, Calendar, DollarSign, Check } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Bed, Utensils, Calendar, DollarSign, Check, Layers } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-const questions = [
+const staticQuestions = [
     {
         id: 'roomType',
         title: 'What type of room do you prefer?',
@@ -66,6 +66,57 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(0);
     const [answers, setAnswers] = useState({});
+    const [questions, setQuestions] = useState(staticQuestions);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchSubcategories = async () => {
+            if (!categoryId || !isOpen) return;
+
+            setLoading(true);
+            try {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/subcategories', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ categoryId })
+                });
+                const data = await response.json();
+
+                if (data.success && data.data && data.data.length > 0) {
+                    const subcategoryQuestion = {
+                        id: 'subcategoryId',
+                        title: 'Select a subcategory',
+                        icon: Layers,
+                        options: data.data.map(sub => ({
+                            value: sub._id,
+                            label: sub.name,
+                            desc: sub.categoryName,
+                            image: sub.image // Optional: if we want to show images
+                        }))
+                    };
+
+                    setQuestions([subcategoryQuestion, ...staticQuestions]);
+                } else {
+                    setQuestions(staticQuestions);
+                }
+            } catch (error) {
+                console.error("Error fetching subcategories", error);
+                setQuestions(staticQuestions);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSubcategories();
+    }, [categoryId, isOpen]);
+
+    // Reset state when modal closes
+    useEffect(() => {
+        if (!isOpen) {
+            setCurrentStep(0);
+            setAnswers({});
+        }
+    }, [isOpen]);
 
     const currentQuestion = questions[currentStep];
     const progress = ((currentStep + 1) / questions.length) * 100;
@@ -94,6 +145,8 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }
             setCurrentStep(currentStep - 1);
         }
     };
+
+    if (!currentQuestion) return null;
 
     const isAnswered = answers[currentQuestion.id];
 
@@ -147,58 +200,73 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }
 
                         {/* Question Content */}
                         <div className="flex-1 overflow-y-auto p-6">
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={currentStep}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    {/* Question Title */}
-                                    <div className="flex items-center space-x-3 mb-6">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-[#037166] to-[#025951] rounded-2xl flex items-center justify-center">
-                                            <currentQuestion.icon className="w-6 h-6 text-white" />
+                            {loading ? (
+                                <div className="flex items-center justify-center h-40">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#037166]"></div>
+                                </div>
+                            ) : (
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={currentStep}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        {/* Question Title */}
+                                        <div className="flex items-center space-x-3 mb-6">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-[#037166] to-[#025951] rounded-2xl flex items-center justify-center">
+                                                <currentQuestion.icon className="w-6 h-6 text-white" />
+                                            </div>
+                                            <h3 className="text-xl font-bold text-gray-900">{currentQuestion.title}</h3>
                                         </div>
-                                        <h3 className="text-xl font-bold text-gray-900">{currentQuestion.title}</h3>
-                                    </div>
 
-                                    {/* Options */}
-                                    <div className="grid gap-3">
-                                        {currentQuestion.options.map((option) => {
-                                            const isSelected = answers[currentQuestion.id] === option.value;
-                                            return (
-                                                <motion.button
-                                                    key={option.value}
-                                                    onClick={() => handleSelect(option.value)}
-                                                    whileHover={{ scale: 1.02 }}
-                                                    whileTap={{ scale: 0.98 }}
-                                                    className={`relative p-4 rounded-2xl border-2 transition-all text-left ${isSelected
-                                                        ? 'border-[#037166] bg-[#037166]/5'
-                                                        : 'border-gray-200 bg-white hover:border-[#037166]/50'
-                                                        }`}
-                                                >
-                                                    <div className="flex items-start justify-between">
-                                                        <div>
-                                                            <div className="font-semibold text-gray-900 mb-1">{option.label}</div>
-                                                            <div className="text-sm text-gray-600">{option.desc}</div>
+                                        {/* Options */}
+                                        <div className="grid gap-3">
+                                            {currentQuestion.options.map((option) => {
+                                                const isSelected = answers[currentQuestion.id] === option.value;
+                                                return (
+                                                    <motion.button
+                                                        key={option.value}
+                                                        onClick={() => handleSelect(option.value)}
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                        className={`relative p-4 rounded-2xl border-2 transition-all text-left ${isSelected
+                                                            ? 'border-[#037166] bg-[#037166]/5'
+                                                            : 'border-gray-200 bg-white hover:border-[#037166]/50'
+                                                            }`}
+                                                    >
+                                                        <div className="flex items-start justify-between">
+                                                            <div className="flex items-center gap-3">
+                                                                {/* Optional: Show image if available (for subcategories) */}
+                                                                {option.image && (
+                                                                    <div
+                                                                        className="w-12 h-12 rounded-lg bg-cover bg-center flex-shrink-0"
+                                                                        style={{ backgroundImage: `url('https://api.doorstephub.com/${option.image}')` }}
+                                                                    />
+                                                                )}
+                                                                <div>
+                                                                    <div className="font-semibold text-gray-900 mb-1">{option.label}</div>
+                                                                    <div className="text-sm text-gray-600">{option.desc}</div>
+                                                                </div>
+                                                            </div>
+                                                            {isSelected && (
+                                                                <motion.div
+                                                                    initial={{ scale: 0 }}
+                                                                    animate={{ scale: 1 }}
+                                                                    className="w-6 h-6 bg-[#037166] rounded-full flex items-center justify-center flex-shrink-0"
+                                                                >
+                                                                    <Check className="w-4 h-4 text-white" />
+                                                                </motion.div>
+                                                            )}
                                                         </div>
-                                                        {isSelected && (
-                                                            <motion.div
-                                                                initial={{ scale: 0 }}
-                                                                animate={{ scale: 1 }}
-                                                                className="w-6 h-6 bg-[#037166] rounded-full flex items-center justify-center flex-shrink-0"
-                                                            >
-                                                                <Check className="w-4 h-4 text-white" />
-                                                            </motion.div>
-                                                        )}
-                                                    </div>
-                                                </motion.button>
-                                            );
-                                        })}
-                                    </div>
-                                </motion.div>
-                            </AnimatePresence>
+                                                    </motion.button>
+                                                );
+                                            })}
+                                        </div>
+                                    </motion.div>
+                                </AnimatePresence>
+                            )}
                         </div>
 
                         {/* Footer Actions */}

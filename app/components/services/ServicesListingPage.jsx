@@ -77,8 +77,8 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
       exit={{ opacity: 0 }}
       className="min-h-screen pt-20"
     >
-      {/* Sticky Header with Teal Gradient */}
-      <div className="sticky top-20 z-40 bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] border-b border-white/10 shadow-lg">
+      {/* Header with Teal Gradient */}
+      <div className="z-40 bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] border-b border-white/10 shadow-lg">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
           <motion.button
             initial={{ opacity: 0, x: -20 }}
@@ -147,7 +147,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
             transition={{ delay: 0.3 }}
             className="hidden lg:block w-80 flex-shrink-0"
           >
-            <div className="sticky top-48 p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10">
               <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <Filter className="w-5 h-5 text-[#04a99d]" />
                 Filters

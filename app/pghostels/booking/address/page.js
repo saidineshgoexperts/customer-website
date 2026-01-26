@@ -1,163 +1,492 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'motion/react';
-import { useRouter } from 'next/navigation';
-import { MapPin, Plus, Check } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/pghostels/ui/dialog';
-import { Input } from '@/components/pghostels/ui/input';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowLeft, Home, Briefcase, MapPin, Plus, Check, X, Trash2, Edit2, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
+import { AuthModal } from '@/components/auth/AuthModal';
 
-const mockAddresses = [
-    { id: 1, label: 'Home', address: '123 MG Road, Bangalore - 560001', isDefault: true },
-    { id: 2, label: 'Office', address: '456 Brigade Road, Bangalore - 560025', isDefault: false },
-];
-
-export default function AddressPage() {
+export default function PGAddressPage() {
     const router = useRouter();
-    const [selectedAddress, setSelectedAddress] = useState(1);
-    const [showAddDialog, setShowAddDialog] = useState(false);
-    const [addresses, setAddresses] = useState(mockAddresses);
-    const [newAddress, setNewAddress] = useState({ label: '', address: '' });
+    const searchParams = useSearchParams();
+    const { token, isAuthenticated } = useAuth();
 
-    const handleContinue = () => {
-        if (selectedAddress) {
-            router.push('/pghostels/booking/confirm');
+    // Params from previous step
+    const providerId = searchParams.get('providerId');
+    const packageId = searchParams.get('packageId');
+    const addons = searchParams.get('addons');
+
+    const [addresses, setAddresses] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [editingAddress, setEditingAddress] = useState(null);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [newAddress, setNewAddress] = useState({
+        name: '',
+        phone: '',
+        type: 'Home',
+        area: '',
+        flat: '',
+        postalCode: '',
+        addressLineOne: '',
+        addressLineTwo: '',
+        stateName: 'Telangana',
+        cityName: 'Hyderabad',
+        defaultAddress: false
+    });
+
+    const fetchAddresses = useCallback(async () => {
+        if (!token) return;
+        setLoading(true);
+        try {
+            const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/useraddress/getuseraddress', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setAddresses(data.data || []);
+                // Auto-select default address if none selected
+                if (!selectedAddress && data.data?.length > 0) {
+                    const def = data.data.find(a => a.defaultAddress) || data.data[0];
+                    setSelectedAddress(def);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching addresses:', error);
+            toast.error('Failed to load addresses');
+        } finally {
+            setLoading(false);
+        }
+    }, [token, selectedAddress]);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchAddresses();
+        } else {
+            // Need a slight delay to allow AuthContext to initialize
+            const timer = setTimeout(() => {
+                if (!isAuthenticated) setShowAuthModal(true);
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [isAuthenticated, fetchAddresses]);
+
+    const handleAddOrUpdateAddress = async () => {
+        if (!newAddress.name || !newAddress.phone || !newAddress.area || !newAddress.flat || !newAddress.postalCode) {
+            toast.error('Please fill in all required fields');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const url = editingAddress
+                ? `https://api.doorstephub.com/v1/dhubApi/app/useraddress/edituseraddress/${editingAddress._id}`
+                : 'https://api.doorstephub.com/v1/dhubApi/app/useraddress/addaddress';
+
+            const method = editingAddress ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...newAddress,
+                    latitude: "17.450123", // Placeholder coords if map selection not implemented
+                    longitude: "78.390456",
+                    defaultAddress: addresses.length === 0 ? true : newAddress.defaultAddress
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                toast.success(editingAddress ? 'Address updated!' : 'Address added!');
+                setShowAddForm(false);
+                setEditingAddress(null);
+                fetchAddresses();
+            } else {
+                toast.error(data.message || 'Action failed');
+            }
+        } catch (error) {
+            toast.error('An error occurred');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleAddAddress = () => {
-        if (newAddress.label && newAddress.address) {
-            const newAddr = {
-                id: addresses.length + 1,
-                label: newAddress.label,
-                address: newAddress.address,
-                isDefault: false,
-            };
-            setAddresses([...addresses, newAddr]);
-            setNewAddress({ label: '', address: '' });
-            setShowAddDialog(false);
+    const handleDeleteAddress = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this address?')) return;
+
+        setLoading(true);
+        try {
+            const response = await fetch(`https://api.doorstephub.com/v1/dhubApi/app/useraddress/deleteuseraddress/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                toast.success('Address deleted');
+                fetchAddresses();
+                if (selectedAddress?._id === id) setSelectedAddress(null);
+            }
+        } catch (error) {
+            toast.error('Failed to delete address');
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const handleEditClick = (address) => {
+        setEditingAddress(address);
+        setNewAddress({
+            name: address.name,
+            phone: address.phone,
+            type: address.type,
+            area: address.area,
+            flat: address.flat,
+            postalCode: address.postalCode,
+            addressLineOne: address.addressLineOne,
+            addressLineTwo: address.addressLineTwo,
+            stateName: address.stateName || 'Telangana',
+            cityName: address.cityName || 'Hyderabad',
+            defaultAddress: address.defaultAddress
+        });
+        setShowAddForm(true);
+    };
+
+    const getIcon = (type) => {
+        switch (type?.toLowerCase()) {
+            case 'home':
+                return Home;
+            case 'office':
+                return Briefcase;
+            default:
+                return MapPin;
+        }
+    };
+
+    const handleContinue = () => {
+        if (!selectedAddress) {
+            toast.error('Please select an address');
+            return;
+        }
+
+        // Save booking context (can be replaced by context/redux)
+        sessionStorage.setItem('pg_booking_data', JSON.stringify({
+            providerId,
+            packageId,
+            addons: addons ? addons.split(',') : [],
+            address: selectedAddress
+        }));
+
+        // Use same key as appliance flow for better compatibility if needed, 
+        // but cleaner to keep separate or clear appropriately.
+        sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
+
+        router.push('/pghostels/booking/confirm');
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-8">
-            <div className="max-w-4xl mx-auto px-4">
-                {/* Progress */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-[#037166]">Step 1 of 3</span>
-                        <span className="text-sm text-gray-500">Select Address</span>
-                    </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: '33.33%' }}
-                            className="h-full bg-gradient-to-r from-[#037166] to-[#025951]"
-                        />
-                    </div>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="min-h-screen pt-20 pb-32 bg-gray-50"
+        >
+            {/* Header */}
+            <section className="sticky top-20 z-40 bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] border-b border-white/10 shadow-lg">
+                <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
+                    <motion.button
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        onClick={() => router.back()}
+                        className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Hostel
+                    </motion.button>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3"
+                    >
+                        <MapPin className="w-8 h-8" />
+                        Select Booking Address
+                    </motion.h1>
                 </div>
+            </section>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-2xl shadow-lg p-8"
-                >
-                    <h1 className="text-2xl font-bold text-gray-900 mb-6">Select Service Address</h1>
+            <div className="max-w-[1000px] mx-auto px-6 lg:px-8 py-8">
+                <div className="grid gap-6">
+                    {/* Saved Addresses */}
+                    <AnimatePresence mode="popLayout">
+                        {loading && addresses.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                                <Loader2 className="w-12 h-12 animate-spin mb-4 text-[#037166]" />
+                                <p>Loading your addresses...</p>
+                            </div>
+                        ) : addresses.length === 0 ? (
+                            <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
+                                <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                                <p className="text-gray-500">No saved addresses found</p>
+                            </div>
+                        ) : (
+                            addresses.map((address, index) => {
+                                const Icon = getIcon(address.type);
+                                const isSelected = selectedAddress?._id === address._id;
 
-                    <div className="space-y-4 mb-6">
-                        {addresses.map((address) => (
-                            <motion.div
-                                key={address.id}
-                                whileHover={{ scale: 1.02 }}
-                                onClick={() => setSelectedAddress(address.id)}
-                                className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${selectedAddress === address.id
-                                        ? 'border-[#037166] bg-[#037166]/5 shadow-lg shadow-[#037166]/20'
-                                        : 'border-gray-200 hover:border-gray-300'
-                                    }`}
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-start space-x-4">
-                                        <div
-                                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-1 ${selectedAddress === address.id
-                                                    ? 'border-[#037166] bg-[#037166]'
-                                                    : 'border-gray-300'
-                                                }`}
-                                        >
-                                            {selectedAddress === address.id && <Check className="w-3 h-3 text-white" />}
-                                        </div>
-                                        <div>
-                                            <div className="flex items-center space-x-2 mb-1">
-                                                <h3 className="font-semibold text-gray-900">{address.label}</h3>
-                                                {address.isDefault && (
-                                                    <span className="px-2 py-0.5 bg-[#037166]/10 text-[#037166] text-xs rounded-full">
-                                                        Default
-                                                    </span>
-                                                )}
+                                return (
+                                    <motion.div
+                                        key={address._id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, x: -100 }}
+                                        transition={{ delay: index * 0.1 }}
+                                        layout
+                                        onClick={() => setSelectedAddress(address)}
+                                        className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${isSelected
+                                            ? 'bg-white border-2 border-[#037166] shadow-lg shadow-[#037166]/10'
+                                            : 'bg-white border border-gray-200 hover:border-[#037166]/30 hover:shadow-md'
+                                            }`}
+                                    >
+                                        <div className="flex gap-6">
+                                            <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${isSelected
+                                                ? 'bg-[#037166]/10'
+                                                : 'bg-gray-100'
+                                                }`}>
+                                                <Icon className={`w-8 h-8 ${isSelected ? 'text-[#037166]' : 'text-gray-400'}`} />
                                             </div>
-                                            <p className="text-gray-600 text-sm flex items-center">
-                                                <MapPin className="w-4 h-4 mr-1" />
-                                                {address.address}
-                                            </p>
+
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <h3 className="text-xl font-bold text-gray-900 capitalize">{address.type}</h3>
+                                                    {address.defaultAddress && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-[#037166]/10 text-[#037166] text-xs font-medium">
+                                                            DEFAULT
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="font-medium text-gray-900 mb-1">{address.name}</p>
+                                                <p className="text-gray-600 text-sm mb-1">{address.flat}, {address.area}</p>
+                                                <p className="text-gray-500 text-xs">{address.cityName}, {address.postalCode}</p>
+                                            </div>
+
+                                            <div className="flex flex-col gap-2">
+                                                {isSelected && (
+                                                    <motion.div
+                                                        initial={{ scale: 0 }}
+                                                        animate={{ scale: 1 }}
+                                                        className="w-8 h-8 rounded-full bg-[#037166] flex items-center justify-center"
+                                                    >
+                                                        <Check className="w-5 h-5 text-white" />
+                                                    </motion.div>
+                                                )}
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleEditClick(address); }}
+                                                    className="p-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-all"
+                                                >
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteAddress(address._id); }}
+                                                    className="p-2 rounded-lg bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })
+                        )}
+                    </AnimatePresence>
+
+                    {/* Add New Address Button */}
+                    {!showAddForm && (
+                        <motion.button
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            onClick={() => {
+                                setEditingAddress(null);
+                                setNewAddress({
+                                    name: '', phone: '', type: 'Home', area: '', flat: '',
+                                    postalCode: '', addressLineOne: '', addressLineTwo: '',
+                                    stateName: 'Telangana', cityName: 'Hyderabad', defaultAddress: false
+                                });
+                                setShowAddForm(true);
+                            }}
+                            className="flex items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#037166] bg-white hover:bg-[#037166]/5 transition-all group"
+                        >
+                            <div className="w-12 h-12 rounded-full bg-[#037166]/10 flex items-center justify-center group-hover:bg-[#037166] transition-colors">
+                                <Plus className="w-6 h-6 text-[#037166] group-hover:text-white transition-colors" />
+                            </div>
+                            <span className="text-gray-700 font-medium text-lg group-hover:text-[#037166]">Add New Address</span>
+                        </motion.button>
+                    )}
+
+                    {/* Add Address Form */}
+                    <AnimatePresence>
+                        {showAddForm && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden"
+                            >
+                                <div className="p-6 rounded-2xl bg-white border border-gray-200 shadow-xl">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="text-xl font-bold text-gray-900">
+                                            {editingAddress ? 'Edit Address' : 'Add New Address'}
+                                        </h3>
+                                        <button
+                                            onClick={() => setShowAddForm(false)}
+                                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                        >
+                                            <X className="w-5 h-5 text-gray-500" />
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="flex gap-3">
+                                            {['Home', 'Office', 'Other'].map((type) => (
+                                                <button
+                                                    key={type}
+                                                    onClick={() => setNewAddress({ ...newAddress, type })}
+                                                    className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${newAddress.type === type
+                                                        ? 'bg-[#037166] text-white shadow-md'
+                                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                        }`}
+                                                >
+                                                    {type}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <input
+                                                placeholder="Full Name"
+                                                value={newAddress.name}
+                                                onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
+                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
+                                            />
+                                            <input
+                                                placeholder="Phone Number"
+                                                value={newAddress.phone}
+                                                onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
+                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
+                                            />
+                                        </div>
+
+                                        <input
+                                            placeholder="Flat / Plot / House No."
+                                            value={newAddress.flat}
+                                            onChange={(e) => setNewAddress({ ...newAddress, flat: e.target.value })}
+                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
+                                        />
+
+                                        <input
+                                            placeholder="Area / Locality"
+                                            value={newAddress.area}
+                                            onChange={(e) => setNewAddress({ ...newAddress, area: e.target.value })}
+                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
+                                        />
+
+                                        <div className="grid md:grid-cols-3 gap-4">
+                                            <input
+                                                placeholder="City"
+                                                value={newAddress.cityName}
+                                                onChange={(e) => setNewAddress({ ...newAddress, cityName: e.target.value })}
+                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
+                                            />
+                                            <input
+                                                placeholder="State"
+                                                value={newAddress.stateName}
+                                                onChange={(e) => setNewAddress({ ...newAddress, stateName: e.target.value })}
+                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
+                                            />
+                                            <input
+                                                placeholder="Postal Code"
+                                                value={newAddress.postalCode}
+                                                onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
+                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
+                                            />
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                id="defaultAddr"
+                                                checked={newAddress.defaultAddress}
+                                                onChange={(e) => setNewAddress({ ...newAddress, defaultAddress: e.target.checked })}
+                                                className="w-4 h-4 rounded border-gray-300 text-[#037166] focus:ring-[#037166]"
+                                            />
+                                            <label htmlFor="defaultAddr" className="text-sm text-gray-600 cursor-pointer">Set as Default Address</label>
+                                        </div>
+
+                                        <div className="flex gap-3 pt-4">
+                                            <button
+                                                onClick={() => setShowAddForm(false)}
+                                                className="flex-1 px-6 py-3 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleAddOrUpdateAddress}
+                                                disabled={loading}
+                                                className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all disabled:opacity-50"
+                                            >
+                                                {loading ? 'Processing...' : editingAddress ? 'Update Address' : 'Save Address'}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </motion.div>
-                        ))}
-                    </div>
+                        )}
+                    </AnimatePresence>
+                </div>
 
-                    <button
-                        onClick={() => setShowAddDialog(true)}
-                        className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-[#037166] hover:text-[#037166] transition-all flex items-center justify-center space-x-2"
+                {/* Continue Button */}
+                {selectedAddress && !showAddForm && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="mt-8"
                     >
-                        <Plus className="w-5 h-5" />
-                        <span className="font-medium">Add New Address</span>
-                    </button>
-
-                    <button
-                        onClick={handleContinue}
-                        disabled={!selectedAddress}
-                        className={`w-full mt-8 py-4 rounded-xl font-semibold transition-all ${selectedAddress
-                                ? 'bg-gradient-to-r from-[#037166] to-[#025951] text-white hover:shadow-xl hover:shadow-[#037166]/30'
-                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            }`}
-                    >
-                        Continue to Booking
-                    </button>
-                </motion.div>
+                        <button
+                            onClick={handleContinue}
+                            className="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium text-lg hover:shadow-lg hover:shadow-[#037166]/40 transition-all"
+                        >
+                            Continue to Confirmation
+                        </button>
+                    </motion.div>
+                )}
             </div>
 
-            {/* Add Address Dialog */}
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Add New Address</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Label</label>
-                            <Input
-                                placeholder="e.g., Home, Office"
-                                value={newAddress.label}
-                                onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                            <Input
-                                placeholder="Enter full address"
-                                value={newAddress.address}
-                                onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
-                            />
-                        </div>
-                        <button
-                            onClick={handleAddAddress}
-                            className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-lg font-medium hover:shadow-lg transition-all"
-                        >
-                            Add Address
-                        </button>
-                    </div>
-                </DialogContent>
-            </Dialog>
-        </div>
+            {/* Auth Modal */}
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => {
+                    setShowAuthModal(false);
+                    // If user closed modal but not authenticated, go back
+                    if (!isAuthenticated) {
+                        router.back();
+                    }
+                }}
+            />
+        </motion.div>
     );
 }

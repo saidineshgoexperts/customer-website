@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X, Search, User, ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -11,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 
 export function Header() {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -30,7 +32,7 @@ export function Header() {
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || pathname?.includes('/services')
           ? 'bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-[#037166]/20 shadow-lg shadow-[#037166]/5'
           : 'bg-transparent'
           }`}
@@ -61,7 +63,7 @@ export function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
-              <Link href="/appliances">
+              <Link href="/services">
                 <motion.span
                   className="text-gray-300 hover:text-[#037166] transition-colors relative group cursor-pointer font-medium whitespace-nowrap"
                   whileHover={{ y: -2 }}
@@ -148,7 +150,7 @@ export function Header() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setAuthModalOpen(true)}
-                className="hidden sm:flex items-center justify-center w-11 h-11 rounded-full bg-[#1a1a1a] hover:bg-[#037166]/20 border border-[#037166]/30 transition-all overflow-hidden shadow-md hover:shadow-lg"
+                className="flex items-center justify-center w-11 h-11 rounded-full bg-[#1a1a1a] hover:bg-[#037166]/20 border border-[#037166]/30 transition-all overflow-hidden shadow-md hover:shadow-lg"
               >
                 {isAuthenticated && user?.image ? (
                   <img
