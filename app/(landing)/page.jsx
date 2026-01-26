@@ -16,12 +16,12 @@ export default function Home() {
             <HeroSection />
             <BookingServices />
             <NearbyServiceCenters />
-            <LatestSpaServices />
-            <RecommendedSpaSalon />
             <PremiumPGHostels />
             <RecommendedHostels />
             <LatestReligiousServices />
             <RecommendedReligious />
+            <LatestSpaServices />
+            <RecommendedSpaSalon />
             <AppDownload />
             <KnowledgeSection />
         </div>

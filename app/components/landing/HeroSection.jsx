@@ -304,7 +304,7 @@ const serviceSlugMap = {
 };
 
 /* ---------- COMPACT SERVICES SECTION ---------- */
-function ServiceCardsSection({ services, loading }) {
+function ServiceCardsSection({ services, loading, activeIndex }) {
   const router = useRouter();
 
   const containerVariants = {
@@ -358,44 +358,56 @@ function ServiceCardsSection({ services, loading }) {
       animate="visible"
       className="mt-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"
     >
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-        {services.map((service, index) => (
-          <motion.div
-            key={service._id}
-            variants={cardVariants}
-            // ✅ FIXED: Pass full service object
-            onClick={() => handleServiceClick(service)}
-            className="group cursor-pointer"
-          >
-            <div className="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-[#037166]/50 transition-all duration-300 hover:scale-105">
-              <Image
-                loader={imageLoader}
-                src={service.image}
-                alt={service.name}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 14vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      <div className="flex flex-wrap justify-center gap-4">
+        {services.map((service, index) => {
+          const isActive = index === activeIndex;
+          return (
+            <motion.div
+              key={service._id}
+              variants={cardVariants}
+              // ✅ FIXED: Pass full service object
+              onClick={() => handleServiceClick(service)}
+              className={`group cursor-pointer w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-0.7rem)] md:w-[calc(25%-0.75rem)] lg:w-[calc(14.28%-0.9rem)] transition-all duration-500`}
+            >
+              <div
+                className={`
+                  relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border 
+                  transition-all duration-500
+                  ${isActive
+                    ? 'border-[#037166] scale-110 shadow-[0_0_20px_rgba(3,113,102,0.4)]'
+                    : 'border-white/10 hover:border-[#037166]/50 hover:scale-105'}
+                `}
+              >
+                <Image
+                  loader={imageLoader}
+                  src={service.image}
+                  alt={service.name}
+                  fill
+                  className={`object-cover transition-transform duration-500 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 14vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-              {/* Service Name Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                {/* Empty overlay preserved */}
+                {/* Service Name Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  {/* Empty overlay preserved */}
+                </div>
+
+                {/* Hover Glow */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: isActive ? 1 : 0 }}
+                  whileHover={{ opacity: 1 }}
+                  className="absolute inset-0 bg-gradient-to-t from-[#037166]/30 to-transparent"
+                />
               </div>
 
-              {/* Hover Glow */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                className="absolute inset-0 bg-gradient-to-t from-[#037166]/30 to-transparent"
-              />
-            </div>
-
-            <p className="text-white text-xs font-medium text-center line-clamp-2 group-hover:text-[#04a99d] transition-colors">
-              {service.name}
-            </p>
-          </motion.div>
-        ))}
+              <p className={`text-xs font-medium text-center line-clamp-2 transition-colors duration-300 ${isActive ? 'text-[#04a99d]' : 'text-white group-hover:text-[#04a99d]'}`}>
+                {service.name}
+              </p>
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );
@@ -404,6 +416,8 @@ function ServiceCardsSection({ services, loading }) {
 /* ---------- HERO SECTION ---------- */
 function HeroContent({ services = [], loading = false, error = null }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -412,6 +426,17 @@ function HeroContent({ services = [], loading = false, error = null }) {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  // Auto-rotation Logic
+  useEffect(() => {
+    if (!services || services.length === 0 || isPaused) return;
+
+    const intervalId = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % services.length);
+    }, 1000); // Change every 1 second
+
+    return () => clearInterval(intervalId);
+  }, [services, isPaused]); // Re-run if services load/change or pause state changes
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
@@ -459,12 +484,66 @@ function HeroContent({ services = [], loading = false, error = null }) {
 
           {/* Main Heading */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
-            <span className="block bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
-              Everything You Need.
-            </span>
-            <span className="block mt-2 bg-gradient-to-r from-[#037166] via-[#02b39a] to-[#037166] bg-clip-text text-transparent">
-              One Hub.
-            </span>
+            {/* SVG Text for Stroke Animation */}
+            <svg className="w-full h-[1.2em] overflow-visible">
+              <motion.text
+                x="50%"
+                y="50%"
+                dominantBaseline="middle"
+                textAnchor="middle"
+                style={{
+                  fill: 'rgba(0, 0, 0, 0)', // Transparent fill as per request
+                  stroke: 'rgb(255, 255, 255)',
+                  strokeDasharray: '41.4975% 8.50253%', // User specified values
+                  strokeWidth: '2px', // Approx 2-3px
+                  fontSize: 'inherit',
+                  fontFamily: 'inherit',
+                  fontWeight: '600',
+                  textTransform: 'none', // Uppercase removed
+                }}
+                animate={{
+                  strokeDashoffset: ["0%", "-16.4975%", "-16.4975%", "0%"], // Start -> End -> Wait -> Back
+                  strokeDasharray: [
+                    "41.4975% 8.50253%",  // Start: Dashed
+                    "41.4975% 8.50253%",  // End
+                    "100% 0%",            // Wait: Solid (Long Dash, No Gap)
+                    "41.4975% 8.50253%"   // Back: Dashed
+                  ],
+                  fill: [
+                    "rgba(0, 0, 0, 0)",         // Start: Transparent
+                    "rgba(255, 255, 255, 1)",   // End: Fully Highlighted
+                    "rgba(255, 255, 255, 1)",   // Wait: Fully Highlighted
+                    "rgba(0, 0, 0, 0)"          // Back: Transparent
+                  ],
+                  filter: [
+                    "drop-shadow(0px 0px 0px rgba(0,0,0,0))",          // Start: No Glow
+                    "drop-shadow(0px 0px 10px rgba(255,255,255,0.8))", // End: Glow
+                    "drop-shadow(0px 0px 10px rgba(255,255,255,0.8))", // Wait: Glow
+                    "drop-shadow(0px 0px 0px rgba(0,0,0,0))"           // Back: No Glow
+                  ]
+                }}
+                transition={{
+                  duration: 6,
+                  times: [0, 0.4, 0.6, 1], // 40% animate, 20% wait, 40% back
+                  repeat: Infinity,
+                  repeatType: "loop",
+                  ease: ["easeIn", "linear", "easeIn"] // Accelerate both ways
+                }}
+              >
+                Everything You Need.
+              </motion.text>
+            </svg>
+
+            <motion.span
+              key={activeIndex} // Triggers animation on change
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="block mt-2 bg-gradient-to-r from-[#037166] via-[#02b39a] to-[#037166] bg-clip-text text-transparent min-h-[1.2em]"
+            >
+              {services.length > 0 ? services[activeIndex]?.name : "One Hub."}
+            </motion.span>
           </h1>
 
           {/* Subtitle */}
@@ -483,6 +562,8 @@ function HeroContent({ services = [], loading = false, error = null }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
           >
             {error ? (
               <div className="mt-12 text-center">
@@ -495,7 +576,7 @@ function HeroContent({ services = [], loading = false, error = null }) {
                 </button>
               </div>
             ) : (
-              <ServiceCardsSection services={services} loading={loading} />
+              <ServiceCardsSection services={services} loading={loading} activeIndex={activeIndex} />
             )}
           </motion.div>
         </motion.div>
@@ -503,7 +584,7 @@ function HeroContent({ services = [], loading = false, error = null }) {
 
       {/* Bottom Gradient */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
-    </section>
+    </section >
   );
 }
 
