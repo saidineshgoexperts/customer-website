@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Home, Briefcase, MapPin, Plus, Check, X, Trash2, Edit2, Loader2 } from 'lucide-react';
@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { useServiceCart } from '@/context/ServiceCartContext';
 
-export default function PGAddressPage() {
+function PGAddressContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { token, isAuthenticated } = useAuth();
@@ -356,168 +356,7 @@ export default function PGAddressPage() {
                             })
                         )}
                     </AnimatePresence>
-
-                    {/* Add New Address Button */}
-                    {!showAddForm && (
-                        <motion.button
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                            onClick={() => {
-                                setEditingAddress(null);
-                                setNewAddress({
-                                    name: '', phone: '', type: 'Home', area: '', flat: '',
-                                    postalCode: '', addressLineOne: '', addressLineTwo: '',
-                                    stateName: 'Telangana', cityName: 'Hyderabad', defaultAddress: false
-                                });
-                                setShowAddForm(true);
-                            }}
-                            className="flex items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#037166] bg-white hover:bg-[#037166]/5 transition-all group"
-                        >
-                            <div className="w-12 h-12 rounded-full bg-[#037166]/10 flex items-center justify-center group-hover:bg-[#037166] transition-colors">
-                                <Plus className="w-6 h-6 text-[#037166] group-hover:text-white transition-colors" />
-                            </div>
-                            <span className="text-gray-700 font-medium text-lg group-hover:text-[#037166]">Add New Address</span>
-                        </motion.button>
-                    )}
-
-                    {/* Add Address Form */}
-                    <AnimatePresence>
-                        {showAddForm && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="overflow-hidden"
-                            >
-                                <div className="p-6 rounded-2xl bg-white border border-gray-200 shadow-xl">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <h3 className="text-xl font-bold text-gray-900">
-                                            {editingAddress ? 'Edit Address' : 'Add New Address'}
-                                        </h3>
-                                        <button
-                                            onClick={() => setShowAddForm(false)}
-                                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                                        >
-                                            <X className="w-5 h-5 text-gray-500" />
-                                        </button>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div className="flex gap-3">
-                                            {['Home', 'Office', 'Other'].map((type) => (
-                                                <button
-                                                    key={type}
-                                                    onClick={() => setNewAddress({ ...newAddress, type })}
-                                                    className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${newAddress.type === type
-                                                        ? 'bg-[#037166] text-white shadow-md'
-                                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                                        }`}
-                                                >
-                                                    {type}
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            <input
-                                                placeholder="Full Name"
-                                                value={newAddress.name}
-                                                onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
-                                            />
-                                            <input
-                                                placeholder="Phone Number"
-                                                value={newAddress.phone}
-                                                onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
-                                            />
-                                        </div>
-
-                                        <input
-                                            placeholder="Flat / Plot / House No."
-                                            value={newAddress.flat}
-                                            onChange={(e) => setNewAddress({ ...newAddress, flat: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
-                                        />
-
-                                        <input
-                                            placeholder="Area / Locality"
-                                            value={newAddress.area}
-                                            onChange={(e) => setNewAddress({ ...newAddress, area: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
-                                        />
-
-                                        <div className="grid md:grid-cols-3 gap-4">
-                                            <input
-                                                placeholder="City"
-                                                value={newAddress.cityName}
-                                                onChange={(e) => setNewAddress({ ...newAddress, cityName: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
-                                            />
-                                            <input
-                                                placeholder="State"
-                                                value={newAddress.stateName}
-                                                onChange={(e) => setNewAddress({ ...newAddress, stateName: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
-                                            />
-                                            <input
-                                                placeholder="Postal Code"
-                                                value={newAddress.postalCode}
-                                                onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all"
-                                            />
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="checkbox"
-                                                id="defaultAddr"
-                                                checked={newAddress.defaultAddress}
-                                                onChange={(e) => setNewAddress({ ...newAddress, defaultAddress: e.target.checked })}
-                                                className="w-4 h-4 rounded border-gray-300 text-[#037166] focus:ring-[#037166]"
-                                            />
-                                            <label htmlFor="defaultAddr" className="text-sm text-gray-600 cursor-pointer">Set as Default Address</label>
-                                        </div>
-
-                                        <div className="flex gap-3 pt-4">
-                                            <button
-                                                onClick={() => setShowAddForm(false)}
-                                                className="flex-1 px-6 py-3 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                onClick={handleAddOrUpdateAddress}
-                                                disabled={loading}
-                                                className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all disabled:opacity-50"
-                                            >
-                                                {loading ? 'Processing...' : editingAddress ? 'Update Address' : 'Save Address'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
                 </div>
-
-                {/* Continue Button */}
-                {selectedAddress && !showAddForm && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="mt-8"
-                    >
-                        <button
-                            onClick={handleContinue}
-                            className="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium text-lg hover:shadow-lg hover:shadow-[#037166]/40 transition-all"
-                        >
-                            Continue to Confirmation
-                        </button>
-                    </motion.div>
-                )}
             </div>
 
             {/* Auth Modal */}
@@ -532,5 +371,17 @@ export default function PGAddressPage() {
                 }}
             />
         </motion.div>
+    );
+}
+
+export default function PGAddressPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-10 h-10 text-[#037166] animate-spin" />
+            </div>
+        }>
+            <PGAddressContent />
+        </Suspense>
     );
 }

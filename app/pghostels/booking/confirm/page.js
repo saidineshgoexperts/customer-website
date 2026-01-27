@@ -499,7 +499,7 @@ export default function PGConfirmPage() {
                                         Processing...
                                     </div>
                                 ) : (
-                                    `Pay ₹{(cartData?.finalAmount || 0).toFixed(2)}`
+                                    `Pay ₹${(cartData?.finalAmount || 0).toFixed(2)}`
                                 )}
                             </motion.button>
                         </motion.div>
