@@ -5,13 +5,40 @@ import { MapPin, ChevronDown, Search, Crosshair, X, Loader2 } from 'lucide-react
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocation } from '@/hooks/useLocation';
 
-export function LocationBar({ theme = 'dark' }) {
+export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
     const { location, detectWithGPS, searchLocation, setManualLocation, loading, error } = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isDetecting, setIsDetecting] = useState(false);
+
+    const themeColors = {
+        pg: {
+            text: 'text-[#037166]',
+            hoverText: 'group-hover:text-[#04a99d]',
+            bg: 'bg-[#037166]',
+            hoverBg: 'hover:bg-[#037166]',
+            border: 'border-[#037166]',
+            lightParams: {
+                icon: 'text-[#037166]',
+                hoverIcon: 'group-hover:text-[#04a99d]'
+            }
+        },
+        spa: {
+            text: 'text-[#C06C84]',
+            hoverText: 'group-hover:text-[#E84393]', // Slightly lighter pink
+            bg: 'bg-[#C06C84]',
+            hoverBg: 'hover:bg-[#C06C84]',
+            border: 'border-[#C06C84]',
+            lightParams: {
+                icon: 'text-[#C06C84]',
+                hoverIcon: 'group-hover:text-[#C06C84]'
+            }
+        }
+    };
+
+    const activeTheme = themeColors[colorTheme] || themeColors.pg;
 
     // REMOVED: Auto-detect on page load (violates UX best practices)
     // Why: GPS permission should ONLY be requested on explicit user action
@@ -66,8 +93,8 @@ export function LocationBar({ theme = 'dark' }) {
             <motion.button
                 onClick={() => setIsOpen(true)}
                 className={`hidden lg:flex items-center space-x-2 px-3 py-2 rounded-xl border transition-all group mr-2 ${isLight
-                        ? 'bg-gray-100/50 hover:bg-gray-200/50 border-gray-200'
-                        : 'bg-[#1a1a1a] hover:bg-[#037166]/10 border-[#037166]/20'
+                    ? 'bg-gray-100/50 hover:bg-gray-200/50 border-gray-200'
+                    : 'bg-[#1a1a1a] hover:bg-[#037166]/10 border-[#037166]/20'
                     }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -104,10 +131,10 @@ export function LocationBar({ theme = 'dark' }) {
                             initial={{ opacity: 0, y: -20, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                            className="relative w-full max-w-md bg-[#0a0a0a] border border-[#037166]/30 rounded-2xl shadow-2xl shadow-[#037166]/20 overflow-hidden"
+                            className={`relative w-full max-w-md bg-[#0a0a0a] border border-opacity-30 rounded-2xl shadow-2xl overflow-hidden ${activeTheme.border}`}
                         >
                             {/* Header */}
-                            <div className="p-4 border-b border-[#037166]/20 flex items-center justify-between bg-[#1a1a1a]/50">
+                            <div className={`p-4 border-b border-opacity-20 flex items-center justify-between bg-[#1a1a1a]/50 ${activeTheme.border}`}>
                                 <h3 className="text-lg font-semibold text-white">Change Location</h3>
                                 <button
                                     onClick={() => setIsOpen(false)}
@@ -127,11 +154,11 @@ export function LocationBar({ theme = 'dark' }) {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Search for area, street name..."
-                                        className="w-full pl-10 pr-4 py-3 bg-[#1a1a1a] border border-[#037166]/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#037166] focus:ring-1 focus:ring-[#037166] transition-all"
+                                        className={`w-full pl-10 pr-4 py-3 bg-[#1a1a1a] border border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-1 transition-all ${activeTheme.border} focus:${activeTheme.border}`}
                                         autoFocus
                                     />
                                     {isSearching && (
-                                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#037166] animate-spin" />
+                                        <Loader2 className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin ${activeTheme.text}`} />
                                     )}
                                 </form>
 
@@ -139,17 +166,17 @@ export function LocationBar({ theme = 'dark' }) {
                                 <button
                                     onClick={handleDetectCurrent}
                                     disabled={isDetecting}
-                                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-[#037166]/10 transition-colors group text-left border border-transparent hover:border-[#037166]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className={`w-full flex items-center gap-3 p-3 rounded-xl hover:bg-opacity-10 transition-colors group text-left border border-transparent hover:border-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed ${activeTheme.hoverBg} hover:border-${activeTheme.border}`}
                                 >
-                                    <div className="w-10 h-10 rounded-full bg-[#037166]/20 flex items-center justify-center group-hover:bg-[#037166] transition-colors">
+                                    <div className={`w-10 h-10 rounded-full bg-opacity-20 flex items-center justify-center transition-colors group-hover:bg-opacity-100 ${activeTheme.bg} group-hover:${activeTheme.bg}`}>
                                         {isDetecting ? (
-                                            <Loader2 className="w-5 h-5 text-[#037166] group-hover:text-white animate-spin" />
+                                            <Loader2 className={`w-5 h-5 group-hover:text-white animate-spin ${activeTheme.text}`} />
                                         ) : (
-                                            <Crosshair className="w-5 h-5 text-[#037166] group-hover:text-white" />
+                                            <Crosshair className={`w-5 h-5 group-hover:text-white ${activeTheme.text}`} />
                                         )}
                                     </div>
                                     <div>
-                                        <div className="text-[#037166] font-semibold group-hover:text-[#04a99d]">
+                                        <div className={`font-semibold group-hover:text-white ${activeTheme.text}`}>
                                             {isDetecting ? 'Detecting location...' : 'Use current location'}
                                         </div>
                                         <div className="text-xs text-gray-500">Using GPS</div>

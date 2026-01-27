@@ -59,7 +59,7 @@ export const ServiceCartProvider = ({ children }) => {
             };
 
             // Add parentServiceId for addons
-            if (itemType === 'addon' && parentServiceId) {
+            if ((itemType === 'addon' || itemType === 'professional_addon') && parentServiceId) {
                 body.parentServiceId = parentServiceId;
             }
 

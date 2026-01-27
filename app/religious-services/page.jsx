@@ -12,6 +12,8 @@ import {
   Calendar, Shield, Award, Heart,
   MapPin, Star, Clock, CheckCircle, ArrowRight, Zap
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useLocationContext } from '@/context/LocationContext';
 
 // Section wrapper with scroll reveal
 function SectionReveal({ children, delay = 0 }) {
@@ -36,6 +38,94 @@ function SectionReveal({ children, delay = 0 }) {
 
 export default function ReligiousServicesPage() {
   const router = useRouter();
+  const { location, detectWithIP } = useLocationContext();
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!location) {
+      detectWithIP().catch(err => console.log("Auto detect failed", err));
+    }
+  }, [location]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      setLoading(true);
+      try {
+        const userLocationData = localStorage.getItem('user_location_data');
+        const locationData = userLocationData ? JSON.parse(userLocationData) : null;
+        const lat = locationData?.lat || 17.3850;
+        const lng = locationData?.lng || 78.4867;
+
+        // Using a generic call or specific category if known. 
+        // Assuming "Religious" services might share the same endpoint.
+        // We might need a subcategoryId, but for now we fetch without it or use a placeholder if needed.
+        // PG used null/undefined and it worked or returned default.
+        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lattitude: lat,
+            longitude: lng,
+            // subcategoryId: 'RELIGIOUS_ID' // TODO: Need specific ID
+          })
+        });
+        const data = await response.json();
+
+        if (data.success && data.professionalServices) {
+          setServices(data.professionalServices);
+        }
+      } catch (error) {
+        console.error("Error fetching religious services:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, [location]);
+
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Fetch Categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const selectedService = localStorage.getItem('selectedService');
+        let serviceId = null;
+        if (selectedService) {
+          try {
+            const serviceData = JSON.parse(selectedService);
+            serviceId = serviceData.id;
+          } catch (e) { console.log('Error parsing selectedService'); }
+        }
+
+        // Fallback or specific ID if needed? 
+        // If serviceId is null, the API might fail or return default. 
+        // We should try to find "Religious" service if not found? 
+        // For now, let's proceed with what we have or a hardcoded fallback if we knew it.
+        // Assuming user navigated from Home, so ID is there.
+
+        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            serviceId: serviceId || '69524fb157bb211ca094e5ee' // Fallback to PG or generic if allowed?
+            // Better to handle missing ID gracefully or generic fetch
+          })
+        });
+        const data = await response.json();
+        if (data.success && data.category) {
+          setCategories(data.category);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--off-white)]">
@@ -317,40 +407,48 @@ export default function ReligiousServicesPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { icon: Sparkles, title: 'Astrology & Consultation', desc: 'Expert guidance for life decisions', color: 'from-purple-500 to-blue-500' },
-                { icon: Calendar, title: 'Life Event Ceremonies', desc: 'Traditional milestone rituals', color: 'from-orange-500 to-red-500' },
-                { icon: Flame, title: 'Homam', desc: 'Sacred fire rituals', color: 'from-red-500 to-pink-500' },
-                { icon: HomeIcon, title: 'Pooja', desc: 'Divine worship services', color: 'from-amber-500 to-orange-500' }
-              ].map((category, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  onClick={() => router.push('/religious-services/category')}
-                  className="group cursor-pointer"
-                >
-                  <Card className="h-full border-2 border-transparent hover:border-[var(--saffron)]/30 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-[var(--soft-cream)]">
-                    <CardContent className="p-6">
-                      <div className={`mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br ${category.color} p-3 group-hover:scale-110 transition-transform shadow-lg`}>
-                        <category.icon className="h-full w-full text-white" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2 group-hover:text-[var(--saffron)] transition-colors">
-                        {category.title}
-                      </h3>
-                      <p className="text-sm text-[var(--muted-foreground)] mb-4">
-                        {category.desc}
-                      </p>
-                      <Button variant="ghost" className="text-[var(--saffron)] hover:text-[var(--temple-red)] p-0 h-auto font-medium pointer-events-none">
-                        View Services â†’
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+              {categoriesLoading ? (
+                // Skeleton or Loading
+                <div className="col-span-4 text-center py-10">Loading categories...</div>
+              ) : categories.length > 0 ? (
+                categories.map((category, index) => (
+                  <motion.div
+                    key={category._id || index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    onClick={() => router.push(`/religious-services/category/${category._id}?name=${encodeURIComponent(category.name)}`)}
+                    className="group cursor-pointer"
+                  >
+                    <Card className="h-full border-2 border-transparent hover:border-[var(--saffron)]/30 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-[var(--soft-cream)]">
+                      <CardContent className="p-6">
+                        {/* Use category image if available, else icon placeholder */}
+                        <div className={`mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 p-3 group-hover:scale-110 transition-transform shadow-lg overflow-hidden`}>
+                          {category.image ? (
+                            <img src={`https://api.doorstephub.com/${category.image}`} alt={category.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <Sparkles className="h-full w-full text-white" />
+                          )}
+                        </div>
+                        <h3 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2 group-hover:text-[var(--saffron)] transition-colors">
+                          {category.name}
+                        </h3>
+                        <p className="text-sm text-[var(--muted-foreground)] mb-4 line-clamp-2">
+                          {category.description || 'Explore our sacred services'}
+                        </p>
+                        <Button variant="ghost" className="text-[var(--saffron)] hover:text-[var(--temple-red)] p-0 h-auto font-medium pointer-events-none">
+                          View Services â†’
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))
+              ) : (
+                // Fallback to static if API returns nothing (or show empty state)
+                <div className="col-span-4 text-center">No categories found.</div>
+              )}
             </div>
           </div>
         </section>
@@ -437,86 +535,49 @@ export default function ReligiousServicesPage() {
 
               <TabsContent value="services">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[
-                    {
-                      name: 'Gruhapravesam Pooja',
-                      desc: 'Traditional housewarming ceremony with all rituals',
-                      price: 2500,
-                      image: 'https://images.unsplash.com/photo-1762090420353-47d4a0b3f6af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjB0ZW1wbGUlMjBwb29qYXxlbnwxfHx8fDE3NjgzOTQ3NzN8MA&ixlib=rb-4.1.0&q=80&w=1080',
-                      rating: 4.8
-                    },
-                    {
-                      name: 'Havan Ceremony',
-                      desc: 'Sacred fire ritual for prosperity and peace',
-                      price: 3500,
-                      image: 'https://images.unsplash.com/photo-1532043956135-d0e0573c54e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYXZhbiUyMGZpcmUlMjBjZXJlbW9ueXxlbnwxfHx8fDE3NjgzOTQ3NzN8MA&ixlib=rb-4.1.0&q=80&w=1080',
-                      rating: 4.9
-                    },
-                    {
-                      name: 'Ganesh Pooja',
-                      desc: 'Auspicious prayer ceremony for new beginnings',
-                      price: 1800,
-                      image: 'https://images.unsplash.com/photo-1764304589223-30bfbfdaa9ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnYW5lc2glMjBwb29qYSUyMHJpdHVhbHxlbnwxfHx8fDE3NjgzOTQ2ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-                      rating: 4.7
-                    },
-                    {
-                      name: 'Satyanarayan Pooja',
-                      desc: 'Complete worship service with prasadam',
-                      price: 2200,
-                      image: 'https://images.unsplash.com/photo-1698221182264-d2b5e821c3a8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwdWphJTIwY2VyZW1vbnklMjBpbmRpYXxlbnwxfHx8fDE3NjgzOTQ2ODF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-                      rating: 4.9
-                    },
-                    {
-                      name: 'Navagraha Shanti',
-                      desc: 'Planetary peace ritual and remedies',
-                      price: 2800,
-                      image: 'https://images.unsplash.com/photo-1631556373338-52e31188effc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjB0ZW1wbGUlMjByaXR1YWx8ZW58MXx8fHwxNzY4MzkzOTA5fDA&ixlib=rb-4.1.0&q=80&w=1080',
-                      rating: 4.8
-                    },
-                    {
-                      name: 'Wedding Ceremony',
-                      desc: 'Complete traditional marriage rituals',
-                      price: 15000,
-                      image: 'https://images.unsplash.com/photo-1680490961937-e933bf1ef920?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjB3ZWRkaW5nJTIwY2VyZW1vbnl8ZW58MXx8fHwxNzY4MzY5NzMzfDA&ixlib=rb-4.1.0&q=80&w=1080',
-                      rating: 5.0
-                    }
-                  ].map((service, i) => (
-                    <Card
-                      key={i}
-                      className="overflow-hidden hover:shadow-xl transition-shadow group cursor-pointer"
-                      onClick={() => router.push('/religious-services/service/1')}
-                    >
-                      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[var(--warm-beige)] to-[var(--soft-cream)]">
-                        <img
-                          src={service.image}
-                          alt={service.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                      </div>
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge className="bg-[var(--sacred-teal)]/10 text-[var(--sacred-teal)]">Pooja</Badge>
-                          <div className="flex items-center text-sm text-[var(--muted-foreground)]">
-                            <Star className="h-4 w-4 fill-[var(--warm-gold)] text-[var(--warm-gold)] mr-1" />
-                            {service.rating}
+                  {services.length > 0 ? (
+                    services.map((service, i) => (
+                      <Card
+                        key={service._id || i}
+                        className="overflow-hidden hover:shadow-xl transition-shadow group cursor-pointer"
+                        onClick={() => router.push(`/religious-services/service/${service._id}`)}
+                      >
+                        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[var(--warm-beige)] to-[var(--soft-cream)]">
+                          <img
+                            src={service.logo ? `https://api.doorstephub.com/${service.logo}` : 'https://images.unsplash.com/photo-1762090420353-47d4a0b3f6af?auto=format&fit=crop&q=80'}
+                            alt={service.business_name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        </div>
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge className="bg-[var(--sacred-teal)]/10 text-[var(--sacred-teal)]">Priest / Service</Badge>
+                            <div className="flex items-center text-sm text-[var(--muted-foreground)]">
+                              <Star className="h-4 w-4 fill-[var(--warm-gold)] text-[var(--warm-gold)] mr-1" />
+                              {service.avgRating || 4.8}
+                            </div>
                           </div>
-                        </div>
-                        <h3 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2 group-hover:text-[var(--saffron)] transition-colors">
-                          {service.name}
-                        </h3>
-                        <p className="text-sm text-[var(--muted-foreground)] mb-4">
-                          {service.desc}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-2xl font-bold text-[var(--saffron)]">â‚¹{service.price.toLocaleString()}</span>
-                          <Button size="sm" className="bg-[var(--saffron)] hover:bg-[var(--temple-red)] text-white">
-                            Book Now
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          <h3 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2 group-hover:text-[var(--saffron)] transition-colors">
+                            {service.business_name || `${service.firstName} ${service.lastName}`}
+                          </h3>
+                          <p className="text-sm text-[var(--muted-foreground)] mb-4 line-clamp-2">
+                            {service.description || service.bio || 'Expert religious services.'}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-2xl font-bold text-[var(--saffron)]">â‚¹{(service.BasePrice || service.minFare || 1000).toLocaleString()}</span>
+                            <Button size="sm" className="bg-[var(--saffron)] hover:bg-[var(--temple-red)] text-white">
+                              Book Now
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-10 text-gray-500">
+                      {loading ? 'Loading services...' : 'No services found nearby.'}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 

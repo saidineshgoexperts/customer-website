@@ -4,87 +4,10 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Search, SlidersHorizontal, Star, MapPin, Clock, Heart, ChevronLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocationContext } from '@/context/LocationContext';
+import { useEffect } from 'react';
 
-const allServices = [
-    {
-        id: 1,
-        name: 'Luxury Hair Spa Treatment',
-        provider: 'Lotus Spa & Wellness',
-        image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWlyJTIwc2Fsb24lMjBzdHlsaW5nfGVufDF8fHx8MTc2ODY1MjY4N3ww&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.8,
-        reviews: 324,
-        price: 999,
-        duration: '60 min',
-        distance: '2.5 km',
-        availability: 'Available Today',
-        isNearby: true,
-    },
-    {
-        id: 2,
-        name: 'Deep Tissue Massage',
-        provider: 'Radiance Beauty Studio',
-        image: 'https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBtYXNzYWdlJTIwcmVsYXhhdGlvbnxlbnwxfHx8fDE3Njg2NTI2ODh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.9,
-        reviews: 456,
-        price: 1899,
-        duration: '120 min',
-        distance: '3.2 km',
-        availability: 'Available Today',
-        isNearby: true,
-    },
-    {
-        id: 3,
-        name: 'Glow Facial Combo',
-        provider: 'Serenity Spa Center',
-        image: 'https://images.unsplash.com/photo-1684014286330-ddbeb4a40c92?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNpYWwlMjB0cmVhdG1lbnQlMjBza2luY2FyZXxlbnwxfHx8fDE3Njg1NTQxNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.7,
-        reviews: 234,
-        price: 1299,
-        duration: '90 min',
-        distance: '4.1 km',
-        availability: 'Available Today',
-        isNearby: true,
-    },
-    {
-        id: 4,
-        name: 'Bridal Makeup Package',
-        provider: 'Glamour Salon & Spa',
-        image: 'https://images.unsplash.com/photo-1625139108082-48bb424c2333?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmlkYWwlMjBtYWtldXAlMjBhcnRpc3R8ZW58MXx8fHwxNzY4NTQyNjYzfDA&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 5.0,
-        reviews: 189,
-        price: 2999,
-        duration: '180 min',
-        distance: '1.8 km',
-        availability: 'Available Today',
-        isNearby: true,
-    },
-    {
-        id: 5,
-        name: 'Premium Haircut & Styling',
-        provider: 'Style Studio',
-        image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWlyJTIwc2Fsb24lMjBzdHlsaW5nfGVufDF8fHx8MTc2ODY1MjY4N3ww&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.6,
-        reviews: 412,
-        price: 599,
-        duration: '45 min',
-        distance: '5.3 km',
-        availability: 'Tomorrow',
-        isNearby: false,
-    },
-    {
-        id: 6,
-        name: 'Relaxation Spa Package',
-        provider: 'Zen Wellness',
-        image: 'https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBtYXNzYWdlJTIwcmVsYXhhdGlvbnxlbnwxfHx8fDE3Njg2NTI2ODh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.8,
-        reviews: 298,
-        price: 1499,
-        duration: '90 min',
-        distance: '6.7 km',
-        availability: 'Tomorrow',
-        isNearby: false,
-    },
-];
+
 
 const filters = [
     'All Services',
@@ -97,12 +20,83 @@ const filters = [
 export function ResultsPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [services, setServices] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState('All Services');
     const [showFilters, setShowFilters] = useState(false);
 
-    const filteredServices = allServices.filter(service => {
+    // Location Context
+    // We need to import useLocationContext. Since I cannot change imports easily with replace_file_content if they are far apart, 
+    // I will assume I can add it or I'll have to do a larger replace. 
+    // Actually, I should probably do a full file replace or a larger chunk replace to handle imports and the main component body cleanly. 
+    // But let's try to do it with valid JS.
+
+    const { location, detectWithIP } = useLocationContext();
+
+    useEffect(() => {
+        if (!location) {
+            detectWithIP().catch(err => console.log("Auto detect failed", err));
+        }
+    }, [location]);
+
+    useEffect(() => {
+        const fetchServices = async () => {
+            setLoading(true);
+            try {
+                const userLocationData = localStorage.getItem('user_location_data');
+                const locationData = userLocationData ? JSON.parse(userLocationData) : null;
+                const lat = locationData?.lat || 17.3850; // Default to Hyd if missing
+                const lng = locationData?.lng || 78.4867;
+
+                // SubcategoryId from params or default to a Spa one if needed. 
+                // Using searchParams.get('subcategoryId') as per PG flow.
+                const subcategoryId = searchParams.get('subcategoryId');
+
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        lattitude: lat,
+                        longitude: lng,
+                        subcategoryId: subcategoryId,
+                        // Add other filters if needed
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.professionalServices) {
+                    const mappedServices = data.professionalServices.map(service => ({
+                        id: service._id,
+                        name: service.business_name || `${service.firstName} ${service.lastName}`,
+                        provider: service.business_name || 'Professional Service',
+                        image: service.logo ? `https://api.doorstephub.com/${service.logo}` : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80',
+                        rating: service.rating || 4.5,
+                        reviews: service.totalOrders || 0,
+                        price: service.BasePrice || service.minFare || 0,
+                        duration: '60 min', // Default as API might not return this in listing
+                        distance: '2.5 km', // Placeholder or calc
+                        availability: 'Available Today',
+                        isNearby: true, // Logic to determine if nearby
+                        address: service.address
+                    }));
+                    setServices(mappedServices);
+                } else {
+                    setServices([]);
+                }
+            } catch (error) {
+                console.error("Error fetching spa services:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchServices();
+    }, [searchParams, location]);
+
+    const filteredServices = services.filter(service => {
         const matchesTab = activeTab === 'all' || (activeTab === 'nearby' && service.isNearby);
         const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             service.provider.toLowerCase().includes(searchQuery.toLowerCase());
@@ -330,11 +324,11 @@ function ServiceCard({ service, index, router }) {
                         whileTap={{ scale: 0.95 }}
                         onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/spa-salon/booking/address?serviceId=${service.id}`);
+                            router.push(`/spa-salon/detail/${service.id}?serviceId=${service.id}`);
                         }}
                         className="px-6 py-2 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white rounded-lg font-medium hover:shadow-lg hover:shadow-[#C06C84]/50 transition-all"
                     >
-                        Book Now
+                        View Details
                     </motion.button>
                 </div>
             </div>

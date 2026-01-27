@@ -1,40 +1,83 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Star, MapPin, Clock, Heart, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Clock, Heart, ChevronRight, Check } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/spasalon/ui/tabs';
+import { AddonsModal } from '@/components/spasalon/AddonsModal';
 
-const mockService = {
-    id: 1,
-    name: 'Luxury Hair Spa Treatment',
-    provider: 'Lotus Spa & Wellness',
-    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWlyJTIwc2Fsb24lMjBzdHlsaW5nfGVufDF8fHx8MTc2ODY1MjY4N3ww&ixlib=rb-4.1.0&q=80&w=1080',
-    rating: 4.8,
-    reviewCount: 324,
-    price: 999,
-    duration: '60 min',
-    distance: '2.5 km',
-    address: '123, Madhapur Main Road, Hyderabad - 500081',
-    description: 'Experience the ultimate relaxation with our luxury hair spa treatment. Our expert stylists use premium products to nourish and revitalize your hair.',
-    includes: [
-        'Deep conditioning treatment',
-        'Scalp massage',
-        'Hair wash with premium shampoo',
-        'Blow dry and styling',
-    ],
-    reviews: [
-        { name: 'Priya Sharma', rating: 5, comment: 'Amazing service! My hair feels so soft and healthy.', avatar: '👩‍💼' },
-        { name: 'Anjali Reddy', rating: 5, comment: 'Best hair spa in the city. Highly recommended!', avatar: '👩‍🎓' },
-        { name: 'Sneha Patel', rating: 4, comment: 'Great experience, will definitely come back.', avatar: '👩‍💻' },
-    ],
-};
 
 export function DetailsPage() {
     const router = useRouter();
     const params = useParams();
     const [activeTab, setActiveTab] = useState('details');
+    const [service, setService] = useState(null);
+    const [selectedPackage, setSelectedPackage] = useState(null);
+    const [showAddonsModal, setShowAddonsModal] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchServiceDetails = async () => {
+            if (!params?.id) return;
+            setLoading(true);
+            try {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/single-professional-provider', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        providerId: params.id
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success && data.storeData && data.storeData.length > 0) {
+                    const store = data.storeData[0];
+                    const mappedService = {
+                        id: store._id || params.id,
+                        name: store.business_name || `${store.firstName} ${store.lastName}`,
+                        provider: store.business_name || 'Professional Service',
+                        image: store.logo ? `https://api.doorstephub.com/${store.logo}` : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80',
+                        rating: parseFloat(store.avgRating || 4.5).toFixed(1),
+                        reviewCount: store.totalOrders || 0,
+                        price: store.BasePrice || store.minFare || 999,
+                        duration: '60 min',
+                        distance: '2.5 km',
+                        address: store.address || 'Address not available',
+                        description: store.description || store.bio || 'Experience the ultimate relaxation with our premium services.',
+                        includes: store.services ? store.services.split(',') : [
+                            'Premium Service',
+                            'Expert Staff',
+                            'Hygienic Environment',
+                            'Quality Products'
+                        ],
+                        packages: data.provider_rate_cards || [],
+                        reviews: data.customerRatings ? data.customerRatings.map(r => ({
+                            name: r.name || 'Anonymous',
+                            rating: r.rating || 5,
+                            comment: r.comment || 'Great service!',
+                            avatar: '👤'
+                        })) : []
+                    };
+                    console.log("DetailsPage Loaded Service:", mappedService);
+                    console.log("Original Store Data:", store);
+                    setService(mappedService);
+
+
+                    if (data.provider_rate_cards && data.provider_rate_cards.length > 0) {
+                        setSelectedPackage(data.provider_rate_cards[0]);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching service details:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchServiceDetails();
+    }, [params?.id]);
+
+    if (loading || !service) return <div className="min-h-screen pt-20 flex justify-center items-center">Loading...</div>;
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pb-32 pt-16">
@@ -51,8 +94,8 @@ export function DetailsPage() {
             {/* Hero Image */}
             <div className="relative h-[400px] overflow-hidden">
                 <img
-                    src={mockService.image}
-                    alt={mockService.name}
+                    src={service.image}
+                    alt={service.name}
                     className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
@@ -69,12 +112,12 @@ export function DetailsPage() {
                         {/* Left - Name & Provider */}
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                                {mockService.name}
+                                {service.name}
                             </h1>
-                            <p className="text-xl text-gray-600">{mockService.provider}</p>
+                            <p className="text-xl text-gray-600">{service.provider}</p>
                             <div className="flex items-center gap-2 mt-2 text-gray-600">
                                 <MapPin className="w-4 h-4" />
-                                <span>{mockService.distance} away</span>
+                                <span>{service.distance} away</span>
                             </div>
                         </div>
 
@@ -84,16 +127,16 @@ export function DetailsPage() {
                             <div className="bg-gradient-to-br from-[#F59E0B]/10 to-[#F59E0B]/5 rounded-2xl p-4 border border-[#F59E0B]/20 min-w-[120px]">
                                 <div className="flex items-center justify-center mb-1">
                                     <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B] mr-1" />
-                                    <span className="text-2xl font-bold text-gray-900">{mockService.rating}</span>
+                                    <span className="text-2xl font-bold text-gray-900">{service.rating}</span>
                                 </div>
-                                <div className="text-xs text-gray-500 text-center">{mockService.reviewCount} Reviews</div>
+                                <div className="text-xs text-gray-500 text-center">{service.reviewCount} Reviews</div>
                             </div>
 
                             {/* Duration Card */}
                             <div className="bg-gradient-to-br from-[#C06C84]/10 to-[#C06C84]/5 rounded-2xl p-4 border border-[#C06C84]/20 min-w-[120px]">
                                 <div className="flex items-center justify-center mb-1">
                                     <Clock className="w-5 h-5 text-[#C06C84] mr-1" />
-                                    <span className="text-2xl font-bold text-gray-900">{mockService.duration}</span>
+                                    <span className="text-2xl font-bold text-gray-900">{service.duration}</span>
                                 </div>
                                 <div className="text-xs text-gray-500 text-center">Duration</div>
                             </div>
@@ -103,12 +146,18 @@ export function DetailsPage() {
                     {/* Tabs */}
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                         <div className="sticky top-20 z-40 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-2">
-                            <TabsList className="bg-transparent w-full grid grid-cols-3 gap-2">
+                            <TabsList className="bg-transparent w-full grid grid-cols-4 gap-2">
                                 <TabsTrigger
                                     value="details"
                                     className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white rounded-xl"
                                 >
                                     Details
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="services"
+                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white rounded-xl"
+                                >
+                                    Services
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="reviews"
@@ -133,11 +182,11 @@ export function DetailsPage() {
                                 className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100"
                             >
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Service Description</h3>
-                                <p className="text-gray-700 leading-relaxed text-lg mb-6">{mockService.description}</p>
+                                <p className="text-gray-700 leading-relaxed text-lg mb-6">{service.description}</p>
 
                                 <h4 className="text-xl font-semibold text-gray-900 mb-4">What's Included</h4>
                                 <ul className="space-y-2">
-                                    {mockService.includes.map((item, index) => (
+                                    {service.includes.map((item, index) => (
                                         <li key={index} className="flex items-center text-gray-700">
                                             <span className="w-2 h-2 bg-[#C06C84] rounded-full mr-3"></span>
                                             {item}
@@ -147,10 +196,61 @@ export function DetailsPage() {
                             </motion.div>
                         </TabsContent>
 
+                        {/* Services / Portfolio Tab */}
+                        <TabsContent value="services">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="grid gap-4"
+                            >
+                                {service.packages.map((pkg) => (
+                                    <div
+                                        key={pkg._id}
+                                        onClick={() => setSelectedPackage(pkg)}
+                                        className={`bg-white rounded-2xl p-4 shadow-sm border-2 cursor-pointer transition-all ${selectedPackage?._id === pkg._id
+                                            ? 'border-[#C06C84] bg-[#C06C84]/5'
+                                            : 'border-gray-100 hover:border-[#C06C84]/30'
+                                            }`}
+                                    >
+                                        <div className="flex gap-4">
+                                            {/* Package Image */}
+                                            <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                                                <img
+                                                    src={pkg.image ? `https://api.doorstephub.com/${pkg.image}` : service.image}
+                                                    alt={pkg.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+
+                                            {/* Package Details */}
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-start">
+                                                    <h3 className="font-bold text-gray-900 line-clamp-1">{pkg.name}</h3>
+                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPackage?._id === pkg._id
+                                                        ? 'border-[#C06C84] bg-[#C06C84]'
+                                                        : 'border-gray-300'
+                                                        }`}>
+                                                        {selectedPackage?._id === pkg._id && (
+                                                            <Check className="w-3 h-3 text-white" />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <p className="text-sm text-gray-500 line-clamp-2 mt-1 mb-2">{pkg.description}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-lg text-gray-900">₹{pkg.price}</span>
+                                                    <span className="text-xs text-gray-400 capitalize">{pkg.priceUnit}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </motion.div>
+                        </TabsContent>
+
                         {/* Reviews Tab */}
                         <TabsContent value="reviews">
                             <div className="space-y-4">
-                                {mockService.reviews.map((review, index) => (
+                                {service.reviews.map((review, index) => (
                                     <motion.div
                                         key={index}
                                         initial={{ opacity: 0, y: 20 }}
@@ -192,9 +292,9 @@ export function DetailsPage() {
                                 className="space-y-6"
                             >
                                 <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-4">About {mockService.provider}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900 mb-4">About {service.provider}</h3>
                                     <p className="text-gray-700 leading-relaxed text-lg">
-                                        {mockService.provider} is a premium wellness center offering top-quality spa and salon services.
+                                        {service.provider} is a premium wellness center offering top-quality spa and salon services.
                                         Our expert staff is dedicated to providing you with the best experience.
                                     </p>
                                 </div>
@@ -204,7 +304,7 @@ export function DetailsPage() {
                                         <MapPin className="w-5 h-5 mr-2 text-[#C06C84]" />
                                         Address
                                     </h3>
-                                    <p className="text-gray-700 text-lg">{mockService.address}</p>
+                                    <p className="text-gray-700 text-lg">{service.address}</p>
                                 </div>
                             </motion.div>
                         </TabsContent>
@@ -223,13 +323,26 @@ export function DetailsPage() {
                         <div className="text-sm text-gray-500 mb-1">Service Price</div>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-3xl font-bold text-gray-900">
-                                ₹{mockService.price}
+                                ₹{service.price}
                             </span>
                         </div>
                     </div>
 
                     <button
-                        onClick={() => router.push('/spa-salon/booking/address')}
+                        onClick={() => {
+                            if (!selectedPackage) {
+                                if (service.packages && service.packages.length > 0) {
+                                    // Fallback auto-select first
+                                    setSelectedPackage(service.packages[0]);
+                                    setShowAddonsModal(true);
+                                } else {
+                                    // If absolutely no packages, try service.id but known to fail
+                                    console.warn("No packages found");
+                                }
+                                return;
+                            }
+                            setShowAddonsModal(true);
+                        }}
                         className="px-12 py-4 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-[#C06C84]/40 transition-all transform hover:scale-105 flex items-center gap-2"
                     >
                         Book Now
@@ -237,6 +350,19 @@ export function DetailsPage() {
                     </button>
                 </div>
             </motion.div>
+
+            {/* Addons Modal */}
+            <AddonsModal
+                isOpen={showAddonsModal}
+                onClose={() => setShowAddonsModal(false)}
+                providerId={params.id}
+                selectedPackageId={selectedPackage?._id}
+                onContinue={(selectedAddons) => {
+                    setShowAddonsModal(false);
+                    const addonIds = selectedAddons.map(a => a._id).join(',');
+                    router.push(`/spa-salon/booking/address?providerId=${params.id}&packageId=${selectedPackage?._id}&addons=${addonIds}`);
+                }}
+            />
         </div>
     );
 }

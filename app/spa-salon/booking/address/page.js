@@ -1,165 +1,402 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'motion/react';
-import { useRouter } from 'next/navigation';
-import { MapPin, Plus, Check } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/spasalon/ui/dialog';
-import { Input } from '@/components/spasalon/ui/input';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowLeft, Home, Briefcase, MapPin, Plus, Check, Trash2, Edit2, Loader2, X, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
+import { useServiceCart } from '@/context/ServiceCartContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { AuthModal } from '@/components/auth/AuthModal';
 
-const mockAddresses = [
-    { id: 1, label: 'Home', address: '123 MG Road, Hyderabad - 500001', isDefault: true },
-    { id: 2, label: 'Office', address: '456 Jubilee Hills, Hyderabad - 500033', isDefault: false },
-];
-
-export default function AddressPage() {
+function SpaAddressContent() {
     const router = useRouter();
-    const [selectedAddress, setSelectedAddress] = useState(1);
-    const [showAddDialog, setShowAddDialog] = useState(false);
-    const [addresses, setAddresses] = useState(mockAddresses);
-    const [newAddress, setNewAddress] = useState({ label: '', address: '' });
+    const searchParams = useSearchParams();
+    const { token, isAuthenticated } = useAuth();
+    const { addToCart, clearCart } = useServiceCart();
 
-    const handleContinue = () => {
-        if (selectedAddress) {
-            router.push('/spa-salon/booking/confirm');
+    const providerId = searchParams.get('providerId');
+    const packageId = searchParams.get('packageId');
+    const addons = searchParams.get('addons');
+
+    const [addresses, setAddresses] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [editingAddress, setEditingAddress] = useState(null);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [newAddress, setNewAddress] = useState({
+        name: '', phone: '', type: 'Home', area: '', flat: '',
+        postalCode: '', addressLineOne: '', addressLineTwo: '',
+        stateName: 'Telangana', cityName: 'Hyderabad', defaultAddress: false
+    });
+
+    const fetchAddresses = useCallback(async () => {
+        if (!token) return;
+        setLoading(true);
+        try {
+            const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/useraddress/getuseraddress', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setAddresses(data.data || []);
+                if (!selectedAddress && data.data?.length > 0) {
+                    const def = data.data.find(a => a.defaultAddress) || data.data[0];
+                    setSelectedAddress(def);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching addresses:', error);
+            toast.error('Failed to load addresses');
+        } finally {
+            setLoading(false);
+        }
+    }, [token, selectedAddress]);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchAddresses();
+        } else {
+            const timer = setTimeout(() => {
+                if (!isAuthenticated) setShowAuthModal(true);
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [isAuthenticated, fetchAddresses]);
+
+    const handleAddOrUpdateAddress = async () => {
+        if (!newAddress.name || !newAddress.phone || !newAddress.area || !newAddress.flat || !newAddress.postalCode) {
+            toast.error('Please fill in required fields');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const url = editingAddress
+                ? `https://api.doorstephub.com/v1/dhubApi/app/useraddress/edituseraddress/${editingAddress._id}`
+                : 'https://api.doorstephub.com/v1/dhubApi/app/useraddress/addaddress';
+
+            const method = editingAddress ? 'PUT' : 'POST';
+
+            const payload = {
+                ...newAddress,
+                latitude: "17.450123",
+                longitude: "78.390456",
+                defaultAddress: addresses.length === 0 ? true : newAddress.defaultAddress
+            };
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                toast.success(editingAddress ? 'Address updated' : 'Address added');
+                setShowAddForm(false);
+                setEditingAddress(null);
+                setNewAddress({
+                    name: '', phone: '', type: 'Home', area: '', flat: '',
+                    postalCode: '', addressLineOne: '', addressLineTwo: '',
+                    stateName: 'Telangana', cityName: 'Hyderabad', defaultAddress: false
+                });
+                fetchAddresses();
+            } else {
+                toast.error(data.message || 'Action failed');
+            }
+        } catch (error) {
+            toast.error('Error processing address');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleAddAddress = () => {
-        if (newAddress.label && newAddress.address) {
-            const newAddr = {
-                id: addresses.length + 1,
-                label: newAddress.label,
-                address: newAddress.address,
-                isDefault: false,
-            };
-            setAddresses([...addresses, newAddr]);
-            setNewAddress({ label: '', address: '' });
-            setShowAddDialog(false);
+    const handleDeleteAddress = async (id) => {
+        if (!confirm('Delete this address?')) return;
+        setLoading(true);
+        try {
+            const response = await fetch(`https://api.doorstephub.com/v1/dhubApi/app/useraddress/deleteuseraddress/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                toast.success('Address deleted');
+                fetchAddresses();
+                if (selectedAddress?._id === id) setSelectedAddress(null);
+            }
+        } catch (e) { toast.error('Failed to delete'); }
+        finally { setLoading(false); }
+    };
+
+    const handleContinue = async () => {
+        if (!selectedAddress) {
+            toast.error("Please select an address");
+            return;
         }
+
+        setLoading(true);
+        try {
+            // Mock Skip
+            if (providerId?.startsWith('mock_') || packageId?.startsWith('mock_')) {
+                sessionStorage.setItem('spa_booking_data', JSON.stringify({
+                    providerId, packageId, addons: addons ? addons.split(',') : [], address: selectedAddress
+                }));
+                sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
+                router.push('/spa-salon/booking/confirm');
+                return;
+            }
+
+            // 1. Clear Cart
+            await clearCart();
+
+            // 2. Add Main Package
+            const packageSuccess = await addToCart(
+                providerId,
+                packageId,
+                'professional_service',
+                1,
+                null,
+                'professional'
+            );
+
+            if (!packageSuccess) {
+                toast.error('Failed to add service to booking');
+                setLoading(false);
+                return;
+            }
+
+            // 3. Add Addons
+            if (addons) {
+                const addonList = addons.split(',');
+                for (const addonId of addonList) {
+                    await addToCart(
+                        providerId,
+                        addonId,
+                        'professional_addon',
+                        1,
+                        packageId,
+                        'professional'
+                    );
+                }
+            }
+
+            // Save booking context
+            sessionStorage.setItem('spa_booking_data', JSON.stringify({
+                providerId,
+                packageId,
+                addons: addons ? addons.split(',') : [],
+                address: selectedAddress
+            }));
+            sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
+
+            router.push('/spa-salon/booking/confirm');
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            toast.error("Failed to proceed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const openEditModal = (addr) => {
+        setEditingAddress(addr);
+        setNewAddress({
+            name: addr.name, phone: addr.phone, type: addr.type, area: addr.area, flat: addr.flat,
+            postalCode: addr.postalCode, addressLineOne: addr.addressLineOne, addressLineTwo: addr.addressLineTwo,
+            stateName: addr.stateName || 'Telangana', cityName: addr.cityName || 'Hyderabad', defaultAddress: addr.defaultAddress
+        });
+        setShowAddForm(true);
+    };
+
+    const getIcon = (type) => {
+        const lower = type?.toLowerCase() || '';
+        if (lower.includes('home')) return Home;
+        if (lower.includes('work') || lower.includes('office')) return Briefcase;
+        return MapPin;
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white to-[#FBEAF0] py-8 pt-24">
-            <div className="max-w-4xl mx-auto px-4">
-                {/* Progress */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-[#C06C84]">Step 1 of 3</span>
-                        <span className="text-sm text-gray-500">Select Address</span>
-                    </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: '33.33%' }}
-                            className="h-full bg-gradient-to-r from-[#C06C84] to-[#6C5CE7]"
-                        />
-                    </div>
+        <div className="min-h-screen pt-20 pb-32 bg-gray-50">
+            {/* Header */}
+            <section className="sticky top-20 z-40 bg-gradient-to-r from-[#C06C84] via-pink-600 to-[#6C5CE7] border-b border-white/10 shadow-lg">
+                <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
+                    <motion.button
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        onClick={() => router.back()}
+                        className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to options
+                    </motion.button>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3"
+                    >
+                        <MapPin className="w-8 h-8" />
+                        Where should we come?
+                    </motion.h1>
                 </div>
+            </section>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-100 p-8"
-                >
-                    <h1 className="text-2xl font-bold text-gray-900 mb-6">Select Service Address</h1>
+            <div className="max-w-[1000px] mx-auto px-6 lg:px-8 py-8">
+                {loading && addresses.length === 0 ? (
+                    <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-[#C06C84]" /></div>
+                ) : (
+                    <div className="grid gap-6">
+                        {addresses.length === 0 && !loading && (
+                            <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl">
+                                <p className="text-gray-500">No addresses found. Add one below.</p>
+                            </div>
+                        )}
+                        {addresses.map((address, index) => {
+                            const Icon = getIcon(address.type);
+                            const isSelected = selectedAddress?._id === address._id;
 
-                    <div className="space-y-4 mb-6">
-                        {addresses.map((address) => (
-                            <motion.div
-                                key={address.id}
-                                whileHover={{ scale: 1.02 }}
-                                onClick={() => setSelectedAddress(address.id)}
-                                className={`p-6 rounded-2xl border-2 cursor-pointer transition-all ${selectedAddress === address.id
-                                    ? 'border-[#C06C84] bg-[#C06C84]/5 shadow-lg shadow-[#C06C84]/20'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                    }`}
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-start space-x-4">
-                                        <div
-                                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-1 ${selectedAddress === address.id
-                                                ? 'border-[#C06C84] bg-[#C06C84]'
-                                                : 'border-gray-300'
-                                                }`}
-                                        >
-                                            {selectedAddress === address.id && <Check className="w-3 h-3 text-white" />}
+                            return (
+                                <motion.div
+                                    key={address._id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    onClick={() => setSelectedAddress(address)}
+                                    className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${isSelected
+                                        ? 'bg-white border-2 border-[#C06C84] shadow-lg shadow-[#C06C84]/10'
+                                        : 'bg-white border border-gray-200 hover:border-[#C06C84]/30 hover:shadow-md'
+                                        }`}
+                                >
+                                    <div className="flex gap-6">
+                                        <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-[#C06C84]/10' : 'bg-gray-100'}`}>
+                                            <Icon className={`w-8 h-8 ${isSelected ? 'text-[#C06C84]' : 'text-gray-400'}`} />
                                         </div>
-                                        <div>
-                                            <div className="flex items-center space-x-2 mb-1">
-                                                <h3 className="font-semibold text-gray-900">{address.label}</h3>
-                                                {address.isDefault && (
-                                                    <span className="px-2 py-0.5 bg-[#C06C84]/10 text-[#C06C84] text-xs rounded-full">
-                                                        Default
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-gray-600 text-sm flex items-center">
-                                                <MapPin className="w-4 h-4 mr-1 text-[#C06C84]" />
-                                                {address.address}
-                                            </p>
+                                        <div className="flex-1">
+                                            <h3 className="text-xl font-bold text-gray-900 capitalize mb-1">{address.type || 'Address'}</h3>
+                                            <p className="font-medium text-gray-800 mb-1">{address.name}</p>
+                                            <p className="text-gray-600 text-sm">{address.flat}, {address.area}, {address.cityName}</p>
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            {isSelected && <div className="w-8 h-8 rounded-full bg-[#C06C84] flex items-center justify-center"><Check className="w-5 h-5 text-white" /></div>}
+                                            <button onClick={(e) => { e.stopPropagation(); openEditModal(address); }} className="p-2 rounded-lg bg-gray-50 hover:bg-gray-100"><Edit2 className="w-4 h-4 text-gray-500" /></button>
+                                            <button onClick={(e) => { e.stopPropagation(); handleDeleteAddress(address._id); }} className="p-2 rounded-lg bg-gray-50 hover:bg-red-50"><Trash2 className="w-4 h-4 text-gray-500 hover:text-red-500" /></button>
                                         </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            );
+                        })}
                     </div>
+                )}
 
-                    <button
-                        onClick={() => setShowAddDialog(true)}
-                        className="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-600 hover:border-[#C06C84] hover:text-[#C06C84] transition-all flex items-center justify-center space-x-2"
+                {!showAddForm && (
+                    <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        onClick={() => {
+                            setEditingAddress(null);
+                            setNewAddress({
+                                name: '', phone: '', type: 'Home', area: '', flat: '',
+                                postalCode: '', addressLineOne: '', addressLineTwo: '',
+                                stateName: 'Telangana', cityName: 'Hyderabad', defaultAddress: false
+                            });
+                            setShowAddForm(true);
+                        }}
+                        className="w-full mt-6 py-4 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center text-gray-500 hover:border-[#C06C84] hover:text-[#C06C84] transition-colors"
                     >
-                        <Plus className="w-5 h-5" />
-                        <span className="font-medium">Add New Address</span>
-                    </button>
+                        <Plus className="w-5 h-5 mr-2" /> Add New Address
+                    </motion.button>
+                )}
 
-                    <button
-                        onClick={handleContinue}
-                        disabled={!selectedAddress}
-                        className={`w-full mt-8 py-4 rounded-2xl font-bold text-lg transition-all ${selectedAddress
-                            ? 'bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white hover:shadow-xl hover:shadow-[#C06C84]/40'
-                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            }`}
-                    >
-                        Continue to Booking
-                    </button>
-                </motion.div>
+                {/* Inline Add/Edit Form */}
+                <AnimatePresence>
+                    {showAddForm && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mt-6 overflow-hidden"
+                        >
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-xl font-bold text-gray-900">{editingAddress ? 'Edit Address' : 'Add New Details'}</h3>
+                                    <Button variant="ghost" size="icon" onClick={() => setShowAddForm(false)}><X className="h-5 w-5" /></Button>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="flex gap-3">
+                                        {['Home', 'Office', 'Other'].map(type => (
+                                            <button
+                                                key={type}
+                                                onClick={() => setNewAddress({ ...newAddress, type })}
+                                                className={`flex-1 py-2 rounded-lg font-medium border ${newAddress.type === type ? 'bg-[#C06C84] text-white border-[#C06C84]' : 'border-gray-200 hover:bg-gray-50'}`}
+                                            >
+                                                {type}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <Input placeholder="Full Name" value={newAddress.name} onChange={e => setNewAddress({ ...newAddress, name: e.target.value })} />
+                                        <Input placeholder="Phone Number" value={newAddress.phone} onChange={e => setNewAddress({ ...newAddress, phone: e.target.value })} />
+                                    </div>
+                                    <Input placeholder="Flat / House No" value={newAddress.flat} onChange={e => setNewAddress({ ...newAddress, flat: e.target.value })} />
+                                    <Input placeholder="Area / Colony" value={newAddress.area} onChange={e => setNewAddress({ ...newAddress, area: e.target.value })} />
+                                    <div className="grid md:grid-cols-3 gap-4">
+                                        <Input placeholder="City" value={newAddress.cityName} onChange={e => setNewAddress({ ...newAddress, cityName: e.target.value })} />
+                                        <Input placeholder="State" value={newAddress.stateName} onChange={e => setNewAddress({ ...newAddress, stateName: e.target.value })} />
+                                        <Input placeholder="Pincode" value={newAddress.postalCode} onChange={e => setNewAddress({ ...newAddress, postalCode: e.target.value })} />
+                                    </div>
+                                    <div className="flex gap-3 pt-2">
+                                        <Button variant="outline" className="flex-1" onClick={() => setShowAddForm(false)}>Cancel</Button>
+                                        <Button className="flex-1 bg-[#C06C84] hover:bg-[#A0556C] text-white" onClick={handleAddOrUpdateAddress}>
+                                            {loading ? 'Saving...' : 'Save Address'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
             </div>
 
-            {/* Add Address Dialog */}
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-xl rounded-3xl">
-                    <DialogHeader>
-                        <DialogTitle className="text-[#0F172A] font-bold text-xl">Add New Address</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 pt-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Label</label>
-                            <Input
-                                placeholder="e.g., Home, Office"
-                                value={newAddress.label}
-                                onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })}
-                                className="rounded-xl border-gray-200 focus:border-[#C06C84]"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                            <Input
-                                placeholder="Enter full address"
-                                value={newAddress.address}
-                                onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
-                                className="rounded-xl border-gray-200 focus:border-[#C06C84]"
-                            />
-                        </div>
-                        <button
-                            onClick={handleAddAddress}
-                            className="w-full py-3 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white rounded-xl font-bold hover:shadow-lg hover:shadow-[#C06C84]/30 transition-all"
-                        >
-                            Add Address
-                        </button>
-                    </div>
-                </DialogContent>
-            </Dialog>
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => {
+                    setShowAuthModal(false);
+                    if (!isAuthenticated) router.back();
+                }}
+            />
+
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
+                <div className="max-w-[1000px] mx-auto">
+                    <Button
+                        onClick={handleContinue}
+                        disabled={!selectedAddress || showAddForm || loading}
+                        className="w-full h-14 text-lg bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] hover:opacity-90 text-white rounded-xl shadow-lg"
+                    >
+                        {loading ? 'Processing...' : 'Proceed to Payment'}
+                    </Button>
+                </div>
+            </div>
         </div>
+    );
+}
+
+export default function SpaBookingAddressPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <SpaAddressContent />
+        </Suspense>
     );
 }

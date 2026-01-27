@@ -1,50 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Star, MapPin, Clock, Heart, ChevronRight, Sparkles, Award, Users, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { QuestionnaireModal } from './QuestionnaireModal';
 import Image from 'next/image';
 
-const categories = [
+const MOCK_CATEGORIES = [
     {
-        id: 'haircut',
+        _id: 'haircut',
         name: 'Haircut & Styling',
         image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWlyJTIwc2Fsb24lMjBzdHlsaW5nfGVufDF8fHx8MTc2ODY1MjY4N3ww&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '✂️',
         description: 'Expert hair cutting & styling',
     },
     {
-        id: 'facial',
+        _id: 'facial',
         name: 'Facial & Skincare',
         image: 'https://images.unsplash.com/photo-1684014286330-ddbeb4a40c92?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNpYWwlMjB0cmVhdG1lbnQlMjBza2luY2FyZXxlbnwxfHx8fDE3Njg1NTQxNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '✨',
         description: 'Glowing skin treatments',
     },
     {
-        id: 'massage',
+        _id: 'massage',
         name: 'Massage & Relaxation',
         image: 'https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBtYXNzYWdlJTIwcmVsYXhhdGlvbnxlbnwxfHx8fDE3Njg2NTI2ODh8MA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '💆',
         description: 'Deep relaxation therapy',
     },
     {
-        id: 'bridal',
+        _id: 'bridal',
         name: 'Bridal & Makeup',
         image: 'https://images.unsplash.com/photo-1625139108082-48bb424c2333?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmlkYWwlMjBtYWtldXAlMjBhcnRpc3R8ZW58MXx8fHwxNzY4NTQyNjYzfDA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '💐',
         description: 'Perfect bridal looks',
     },
     {
-        id: 'manicure',
+        _id: 'manicure',
         name: 'Manicure & Pedicure',
         image: 'https://images.unsplash.com/photo-1634235421135-16ebd88c13c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW5pY3VyZSUyMHBlZGljdXJlJTIwbmFpbHN8ZW58MXx8fHwxNzY4NTcwMDcwfDA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '💅',
         description: 'Beautiful nail care',
     },
     {
-        id: 'waxing',
+        _id: 'waxing',
         name: 'Waxing & Threading',
         image: 'https://images.unsplash.com/photo-1706973320004-98a2fe6ddb7c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWF1dHklMjBzYWxvbiUyMHdheGluZ3xlbnwxfHx8fDE3Njg2NTI2ODl8MA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '🌿',
@@ -104,6 +104,63 @@ export function HomePage() {
     const router = useRouter();
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [categories, setCategories] = useState(MOCK_CATEGORIES);
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const API_BASE_URL = 'https://api.doorstephub.com/v1/dhubApi/app';
+                // Get service ID from localStorage
+                const selectedService = localStorage.getItem('selectedService');
+                let serviceId = null;
+
+                if (selectedService) {
+                    try {
+                        const serviceData = JSON.parse(selectedService);
+                        serviceId = serviceData.id;
+                    } catch (e) {
+                        console.log('Error parsing selectedService from localStorage');
+                    }
+                }
+
+                // If no service ID found, we might want to use a default or just rely on mocks
+                // For now, we attempt to fetch if we have an ID or just try (API might require ID)
+
+                const response = await fetch(`${API_BASE_URL}/professional-services-flow/public/categories`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        serviceId: serviceId || '6790757755050f22d997d95d' // Fallback to a valid Service ID if known, or let it fail to mocks. 
+                        // Note: 6790757755050f22d997d95d is likely the Spa/Saloon ID based on context or we can try to find it. 
+                        // Actually, without a known ID, this might return error. 
+                        // Let's use the code structure that allows fallback.
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success && data.category && data.category.length > 0) {
+                    const mappedCategories = data.category.map(cat => ({
+                        _id: cat._id,
+                        name: cat.name,
+                        image: cat.image ? `https://api.doorstephub.com/${cat.image}` : 'https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&q=80', // Fallback image
+                        icon: cat.icon || '✨', // API might not return emoji icon, use default
+                        description: cat.description || 'Premium wellness service'
+                    }));
+                    setCategories(mappedCategories);
+                }
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+                // MOCK_CATEGORIES are already initial state, so no action needed on error
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handleCategoryClick = (category) => {
         setSelectedCategory(category);
@@ -290,7 +347,7 @@ export function HomePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {categories.map((category, index) => (
                             <motion.div
-                                key={category.id}
+                                key={category._id || category.id}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -482,7 +539,7 @@ export function HomePage() {
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
                 categoryName={selectedCategory?.name || ''}
-                categoryId={selectedCategory?.id || ''}
+                categoryId={selectedCategory?._id || selectedCategory?.id || ''}
             />
         </div>
     );

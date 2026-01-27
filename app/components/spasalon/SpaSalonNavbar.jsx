@@ -2,11 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, ShoppingCart, ChevronDown, Menu, X } from 'lucide-react';
+import { MapPin, ShoppingCart, ChevronDown, Menu, X, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { LocationBar } from '@/components/location/LocationBar';
+import { useAuth } from '@/context/AuthContext';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { useLocation } from '@/hooks/useLocation';
 
 export function SpaSalonNavbar() {
     const router = useRouter();
+    const { location } = useLocation();
+    const { user, isAuthenticated } = useAuth();
+    const [authModalOpen, setAuthModalOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [moreOpen, setMoreOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -82,13 +89,9 @@ export function SpaSalonNavbar() {
                     {/* Right Side Actions */}
                     <div className="hidden lg:flex items-center space-x-4">
                         {/* Location */}
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F6F7FB] hover:bg-[#E8ECF2] transition-colors border border-[#E8ECF2]"
-                        >
-                            <MapPin className="w-4 h-4 text-[#C06C84]" />
-                            <span className="text-sm text-[#0F172A]">Hyderabad, Madhapur</span>
-                        </motion.button>
+                        <div className="hidden lg:block">
+                            <LocationBar theme="light" colorTheme="spa" />
+                        </div>
 
                         {/* Cart */}
                         <motion.button
@@ -111,14 +114,21 @@ export function SpaSalonNavbar() {
                             Contact Us
                         </motion.button>
 
-                        {/* Sign In */}
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-6 py-2 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white rounded-lg font-medium hover:shadow-lg hover:shadow-[#C06C84]/50 transition-all"
+                        {/* Sign In / Profile */}
+                        <button
+                            onClick={() => setAuthModalOpen(true)}
+                            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-[#C06C84]/10 hover:text-[#C06C84] transition-all overflow-hidden border border-transparent hover:border-[#C06C84]/20"
                         >
-                            Sign In
-                        </motion.button>
+                            {isAuthenticated && user?.image ? (
+                                <img
+                                    src={user.image}
+                                    alt={user.name}
+                                    className="w-full h-full object-cover rounded-full"
+                                />
+                            ) : (
+                                <User className="w-5 h-5 text-gray-600" />
+                            )}
+                        </button>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -150,10 +160,11 @@ export function SpaSalonNavbar() {
                             </MobileNavLink>
 
                             <div className="pt-3 border-t border-[#E8ECF2] space-y-2">
-                                <button className="w-full px-4 py-2 bg-[#F6F7FB] text-[#0F172A] rounded-lg text-left flex items-center gap-2">
+                                <div
+                                    className="w-full px-4 py-2 bg-[#F6F7FB] text-[#0F172A] rounded-lg text-left flex items-center gap-2">
                                     <MapPin className="w-4 h-4 text-[#C06C84]" />
-                                    Hyderabad, Madhapur
-                                </button>
+                                    <span className="truncate">{location?.address || 'Location not set'}</span>
+                                </div>
                                 <button className="w-full px-4 py-2 bg-[#F6F7FB] text-[#0F172A] rounded-lg">
                                     Contact Us
                                 </button>
@@ -165,6 +176,7 @@ export function SpaSalonNavbar() {
                     </motion.div>
                 )}
             </div>
+            <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} theme="light" />
         </motion.nav>
     );
 }
