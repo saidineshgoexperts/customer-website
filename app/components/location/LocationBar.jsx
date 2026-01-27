@@ -5,7 +5,7 @@ import { MapPin, ChevronDown, Search, Crosshair, X, Loader2 } from 'lucide-react
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocation } from '@/hooks/useLocation';
 
-export function LocationBar() {
+export function LocationBar({ theme = 'dark' }) {
     const { location, detectWithGPS, searchLocation, setManualLocation, loading, error } = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -57,25 +57,31 @@ export function LocationBar() {
         }
     };
 
+    const isLight = theme === 'light';
+
+
     return (
         <>
             {/* Navbar Trigger */}
             <motion.button
                 onClick={() => setIsOpen(true)}
-                className="hidden lg:flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#1a1a1a] hover:bg-[#037166]/10 border border-[#037166]/20 transition-all group mr-2"
+                className={`hidden lg:flex items-center space-x-2 px-3 py-2 rounded-xl border transition-all group mr-2 ${isLight
+                        ? 'bg-gray-100/50 hover:bg-gray-200/50 border-gray-200'
+                        : 'bg-[#1a1a1a] hover:bg-[#037166]/10 border-[#037166]/20'
+                    }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
             >
-                <MapPin className="w-4 h-4 text-[#037166] group-hover:text-[#04a99d]" />
+                <MapPin className={`w-4 h-4 ${isLight ? 'text-[#037166]' : 'text-[#037166] group-hover:text-[#04a99d]'}`} />
                 <div className="flex flex-col items-start min-w-[100px] max-w-[160px]">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">
+                    <span className={`text-[10px] uppercase tracking-wider font-semibold ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
                         {location ? 'Delivering to' : 'Location'}
                     </span>
-                    <span className="text-xs font-medium text-white truncate w-full text-left">
+                    <span className={`text-xs font-medium truncate w-full text-left ${isLight ? 'text-gray-900' : 'text-white'}`}>
                         {loading ? 'Detecting...' : location ? location.shortAddress : 'Select location'}
                     </span>
                 </div>
-                <ChevronDown className="w-3 h-3 text-gray-500 group-hover:text-[#037166]" />
+                <ChevronDown className={`w-3 h-3 ${isLight ? 'text-gray-400' : 'text-gray-500 group-hover:text-[#037166]'}`} />
             </motion.button>
 
             {/* Helper for Mobile (Icon only or specific mobile bar) - Assuming GlobalNav handles mobile, we'll stick to this for now */}

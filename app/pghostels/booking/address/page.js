@@ -7,11 +7,13 @@ import { ArrowLeft, Home, Briefcase, MapPin, Plus, Check, X, Trash2, Edit2, Load
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { useServiceCart } from '@/context/ServiceCartContext';
 
 export default function PGAddressPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { token, isAuthenticated } = useAuth();
+    const { addToCart, clearCart } = useServiceCart();
 
     // Params from previous step
     const providerId = searchParams.get('providerId');
@@ -175,25 +177,67 @@ export default function PGAddressPage() {
         }
     };
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (!selectedAddress) {
             toast.error('Please select an address');
             return;
         }
 
-        // Save booking context (can be replaced by context/redux)
-        sessionStorage.setItem('pg_booking_data', JSON.stringify({
-            providerId,
-            packageId,
-            addons: addons ? addons.split(',') : [],
-            address: selectedAddress
-        }));
+        setLoading(true);
+        try {
+            // 1. Clear existing cart to start fresh
+            await clearCart();
 
-        // Use same key as appliance flow for better compatibility if needed, 
-        // but cleaner to keep separate or clear appropriately.
-        sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
+            // 2. Add Main Package (Professional Service)
+            const packageSuccess = await addToCart(
+                providerId,
+                packageId,
+                'professional_service', // itemType
+                1, // quantity
+                null, // parentServiceId
+                'professional' // providerType
+            );
 
-        router.push('/pghostels/booking/confirm');
+            if (!packageSuccess) {
+                toast.error('Failed to add package to booking');
+                setLoading(false);
+                return;
+            }
+
+            // 3. Add Add-ons (Professional Addons)
+            if (addons) {
+                const addonList = addons.split(',');
+                for (const addonId of addonList) {
+                    await addToCart(
+                        providerId,
+                        addonId,
+                        'professional_addon',
+                        1,
+                        packageId, // Link addon to the package
+                        'professional'
+                    );
+                }
+            }
+
+            // Save booking context (backup/legacy)
+            sessionStorage.setItem('pg_booking_data', JSON.stringify({
+                providerId,
+                packageId,
+                addons: addons ? addons.split(',') : [],
+                address: selectedAddress
+            }));
+
+            // Save address for Confirm Page
+            sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
+
+            router.push('/pghostels/booking/confirm');
+
+        } catch (error) {
+            console.error('Booking pre-check error:', error);
+            toast.error('Failed to prepare booking. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

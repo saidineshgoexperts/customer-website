@@ -1,14 +1,14 @@
 {
   "pages": {
-    "/(landing)/page": [
+    "/pg-hostel/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/page.js"
+      "static/chunks/app/pg-hostel/page.js"
     ],
-    "/(landing)/layout": [
+    "/pg-hostel/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/layout.js"
+      "static/chunks/app/pg-hostel/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -20,6 +20,52 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
+    ],
+    "/pghostels/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pghostels/page.js"
+    ],
+    "/pghostels/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pghostels/layout.js"
+    ],
+    "/pghostels/results/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pghostels/results/page.js"
+    ],
+    "/pghostels/hostel-detail/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/pghostels/hostel-detail/[id]/page.css",
+      "static/chunks/app/pghostels/hostel-detail/[id]/page.js"
+    ],
+    "/pghostels/booking/address/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pghostels/booking/address/page.js"
+    ],
+    "/pghostels/booking/confirm/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pghostels/booking/confirm/page.js"
+    ],
+    "/(landing)/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(landing)/page.js"
+    ],
+    "/(landing)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(landing)/layout.js"
     ],
     "/appliances/page": [
       "static/chunks/webpack.js",
@@ -41,15 +87,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/services/layout.js"
     ],
-    "/spa-salon/page": [
+    "/services/thank-you/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/spa-salon/page.js"
-    ],
-    "/spa-salon/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/spa-salon/layout.js"
+      "static/chunks/app/services/thank-you/page.js"
     ]
   }
 }

@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, User } from 'lucide-react';
 import { LocationBar } from '@/components/location/LocationBar';
+import { useAuth } from '@/context/AuthContext';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 const navLinks = [
     { label: 'Home', path: '/pghostels' },
@@ -24,6 +26,8 @@ const moreItems = [
 export function PGHostelNavbar() {
     const [showMoreDropdown, setShowMoreDropdown] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [authModalOpen, setAuthModalOpen] = useState(false);
+    const { user, isAuthenticated } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -56,7 +60,7 @@ export function PGHostelNavbar() {
 
                         {/* Location Bar */}
                         <div className="hidden sm:block">
-                            <LocationBar />
+                            <LocationBar theme="light" />
                         </div>
                     </div>
 
@@ -110,13 +114,25 @@ export function PGHostelNavbar() {
 
                     {/* Right Side - Profile */}
                     <div className="flex items-center space-x-3">
-                        {/* Mobile location bar if needed, or keeping it hidden on mobile to avoid clutter as per design */}
-                        <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-                            <User className="w-5 h-5 text-gray-600" />
+                        {/* Auth Button */}
+                        <button
+                            onClick={() => setAuthModalOpen(true)}
+                            className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-[#037166]/10 hover:text-[#037166] transition-all overflow-hidden border border-transparent hover:border-[#037166]/20"
+                        >
+                            {isAuthenticated && user?.image ? (
+                                <img
+                                    src={user.image}
+                                    alt={user.name}
+                                    className="w-full h-full object-cover rounded-full"
+                                />
+                            ) : (
+                                <User className="w-5 h-5 text-gray-600" />
+                            )}
                         </button>
                     </div>
                 </div>
             </div>
+            <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} theme="light" />
         </motion.nav>
     );
 }

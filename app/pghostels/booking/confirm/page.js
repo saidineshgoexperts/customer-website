@@ -144,26 +144,33 @@ export default function PGConfirmPage() {
             return;
         }
 
-        // Detect provider type from cart items (assume homogeneous cart for now or verify if mixed is allowed)
+        // Detect provider type from cart items
         const isProfessional = cartItems.some(item => item.itemType === 'professional_service' || item.itemType === 'professional_addon');
         const checkoutProviderType = isProfessional ? 'professional' : 'regular';
 
         setLoading(true);
         try {
-            const endpoint = paymentMethod === 'ONLINE'
-                ? 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/initiate-payment'
-                : 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
-
-            const payload = {
+            let endpoint = '';
+            let payload = {
                 serviceAddressId: selectedAddress._id,
                 bookedDate,
                 bookedTime,
                 paymentMethod,
-                sourceOfLead: 'App',
+                sourceOfLead: 'website',
                 providerType: checkoutProviderType
             };
 
-            console.log("💳 Checkout Payload:", payload);
+            if (paymentMethod === 'ONLINE') {
+                endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/initiate-payment';
+            } else if (paymentMethod === 'WALLET') {
+                // Wallet Payment API
+                endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
+            } else {
+                // COD / Default
+                endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
+            }
+
+            console.log(`💳 Checkout [${paymentMethod}] Payload:`, payload);
 
             const response = await fetch(endpoint, {
                 method: 'POST',

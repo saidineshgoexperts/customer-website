@@ -1,6 +1,9 @@
 {
-  "/(landing)/page": "app/(landing)/page.js",
-  "/services/page": "app/services/page.js",
-  "/appliances/page": "app/appliances/page.js",
-  "/spa-salon/page": "app/spa-salon/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/pghostels/results/page": "app/pghostels/results/page.js",
+  "/pghostels/booking/confirm/page": "app/pghostels/booking/confirm/page.js",
+  "/pghostels/hostel-detail/[id]/page": "app/pghostels/hostel-detail/[id]/page.js",
+  "/pghostels/booking/address/page": "app/pghostels/booking/address/page.js",
+  "/services/thank-you/page": "app/services/thank-you/page.js",
+  "/(landing)/page": "app/(landing)/page.js"
 }

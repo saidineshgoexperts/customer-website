@@ -55,8 +55,17 @@ function PGResultsContent() {
             setLoading(true);
             try {
                 // Default to Hyderabad coords if location is missing (or handle gracefully)
-                const lat = location?.latitude || "17.3850";
-                const lng = location?.longitude || "78.4867";
+
+
+                const userLocationData = localStorage.getItem('user_location_data');
+                const locationData = JSON.parse(userLocationData);
+
+
+                console.log("locationData", locationData)
+
+
+                const lat = locationData?.lat;
+                const lng = locationData?.lng;
 
                 const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
                     method: 'POST',
