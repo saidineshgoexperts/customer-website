@@ -158,7 +158,7 @@ function ReligiousAddressContent() {
         setLoading(true);
         try {
             // 1. Clear Cart
-            await clearCart();
+            await clearCart(true);
 
             // 2. Add Main Package (Professional Service)
             const packageSuccess = await addToCart(
@@ -167,7 +167,8 @@ function ReligiousAddressContent() {
                 'professional_service',
                 1,
                 null,
-                'professional'
+                'professional',
+                true // suppressToast
             );
 
             if (!packageSuccess) {
@@ -186,7 +187,8 @@ function ReligiousAddressContent() {
                         'professional_addon',
                         1,
                         packageId, // Linked to package
-                        'professional'
+                        'professional',
+                        true // suppressToast
                     );
                 }
             }

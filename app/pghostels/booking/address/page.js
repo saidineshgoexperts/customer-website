@@ -186,7 +186,7 @@ function PGAddressContent() {
         setLoading(true);
         try {
             // 1. Clear existing cart to start fresh
-            await clearCart();
+            await clearCart(true);
 
             // 2. Add Main Package (Professional Service)
             const packageSuccess = await addToCart(
@@ -195,7 +195,8 @@ function PGAddressContent() {
                 'professional_service', // itemType
                 1, // quantity
                 null, // parentServiceId
-                'professional' // providerType
+                'professional', // providerType
+                true // suppressToast
             );
 
             if (!packageSuccess) {
@@ -214,7 +215,8 @@ function PGAddressContent() {
                         'professional_addon',
                         1,
                         packageId, // Link addon to the package
-                        'professional'
+                        'professional',
+                        true // suppressToast
                     );
                 }
             }

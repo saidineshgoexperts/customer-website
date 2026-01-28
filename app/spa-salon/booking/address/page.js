@@ -158,7 +158,7 @@ function SpaAddressContent() {
             }
 
             // 1. Clear Cart
-            await clearCart();
+            await clearCart(true);
 
             // 2. Add Main Package
             const packageSuccess = await addToCart(
@@ -167,7 +167,8 @@ function SpaAddressContent() {
                 'professional_service',
                 1,
                 null,
-                'professional'
+                'professional',
+                true // suppressToast
             );
 
             if (!packageSuccess) {
@@ -186,7 +187,8 @@ function SpaAddressContent() {
                         'professional_addon',
                         1,
                         packageId,
-                        'professional'
+                        'professional',
+                        true // suppressToast
                     );
                 }
             }

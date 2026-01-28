@@ -43,7 +43,7 @@ export const ServiceCartProvider = ({ children }) => {
         fetchCart();
     }, [fetchCart]);
 
-    const addToCart = async (providerId, itemId, itemType = 'service', quantity = 1, parentServiceId = null, providerType = 'regular') => {
+    const addToCart = async (providerId, itemId, itemType = 'service', quantity = 1, parentServiceId = null, providerType = 'regular', suppressToast = false) => {
         if (!isAuthenticated) {
             toast.error('Please login to add items to cart');
             openAuthModal(); // Trigger the auth modal
@@ -78,6 +78,9 @@ export const ServiceCartProvider = ({ children }) => {
 
             if (data.success) {
                 await fetchCart();
+                if (!suppressToast) {
+                    toast.success('Added to cart');
+                }
                 return true;
             } else {
                 toast.error(data.message || 'Failed to add to cart');
@@ -115,7 +118,7 @@ export const ServiceCartProvider = ({ children }) => {
         }
     };
 
-    const clearCart = async () => {
+    const clearCart = async (suppressToast = false) => {
         if (!isAuthenticated) return;
         try {
             const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/service-cart/clear', {
@@ -129,7 +132,9 @@ export const ServiceCartProvider = ({ children }) => {
             if (data.success) {
                 setCartItems([]);
                 setCartData(null);
-                toast.success('Cart cleared');
+                if (!suppressToast) {
+                    toast.success('Cart cleared');
+                }
             }
         } catch (error) {
             console.error('Error clearing service cart:', error);
