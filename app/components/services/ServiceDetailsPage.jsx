@@ -50,6 +50,7 @@ export function ServiceDetailsPage({
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('services');
   const [visibleReviews, setVisibleReviews] = useState(4);
+  const [isExpanded, setIsExpanded] = useState(false);
   const accentColor = serviceAccents[category] || '#5a8b9d';
 
   useEffect(() => {
@@ -249,9 +250,19 @@ export function ServiceDetailsPage({
                 </div>
               </div>
 
-              <p className="text-white/80 text-lg mb-6 leading-relaxed whitespace-pre-line">
-                {storeData.description}
-              </p>
+              <div className="mb-6">
+                <p className="text-white/80 text-lg leading-relaxed whitespace-pre-line inline">
+                  {isExpanded ? storeData.description : storeData.description?.slice(0, 250) + (storeData.description?.length > 250 ? '...' : '')}
+                </p>
+                {storeData.description?.length > 250 && (
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="text-[#04a99d] font-bold ml-2 hover:underline focus:outline-none inline-block"
+                  >
+                    {isExpanded ? 'Read Less' : 'Read More'}
+                  </button>
+                )}
+              </div>
 
               {/* Service Highlights */}
               <div className="grid grid-cols-2 gap-4">

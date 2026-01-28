@@ -149,7 +149,7 @@ export function ViewAllPage({
               image: service.mainImage ? `https://api.doorstephub.com/${service.mainImage}` : 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=400',
               title: service.serviceName,
               description: `${service.categoryName} - ${service.subcategoryName}`,
-              price: '₹999+',
+              price: service.serviceBookingCost || 999,
               bookings: Math.floor(Math.random() * 200) + 50,
               categoryName: service.categoryName,
               subcategoryName: service.subcategoryName,
@@ -193,7 +193,7 @@ export function ViewAllPage({
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all"
+            className="inline-flex items-center gap-2 mb-6 px-4 py-2 mt-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -357,7 +357,7 @@ export function ViewAllPage({
                     </h3>
                     <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
                     <div className="flex items-center justify-between mt-auto">
-                      <p className="text-2xl font-bold text-white">₹999+</p>
+                      <p className="text-2xl font-bold text-white">₹{service.price}</p>
                       <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg transition-all text-sm flex items-center gap-2">
                         Book Now
                         <ArrowRight className="w-4 h-4" />

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Phone, ShieldCheck, Mail, User, LogOut, Camera, Chrome } from 'lucide-react';
+import { X, Phone, ShieldCheck, Mail, User, LogOut, Camera, Chrome, Pencil, Check } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
@@ -12,6 +12,23 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
     const [mobile, setMobile] = useState('');
     const [otp, setOtp] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Profile Edit State
+    const [isEditing, setIsEditing] = useState(false);
+    const [profileData, setProfileData] = useState({ name: '', email: '' });
+    const [previewImage, setPreviewImage] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const fileInputRef = React.useRef(null);
+
+    // Initial load of profile data
+    React.useEffect(() => {
+        if (user) {
+            setProfileData({
+                name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+                email: user.email || ''
+            });
+        }
+    }, [user]);
 
     // Default Dark Theme (Fallback)
     const defaultTheme = {
@@ -234,15 +251,33 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                             <div className="relative flex flex-col items-center">
                                 <div className="relative group">
                                     <div className={`w-24 h-24 rounded-full border-2 border-opacity-50 ${borderColor} overflow-hidden ${inputBg}`}>
-                                        {user?.image ? (
-                                            <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                                        {previewImage || user?.image ? (
+                                            <img src={previewImage || user.image} alt={user.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className={`w-full h-full flex items-center justify-center text-3xl font-bold ${accentText}`}>
                                                 {user?.firstName?.[0] || user?.name?.[0] || 'U'}
                                             </div>
                                         )}
                                     </div>
-                                    <button className={`absolute bottom-0 right-0 p-2 ${t.accent} rounded-full text-white shadow-lg group-hover:scale-110 transition-transform`}>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                setSelectedFile(file);
+                                                setPreviewImage(URL.createObjectURL(file));
+                                                // Auto-enable edit mode if image is changed
+                                                setIsEditing(true);
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className={`absolute bottom-0 right-0 p-2 ${t.accent} rounded-full text-white shadow-lg group-hover:scale-110 transition-transform cursor-pointer hover:bg-opacity-90`}
+                                    >
                                         <Camera className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -250,6 +285,34 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                     <h3 className={`text-xl font-bold ${t.textMain}`}>{user?.name || `${user?.firstName} ${user?.lastName}`}</h3>
                                     <p className={`${t.textMain} opacity-60 text-sm`}>{user?.phone || user?.mobile || 'No phone'}</p>
                                 </div>
+                                <button
+                                    onClick={async () => {
+                                        if (isEditing) {
+                                            // Handle Save
+                                            setLoading(true);
+                                            try {
+                                                const formData = new FormData();
+                                                formData.append('name', profileData.name);
+                                                formData.append('email', profileData.email);
+                                                if (selectedFile) {
+                                                    formData.append('image', selectedFile);
+                                                }
+
+                                                await updateProfile(formData);
+                                                setIsEditing(false);
+                                                setSelectedFile(null);
+                                                // Preview image stays until next full refresh or update via context
+                                            } finally {
+                                                setLoading(false);
+                                            }
+                                        } else {
+                                            setIsEditing(true);
+                                        }
+                                    }}
+                                    className={`absolute top-0 right-0 p-2 rounded-xl bg-white/5 border border-white/10 ${t.textHover} hover:bg-white/10 transition-all`}
+                                >
+                                    {isEditing ? <Check className="w-5 h-5 text-green-500" /> : <Pencil className="w-5 h-5" />}
+                                </button>
                             </div>
 
                             <div className="space-y-4">
@@ -258,9 +321,10 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                     <input
                                         type="email"
                                         placeholder="Email Address"
-                                        defaultValue={user?.email}
-                                        onBlur={(e) => updateProfile({ email: e.target.value })}
-                                        className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none`}
+                                        value={profileData.email}
+                                        disabled={!isEditing}
+                                        onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                                        className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none ${!isEditing && 'opacity-60 cursor-not-allowed'}`}
                                     />
                                 </div>
                                 <div className="relative">
@@ -268,9 +332,10 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                     <input
                                         type="text"
                                         placeholder="Full Name"
-                                        defaultValue={user?.name || `${user?.firstName} ${user?.lastName}`}
-                                        onBlur={(e) => updateProfile({ name: e.target.value })}
-                                        className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none`}
+                                        value={profileData.name}
+                                        disabled={!isEditing}
+                                        onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                                        className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none ${!isEditing && 'opacity-60 cursor-not-allowed'}`}
                                     />
                                 </div>
                             </div>

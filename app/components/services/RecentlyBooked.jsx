@@ -34,7 +34,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
             image: service.mainImage ? `https://api.doorstephub.com/${service.mainImage}` : 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=400',
             title: service.serviceName,
             description: `${service.categoryName} - ${service.subcategoryName}`,
-            price: '₹999+', // Default pricing (can be fetched from rate cards if needed)
+            price: service.serviceBookingCost, // Default pricing (can be fetched from rate cards if needed)
             bookings: Math.floor(Math.random() * 200) + 50, // Random bookings for demo
             categoryName: service.categoryName,
             subcategoryName: service.subcategoryName,
@@ -244,7 +244,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-xs text-white/50 mb-1">From</p>
-                          <p className="text-2xl font-bold text-white">₹999+</p>
+                          <p className="text-2xl font-bold text-white">₹{service.price}</p>
                         </div>
                         <motion.button
                           whileHover={{ scale: 1.1, rotate: 5 }}

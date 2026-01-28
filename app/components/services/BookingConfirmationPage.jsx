@@ -46,7 +46,7 @@ export function BookingConfirmationPage({
     ? directBookingItems.reduce((acc, item) => acc + (item.inspectionCost || 0), 0)
     : 0;
 
-  const total = subtotal + bookingCost + inspectionCost;
+  const total = bookingCost;
   const tax = 0;
 
   // Service window: 9 AM to 9 PM (9:00 to 21:00)
@@ -145,7 +145,7 @@ export function BookingConfirmationPage({
       const bookingData = {
         serviceId: serviceId,
         serviceAddressId: address._id || address.id,
-        sourceOfLead: 'mobile-app',
+        sourceOfLead: 'website',
         addMoreInfo: `Technician Preference: ${technicianPreference}. Payment: ${paymentMethod}. Packages: ${cartItems.map(i => i.packageName || i.serviceName).join(', ')}`,
         bookedDate: selectedDate,
         bookedTime: selectedTime,
@@ -447,8 +447,9 @@ export function BookingConfirmationPage({
                         Qty: {item.quantity || 1}
                       </p>
                     </div>
+                    {/* Item cost is effectively 0 for immediate payment */}
                     <span className="text-white/90 font-medium">
-                      ₹{(item.price || 0) * (item.quantity || 1)}
+                      ₹0
                     </span>
                   </div>
                 ))}
@@ -460,7 +461,7 @@ export function BookingConfirmationPage({
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-white/80">
                   <span>Subtotal</span>
-                  <span>₹{subtotal}</span>
+                  <span>₹0</span>
                 </div>
                 {bookingCost > 0 && (
                   <div className="flex justify-between text-white/80">
@@ -468,6 +469,7 @@ export function BookingConfirmationPage({
                     <span>₹{bookingCost}</span>
                   </div>
                 )}
+                {/* Hidden inspection cost for summary since subtotal is zero logic applies */}
                 {inspectionCost > 0 && (
                   <div className="flex justify-between text-white/80">
                     <span>Inspection Cost</span>
@@ -485,6 +487,12 @@ export function BookingConfirmationPage({
               <div className="flex justify-between text-xl font-bold text-white mb-6">
                 <span>Total</span>
                 <span>₹{total}</span>
+              </div>
+
+              <div className="p-3 mb-6 bg-[#037166]/10 border border-[#037166]/20 rounded-lg">
+                <p className="text-[#04a99d] text-xs text-center font-medium leading-relaxed">
+                  Note: This is the service booking cost only. The inspection/service cost will be collected at Doorstep.
+                </p>
               </div>
 
               {/* Selected Date/Time Preview */}

@@ -152,15 +152,12 @@ export function AppDownload() {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-[#0a0a0a] rounded-b-3xl z-20" />
 
                 {/* Screen */}
-                <div className="relative w-full h-full bg-gradient-to-b from-[#0a0a0a] to-[#0d1410] p-4">
+                <div className="relative w-full h-full bg-white flex items-center justify-center p-8">
                   <ImageWithFallback
-                    src="/android1.png"
-                    alt="App Preview"
-                    className="w-full h-full object-cover rounded-3xl"
+                    src="/d-hub-logo.png"
+                    alt="Doorstep Hub App"
+                    className="w-full h-auto object-contain"
                   />
-
-                  {/* Glow Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#037166]/20 via-transparent to-transparent rounded-3xl" />
                 </div>
 
                 {/* Screen Glow */}
