@@ -158,7 +158,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8 }}
               className="group cursor-pointer"
-              onClick={() => onServiceClick?.(service._id)}
+              onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName)}
             >
               <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
                 {/* Featured Badge */}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Waves, Star, Clock, Heart, MapPin } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
@@ -198,13 +199,15 @@ export function LatestSpaServices() {
                     </div>
 
                     {/* Book Button */}
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full py-3 bg-gradient-to-r from-[#037166]/80 to-[#025951]/80 backdrop-blur-sm rounded-xl text-white font-medium hover:from-[#037166] hover:to-[#025951] transition-all"
-                    >
-                      View Details
-                    </motion.button>
+                    <Link href={`/spa-salon/detail/${store._id}`} className="w-full mt-auto block">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full py-3 bg-gradient-to-r from-[#037166]/80 to-[#025951]/80 backdrop-blur-sm rounded-xl text-white font-medium hover:from-[#037166] hover:to-[#025951] transition-all"
+                      >
+                        View Details
+                      </motion.button>
+                    </Link>
                   </div>
 
                   {/* Subtle Glow */}

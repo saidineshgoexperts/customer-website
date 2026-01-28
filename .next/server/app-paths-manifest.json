@@ -1,10 +1,6 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/spa-salon/category/[id]/page": "app/spa-salon/category/[id]/page.js",
-  "/spa-salon/results/page": "app/spa-salon/results/page.js",
-  "/spa-salon/booking/address/page": "app/spa-salon/booking/address/page.js",
-  "/spa-salon/detail/[id]/page": "app/spa-salon/detail/[id]/page.js",
-  "/spa-salon/booking/confirm/page": "app/spa-salon/booking/confirm/page.js",
-  "/spa-salon/thank-you/page": "app/spa-salon/thank-you/page.js",
-  "/spa-salon/page": "app/spa-salon/page.js"
+  "/(landing)/page": "app/(landing)/page.js",
+  "/pghostels/page": "app/pghostels/page.js",
+  "/services/detail/[serviceId]/page": "app/services/detail/[serviceId]/page.js",
+  "/services/page": "app/services/page.js"
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Heart, Users, Star, Check, Home } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
@@ -299,14 +300,18 @@ export function RecommendedHostels() {
                   </div>
 
                   {/* Action Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/50 transition-all flex items-center justify-center space-x-2"
-                  >
-                    <Home className="w-5 h-5" />
-                    <span>Schedule a Visit</span>
-                  </motion.button>
+                  <div className="w-full">
+                    <Link href={`/pghostels/hostel-detail/${hostel.id}`}>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/50 transition-all flex items-center justify-center space-x-2"
+                      >
+                        <Home className="w-5 h-5" />
+                        <span>Schedule a Visit</span>
+                      </motion.button>
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Warm Glow Effect */}

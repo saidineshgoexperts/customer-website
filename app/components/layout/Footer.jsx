@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'motion/react';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 
@@ -49,9 +50,15 @@ export function Footer() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-[#037166] to-[#04a99d] bg-clip-text text-transparent mb-4">
-                Doorstep Hub
-              </h3>
+              <div className="relative w-48 h-14 overflow-hidden mb-6">
+                <Image
+                  src="/d-hub-logo.png"
+                  alt="Doorstep Hub Logo"
+                  fill
+                  sizes="192px"
+                  className="object-contain object-left"
+                />
+              </div>
               <p className="text-white/60 mb-6 leading-relaxed max-w-sm">
                 Your trusted partner for all home service needs. Connecting you with verified professionals for quick, reliable, and affordable solutions.
               </p>

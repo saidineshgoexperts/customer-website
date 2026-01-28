@@ -31,7 +31,7 @@ export function AppDownload() {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* Left: Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -47,8 +47,8 @@ export function AppDownload() {
 
             {/* Heading */}
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-              <span className="block text-white mb-2">Everything in</span>
-              <span className="block bg-gradient-to-r from-[#037166] to-[#02b39a] bg-clip-text text-transparent">
+              <span className="text-white">Everything in </span>
+              <span className="bg-gradient-to-r from-[#037166] to-[#02b39a] bg-clip-text text-transparent">
                 Your Pocket
               </span>
             </h2>
@@ -137,7 +137,7 @@ export function AppDownload() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="relative h-[600px] hidden lg:block"
+            className="relative h-[700px] hidden lg:block"
           >
             {/* Main Phone */}
             <motion.div
@@ -145,7 +145,7 @@ export function AppDownload() {
                 y: [0, -20, 0],
               }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
+              className="absolute top-20 left-1/2 -translate-x-1/2 z-10"
             >
               <div className="relative w-72 h-[580px] bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-[3rem] border-8 border-[#2a2a2a] shadow-2xl overflow-hidden">
                 {/* Notch */}
@@ -154,7 +154,7 @@ export function AppDownload() {
                 {/* Screen */}
                 <div className="relative w-full h-full bg-gradient-to-b from-[#0a0a0a] to-[#0d1410] p-4">
                   <ImageWithFallback
-                    src="https://images.unsplash.com/photo-1730818875087-182c15e1e7a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2JpbGUlMjBhcHAlMjBzbWFydHBob25lfGVufDF8fHx8MTc2ODAyNjc0OXww&ixlib=rb-4.1.0&q=80&w=1080"
+                    src="/android1.png"
                     alt="App Preview"
                     className="w-full h-full object-cover rounded-3xl"
                   />
@@ -174,7 +174,7 @@ export function AppDownload() {
                 y: [0, 20, 0],
               }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-40 scale-90 -rotate-12"
+              className="absolute top-28 left-1/2 -translate-x-1/2 opacity-40 scale-90 -rotate-12"
             >
               <div className="w-72 h-[580px] bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-[3rem] border-8 border-[#2a2a2a] shadow-2xl" />
             </motion.div>

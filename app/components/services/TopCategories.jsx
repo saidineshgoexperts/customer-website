@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 
-export function TopCategories() {
+export function TopCategories({ onViewAll }) {
   const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -154,7 +154,7 @@ export function TopCategories() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="hidden md:flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 transition-all duration-300 group"
-            onClick={() => router.push('/services')}
+            onClick={onViewAll}
           >
             <span>View All</span>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

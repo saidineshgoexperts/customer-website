@@ -6,12 +6,31 @@ import { X, Phone, ShieldCheck, Mail, User, LogOut, Camera, Chrome } from 'lucid
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
-export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
+export function AuthModal({ isOpen, onClose, theme = {} }) {
     const { user, loginWithWhatsApp, verifyOtp, loginWithGoogle, updateProfile, logout, isAuthenticated } = useAuth();
     const [step, setStep] = useState('login'); // login, otp, profile
     const [mobile, setMobile] = useState('');
     const [otp, setOtp] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Default Dark Theme (Fallback)
+    const defaultTheme = {
+        bgMobile: 'bg-[#0a0a0a]',
+        textMain: 'text-white',
+        textHover: 'text-[#037166]', // Accent
+        border: 'border-[#037166]/20',
+        buttonBg: 'bg-[#1a1a1a]', // Input bg
+        accentGradientFrom: 'from-[#037166]',
+        accentGradientTo: 'to-[#04a99d]',
+        accent: 'bg-[#037166]'
+    };
+
+    const t = typeof theme === 'object' && Object.keys(theme).length > 0 ? theme : defaultTheme;
+
+    // Derived colors for cleaner JSX
+    const inputBg = t.buttonBg;
+    const borderColor = t.border;
+    const accentText = t.textHover;
 
     const handleSendOtp = async (e) => {
         e.preventDefault();
@@ -71,16 +90,6 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
         }
     };
 
-    const isLight = theme === 'light';
-    const bgColor = isLight ? 'bg-white' : 'bg-[#1a1a1a]';
-    const borderColor = isLight ? 'border-gray-200' : 'border-[#037166]/30';
-    const textColor = isLight ? 'text-gray-900' : 'text-white';
-    const subTextColor = isLight ? 'text-gray-500' : 'text-white/60';
-    const inputBg = isLight ? 'bg-gray-50' : 'bg-white/5';
-    const inputBorder = isLight ? 'border-gray-200' : 'border-white/10';
-    const closeBtnHover = isLight ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600' : 'bg-white/5 hover:bg-white/10 text-white/60';
-    const otpInputBg = isLight ? 'bg-gray-50 border-gray-200 text-gray-900' : 'bg-white/5 border-white/10 text-white';
-
     if (!isOpen) return null;
 
     return (
@@ -97,14 +106,14 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                className={`relative w-full max-w-md ${bgColor} rounded-3xl border ${borderColor} shadow-2xl overflow-hidden`}
+                className={`relative w-full max-w-md ${t.bgMobile} rounded-3xl border ${borderColor} shadow-2xl overflow-hidden`}
             >
                 {/* Header */}
-                <div className={`p-6 border-b ${isLight ? 'border-gray-100' : 'border-white/10'} flex items-center justify-between`}>
-                    <h2 className={`text-xl font-bold ${textColor}`}>
+                <div className={`p-6 border-b border-opacity-10 ${borderColor} flex items-center justify-between`}>
+                    <h2 className={`text-xl font-bold ${t.textMain}`}>
                         {isAuthenticated ? 'Your Profile' : 'Sign In'}
                     </h2>
-                    <button onClick={onClose} className={`p-2 rounded-xl transition-colors ${closeBtnHover}`}>
+                    <button onClick={onClose} className={`p-2 rounded-xl transition-colors hover:bg-white/10 ${t.textMain} opacity-70 hover:opacity-100`}>
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -114,29 +123,29 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                         step === 'login' ? (
                             <div className="space-y-6">
                                 <div className="text-center">
-                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ${isLight ? 'bg-[#037166]/10' : 'bg-[#037166]/20'}`}>
-                                        <Phone className="w-8 h-8 text-[#037166]" />
+                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-opacity-10 ${t.accent}`}>
+                                        <Phone className={`w-8 h-8 ${accentText}`} />
                                     </div>
-                                    <h3 className={`text-lg font-bold ${textColor} mb-2`}>Login with WhatsApp</h3>
-                                    <p className={`${subTextColor} text-sm`}>We'll send you a one-time password on WhatsApp</p>
+                                    <h3 className={`text-lg font-bold ${t.textMain} mb-2`}>Login with WhatsApp</h3>
+                                    <p className={`${t.textMain} opacity-60 text-sm`}>We'll send you a one-time password on WhatsApp</p>
                                 </div>
 
                                 <form onSubmit={handleSendOtp} className="space-y-4">
                                     <div className="relative">
-                                        <Phone className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${isLight ? 'text-gray-400' : 'text-white/40'}`} />
+                                        <Phone className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${t.textMain} opacity-40`} />
                                         <input
                                             type="tel"
                                             placeholder="Mobile Number"
                                             value={mobile}
                                             onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                            className={`w-full pl-12 pr-4 py-4 ${inputBg} border ${inputBorder} rounded-xl ${textColor} ${isLight ? 'placeholder:text-gray-400' : 'placeholder:text-white/20'} focus:border-[#037166] transition-all outline-none`}
+                                            className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none`}
                                             required
                                         />
                                     </div>
                                     <button
                                         type="submit"
                                         disabled={loading || mobile.length !== 10}
-                                        className="w-full py-4 bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold rounded-xl hover:shadow-lg hover:shadow-[#037166]/30 disabled:opacity-50 transition-all"
+                                        className={`w-full py-4 bg-gradient-to-r ${t.accentGradientFrom} ${t.accentGradientTo} text-white font-bold rounded-xl hover:shadow-lg hover:shadow-current/30 disabled:opacity-50 transition-all`}
                                     >
                                         {loading ? 'Sending...' : 'Send OTP'}
                                     </button>
@@ -144,16 +153,16 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
 
                                 <div className="relative py-4">
                                     <div className="absolute inset-0 flex items-center">
-                                        <div className={`w-full border-t ${isLight ? 'border-gray-200' : 'border-white/10'}`}></div>
+                                        <div className={`w-full border-t border-opacity-10 ${borderColor}`}></div>
                                     </div>
                                     <div className="relative flex justify-center">
-                                        <span className={`px-4 ${bgColor} ${subTextColor} text-sm italic`}>or continue with</span>
+                                        <span className={`px-4 ${t.bgMobile} ${t.textMain} opacity-50 text-sm italic`}>or continue with</span>
                                     </div>
                                 </div>
 
                                 <button
                                     onClick={handleGoogleLogin}
-                                    className={`w-full py-4 ${isLight ? 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50' : 'bg-white text-black hover:bg-white/90'} font-bold rounded-xl flex items-center justify-center gap-3 transition-all`}
+                                    className={`w-full py-4 ${inputBg} border border-opacity-20 ${borderColor} ${t.textMain} hover:bg-opacity-80 font-bold rounded-xl flex items-center justify-center gap-3 transition-all`}
                                 >
                                     <Chrome className="w-5 h-5" />
                                     Sign in with Google
@@ -162,11 +171,11 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                         ) : (
                             <div className="space-y-6">
                                 <div className="text-center">
-                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ${isLight ? 'bg-[#037166]/10' : 'bg-[#037166]/20'}`}>
-                                        <ShieldCheck className="w-8 h-8 text-[#037166]" />
+                                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-opacity-10 ${t.accent}`}>
+                                        <ShieldCheck className={`w-8 h-8 ${accentText}`} />
                                     </div>
-                                    <h3 className={`text-lg font-bold ${textColor} mb-2`}>Enter Verification Code</h3>
-                                    <p className={`${subTextColor} text-sm`}>Code sent to +91 {mobile}</p>
+                                    <h3 className={`text-lg font-bold ${t.textMain} mb-2`}>Enter Verification Code</h3>
+                                    <p className={`${t.textMain} opacity-60 text-sm`}>Code sent to +91 {mobile}</p>
                                 </div>
 
                                 <form onSubmit={handleVerifyOtp} className="space-y-6">
@@ -195,14 +204,14 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                                                         document.getElementById(`otp-${index - 1}`).focus();
                                                     }
                                                 }}
-                                                className={`w-12 h-14 ${otpInputBg} rounded-xl text-center text-xl font-bold focus:border-[#037166] focus:ring-1 focus:ring-[#037166] outline-none transition-all`}
+                                                className={`w-12 h-14 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} text-center text-xl font-bold focus:border-opacity-100 outline-none transition-all`}
                                             />
                                         ))}
                                     </div>
                                     <button
                                         type="submit"
                                         disabled={loading || otp.length !== 6}
-                                        className="w-full py-4 bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold rounded-xl hover:shadow-lg hover:shadow-[#037166]/30 disabled:opacity-50 transition-all"
+                                        className={`w-full py-4 bg-gradient-to-r ${t.accentGradientFrom} ${t.accentGradientTo} text-white font-bold rounded-xl hover:shadow-lg hover:shadow-current/30 disabled:opacity-50 transition-all`}
                                     >
                                         {loading ? 'Verifying...' : 'Verify OTP'}
                                     </button>
@@ -212,7 +221,7 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                                             setStep('login');
                                             setOtp('');
                                         }}
-                                        className="w-full text-white/60 text-sm hover:text-white hover:underline transition-colors"
+                                        className={`w-full ${t.textMain} opacity-60 text-sm hover:opacity-100 hover:underline transition-colors`}
                                     >
                                         Back to Mobile Login
                                     </button>
@@ -224,44 +233,44 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                         <div className="space-y-6">
                             <div className="relative flex flex-col items-center">
                                 <div className="relative group">
-                                    <div className={`w-24 h-24 rounded-full border-2 border-[#037166] overflow-hidden ${isLight ? 'bg-gray-100' : 'bg-white/5'}`}>
+                                    <div className={`w-24 h-24 rounded-full border-2 border-opacity-50 ${borderColor} overflow-hidden ${inputBg}`}>
                                         {user?.image ? (
                                             <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-[#037166]">
+                                            <div className={`w-full h-full flex items-center justify-center text-3xl font-bold ${accentText}`}>
                                                 {user?.firstName?.[0] || user?.name?.[0] || 'U'}
                                             </div>
                                         )}
                                     </div>
-                                    <button className="absolute bottom-0 right-0 p-2 bg-[#037166] rounded-full text-white shadow-lg group-hover:scale-110 transition-transform">
+                                    <button className={`absolute bottom-0 right-0 p-2 ${t.accent} rounded-full text-white shadow-lg group-hover:scale-110 transition-transform`}>
                                         <Camera className="w-4 h-4" />
                                     </button>
                                 </div>
                                 <div className="mt-4 text-center">
-                                    <h3 className={`text-xl font-bold ${textColor}`}>{user?.name || `${user?.firstName} ${user?.lastName}`}</h3>
-                                    <p className={`${subTextColor} text-sm`}>{user?.phone || user?.mobile || 'No phone'}</p>
+                                    <h3 className={`text-xl font-bold ${t.textMain}`}>{user?.name || `${user?.firstName} ${user?.lastName}`}</h3>
+                                    <p className={`${t.textMain} opacity-60 text-sm`}>{user?.phone || user?.mobile || 'No phone'}</p>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="relative">
-                                    <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-gray-400' : 'text-white/40'}`} />
+                                    <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${t.textMain} opacity-40`} />
                                     <input
                                         type="email"
                                         placeholder="Email Address"
                                         defaultValue={user?.email}
                                         onBlur={(e) => updateProfile({ email: e.target.value })}
-                                        className={`w-full pl-12 pr-4 py-4 ${inputBg} border ${inputBorder} rounded-xl ${textColor} ${isLight ? 'placeholder:text-gray-400' : 'placeholder:text-white/20'} focus:border-[#037166] transition-all outline-none`}
+                                        className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none`}
                                     />
                                 </div>
                                 <div className="relative">
-                                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${isLight ? 'text-gray-400' : 'text-white/40'}`} />
+                                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${t.textMain} opacity-40`} />
                                     <input
                                         type="text"
                                         placeholder="Full Name"
                                         defaultValue={user?.name || `${user?.firstName} ${user?.lastName}`}
                                         onBlur={(e) => updateProfile({ name: e.target.value })}
-                                        className={`w-full pl-12 pr-4 py-4 ${inputBg} border ${inputBorder} rounded-xl ${textColor} ${isLight ? 'placeholder:text-gray-400' : 'placeholder:text-white/20'} focus:border-[#037166] transition-all outline-none`}
+                                        className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none`}
                                     />
                                 </div>
                             </div>
@@ -271,7 +280,7 @@ export function AuthModal({ isOpen, onClose, theme = 'dark' }) {
                                     logout();
                                     onClose();
                                 }}
-                                className={`w-full py-4 border border-red-500/30 text-red-500 font-bold rounded-xl flex items-center justify-center gap-3 ${isLight ? 'hover:bg-red-50' : 'hover:bg-red-500/10'} transition-all`}
+                                className={`w-full py-4 border border-red-500/30 text-red-500 font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-red-500/10 transition-all`}
                             >
                                 <LogOut className="w-5 h-5" />
                                 Logout

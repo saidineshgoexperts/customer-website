@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Building2, Wifi, Coffee, Shield, Bed, Users, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
@@ -283,20 +284,24 @@ export function PremiumPGHostels() {
 
                     {/* Action Buttons */}
                     <div className="grid grid-cols-2 gap-3">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold text-sm shadow-lg shadow-[#037166]/30"
-                      >
-                        Book Tour
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="py-3 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#037166]/30 rounded-xl text-white font-semibold text-sm hover:bg-[#037166]/10 transition-all"
-                      >
-                        Details
-                      </motion.button>
+                      <Link href={`/pghostels/hostel-detail/${hostel.id}`} className="w-full">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold text-sm shadow-lg shadow-[#037166]/30"
+                        >
+                          Book Tour
+                        </motion.button>
+                      </Link>
+                      <Link href={`/pghostels/hostel-detail/${hostel.id}`} className="w-full">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full py-3 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#037166]/30 rounded-xl text-white font-semibold text-sm hover:bg-[#037166]/10 transition-all"
+                        >
+                          Details
+                        </motion.button>
+                      </Link>
                     </div>
                   </div>
 

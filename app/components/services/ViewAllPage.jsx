@@ -13,6 +13,7 @@ export function ViewAllPage({
 }) {
   const [categories, setCategories] = useState([]);
   const [featuredServices, setFeaturedServices] = useState([]);
+  const [recentServices, setRecentServices] = useState([]);
   const [stores, setStores] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { location, detectLocation } = useLocation();
@@ -255,7 +256,7 @@ export function ViewAllPage({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ y: -8 }}
-                onClick={() => onServiceClick?.(service._id)}
+                onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName)}
                 className="group cursor-pointer"
               >
                 <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-[#1a1a1a] border border-white/10 h-full">

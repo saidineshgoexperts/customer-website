@@ -5,7 +5,7 @@ import { MapPin, ChevronDown, Search, Crosshair, X, Loader2 } from 'lucide-react
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocation } from '@/hooks/useLocation';
 
-export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
+export function LocationBar({ theme = {} }) {
     const { location, detectWithGPS, searchLocation, setManualLocation, loading, error } = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -13,36 +13,25 @@ export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
     const [isSearching, setIsSearching] = useState(false);
     const [isDetecting, setIsDetecting] = useState(false);
 
-    const themeColors = {
-        pg: {
-            text: 'text-[#037166]',
-            hoverText: 'group-hover:text-[#04a99d]',
-            bg: 'bg-[#037166]',
-            hoverBg: 'hover:bg-[#037166]',
-            border: 'border-[#037166]',
-            lightParams: {
-                icon: 'text-[#037166]',
-                hoverIcon: 'group-hover:text-[#04a99d]'
-            }
-        },
-        spa: {
-            text: 'text-[#C06C84]',
-            hoverText: 'group-hover:text-[#E84393]', // Slightly lighter pink
-            bg: 'bg-[#C06C84]',
-            hoverBg: 'hover:bg-[#C06C84]',
-            border: 'border-[#C06C84]',
-            lightParams: {
-                icon: 'text-[#C06C84]',
-                hoverIcon: 'group-hover:text-[#C06C84]'
-            }
-        }
+    // Default Dark Theme (Fallback)
+    const defaultTheme = {
+        bgScrolled: 'bg-[#0a0a0a]/80',
+        textMain: 'text-gray-300',
+        textHover: 'text-[#037166]', // Accent color
+        border: 'border-[#037166]/20',
+        buttonBg: 'bg-[#1a1a1a]',
     };
 
-    const activeTheme = themeColors[colorTheme] || themeColors.pg;
+    // Merge provided theme with default or use if comprehensive
+    // If theme is passed as string 'dark'/'light' (legacy), ignore and use default, 
+    // but Header passes a comprehensive object now.
+    const t = typeof theme === 'object' && Object.keys(theme).length > 0 ? theme : defaultTheme;
 
-    // REMOVED: Auto-detect on page load (violates UX best practices)
-    // Why: GPS permission should ONLY be requested on explicit user action
-    // LocationContext now handles silent IP detection as fallback
+    // Extract accent color for icons (approximation if not explicit)
+    // textHover usually holds the accent color in our schema
+    const accentClass = t.textHover.replace('text-', ''); // e.g., '[#037166]' or 'blue-500'
+    const accentText = t.textHover;
+    const accentBorder = t.border;
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -72,19 +61,15 @@ export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
         setIsDetecting(true);
         try {
             await detectWithGPS();
-            // Keep modal open to show result, then close after brief delay
             setTimeout(() => {
                 setIsOpen(false);
             }, 500);
         } catch (error) {
             console.error('GPS detection failed:', error);
-            // Error is handled in context, fallback to IP already attempted
         } finally {
             setIsDetecting(false);
         }
     };
-
-    const isLight = theme === 'light';
 
 
     return (
@@ -92,23 +77,20 @@ export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
             {/* Navbar Trigger */}
             <motion.button
                 onClick={() => setIsOpen(true)}
-                className={`hidden lg:flex items-center space-x-2 px-3 py-2 rounded-xl border transition-all group mr-2 ${isLight
-                    ? 'bg-gray-100/50 hover:bg-gray-200/50 border-gray-200'
-                    : 'bg-[#1a1a1a] hover:bg-[#037166]/10 border-[#037166]/20'
-                    }`}
+                className={`hidden lg:flex items-center space-x-2 px-3 py-2 rounded-xl border transition-all group mr-2 ${t.buttonBg} hover:bg-opacity-80 ${t.border}`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
             >
-                <MapPin className={`w-4 h-4 ${isLight ? 'text-[#037166]' : 'text-[#037166] group-hover:text-[#04a99d]'}`} />
+                <MapPin className={`w-4 h-4 ${accentText}`} />
                 <div className="flex flex-col items-start min-w-[100px] max-w-[160px]">
-                    <span className={`text-[10px] uppercase tracking-wider font-semibold ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] uppercase tracking-wider font-semibold opacity-70 ${t.textMain}`}>
                         {location ? 'Delivering to' : 'Location'}
                     </span>
-                    <span className={`text-xs font-medium truncate w-full text-left ${isLight ? 'text-gray-900' : 'text-white'}`}>
+                    <span className={`text-xs font-medium truncate w-full text-left ${t.textMain}`}>
                         {loading ? 'Detecting...' : location ? location.shortAddress : 'Select location'}
                     </span>
                 </div>
-                <ChevronDown className={`w-3 h-3 ${isLight ? 'text-gray-400' : 'text-gray-500 group-hover:text-[#037166]'}`} />
+                <ChevronDown className={`w-3 h-3 opacity-50 ${t.textMain} group-hover:opacity-100 transition-opacity`} />
             </motion.button>
 
             {/* Helper for Mobile (Icon only or specific mobile bar) - Assuming GlobalNav handles mobile, we'll stick to this for now */}
@@ -131,16 +113,16 @@ export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
                             initial={{ opacity: 0, y: -20, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                            className={`relative w-full max-w-md bg-[#0a0a0a] border border-opacity-30 rounded-2xl shadow-2xl overflow-hidden ${activeTheme.border}`}
+                            className={`relative w-full max-w-md ${t.bgMobile} backdrop-blur-xl border border-opacity-30 rounded-2xl shadow-2xl overflow-hidden ${t.border}`}
                         >
                             {/* Header */}
-                            <div className={`p-4 border-b border-opacity-20 flex items-center justify-between bg-[#1a1a1a]/50 ${activeTheme.border}`}>
-                                <h3 className="text-lg font-semibold text-white">Change Location</h3>
+                            <div className={`p-4 border-b border-opacity-20 flex items-center justify-between ${t.buttonBg} ${t.border}`}>
+                                <h3 className={`text-lg font-semibold ${t.textMain}`}>Change Location</h3>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className="p-1 rounded-lg hover:bg-white/10 transition-colors"
+                                    className={`p-1 rounded-lg hover:bg-opacity-10 transition-colors ${t.textMain} hover:${t.bgMobile}`}
                                 >
-                                    <X className="w-5 h-5 text-gray-400" />
+                                    <X className="w-5 h-5 opacity-70" />
                                 </button>
                             </div>
 
@@ -148,17 +130,17 @@ export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
                             <div className="p-4 space-y-4">
                                 {/* Search Input */}
                                 <form onSubmit={handleSearch} className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 ${t.textMain}`} />
                                     <input
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Search for area, street name..."
-                                        className={`w-full pl-10 pr-4 py-3 bg-[#1a1a1a] border border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-1 transition-all ${activeTheme.border} focus:${activeTheme.border}`}
+                                        className={`w-full pl-10 pr-4 py-3 ${t.buttonBg} border border-opacity-20 rounded-xl ${t.textMain} placeholder-gray-500 focus:outline-none focus:ring-1 transition-all ${t.border} focus:${t.border}`}
                                         autoFocus
                                     />
                                     {isSearching && (
-                                        <Loader2 className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin ${activeTheme.text}`} />
+                                        <Loader2 className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin ${t.textHover}`} />
                                     )}
                                 </form>
 
@@ -166,17 +148,17 @@ export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
                                 <button
                                     onClick={handleDetectCurrent}
                                     disabled={isDetecting}
-                                    className={`w-full flex items-center gap-3 p-3 rounded-xl hover:bg-opacity-10 transition-colors group text-left border border-transparent hover:border-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed ${activeTheme.hoverBg} hover:border-${activeTheme.border}`}
+                                    className={`w-full flex items-center gap-3 p-3 rounded-xl hover:bg-opacity-10 transition-colors group text-left border border-transparent hover:border-opacity-20 disabled:opacity-50 disabled:cursor-not-allowed hover:${t.border}`}
                                 >
-                                    <div className={`w-10 h-10 rounded-full bg-opacity-20 flex items-center justify-center transition-colors group-hover:bg-opacity-100 ${activeTheme.bg} group-hover:${activeTheme.bg}`}>
+                                    <div className={`w-10 h-10 rounded-full bg-opacity-20 flex items-center justify-center transition-colors group-hover:bg-opacity-100 ${t.accent} group-hover:${t.accent}`}>
                                         {isDetecting ? (
-                                            <Loader2 className={`w-5 h-5 group-hover:text-white animate-spin ${activeTheme.text}`} />
+                                            <Loader2 className={`w-5 h-5 group-hover:text-white animate-spin ${t.textHover}`} />
                                         ) : (
-                                            <Crosshair className={`w-5 h-5 group-hover:text-white ${activeTheme.text}`} />
+                                            <Crosshair className={`w-5 h-5 group-hover:text-white ${t.textHover}`} />
                                         )}
                                     </div>
                                     <div>
-                                        <div className={`font-semibold group-hover:text-white ${activeTheme.text}`}>
+                                        <div className={`font-semibold group-hover:text-white ${t.textHover}`}>
                                             {isDetecting ? 'Detecting location...' : 'Use current location'}
                                         </div>
                                         <div className="text-xs text-gray-500">Using GPS</div>
@@ -191,12 +173,12 @@ export function LocationBar({ theme = 'dark', colorTheme = 'pg' }) {
                                             <button
                                                 key={index}
                                                 onClick={() => handleSelectLocation(place)}
-                                                className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-left border-b border-white/5 last:border-0"
+                                                className={`w-full flex items-start gap-3 p-3 rounded-xl hover:bg-opacity-5 transition-colors text-left border-b border-opacity-5 last:border-0 ${t.textMain} hover:${t.textMain} border-gray-500`}
                                             >
-                                                <MapPin className="w-4 h-4 text-gray-400 mt-1 shrink-0" />
+                                                <MapPin className="w-4 h-4 opacity-50 mt-1 shrink-0" />
                                                 <div>
-                                                    <div className="text-sm font-medium text-white">{place.main_text}</div>
-                                                    <div className="text-xs text-gray-500 line-clamp-2">{place.secondary_text}</div>
+                                                    <div className="text-sm font-medium">{place.main_text}</div>
+                                                    <div className="text-xs opacity-60 line-clamp-2">{place.secondary_text}</div>
                                                 </div>
                                             </button>
                                         ))}

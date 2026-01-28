@@ -1,4 +1,4 @@
-import { PGHostelNavbar } from '@/components/pghostels/PGHostelNavbar';
+import { Header } from '@/components/layout/Header';
 
 export const metadata = {
     title: 'PG & Hostels Booking | SuperHub',
@@ -6,9 +6,21 @@ export const metadata = {
 };
 
 export default function PGHostelsLayout({ children }) {
+    const pgTheme = {
+        bgScrolled: 'bg-white/95',
+        bgMobile: 'bg-white/95',
+        textMain: 'text-gray-700',
+        textHover: 'text-[#037166]',
+        border: 'border-gray-200',
+        accent: 'bg-[#037166]',
+        accentGradientFrom: 'from-[#037166]',
+        accentGradientTo: 'to-[#025951]',
+        buttonBg: 'bg-gray-50',
+    };
+
     return (
         <>
-            <PGHostelNavbar />
+            <Header theme={pgTheme} />
             {children}
         </>
     );

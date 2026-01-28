@@ -26,12 +26,18 @@ export default function ServicesPage() {
 
     return (
         <>
-            <Hero />
-            <TopCategories />
-            <FeaturedServices />
+            <Hero
+                onBookService={() => router.push('/services/categories')}
+                onViewServices={() => router.push('/services/featured')}
+            />
+            <TopCategories onViewAll={() => router.push('/services/categories')} />
+            <FeaturedServices
+                onServiceClick={handleServiceClick}
+                onViewAll={() => router.push('/services/featured')}
+            />
             <RecentlyBooked
                 onServiceClick={handleServiceClick}
-                onViewAll={() => router.push('/services')}
+                onViewAll={() => router.push('/services/recent')}
             />
             <PromoBanner />
             <DownloadApp />
