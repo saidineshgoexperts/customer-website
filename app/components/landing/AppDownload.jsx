@@ -7,7 +7,7 @@ import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 export function AppDownload() {
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section id="app-download" className="relative py-32 overflow-hidden">
       {/* Dynamic Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a1412] to-[#0a0a0a]" />

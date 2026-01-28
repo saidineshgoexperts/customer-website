@@ -13,26 +13,13 @@ export function NearbyHostelsSection({ router }) {
 
     useEffect(() => {
         const fetchNearbyHostels = async () => {
-            if (!location?.lat || !location?.lng) {
-                setLoading(false);
-                return;
-            }
-
             setLoading(true);
             try {
-                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/nearby_pg_hostels', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        lattitude: location.lat,
-                        longitude: location.lng
-                    })
-                });
+                // Using 'latest_pg_hostels' as requested for the nearby section
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/latest_pg_hostels');
 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch nearby hostels');
+                    throw new Error('Failed to fetch hostels');
                 }
 
                 const data = await response.json();
@@ -44,15 +31,15 @@ export function NearbyHostelsSection({ router }) {
                 }
 
             } catch (err) {
-                console.error('Error fetching nearby hostels:', err);
-                setError('Failed to load nearby hostels');
+                console.error('Error fetching hostels:', err);
+                setError('Failed to load hostels');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchNearbyHostels();
-    }, [location?.lat, location?.lng]);
+    }, []);
 
     if (loading) {
         return (

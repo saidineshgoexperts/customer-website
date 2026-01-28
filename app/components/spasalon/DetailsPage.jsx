@@ -149,25 +149,25 @@ export function DetailsPage() {
                             <TabsList className="bg-transparent w-full grid grid-cols-4 gap-2">
                                 <TabsTrigger
                                     value="details"
-                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white rounded-xl"
+                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
                                 >
                                     Details
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="services"
-                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white rounded-xl"
+                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
                                 >
                                     Services
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="reviews"
-                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white rounded-xl"
+                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
                                 >
                                     Reviews
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="about"
-                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white rounded-xl"
+                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
                                 >
                                     About
                                 </TabsTrigger>

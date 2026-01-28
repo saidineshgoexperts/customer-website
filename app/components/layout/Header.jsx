@@ -50,7 +50,68 @@ export function Header({ theme = {}, navItems = [] }) {
     }
   ];
 
-  const menuItems = navItems.length > 0 ? navItems : defaultNavItems;
+  const [apiNavItems, setApiNavItems] = useState([]);
+
+  // Fetch Services for Navigation
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          const mappedItems = data.data.map(service => {
+            let href = '#';
+            const name = service.name.trim();
+
+            if (name.toUpperCase() === 'APPLIANCE SERVICE') href = '/services';
+            else if (name.toUpperCase() === 'RELIGIOUS SERVICES') href = '/religious-services';
+            else if (name.toUpperCase() === 'PG HOSTELS') href = '/pghostels';
+            else if (name.toUpperCase() === 'SPA SALONS') href = '/spa-salon';
+
+            // Format Name: Title Case
+            const formattedName = name
+              .toLowerCase()
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+
+            return { name: formattedName, href };
+          });
+
+          // Add 'More' dropdown for extra static items
+          mappedItems.push({
+            name: 'More',
+            dropdown: [
+              { name: 'Share Ride', href: '#share-ride' },
+              { name: 'Order Medicine', href: '#order-medicine' }
+            ]
+          });
+
+          setApiNavItems(mappedItems);
+        }
+      } catch (error) {
+        console.error("Failed to fetch nav services:", error);
+      }
+    };
+
+    if (navItems.length === 0) {
+      fetchServices();
+    }
+  }, []);
+
+  const handleServiceClick = (item) => {
+    if (item.originalService) {
+      const serviceData = {
+        id: item.originalService._id,
+        name: item.originalService.name,
+        type: item.originalService.servicetypeName
+      };
+      localStorage.setItem('selectedService', JSON.stringify(serviceData));
+    }
+  };
+
+  const menuItems = navItems.length > 0 ? navItems : (apiNavItems.length > 0 ? apiNavItems : defaultNavItems);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,7 +153,7 @@ export function Header({ theme = {}, navItems = [] }) {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav id="navbar-services" className="hidden lg:flex items-center space-x-8">
               {menuItems.map((item, index) => (
                 <div key={index} className="relative group">
                   {item.dropdown ? (
@@ -121,7 +182,7 @@ export function Header({ theme = {}, navItems = [] }) {
                       </motion.div>
                     </>
                   ) : (
-                    <Link href={item.href}>
+                    <Link href={item.href} onClick={() => handleServiceClick(item)}>
                       <motion.span
                         className={`${currentTheme.textMain} hover:text-[#037166] transition-colors relative group font-medium whitespace-nowrap cursor-pointer`}
                         whileHover={{ y: -2 }}
@@ -137,7 +198,9 @@ export function Header({ theme = {}, navItems = [] }) {
 
             {/* Right Actions */}
             <div className="flex items-center space-x-3">
-              <LocationBar theme={currentTheme} />
+              <div id="location-bar">
+                <LocationBar theme={currentTheme} />
+              </div>
 
               {/* Cart Button */}
               <motion.button
@@ -235,7 +298,10 @@ export function Header({ theme = {}, navItems = [] }) {
                     ) : (
                       <Link
                         href={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={() => {
+                          handleServiceClick(item);
+                          setMobileMenuOpen(false);
+                        }}
                       >
                         <motion.span
                           className={`block py-3 px-4 ${currentTheme.textMain} hover:text-[#037166] hover:bg-[#037166]/10 rounded-xl transition-all font-medium text-base cursor-pointer`}

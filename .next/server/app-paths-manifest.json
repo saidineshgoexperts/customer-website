@@ -1,7 +1,9 @@
 {
-  "/services/category/[categoryId]/page": "app/services/category/[categoryId]/page.js",
-  "/services/detail/[serviceId]/page": "app/services/detail/[serviceId]/page.js",
   "/(landing)/page": "app/(landing)/page.js",
-  "/services/store/[storeId]/page": "app/services/store/[storeId]/page.js",
-  "/services/listing/[subCategoryId]/page": "app/services/listing/[subCategoryId]/page.js"
+  "/pghostels/hostel-detail/[id]/page": "app/pghostels/hostel-detail/[id]/page.js",
+  "/pghostels/results/page": "app/pghostels/results/page.js",
+  "/pg-hostel/page": "app/pg-hostel/page.js",
+  "/pghostels/booking/address/page": "app/pghostels/booking/address/page.js",
+  "/pghostels/booking/confirm/page": "app/pghostels/booking/confirm/page.js",
+  "/pghostels/page": "app/pghostels/page.js"
 }

@@ -4,22 +4,27 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Check, Loader2, Sparkles } from 'lucide-react';
 
-export function AddonsModal({ isOpen, onClose, providerId, selectedPackageId, onContinue }) {
+export function AddonsModal({ isOpen, onClose, providerId, selectedPackageId, onContinue, prefetchedAddons }) {
     const [addons, setAddons] = useState([]);
     const [selectedAddons, setSelectedAddons] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!prefetchedAddons);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         if (isOpen && providerId && selectedPackageId) {
-            fetchAddons();
+            if (prefetchedAddons) {
+                setAddons(prefetchedAddons);
+                setLoading(false);
+            } else {
+                fetchAddons();
+            }
         } else {
             // Reset state when closed
             setAddons([]);
             setSelectedAddons([]);
             setLoading(true);
         }
-    }, [isOpen, providerId, selectedPackageId]);
+    }, [isOpen, providerId, selectedPackageId, prefetchedAddons]);
 
     const fetchAddons = async () => {
         setLoading(true);

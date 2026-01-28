@@ -112,7 +112,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
   }
 
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section id="featured-services" className="py-20 relative overflow-hidden">
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f1614]/30 to-transparent" />
 

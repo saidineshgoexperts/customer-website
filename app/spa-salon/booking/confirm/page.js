@@ -407,10 +407,13 @@ export default function SpaConfirmPage() {
 
                             <div className="h-px bg-gray-100 mb-4" />
 
-                            <div className="flex justify-between text-xl font-bold text-[#C06C84] mb-6">
+                            <div className="flex justify-between text-xl font-bold text-[#C06C84] mb-2">
                                 <span>Total</span>
                                 <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
                             </div>
+                            <p className="text-xs text-gray-500 mb-6 text-center bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                <span className="font-semibold">Note:</span> This is only the booking cost. The total service amount is collected at the store.
+                            </p>
 
                             {/* Selected Date/Time Preview */}
                             {bookedDate && bookedTime && (

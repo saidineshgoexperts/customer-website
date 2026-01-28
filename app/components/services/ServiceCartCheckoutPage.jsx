@@ -130,7 +130,7 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                     bookedDate,
                     bookedTime,
                     paymentMethod,
-                    sourceOfLead: 'App'
+                    sourceOfLead: 'website'
                 })
             });
 

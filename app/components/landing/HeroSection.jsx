@@ -557,6 +557,20 @@ function HeroContent({ services = [], loading = false, error = null }) {
             All in one beautifully crafted platform.
           </motion.p>
 
+          {/* Tour Trigger Button */}
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            onClick={() => window.dispatchEvent(new CustomEvent('dhub-start-tour'))}
+            className="mb-12 px-8 py-3 bg-white/5 border border-white/10 hover:bg-[#037166]/20 hover:border-[#037166]/50 rounded-full text-white font-medium transition-all duration-300 backdrop-blur-sm group"
+          >
+            <span className="flex items-center gap-2">
+              Get Started with Tour
+              <Sparkles className="w-4 h-4 text-[#04a99d] group-hover:rotate-12 transition-transform" />
+            </span>
+          </motion.button>
+
           {/* Service Cards */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

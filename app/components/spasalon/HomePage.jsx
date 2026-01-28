@@ -52,67 +52,27 @@ const MOCK_CATEGORIES = [
     },
 ];
 
-const featuredPackages = [
-    {
-        id: 1,
-        name: 'Glow Facial Combo',
-        image: 'https://images.unsplash.com/photo-1684014286330-ddbeb4a40c92?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNpYWwlMjB0cmVhdG1lbnQlMjBza2luY2FyZXxlbnwxfHx8fDE3Njg1NTQxNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.8,
-        price: 1299,
-        duration: '90 min',
-        reviews: 234,
-    },
-    {
-        id: 2,
-        name: 'Deep Tissue Massage',
-        image: 'https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBtYXNzYWdlJTIwcmVsYXhhdGlvbnxlbnwxfHx8fDE3Njg2NTI2ODh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.9,
-        price: 1899,
-        duration: '120 min',
-        reviews: 456,
-    },
-    {
-        id: 3,
-        name: 'Bridal Trial Package',
-        image: 'https://images.unsplash.com/photo-1625139108082-48bb424c2333?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmlkYWwlMjBtYWtldXAlMjBhcnRpc3R8ZW58MXx8fHwxNzY4NTQyNjYzfDA&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 5.0,
-        price: 2999,
-        duration: '180 min',
-        reviews: 189,
-    },
-    {
-        id: 4,
-        name: 'Luxury Hair Spa',
-        image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWlyJTIwc2Fsb24lMjBzdHlsaW5nfGVufDF8fHx8MTc2ODY1MjY4N3ww&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.7,
-        price: 999,
-        duration: '60 min',
-        reviews: 321,
-    },
-    {
-        id: 5,
-        name: 'Party Makeup',
-        image: 'https://images.unsplash.com/photo-1625139108082-48bb424c2333?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmlkYWwlMjBtYWtldXAlMjBhcnRpc3R8ZW58MXx8fHwxNzY4NTQyNjYzfDA&ixlib=rb-4.1.0&q=80&w=1080',
-        rating: 4.6,
-        price: 1499,
-        duration: '75 min',
-        reviews: 278,
-    },
-];
-
 export function HomePage() {
     const router = useRouter();
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [categories, setCategories] = useState(MOCK_CATEGORIES);
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true); // Renamed to accurately reflect category loading if needed, or just use general loading
 
+    // Featured Packages State
+    // Featured Packages State
+    const [featuredPackages, setFeaturedPackages] = useState([]);
+    const [loadingFeatured, setLoadingFeatured] = useState(true);
+
+    // Recent/Booked Near You State
+    const [recentStores, setRecentStores] = useState([]);
+    const [loadingRecent, setLoadingRecent] = useState(true);
 
     useEffect(() => {
         const fetchCategories = async () => {
+            // ... existing category fetch
             try {
                 const API_BASE_URL = 'https://api.doorstephub.com/v1/dhubApi/app';
-                // Get service ID from localStorage
                 const selectedService = localStorage.getItem('selectedService');
                 let serviceId = null;
 
@@ -125,19 +85,11 @@ export function HomePage() {
                     }
                 }
 
-                // If no service ID found, we might want to use a default or just rely on mocks
-                // For now, we attempt to fetch if we have an ID or just try (API might require ID)
-
                 const response = await fetch(`${API_BASE_URL}/professional-services-flow/public/categories`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        serviceId: serviceId || '6790757755050f22d997d95d' // Fallback to a valid Service ID if known, or let it fail to mocks. 
-                        // Note: 6790757755050f22d997d95d is likely the Spa/Saloon ID based on context or we can try to find it. 
-                        // Actually, without a known ID, this might return error. 
-                        // Let's use the code structure that allows fallback.
+                        serviceId: serviceId || '6790757755050f22d997d95d'
                     })
                 });
 
@@ -146,20 +98,75 @@ export function HomePage() {
                     const mappedCategories = data.category.map(cat => ({
                         _id: cat._id,
                         name: cat.name,
-                        image: cat.image ? `https://api.doorstephub.com/${cat.image}` : 'https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&q=80', // Fallback image
-                        icon: cat.icon || '✨', // API might not return emoji icon, use default
+                        image: cat.image ? `https://api.doorstephub.com/${cat.image}` : 'https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&q=80',
+                        icon: cat.icon || '✨',
                         description: cat.description || 'Premium wellness service'
                     }));
                     setCategories(mappedCategories);
                 }
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
-                // MOCK_CATEGORIES are already initial state, so no action needed on error
-            } finally {
-                setLoading(false);
             }
         };
+
+        const fetchFeaturedPackages = async () => {
+            try {
+                setLoadingFeatured(true);
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/featured_spa_stores');
+                const data = await response.json();
+
+                if (data.success && data.stores) {
+                    const mappedPackages = data.stores.map(store => ({
+                        id: store._id,
+                        name: store.storeName || store.name || 'Spa Center',
+                        image: store.image
+                            ? (store.image.startsWith('http') ? store.image : `https://api.doorstephub.com/${store.image}`)
+                            : 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80',
+                        rating: store.rating || 4.8,
+                        price: store.price || store.startingPrice || 999,
+                        duration: store.duration || '60 min',
+                        reviews: store.reviewsCount || 100,
+                        location: store.location || 'Nearby',
+                    }));
+                    setFeaturedPackages(mappedPackages);
+                }
+            } catch (error) {
+                console.error("Failed to fetch featured spa stores:", error);
+            } finally {
+                setLoadingFeatured(false);
+            }
+        };
+
+        const fetchRecentStores = async () => {
+            try {
+                setLoadingRecent(true);
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/latest_spa_stores');
+                const data = await response.json();
+
+                if (data.success && data.stores) {
+                    const mappedStores = data.stores.map(store => ({
+                        id: store._id,
+                        name: store.storeName,
+                        image: store.image
+                            ? (store.image.startsWith('http') ? store.image : `https://api.doorstephub.com/${store.image}`)
+                            : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80',
+                        rating: 4.9, // API doesn't return rating yet, fallback
+                        price: store.serviceBookingCost || store.defaultPrice || 125,
+                        address: store.address || store.cityName,
+                        isAvailable: true // API implies success fetch means available
+                    }));
+                    setRecentStores(mappedStores);
+                }
+            } catch (error) {
+                console.error("Failed to fetch recent spa stores:", error);
+            } finally {
+                setLoadingRecent(false);
+            }
+        };
+
         fetchCategories();
+        fetchFeaturedPackages();
+        fetchRecentStores();
     }, []);
 
     const handleCategoryClick = (category) => {
@@ -171,7 +178,7 @@ export function HomePage() {
         <div className="min-h-screen bg-white pt-16">
             {/* Hero Section */}
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-white via-[#FBEAF0] to-[#F4F3FF]">
-                {/* Animated Background Elements */}
+                {/* ... (Hero Content) ... */}
                 <div className="absolute inset-0 overflow-hidden">
                     {/* Sparkles */}
                     {[...Array(15)].map((_, i) => (
@@ -267,7 +274,7 @@ export function HomePage() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => router.push('/spa-salon/booking/address')}
+                                    onClick={() => document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' })}
                                     className="px-8 py-4 bg-white text-[#C06C84] rounded-xl font-medium border-2 border-[#C06C84] hover:bg-[#C06C84] hover:text-white transition-all"
                                 >
                                     Book Appointment Now
@@ -393,9 +400,20 @@ export function HomePage() {
                     </motion.div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {featuredPackages.slice(0, 3).map((pkg, index) => (
-                            <PackageCard key={pkg.id} package={pkg} index={index} router={router} />
-                        ))}
+                        {loadingFeatured ? (
+                            // Skeleton Loading
+                            [1, 2, 3].map((_, index) => (
+                                <div key={index} className="h-96 bg-gray-100 rounded-2xl animate-pulse" />
+                            ))
+                        ) : featuredPackages.length > 0 ? (
+                            featuredPackages.slice(0, 3).map((pkg, index) => (
+                                <PackageCard key={pkg.id} package={pkg} index={index} router={router} />
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center py-10 text-gray-400">
+                                <p>No featured spa packages available at the moment.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -414,18 +432,28 @@ export function HomePage() {
                     </motion.div>
 
                     <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-                        {featuredPackages.map((pkg, index) => (
-                            <motion.div
-                                key={pkg.id}
-                                initial={{ opacity: 0, x: 30 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                                className="flex-shrink-0 w-80"
-                            >
-                                <RecentlyBookedCard package={pkg} router={router} />
-                            </motion.div>
-                        ))}
+                        {loadingRecent ? (
+                            [1, 2, 3].map((i) => (
+                                <div key={i} className="flex-shrink-0 w-80 h-48 bg-gray-200 rounded-xl animate-pulse" />
+                            ))
+                        ) : recentStores.length > 0 ? (
+                            recentStores.map((pkg, index) => (
+                                <motion.div
+                                    key={pkg.id}
+                                    initial={{ opacity: 0, x: 30 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="flex-shrink-0 w-80"
+                                >
+                                    <RecentlyBookedCard package={pkg} router={router} />
+                                </motion.div>
+                            ))
+                        ) : (
+                            <div className="w-full text-center text-gray-400 py-4">
+                                No recently booked services nearby.
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -454,15 +482,25 @@ export function HomePage() {
                     </motion.div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[1, 2, 3, 4].map((_, index) => (
-                            <NearbyCenterCard key={index} index={index} router={router} />
-                        ))}
+                        {loadingFeatured ? (
+                            [1, 2, 3, 4].map((i) => (
+                                <div key={i} className="h-40 bg-gray-100 rounded-xl animate-pulse" />
+                            ))
+                        ) : featuredPackages.length > 0 ? (
+                            featuredPackages.slice(0, 4).map((center, index) => (
+                                <NearbyCenterCard key={center.id} center={center} index={index} router={router} />
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center py-4 text-gray-400">
+                                No nearby spa centers found.
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
 
             {/* Recommended For You */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F6F7FB]">
+            {/* <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F6F7FB]">
                 <div className="max-w-7xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -499,10 +537,10 @@ export function HomePage() {
                         />
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* Beauty & Wellness Tips */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+            {/* <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
                 <div className="max-w-7xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -532,7 +570,7 @@ export function HomePage() {
                         />
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* Questionnaire Modal */}
             <QuestionnaireModal
@@ -649,40 +687,7 @@ function RecentlyBookedCard({ package: pkg, router }) {
     );
 }
 
-function NearbyCenterCard({ index, router }) {
-    const centers = [
-        {
-            name: 'Lotus Spa & Wellness',
-            image: 'https://images.unsplash.com/photo-1760882206955-f4e8321cc9f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBjZW50ZXIlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2NTI2ODl8MA&ixlib=rb-4.1.0&q=80&w=1080',
-            location: 'Madhapur, 2.5 km',
-            rating: 4.8,
-            price: 599,
-        },
-        {
-            name: 'Radiance Beauty Studio',
-            image: 'https://images.unsplash.com/photo-1633692315409-a23e338c5cd4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWF1dHklMjBzYWxvbiUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3Njg2MzQwMTB8MA&ixlib=rb-4.1.0&q=80&w=1080',
-            location: 'Gachibowli, 3.2 km',
-            rating: 4.9,
-            price: 799,
-        },
-        {
-            name: 'Serenity Spa Center',
-            image: 'https://images.unsplash.com/photo-1690552153723-32572f195000?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWxsbmVzcyUyMHNwYSUyMHJlY2VwdGlvbnxlbnwxfHx8fDE3Njg2NTI2OTB8MA&ixlib=rb-4.1.0&q=80&w=1080',
-            location: 'Kondapur, 4.1 km',
-            rating: 4.7,
-            price: 699,
-        },
-        {
-            name: 'Glamour Salon & Spa',
-            image: 'https://images.unsplash.com/photo-1667235195726-a7c440bca9bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcGElMjB3ZWxsbmVzc3xlbnwxfHx8fDE3Njg1NTcwMzZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-            location: 'Hitech City, 1.8 km',
-            rating: 5.0,
-            price: 899,
-        },
-    ];
-
-    const center = centers[index];
-
+function NearbyCenterCard({ center, index, router }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -690,7 +695,7 @@ function NearbyCenterCard({ index, router }) {
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
             whileHover={{ y: -5 }}
-            onClick={() => router.push(`/spa-salon/detail/${index + 1}`)}
+            onClick={() => router.push(`/spa-salon/detail/${center.id}`)}
             className="bg-white rounded-xl overflow-hidden border border-[#E8ECF2] cursor-pointer shadow-md hover:shadow-lg transition-all"
         >
             <div className="relative h-40">

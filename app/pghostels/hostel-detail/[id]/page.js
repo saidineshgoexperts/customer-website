@@ -39,6 +39,8 @@ export default function NewHostelDetailPage() {
     const [loading, setLoading] = useState(true);
     const [selectedPackage, setSelectedPackage] = useState(null);
     const [showAddonsModal, setShowAddonsModal] = useState(false);
+    const [addonsData, setAddonsData] = useState(null);
+    const [isCheckingAddons, setIsCheckingAddons] = useState(false);
 
     const sliderSettings = {
         dots: true,
@@ -77,6 +79,7 @@ export default function NewHostelDetailPage() {
                         rating: parseFloat(store.avgRating || 4.5).toFixed(1),
                         orders: store.totalOrders || 0,
                         basePrice: store.BasePrice || 0,
+                        bookingCost: store.serviceBookingCost || 0,
                         monthlyPrice: store.BasePrice * 30 || 5000, // Roughly estimating if not provided directly
                         logo: store.logo ? `https://api.doorstephub.com/${store.logo}` : 'https://images.unsplash.com/photo-1730096081994-73f1fa5f189a?fit=max&fm=jpg&w=200',
                         images: data.serviceImages && data.serviceImages.length > 0
@@ -132,7 +135,7 @@ export default function NewHostelDetailPage() {
         );
     }
 
-    const handleContinueToBook = () => {
+    const handleContinueToBook = async () => {
         if (!selectedPackage) {
             alert("Please select a package from the Portfolio tab.");
             setActiveTab('portfolio');
@@ -140,7 +143,39 @@ export default function NewHostelDetailPage() {
             window.scrollTo({ top: 500, behavior: 'smooth' });
             return;
         }
-        setShowAddonsModal(true);
+
+        setIsCheckingAddons(true);
+        try {
+            const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-service-addons', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    serviceIds: [selectedPackage._id],
+                    professionalProviderId: id
+                })
+            });
+            const data = await response.json();
+
+            if (data.success && data.data && data.data.length > 0) {
+                const allAddons = data.data.flatMap(item => item.addons || []);
+                if (allAddons.length > 0) {
+                    setAddonsData(allAddons);
+                    setShowAddonsModal(true);
+                } else {
+                    // No actual addons found in the structure
+                    handleAddonsContinue([]);
+                }
+            } else {
+                // No addons found
+                handleAddonsContinue([]);
+            }
+        } catch (error) {
+            console.error("Error checking addons:", error);
+            // On error, safely proceed without addons
+            handleAddonsContinue([]);
+        } finally {
+            setIsCheckingAddons(false);
+        }
     };
 
     const handleAddonsContinue = (selectedAddons) => {
@@ -257,28 +292,28 @@ export default function NewHostelDetailPage() {
                         <TabsList className="bg-transparent w-full grid grid-cols-4 gap-2">
                             <TabsTrigger
                                 value="portfolio"
-                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white rounded-xl"
+                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
                             >
                                 <Camera className="w-4 h-4 mr-2" />
                                 Portfolio
                             </TabsTrigger>
                             <TabsTrigger
                                 value="reviews"
-                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white rounded-xl"
+                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
                             >
                                 <MessageSquare className="w-4 h-4 mr-2" />
                                 Reviews
                             </TabsTrigger>
                             <TabsTrigger
                                 value="amenities"
-                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white rounded-xl"
+                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
                             >
                                 <Sparkles className="w-4 h-4 mr-2" />
                                 Amenities
                             </TabsTrigger>
                             <TabsTrigger
                                 value="about"
-                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white rounded-xl"
+                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
                             >
                                 <MapPin className="w-4 h-4 mr-2" />
                                 About
@@ -496,27 +531,26 @@ export default function NewHostelDetailPage() {
             >
                 <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                     <div>
-                        <div className="text-sm text-gray-500 mb-1">Monthly Price</div>
+                        <div className="text-sm text-gray-500 mb-1">Booking Amount (Payable Now)</div>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-3xl font-bold text-gray-900">
-                                {selectedPackage
-                                    ? `₹${selectedPackage.price.toLocaleString()}`
-                                    : `₹${hostelData.monthlyPrice.toLocaleString()}`}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                                {selectedPackage ? `/${selectedPackage.priceUnit}` : '/month'}
+                                ₹{hostelData.bookingCost.toLocaleString()}
                             </span>
                         </div>
-                        <div className="text-xs text-gray-400 mt-1">
-                            {selectedPackage ? 'Selected Package' : `₹${hostelData.basePrice}/day base price`}
+                        <div className="text-xs text-[#037166] font-medium mt-1">
+                            {selectedPackage
+                                ? `Total Package: ₹${selectedPackage.price.toLocaleString()} (Pay at Hostel)`
+                                : 'Select a package to proceed'}
                         </div>
                     </div>
 
                     <button
                         onClick={handleContinueToBook}
-                        className="px-12 py-4 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-[#037166]/40 transition-all transform hover:scale-105"
+                        disabled={isCheckingAddons}
+                        className="px-12 py-4 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-[#037166]/40 transition-all transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
                     >
-                        Continue to Book
+                        {isCheckingAddons && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>}
+                        {isCheckingAddons ? 'Checking...' : 'Continue to Book'}
                     </button>
                 </div>
             </motion.div>
@@ -528,6 +562,7 @@ export default function NewHostelDetailPage() {
                 providerId={id}
                 selectedPackageId={selectedPackage?._id}
                 onContinue={handleAddonsContinue}
+                prefetchedAddons={addonsData}
             />
         </div>
     );
