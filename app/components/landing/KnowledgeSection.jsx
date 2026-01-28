@@ -1,41 +1,56 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { BookOpen, TrendingUp, Clock, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 export function KnowledgeSection() {
-  const articles = [
-    {
-      title: 'The Ultimate Guide to Spa Treatments',
-      category: 'Wellness',
-      readTime: '5 min read',
-      image: 'https://images.unsplash.com/photo-1582498674105-ad104fcc5784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcGElMjB0cmVhdG1lbnR8ZW58MXx8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
-      trending: true,
-    },
-    {
-      title: 'Finding Your Perfect PG Accommodation',
-      category: 'Housing',
-      readTime: '7 min read',
-      image: 'https://images.unsplash.com/photo-1594873604892-b599f847e859?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njc5NTMwMzR8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      trending: false,
-    },
-    {
-      title: 'Spiritual Practices for Modern Living',
-      category: 'Spirituality',
-      readTime: '6 min read',
-      image: 'https://images.unsplash.com/photo-1618425977996-bebc5afe88f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZWRpdGF0aW9uJTIwc3Bpcml0dWFsJTIwcGVhY2V8ZW58MXx8fHwxNzY4MDI2NzQ5fDA&ixlib=rb-4.1.0&q=80&w=1080',
-      trending: true,
-    },
-    {
-      title: 'Top 10 Service Centers Near You',
-      category: 'Services',
-      readTime: '4 min read',
-      image: 'https://images.unsplash.com/photo-1539606420556-14c457c45507?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3N0ZWwlMjBhY2NvbW1vZGF0aW9ufGVufDF8fHx8MTc2ODAyNjc0Nnww&ixlib=rb-4.1.0&q=80&w=1080',
-      trending: false,
-    },
-  ];
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/knowledge-base');
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          const mappedArticles = data.data.slice(0, 4).map(item => ({
+            id: item._id,
+            title: item.title,
+            category: item.subcategoryId?.name || item.categoryId?.name || item.serviceId?.name || 'General',
+            readTime: `${item.readTime} min read`,
+            image: item.coverImage?.url ? encodeURI(`https://api.doorstephub.com${item.coverImage.url}`) : 'https://images.unsplash.com/photo-1582498674105-ad104fcc5784?w=800',
+            trending: item.isTrending,
+            summary: item.summary,
+            slug: item.slug
+          }));
+          setArticles(mappedArticles);
+        }
+      } catch (error) {
+        console.error('Error fetching knowledge base:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
+
+  // Skeleton Card
+  const SkeletonCard = () => (
+    <div className="h-full rounded-3xl overflow-hidden bg-[#1a1a1a] border border-white/5">
+      <div className="h-48 bg-white/5 animate-pulse" />
+      <div className="p-6 space-y-4">
+        <div className="h-6 w-3/4 bg-white/5 rounded animate-pulse" />
+        <div className="flex justify-between">
+          <div className="h-4 w-20 bg-white/5 rounded animate-pulse" />
+          <div className="h-4 w-12 bg-white/5 rounded animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <section className="relative py-32 overflow-hidden">
@@ -74,72 +89,77 @@ export function KnowledgeSection() {
 
         {/* Articles Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {articles.map((article, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="group"
-            >
-              {/* Studio Card */}
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            : articles.map((article, index) => (
               <motion.div
-                whileHover={{ y: -10 }}
-                className="relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300"
+                key={article.id || index}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="group"
               >
-                {/* Trending Badge */}
-                {article.trending && (
-                  <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] rounded-full flex items-center space-x-1">
-                    <TrendingUp className="w-3 h-3 text-white" />
-                    <span className="text-xs font-bold text-white">Trending</span>
-                  </div>
-                )}
-
-                {/* Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <ImageWithFallback
-                    src={article.image}
-                    alt={article.title}
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-
-                  {/* Category Badge */}
-                  <div className="absolute bottom-4 left-4 px-3 py-1 bg-[#037166]/80 backdrop-blur-md rounded-full">
-                    <span className="text-xs font-semibold text-white uppercase tracking-wider">
-                      {article.category}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-white mb-4 leading-snug group-hover:text-[#037166] transition-colors line-clamp-2">
-                    {article.title}
-                  </h3>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2 text-sm text-gray-400">
-                      <Clock className="w-4 h-4 text-[#037166]" />
-                      <span>{article.readTime}</span>
+                {/* Studio Card */}
+                <motion.div
+                  whileHover={{ y: -10 }}
+                  className="relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300"
+                >
+                  {/* Trending Badge */}
+                  {article.trending && (
+                    <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] rounded-full flex items-center space-x-1">
+                      <TrendingUp className="w-3 h-3 text-white" />
+                      <span className="text-xs font-bold text-white">Trending</span>
                     </div>
+                  )}
 
-                    <motion.button
-                      whileHover={{ x: 5 }}
-                      className="text-[#037166] font-medium text-sm flex items-center space-x-1 group/btn"
-                    >
-                      <span>Read</span>
-                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                    </motion.button>
+                  {/* Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <ImageWithFallback
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+
+                    {/* Category Badge */}
+                    <div className="absolute bottom-4 left-4 px-3 py-1 bg-[#037166]/80 backdrop-blur-md rounded-full">
+                      <span className="text-xs font-semibold text-white uppercase tracking-wider">
+                        {article.category}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Hover Glow */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/0 via-[#037166]/20 to-[#037166]/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
+                  {/* Content */}
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-white mb-2 leading-snug group-hover:text-[#037166] transition-colors line-clamp-1">
+                      {article.title}
+                    </h3>
+                    <p className="text-white/60 text-sm mb-4 line-clamp-2">
+                      {article.summary}
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2 text-sm text-gray-400">
+                        <Clock className="w-4 h-4 text-[#037166]" />
+                        <span>{article.readTime}</span>
+                      </div>
+
+                      <motion.button
+                        whileHover={{ x: 5 }}
+                        className="text-[#037166] font-medium text-sm flex items-center space-x-1 group/btn"
+                      >
+                        <span>Read</span>
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </motion.button>
+                    </div>
+                  </div>
+
+                  {/* Hover Glow */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/0 via-[#037166]/20 to-[#037166]/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
+                </motion.div>
               </motion.div>
-            </motion.div>
-          ))}
+            ))}
         </div>
 
         {/* View All Button */}

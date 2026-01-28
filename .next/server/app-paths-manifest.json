@@ -1,6 +1,4 @@
 {
-  "/(landing)/page": "app/(landing)/page.js",
-  "/pghostels/page": "app/pghostels/page.js",
-  "/services/detail/[serviceId]/page": "app/services/detail/[serviceId]/page.js",
-  "/services/page": "app/services/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(landing)/page": "app/(landing)/page.js"
 }

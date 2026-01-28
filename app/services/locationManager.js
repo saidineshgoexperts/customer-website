@@ -28,13 +28,13 @@ class LocationManager {
         if (typeof window === 'undefined') return;
 
         if (window.google && window.google.maps) {
-            if (!this.geocoder) {
+            if (!this.geocoder && window.google.maps.Geocoder) {
                 this.geocoder = new window.google.maps.Geocoder();
             }
-            if (!this.autocompleteService) {
+            if (!this.autocompleteService && window.google.maps.places?.AutocompleteService) {
                 this.autocompleteService = new window.google.maps.places.AutocompleteService();
             }
-            if (!this.placesService) {
+            if (!this.placesService && window.google.maps.places?.PlacesService) {
                 const dummyNode = document.createElement('div');
                 this.placesService = new window.google.maps.places.PlacesService(dummyNode);
             }
