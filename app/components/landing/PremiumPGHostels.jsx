@@ -7,6 +7,42 @@ import { Building2, Wifi, Coffee, Shield, Bed, Users, ArrowRight } from 'lucide-
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 import { useRouter } from 'next/navigation';
 
+const dummyHostels = [
+  {
+    id: 'dummy-1',
+    name: 'Sunrise Premium PG',
+    type: 'Premium PG',
+    location: 'Gachibowli, Hyderabad',
+    price: '₹12,000/month',
+    occupancy: 'Single/Double',
+    image: 'https://images.unsplash.com/photo-1594873604892-b599f847e859?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njc5NTMwMzR8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    amenities: ['Fully Furnished', '24/7 Security', 'High-Speed WiFi', 'Power Backup'],
+    isDummy: true
+  },
+  {
+    id: 'dummy-2',
+    name: 'Elite Stays Hostel',
+    type: 'Luxury Hostel',
+    location: 'Hitech City, Hyderabad',
+    price: '₹15,000/month',
+    occupancy: 'Single',
+    image: 'https://images.unsplash.com/photo-1522771753062-5a496b63115a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBiZWRyb29tfGVufDF8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    amenities: ['AC Rooms', 'Food Included', 'Laundry', 'Gym Access'],
+    isDummy: true
+  },
+  {
+    id: 'dummy-3',
+    name: 'Comfort Zone PG',
+    type: 'Executive PG',
+    location: 'Madhapur, Hyderabad',
+    price: '₹10,000/month',
+    occupancy: 'Double/Triple',
+    image: 'https://images.unsplash.com/photo-1505693416388-b0346efee539?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwgY296eSUyMHJvb218ZW58MXx8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    amenities: ['Housekeeping', 'Recreation', 'Study Rooms', 'Cafeteria'],
+    isDummy: true
+  }
+];
+
 export function PremiumPGHostels() {
   const router = useRouter();
   const [hostels, setHostels] = useState([]);
@@ -20,7 +56,7 @@ export function PremiumPGHostels() {
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/featured_pg_hostels');
         const data = await response.json();
 
-        if (data.success && data.hostels) {
+        if (data.success && data.hostels && data.hostels.length > 0) {
           const mappedHostels = data.hostels.map((hostel, index) => ({
             id: hostel._id,
             name: hostel.hostelName || `${hostel.firstName} ${hostel.lastName}`,
@@ -34,12 +70,16 @@ export function PremiumPGHostels() {
               '24/7 Security',
               'High-Speed WiFi',
               'Power Backup'
-            ]
+            ],
+            isDummy: false
           }));
           setHostels(mappedHostels);
+        } else {
+          setHostels(dummyHostels);
         }
       } catch (err) {
         console.error('Error fetching featured PG hostels:', err);
+        setHostels(dummyHostels);
       } finally {
         setLoading(false);
       }
@@ -198,7 +238,7 @@ export function PremiumPGHostels() {
             <SkeletonCard />
             <SkeletonCard />
           </div>
-        ) : hostels.length > 0 ? (
+        ) : (
           <div className="grid md:grid-cols-3 gap-8">
             {hostels.map((hostel, index) => (
               <motion.div
@@ -207,13 +247,13 @@ export function PremiumPGHostels() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15, duration: 0.6 }}
-                className="group"
+                className={`group ${hostel.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
               >
                 {/* Card with Parallax Effect */}
                 <motion.div
-                  whileHover={{ y: -15, rotateY: 5 }}
+                  whileHover={hostel.isDummy ? {} : { y: -15, rotateY: 5 }}
                   transition={{ type: 'spring', stiffness: 300 }}
-                  className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] border border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl"
+                  className={`relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] border border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl ${hostel.isDummy ? 'pointer-events-none' : ''}`}
                   style={{ transformStyle: 'preserve-3d' }}
                 >
                   {/* Type Badge */}
@@ -224,7 +264,7 @@ export function PremiumPGHostels() {
                   {/* Image with Depth */}
                   <div className="relative h-64 overflow-hidden">
                     <motion.div
-                      whileHover={{ scale: 1.1 }}
+                      whileHover={hostel.isDummy ? {} : { scale: 1.1 }}
                       transition={{ duration: 0.6 }}
                     >
                       <ImageWithFallback
@@ -283,21 +323,23 @@ export function PremiumPGHostels() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <Link href={`/pghostels/hostel-detail/${hostel.id}`} className="w-full">
+                    <div className={`grid grid-cols-2 gap-3 ${hostel.isDummy ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <Link href={hostel.isDummy ? '#' : `/pghostels/hostel-detail/${hostel.id}`} className="w-full">
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold text-sm shadow-lg shadow-[#037166]/30"
+                          disabled={hostel.isDummy}
                         >
                           Book Tour
                         </motion.button>
                       </Link>
-                      <Link href={`/pghostels/hostel-detail/${hostel.id}`} className="w-full">
+                      <Link href={hostel.isDummy ? '#' : `/pghostels/hostel-detail/${hostel.id}`} className="w-full">
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className="w-full py-3 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#037166]/30 rounded-xl text-white font-semibold text-sm hover:bg-[#037166]/10 transition-all"
+                          disabled={hostel.isDummy}
                         >
                           Details
                         </motion.button>
@@ -306,14 +348,12 @@ export function PremiumPGHostels() {
                   </div>
 
                   {/* 3D Depth Effect */}
-                  <div className="absolute -inset-1 bg-gradient-to-br from-[#037166]/20 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
+                  {!hostel.isDummy && (
+                    <div className="absolute -inset-1 bg-gradient-to-br from-[#037166]/20 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
+                  )}
                 </motion.div>
               </motion.div>
             ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <p className="text-gray-400 text-lg">No hostels available at the moment</p>
           </div>
         )}
       </div>

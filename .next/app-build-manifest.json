@@ -1,14 +1,14 @@
 {
   "pages": {
-    "/services/thank-you/page": [
+    "/(landing)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/thank-you/page.js"
+      "static/chunks/app/(landing)/page.js"
     ],
-    "/services/layout": [
+    "/(landing)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/layout.js"
+      "static/chunks/app/(landing)/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -20,62 +20,6 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
-    ],
-    "/(landing)/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/page.js"
-    ],
-    "/(landing)/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/layout.js"
-    ],
-    "/pg-hostel/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/pg-hostel/page.js"
-    ],
-    "/pg-hostel/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/pg-hostel/layout.js"
-    ],
-    "/pghostels/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/page.js"
-    ],
-    "/pghostels/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/layout.js"
-    ],
-    "/pghostels/listings/[type]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/listings/[type]/page.js"
-    ],
-    "/pghostels/results/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/results/page.js"
-    ],
-    "/pghostels/hostel-detail/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/pghostels/hostel-detail/[id]/page.css",
-      "static/chunks/app/pghostels/hostel-detail/[id]/page.js"
-    ],
-    "/pghostels/booking/address/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/booking/address/page.js"
-    ],
-    "/pghostels/booking/confirm/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/booking/confirm/page.js"
     ]
   }
 }

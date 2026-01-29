@@ -483,56 +483,12 @@ function HeroContent({ services = [], loading = false, error = null }) {
           </motion.div>
 
           {/* Main Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+          <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold mb-6">
             {/* SVG Text for Stroke Animation */}
-            <svg className="w-full h-[1.2em] overflow-visible">
-              <motion.text
-                x="50%"
-                y="50%"
-                dominantBaseline="middle"
-                textAnchor="middle"
-                style={{
-                  fill: 'rgba(0, 0, 0, 0)', // Transparent fill as per request
-                  stroke: 'rgb(255, 255, 255)',
-                  strokeDasharray: '41.4975% 8.50253%', // User specified values
-                  strokeWidth: '2px', // Approx 2-3px
-                  fontSize: 'inherit',
-                  fontFamily: 'inherit',
-                  fontWeight: '600',
-                  textTransform: 'none', // Uppercase removed
-                }}
-                animate={{
-                  strokeDashoffset: ["0%", "-16.4975%", "-16.4975%", "0%"], // Start -> End -> Wait -> Back
-                  strokeDasharray: [
-                    "41.4975% 8.50253%",  // Start: Dashed
-                    "41.4975% 8.50253%",  // End
-                    "100% 0%",            // Wait: Solid (Long Dash, No Gap)
-                    "41.4975% 8.50253%"   // Back: Dashed
-                  ],
-                  fill: [
-                    "rgba(0, 0, 0, 0)",         // Start: Transparent
-                    "rgba(255, 255, 255, 1)",   // End: Fully Highlighted
-                    "rgba(255, 255, 255, 1)",   // Wait: Fully Highlighted
-                    "rgba(0, 0, 0, 0)"          // Back: Transparent
-                  ],
-                  filter: [
-                    "drop-shadow(0px 0px 0px rgba(0,0,0,0))",          // Start: No Glow
-                    "drop-shadow(0px 0px 10px rgba(255,255,255,0.8))", // End: Glow
-                    "drop-shadow(0px 0px 10px rgba(255,255,255,0.8))", // Wait: Glow
-                    "drop-shadow(0px 0px 0px rgba(0,0,0,0))"           // Back: No Glow
-                  ]
-                }}
-                transition={{
-                  duration: 6,
-                  times: [0, 0.4, 0.6, 1], // 40% animate, 20% wait, 40% back
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  ease: ["easeIn", "linear", "easeIn"] // Accelerate both ways
-                }}
-              >
-                Everything You Need.
-              </motion.text>
-            </svg>
+
+            Everything You Need.
+
+
 
             <motion.span
               key={activeIndex} // Triggers animation on change

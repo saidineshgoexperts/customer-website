@@ -1,9 +1,3 @@
 {
-  "/pghostels/results/page": "app/pghostels/results/page.js",
-  "/(landing)/page": "app/(landing)/page.js",
-  "/pghostels/booking/address/page": "app/pghostels/booking/address/page.js",
-  "/pghostels/hostel-detail/[id]/page": "app/pghostels/hostel-detail/[id]/page.js",
-  "/pghostels/booking/confirm/page": "app/pghostels/booking/confirm/page.js",
-  "/pg-hostel/page": "app/pg-hostel/page.js",
-  "/pghostels/page": "app/pghostels/page.js"
+  "/(landing)/page": "app/(landing)/page.js"
 }

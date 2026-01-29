@@ -43,7 +43,7 @@ export function Header({ theme = {}, navItems = [] }) {
     {
       name: 'More',
       dropdown: [
-        { name: 'Spa & Salon', href: '/spa-salon' },
+        { name: 'Spa & Saloon', href: '/spa-salon' },
         { name: 'Share Ride', href: '#share-ride' },
         { name: 'Order Medicine', href: '#order-medicine' }
       ]
@@ -238,16 +238,7 @@ export function Header({ theme = {}, navItems = [] }) {
                 )}
               </motion.button>
 
-              {/* Get Started Button */}
-              <Link href="/appliances">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`hidden sm:block px-6 py-2.5 bg-gradient-to-r ${currentTheme.accentGradientFrom} ${currentTheme.accentGradientTo} rounded-full text-white font-semibold text-sm hover:shadow-lg hover:shadow-[#037166]/40 transition-all border ${currentTheme.border}`}
-                >
-                  Get Started
-                </motion.button>
-              </Link>
+
 
               {/* Mobile Menu Button */}
               <button
@@ -313,12 +304,7 @@ export function Header({ theme = {}, navItems = [] }) {
                     )}
                   </div>
                 ))}
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  className={`w-full px-6 py-3.5 bg-gradient-to-r ${currentTheme.accentGradientFrom} ${currentTheme.accentGradientTo} rounded-xl text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all border ${currentTheme.border}`}
-                >
-                  Get Started
-                </motion.button>
+
               </div>
             </motion.div>
           )}

@@ -203,16 +203,10 @@ export function Header() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-        ? 'bg-teal-500/10 backdrop-blur-3xl border-b border-teal-400/30 shadow-xl shadow-teal-900/20'
-        : 'bg-teal-500/15 backdrop-blur-2xl border-b border-teal-400/20 shadow-lg shadow-teal-900/10'
+        ? 'bg-white/10 backdrop-blur-md border-b border-white/10 shadow-lg shadow-white/5'
+        : 'bg-transparent border-b border-transparent'
         }`}
     >
-
-
-
-
-
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -233,12 +227,12 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            {['Appliance Services', 'Religious Services', 'PG & Hostels'].map((item) => (
+          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+            {['Appliance Service', 'Spa Saloons', 'Pg Hostels', 'Religious Services'].map((item) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase().replace(/\s/g, '-')}`}
-                className="text-gray-200/90 hover:text-white transition-all relative group backdrop-blur-sm px-3 py-1 rounded-lg hover:bg-white/5"
+                className="text-white/90 hover:text-white transition-all relative group px-3 py-1 rounded-lg hover:bg-[#037166]/10 font-medium text-sm xl:text-base"
                 whileHover={{ y: -2 }}
               >
                 {item}
@@ -250,7 +244,7 @@ export function Header() {
             <div className="relative group">
               <motion.button
                 whileHover={{ y: -2 }}
-                className="text-gray-200/90 hover:text-white transition-all backdrop-blur-sm px-3 py-1 rounded-lg hover:bg-white/5 relative"
+                className="text-white/90 hover:text-white transition-all px-3 py-1 rounded-lg hover:bg-[#037166]/10 relative font-medium text-sm xl:text-base"
               >
                 More
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#037166] to-[#02b39a] group-hover:w-full transition-all duration-300" />
@@ -260,24 +254,23 @@ export function Header() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="absolute top-full left-0 mt-3 w-48 bg-gradient-to-br from-[#0f0f0f]/80 via-[#025951]/60 to-[#037166]/50 backdrop-blur-2xl border border-[#037166]/40 rounded-2xl shadow-2xl shadow-[#037166]/40 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300"
+                className="absolute top-full left-0 mt-3 w-48 bg-[#0a0a0a]/90 backdrop-blur-xl border border-[#037166]/30 rounded-2xl shadow-xl shadow-[#037166]/20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300"
               >
                 <a
-                  href="#spa-&-salon"
-                  className="block px-4 py-3 text-sm text-gray-200/90 hover:text-white hover:bg-white/10 rounded-xl transition-all backdrop-blur-sm"
+                  href="#daily-needs"
+                  className="block px-4 py-3 text-sm text-white/90 hover:text-white hover:bg-[#037166]/20 rounded-xl transition-all"
                 >
-                  Spa & Salon
+                  Daily Needs
                 </a>
-
                 <a
                   href="#share-ride"
-                  className="block px-4 py-3 text-sm text-gray-200/90 hover:text-white hover:bg-white/10 rounded-xl transition-all backdrop-blur-sm"
+                  className="block px-4 py-3 text-sm text-white/90 hover:text-white hover:bg-[#037166]/20 rounded-xl transition-all"
                 >
                   Share Ride
                 </a>
                 <a
                   href="#order-medicine"
-                  className="block px-4 py-3 text-sm text-gray-200/90 hover:text-white hover:bg-white/10 rounded-xl transition-all backdrop-blur-sm"
+                  className="block px-4 py-3 text-sm text-white/90 hover:text-white hover:bg-[#037166]/20 rounded-xl transition-all"
                 >
                   Order Medicine
                 </a>
@@ -286,29 +279,40 @@ export function Header() {
           </nav>
 
           {/* Right Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            {/* Location Pill */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 hover:border-white/30 rounded-xl transition-all shadow-lg shadow-black/5"
+            >
+              <div className="p-1 rounded-full bg-[#037166]/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#037166]"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+              </div>
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-[10px] text-gray-400 uppercase tracking-wider">Delivering to</span>
+                <div className="flex items-center space-x-1">
+                  <span className="text-sm font-medium text-white">Hyderabad</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><path d="m6 9 6 6 6-6" /></svg>
+                </div>
+              </div>
+            </motion.button>
+
+            {/* Cart Button */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="hidden sm:flex items-center justify-center w-10 h-10 bg-gradient-to-r from-[#025951]/50 to-[#037166]/60 hover:from-[#037166]/70 hover:to-[#02b39a]/70 backdrop-blur-xl border border-[#037166]/50 rounded-xl transition-all shadow-lg shadow-[#037166]/30 hover:shadow-xl hover:shadow-[#037166]/50"
+              className="hidden sm:flex items-center justify-center w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full transition-all shadow-lg shadow-black/5"
             >
-              <Search className="w-5 h-5 text-white/90" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#037166]"><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></svg>
             </motion.button>
 
+            {/* User Button */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="hidden sm:flex items-center justify-center w-10 h-10 bg-gradient-to-r from-[#025951]/50 to-[#037166]/60 hover:from-[#037166]/70 hover:to-[#02b39a]/70 backdrop-blur-xl border border-[#037166]/50 rounded-xl transition-all shadow-lg shadow-[#037166]/30 hover:shadow-xl hover:shadow-[#037166]/50"
+              className="hidden sm:flex items-center justify-center w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full transition-all shadow-lg shadow-black/5"
             >
-              <User className="w-5 h-5 text-white/90" />
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden sm:block px-6 py-2.5 bg-gradient-to-r from-[#037166] via-[#02b39a] to-[#025951] backdrop-blur-xl text-white font-medium rounded-2xl border border-[#037166]/50 shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/60 transition-all hover:from-[#02b39a] hover:to-[#037166]"
-            >
-              Get Started
+              <User className="w-5 h-5 text-[#037166]" />
             </motion.button>
 
             {/* Mobile Menu Button */}
@@ -316,12 +320,12 @@ export function Header() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-2xl bg-gradient-to-r from-[#025951]/60 to-[#037166]/70 backdrop-blur-xl border border-[#037166]/50 shadow-lg shadow-[#037166]/30 hover:shadow-xl hover:shadow-[#037166]/50 transition-all"
+              className="lg:hidden p-2.5 rounded-full bg-[#037166]/20 hover:bg-[#037166]/40 backdrop-blur-md border border-[#037166]/30 shadow-lg shadow-[#037166]/10 transition-all"
             >
               {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-white/90" />
+                <X className="w-6 h-6 text-white" />
               ) : (
-                <Menu className="w-6 h-6 text-white/90" />
+                <Menu className="w-6 h-6 text-white" />
               )}
             </motion.button>
           </div>
@@ -335,26 +339,20 @@ export function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-gradient-to-b from-[#0a0a0a]/80 via-[#025951]/70 to-[#037166]/60 backdrop-blur-2xl border-t border-[#037166]/40 shadow-2xl shadow-[#037166]/30"
+            className="lg:hidden bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-[#037166]/30 shadow-2xl shadow-[#037166]/20"
           >
             <div className="px-4 py-6 space-y-4">
               {['Services', 'Booking', 'Spa & Saloons', 'PG & Hostels', 'Religious Services', 'More'].map((item) => (
                 <motion.a
                   key={item}
                   href={`#${item.toLowerCase().replace(/\s/g, '-')}`}
-                  className="block py-3 px-4 text-gray-200/90 hover:text-white hover:bg-white/10 rounded-xl transition-all backdrop-blur-sm font-medium"
+                  className="block py-3 px-4 text-white/90 hover:text-white hover:bg-[#037166]/20 rounded-xl transition-all font-medium"
                   whileTap={{ x: 10 }}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item}
                 </motion.a>
               ))}
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                className="w-full px-6 py-3.5 bg-gradient-to-r from-[#037166] via-[#02b39a] to-[#025951] backdrop-blur-xl text-white font-semibold rounded-2xl border border-[#037166]/50 shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/60 transition-all"
-              >
-                Get Started
-              </motion.button>
             </div>
           </motion.div>
         )}

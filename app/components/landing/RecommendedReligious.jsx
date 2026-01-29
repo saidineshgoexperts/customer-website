@@ -5,6 +5,45 @@ import { motion } from 'motion/react';
 import { Compass, Star, Clock, Heart, BookOpen } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
+const dummyJourneys = [
+  {
+    id: 'dummy-1',
+    title: 'Sacred Temple Tour',
+    description: 'A guided spiritual journey through ancient temples',
+    duration: '4 hours',
+    difficulty: 'Easy',
+    rating: 4.9,
+    participants: 45,
+    image: 'https://images.unsplash.com/photo-1741798037832-6c0c86a6262a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoaW5kdSUyMHRlbXBsZSUyMHByYXllcnxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    highlights: ['Expert Guide', 'Prayer Session', 'Cultural Insights'],
+    isDummy: true
+  },
+  {
+    id: 'dummy-2',
+    title: 'Meditation Retreat',
+    description: 'Deep meditation and spiritual awakening experience',
+    duration: '2 days',
+    difficulty: 'Moderate',
+    rating: 5.0,
+    participants: 30,
+    image: 'https://images.unsplash.com/photo-1618425977996-bebc5afe88f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZWRpdGF0aW9uJTIwc3Bpcml0dWFsJTIwcGVhY2V8ZW58MXx8fHwxNzY4MDI2NzQ5fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    highlights: ['Silent Meditation', 'Yoga Sessions', 'Organic Meals'],
+    isDummy: true
+  },
+  {
+    id: 'dummy-3',
+    title: 'Vedic Ceremonies',
+    description: 'Experience traditional vedic rituals and chants',
+    duration: '3 hours',
+    difficulty: 'Easy',
+    rating: 4.8,
+    participants: 25,
+    image: 'https://images.unsplash.com/photo-1604360699049-7414bc918667?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwaWxvZyUyMHRlbXBsZXxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    highlights: ['Traditional Chants', 'Ceremonial Fire', 'Spiritual Discourse'],
+    isDummy: true
+  }
+];
+
 export function RecommendedReligious() {
   const [journeys, setJourneys] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +56,7 @@ export function RecommendedReligious() {
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/featured_religious_services');
         const data = await response.json();
 
-        if (data.success && data.services) {
+        if (data.success && data.services && data.services.length > 0) {
           const mappedJourneys = data.services.map((service, index) => ({
             id: service._id,
             title: service.serviceName || `${service.firstName} ${service.lastName}`,
@@ -31,12 +70,16 @@ export function RecommendedReligious() {
               service.cityName || service.address || 'Hyderabad Location',
               'Experienced Pandits',
               'Traditional Rituals'
-            ]
+            ],
+            isDummy: false
           }));
           setJourneys(mappedJourneys);
+        } else {
+          setJourneys(dummyJourneys);
         }
       } catch (err) {
         console.error('Error fetching featured religious services:', err);
+        setJourneys(dummyJourneys);
       } finally {
         setLoading(false);
       }
@@ -129,7 +172,8 @@ export function RecommendedReligious() {
             <div className="h-5 w-64 mx-auto bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
           </div>
@@ -218,7 +262,7 @@ export function RecommendedReligious() {
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-white via-[#9b59b6] to-white bg-clip-text text-transparent">
-              Recommended Religious Journeys
+              Recommended Pandit's
             </span>
           </h2>
 
@@ -228,7 +272,7 @@ export function RecommendedReligious() {
         </motion.div>
 
         {/* Journey Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
           {journeys.map((journey, index) => (
             <motion.div
               key={journey.id || index}
@@ -236,10 +280,10 @@ export function RecommendedReligious() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
-              className="group"
+              className={`group ${journey.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
             >
               {/* Journey Card */}
-              <div className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f1a] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
+              <div className={`relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f1a] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl ${journey.isDummy ? 'pointer-events-none' : ''}`}>
                 {/* Image with Compass Overlay */}
                 <div className="relative h-80 overflow-hidden">
                   <ImageWithFallback
@@ -328,9 +372,10 @@ export function RecommendedReligious() {
                     </div>
 
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-6 py-3 bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-[length:200%_100%] hover:bg-right rounded-xl text-white font-semibold transition-all duration-500 shadow-lg shadow-[#037166]/40"
+                      whileHover={journey.isDummy ? {} : { scale: 1.05 }}
+                      whileTap={journey.isDummy ? {} : { scale: 0.95 }}
+                      className={`px-6 py-3 bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-[length:200%_100%] rounded-xl text-white font-semibold shadow-lg shadow-[#037166]/40 transition-all duration-500 ${journey.isDummy ? 'opacity-50 cursor-not-allowed' : 'hover:bg-right'}`}
+                      disabled={journey.isDummy}
                     >
                       Begin Journey
                     </motion.button>
@@ -338,7 +383,9 @@ export function RecommendedReligious() {
                 </div>
 
                 {/* Spiritual Glow */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/20 via-[#9b59b6]/20 to-[#037166]/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-700 -z-10" />
+                {!journey.isDummy && (
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/20 via-[#9b59b6]/20 to-[#037166]/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-700 -z-10" />
+                )}
               </div>
             </motion.div>
           ))}

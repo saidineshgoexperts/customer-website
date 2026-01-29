@@ -8,19 +8,21 @@ import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 function SkeletonCard() {
   return (
-    <div className="relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden">
+    <div className="h-[440px] bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden">
       <div className="h-48 bg-gradient-to-r from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] animate-pulse" />
-      <div className="p-6 space-y-4">
-        <div className="h-3 w-24 bg-[#2a2a2a] rounded animate-pulse" />
+      <div className="p-6 space-y-4 h-[192px] flex flex-col justify-between">
         <div className="space-y-2">
-          <div className="h-5 bg-[#2a2a2a] rounded animate-pulse" />
-          <div className="h-5 w-3/4 bg-[#2a2a2a] rounded animate-pulse" />
+          <div className="h-3 w-24 bg-[#2a2a2a] rounded animate-pulse" />
+          <div className="h-5 bg-[#2a2a2a] rounded animate-pulse w-3/4" />
+          <div className="h-5 bg-[#2a2a2a] rounded animate-pulse w-full" />
         </div>
-        <div className="flex justify-between">
-          <div className="h-4 w-16 bg-[#2a2a2a] rounded animate-pulse" />
-          <div className="h-4 w-24 bg-[#2a2a2a] rounded animate-pulse" />
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <div className="h-4 w-16 bg-[#2a2a2a] rounded animate-pulse" />
+            <div className="h-4 w-24 bg-[#2a2a2a] rounded animate-pulse" />
+          </div>
+          <div className="h-12 bg-[#2a2a2a] rounded-xl animate-pulse" />
         </div>
-        <div className="h-12 bg-[#2a2a2a] rounded-xl animate-pulse" />
       </div>
     </div>
   );
@@ -62,7 +64,6 @@ export function BookingServices() {
   }, []);
 
   const handleServiceClick = (service) => {
-    // Construct the URL with service ID and query parameters
     const categoryParam = encodeURIComponent(service.category);
     const subCategoryParam = encodeURIComponent(service.title);
     router.push(`/services/detail/${service.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
@@ -111,14 +112,16 @@ export function BookingServices() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="group relative"
+                className="group relative h-[440px] flex flex-col"
               >
-                <div className="relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300">
+                <div className="relative flex-1 bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300 flex flex-col">
+                  {/* Status Badge */}
                   <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-[#037166]/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
                     {service.status}
                   </div>
 
-                  <div className="relative h-48 overflow-hidden">
+                  {/* Image - Fixed height */}
+                  <div className="relative h-48 overflow-hidden flex-shrink-0">
                     <ImageWithFallback
                       src={service.image}
                       alt={service.title}
@@ -128,15 +131,22 @@ export function BookingServices() {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
                   </div>
 
-                  <div className="p-6">
-                    <div className="text-xs text-[#037166] font-medium mb-2 uppercase tracking-wider">
-                      {service.category}
+                  {/* Content - Fixed height with 2-line title */}
+                  <div className="p-6 flex-1 flex flex-col justify-between">
+                    {/* Category & Title */}
+                    <div className="space-y-2">
+                      <div className="text-xs text-[#037166] font-medium uppercase tracking-wider">
+                        {service.category}
+                      </div>
+                      <h3
+                        className="text-xl font-semibold text-white leading-tight line-clamp-2"
+                        title={service.title}
+                      >
+                        {service.title}
+                      </h3>
                     </div>
 
-                    <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-[#037166] transition-colors">
-                      {service.title}
-                    </h3>
-
+                    {/* Rating & Bookings */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-1">
                         <Star className="w-4 h-4 text-[#037166] fill-[#037166]" />
@@ -148,39 +158,25 @@ export function BookingServices() {
                       </div>
                     </div>
 
+                    {/* FIXED BOTTOM BUTTON */}
                     <motion.button
                       onClick={() => handleServiceClick(service)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-medium flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-[#037166]/40 transition-all"
+                      className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-medium flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-[#037166]/40 transition-all flex-shrink-0 mt-auto"
                     >
                       <span>Book Now</span>
                       <ChevronRight className="w-4 h-4" />
                     </motion.button>
                   </div>
 
+                  {/* Hover glow effect */}
                   <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/0 via-[#037166]/20 to-[#037166]/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
                 </div>
               </motion.div>
             ))
           )}
         </div>
-
-        {/* <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#037166]/30 rounded-full text-white font-semibold hover:bg-[#037166]/10 transition-all inline-flex items-center space-x-2"
-          >
-            <span>View All Services</span>
-            <ChevronRight className="w-5 h-5" />
-          </motion.button>
-        </motion.div> */}
       </div>
     </section>
   );

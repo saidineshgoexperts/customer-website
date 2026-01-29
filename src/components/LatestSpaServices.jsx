@@ -38,7 +38,7 @@ export function LatestSpaServices() {
       {/* Zen World Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a120f] to-[#0a0a0a]" />
-        
+
         {/* Breathing Animation Circles */}
         <motion.div
           animate={{
@@ -71,7 +71,7 @@ export function LatestSpaServices() {
             <Waves className="w-4 h-4 text-[#037166]" />
             <span className="text-sm text-[#037166] font-medium">Calm Zen World</span>
           </div>
-          
+
           <motion.h2
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -82,7 +82,7 @@ export function LatestSpaServices() {
               Latest Spa Services
             </span>
           </motion.h2>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -94,7 +94,7 @@ export function LatestSpaServices() {
         </motion.div>
 
         {/* Spa Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {spaServices.map((service, index) => (
             <motion.div
               key={index}
@@ -125,7 +125,7 @@ export function LatestSpaServices() {
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-                  
+
                   {/* Floating Heart Icon */}
                   <motion.div
                     whileHover={{ scale: 1.2, rotate: 360 }}

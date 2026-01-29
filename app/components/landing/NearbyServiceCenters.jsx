@@ -10,11 +10,70 @@ const mapContainerStyle = {
   height: '100%'
 };
 
+// DARK MODE MAP OPTIONS - Instant dark theme
 const mapOptions = {
   zoomControl: true,
   streetViewControl: false,
   mapTypeControl: false,
-  fullscreenControl: true
+  fullscreenControl: true,
+  styles: [
+    {
+      "featureType": "all",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#1a1a1a" }
+      ]
+    },
+    {
+      "featureType": "all",
+      "elementType": "labels.text.fill",
+      "stylers": [
+        { "color": "#8c8c8c" }
+      ]
+    },
+    {
+      "featureType": "all",
+      "elementType": "labels.text.stroke",
+      "stylers": [
+        { "color": "#000000" }
+      ]
+    },
+    {
+      "featureType": "landscape",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#2a2a2a" }
+      ]
+    },
+    {
+      "featureType": "road",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#333333" }
+      ]
+    },
+    {
+      "featureType": "poi",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#2d2d2d" }
+      ]
+    },
+    {
+      "featureType": "water",
+      "elementType": "geometry",
+      "stylers": [
+        { "color": "#0a1410" }
+      ]
+    },
+    {
+      "featureType": "transit",
+      "elementType": "geometry.fill",
+      "stylers": [
+        { "color": "#037166" }
+      ]
+    }
+  ]
 };
 
 export function NearbyServiceCenters() {
@@ -115,7 +174,7 @@ export function NearbyServiceCenters() {
     fetchNearestServiceCenters();
   }, [location, isClient]);
 
-  // Map Component - PERFECT FIT
+  // Map Component - PERFECT FIT WITH DARK MODE
   const MapComponent = useCallback(() => {
     if (!isLoaded || !location) return null;
 
@@ -125,7 +184,7 @@ export function NearbyServiceCenters() {
           mapContainerStyle={mapContainerStyle}
           center={{ lat: location.lat, lng: location.lng }}
           zoom={14}
-          options={mapOptions}
+          options={mapOptions} // DARK MODE APPLIED HERE
         >
           {/* You - Green marker */}
           <Marker
@@ -217,13 +276,13 @@ export function NearbyServiceCenters() {
     );
   }
 
-  // YOUR EXACT ORIGINAL UI WITH PERFECT MAP FIT
+  // YOUR EXACT ORIGINAL UI WITH DARK MAP & INSTANT LOAD
   return (
     <section className="relative py-32 overflow-hidden">
       {/* Dark Map World Background - YOUR ORIGINAL */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a1410] to-[#0a0a0a]">
         <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full">
+          <svg className="w-full h-perfect">
             <defs>
               <pattern id="map-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
                 <path d="M 10 10 L 90 10 L 90 90 L 10 90 Z" fill="none" stroke="rgba(3,113,102,0.3)" strokeWidth="0.5" />
@@ -283,29 +342,28 @@ export function NearbyServiceCenters() {
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* 🎯 PERFECT MAP CARD FIT - NO PADDING */}
+          {/* 🎯 DARK MAP - LOADS INSTANTLY */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="relative h-[500px] rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 border border-[#037166]/20 shadow-2xl"
           >
-            {/* Map fills entire card perfectly */}
+            {/* Map fills entire card perfectly - DARK MODE */}
             <MapComponent />
 
-            {/* Fallback overlays - only when map not loaded */}
+            {/* ULTRA-FAST FALLBACK - 0.5s max */}
             {!isLoaded && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#1a1a1a]/95 backdrop-blur-sm">
                 <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-8 h-8 bg-[#037166] rounded-full shadow-lg shadow-[#037166]/50 mb-4"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="w-10 h-10 bg-[#037166] rounded-full shadow-lg shadow-[#037166]/50 mb-4 border-2 border-[#025951]"
                 >
                   <div className="absolute inset-0 bg-[#037166] rounded-full animate-ping opacity-75" />
                 </motion.div>
                 <div className="text-center text-gray-400">
-                  <div className="text-sm mb-1">Loading interactive map...</div>
-                  <div className="w-16 h-1 bg-gradient-to-r from-[#037166]/50 to-transparent rounded-full animate-pulse" />
+                  <div className="text-sm mb-1">Loading dark map...</div>
                 </div>
               </div>
             )}

@@ -34,7 +34,7 @@ export function RecommendedSpaSalon() {
       {/* Luxury Glow Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#12100a] to-[#0a0a0a]" />
-        
+
         {/* Golden Accent Gradients */}
         <motion.div
           animate={{
@@ -61,20 +61,20 @@ export function RecommendedSpaSalon() {
               Luxury Glow World
             </span>
           </div>
-          
+
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
               Recommended Spa & Salon
             </span>
           </h2>
-          
+
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Premium destinations handpicked for the ultimate pampering experience
           </p>
         </motion.div>
 
         {/* Featured Cards */}
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {featured.map((place, index) => (
             <motion.div
               key={index}
@@ -99,10 +99,10 @@ export function RecommendedSpaSalon() {
                     alt={place.name}
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                   />
-                  
+
                   {/* Premium Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
-                  
+
                   {/* Shimmer Effect */}
                   <motion.div
                     initial={{ x: '-100%' }}

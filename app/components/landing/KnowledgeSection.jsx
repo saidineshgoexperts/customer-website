@@ -5,6 +5,49 @@ import { motion } from 'motion/react';
 import { BookOpen, TrendingUp, Clock, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
+const dummyArticles = [
+  {
+    id: 'dummy-1',
+    title: '5 Tips for Home Maintenance',
+    category: 'Home Care',
+    readTime: '5 min read',
+    image: 'https://images.unsplash.com/photo-1581578731117-10d52143b1e5?auto=format&fit=crop&q=80&w=1080',
+    trending: true,
+    summary: 'Essential maintenance tips to keep your home engaging and comfortable year-round.',
+    isDummy: true
+  },
+  {
+    id: 'dummy-2',
+    title: 'Understanding AC Servicing',
+    category: 'Appliance Repair',
+    readTime: '4 min read',
+    image: 'https://images.unsplash.com/photo-1621905476017-60f38c3d79f0?auto=format&fit=crop&q=80&w=1080',
+    trending: false,
+    summary: 'Why regular AC servicing is crucial for longevity and efficiency.',
+    isDummy: true
+  },
+  {
+    id: 'dummy-3',
+    title: 'Kitchen Cleaning Hacks',
+    category: 'Cleaning',
+    readTime: '3 min read',
+    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=1080',
+    trending: true,
+    summary: 'Quick and effective hacks to keep your kitchen sparkling clean.',
+    isDummy: true
+  },
+  {
+    id: 'dummy-4',
+    title: 'The Guide to Pest Control',
+    category: 'Pest Control',
+    readTime: '6 min read',
+    image: 'https://images.unsplash.com/photo-1633535978184-a1415f368f56?auto=format&fit=crop&q=80&w=1080',
+    trending: false,
+    summary: 'How to identify and manage common household pests effectively.',
+    isDummy: true
+  }
+];
+
 export function KnowledgeSection() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +58,7 @@ export function KnowledgeSection() {
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/knowledge-base');
         const data = await response.json();
 
-        if (data.success && data.data) {
+        if (data.success && data.data && data.data.length > 0) {
           const mappedArticles = data.data.slice(0, 4).map(item => ({
             id: item._id,
             title: item.title,
@@ -24,12 +67,16 @@ export function KnowledgeSection() {
             image: item.coverImage?.url ? encodeURI(`https://api.doorstephub.com${item.coverImage.url}`) : 'https://images.unsplash.com/photo-1582498674105-ad104fcc5784?w=800',
             trending: item.isTrending,
             summary: item.summary,
-            slug: item.slug
+            slug: item.slug,
+            isDummy: false
           }));
           setArticles(mappedArticles);
+        } else {
+          setArticles(dummyArticles);
         }
       } catch (error) {
         console.error('Error fetching knowledge base:', error);
+        setArticles(dummyArticles);
       } finally {
         setLoading(false);
       }
@@ -98,12 +145,12 @@ export function KnowledgeSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="group"
+                className={`group ${article.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
               >
                 {/* Studio Card */}
                 <motion.div
-                  whileHover={{ y: -10 }}
-                  className="relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300"
+                  whileHover={article.isDummy ? {} : { y: -10 }}
+                  className={`relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300 ${article.isDummy ? 'pointer-events-none' : ''}`}
                 >
                   {/* Trending Badge */}
                   {article.trending && (
@@ -146,8 +193,9 @@ export function KnowledgeSection() {
                       </div>
 
                       <motion.button
-                        whileHover={{ x: 5 }}
-                        className="text-[#037166] font-medium text-sm flex items-center space-x-1 group/btn"
+                        whileHover={article.isDummy ? {} : { x: 5 }}
+                        className={`text-[#037166] font-medium text-sm flex items-center space-x-1 group/btn ${article.isDummy ? 'opacity-50' : ''}`}
+                        disabled={article.isDummy}
                       >
                         <span>Read</span>
                         <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
@@ -156,7 +204,9 @@ export function KnowledgeSection() {
                   </div>
 
                   {/* Hover Glow */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/0 via-[#037166]/20 to-[#037166]/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
+                  {!article.isDummy && (
+                    <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/0 via-[#037166]/20 to-[#037166]/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
+                  )}
                 </motion.div>
               </motion.div>
             ))}

@@ -32,7 +32,7 @@ export function RecommendedHostels() {
       {/* Warm Comfort Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0f0a0a] to-[#0a0a0a]" />
-        
+
         {/* Warm Glow */}
         <motion.div
           animate={{
@@ -59,20 +59,20 @@ export function RecommendedHostels() {
               Warm Comfort World
             </span>
           </div>
-          
+
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
               Recommended Hostels
             </span>
           </h2>
-          
+
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Trusted accommodations with a focus on safety, comfort, and community
           </p>
         </motion.div>
 
         {/* Hostels Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
           {hostels.map((hostel, index) => (
             <motion.div
               key={index}
@@ -128,7 +128,7 @@ export function RecommendedHostels() {
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
-                  
+
                   {/* Heart Icon */}
                   <motion.button
                     whileHover={{ scale: 1.2 }}

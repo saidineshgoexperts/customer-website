@@ -17,7 +17,7 @@ export function RecommendedSpaSalon() {
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/featured_spa_stores');
         const data = await response.json();
 
-        if (data.success && data.stores) {
+        if (data.success && data.stores && data.stores.length > 0) {
           const mappedStores = data.stores.map((store, index) => ({
             id: store._id,
             name: store.storeName || `${store.firstName} ${store.lastName}`,
@@ -31,14 +31,15 @@ export function RecommendedSpaSalon() {
               store.bio || 'Experienced professional',
               'Premium Services',
               `${store.cityName || 'Hyderabad'} Location`
-            ]
+            ],
+            isDummy: false
           }));
           setFeatured(mappedStores);
         } else {
           // Fallback to original hardcoded data - expanded to 4 items
           setFeatured([
             {
-              id: '1',
+              id: 'dummy-1',
               name: 'Royal Glow Spa',
               category: 'Premium Spa',
               rating: 4.9,
@@ -47,9 +48,10 @@ export function RecommendedSpaSalon() {
               image: 'https://images.unsplash.com/photo-1582498674105-ad104fcc5784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcGElMjB0cmVhdG1lbnR8ZW58MXx8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
               badge: 'Top Rated',
               highlights: ['VIP Lounge', 'Expert Therapists', 'Premium Products'],
+              isDummy: true
             },
             {
-              id: '2',
+              id: 'dummy-2',
               name: 'Elegance Hair Studio',
               category: 'Luxury Salon',
               rating: 4.8,
@@ -58,9 +60,10 @@ export function RecommendedSpaSalon() {
               image: 'https://images.unsplash.com/photo-1675034741696-fa9551c31bb4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzYWxvbiUyMGhhaXJjdXQlMjBiZWF1dHl8ZW58MXx8fHwxNzY4MDI2NzQ1fDA&ixlib=rb-4.1.0&q=80&w=1080',
               badge: 'Trending',
               highlights: ['Celebrity Stylists', 'Latest Trends', 'Exclusive Brands'],
+              isDummy: true
             },
             {
-              id: '3',
+              id: 'dummy-3',
               name: 'Zenith Wellness Retreat',
               category: 'Luxury Spa',
               rating: 4.9,
@@ -69,9 +72,10 @@ export function RecommendedSpaSalon() {
               image: 'https://images.unsplash.com/photo-1578631618866-c4e99113bbce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjByZXRyZWF0fGVufDF8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
               badge: 'Top Rated',
               highlights: ['Holistic Treatments', 'Organic Products', 'Private Suites'],
+              isDummy: true
             },
             {
-              id: '4',
+              id: 'dummy-4',
               name: 'Velvet Touch Salon',
               category: 'Premium Salon',
               rating: 4.7,
@@ -80,6 +84,7 @@ export function RecommendedSpaSalon() {
               image: 'https://images.unsplash.com/photo-1606851732918-bfec4a081ec8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHNiYWxheSUyMGhhaXJ8ZW58MXx8fHwxNzY4MDI2NzQ1fDA&ixlib=rb-4.1.0&q=80&w=1080',
               badge: 'Trending',
               highlights: ['Signature Styles', 'Premium Colors', 'Express Services'],
+              isDummy: true
             }
           ]);
         }
@@ -88,7 +93,7 @@ export function RecommendedSpaSalon() {
         // Fallback to original hardcoded data - expanded to 4 items
         setFeatured([
           {
-            id: '1',
+            id: 'dummy-1',
             name: 'Royal Glow Spa',
             category: 'Premium Spa',
             rating: 4.9,
@@ -97,9 +102,10 @@ export function RecommendedSpaSalon() {
             image: 'https://images.unsplash.com/photo-1582498674105-ad104fcc5784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcGElMjB0cmVhdG1lbnR8ZW58MXx8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
             badge: 'Top Rated',
             highlights: ['VIP Lounge', 'Expert Therapists', 'Premium Products'],
+            isDummy: true
           },
           {
-            id: '2',
+            id: 'dummy-2',
             name: 'Elegance Hair Studio',
             category: 'Luxury Salon',
             rating: 4.8,
@@ -108,9 +114,10 @@ export function RecommendedSpaSalon() {
             image: 'https://images.unsplash.com/photo-1675034741696-fa9551c31bb4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzYWxvbiUyMGhhaXJjdXQlMjBiZWF1dHl8ZW58MXx8fHwxNzY4MDI2NzQ1fDA&ixlib=rb-4.1.0&q=80&w=1080',
             badge: 'Trending',
             highlights: ['Celebrity Stylists', 'Latest Trends', 'Exclusive Brands'],
+            isDummy: true
           },
           {
-            id: '3',
+            id: 'dummy-3',
             name: 'Zenith Wellness Retreat',
             category: 'Luxury Spa',
             rating: 4.9,
@@ -119,9 +126,10 @@ export function RecommendedSpaSalon() {
             image: 'https://images.unsplash.com/photo-1578631618866-c4e99113bbce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjByZXRyZWF0fGVufDF8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
             badge: 'Top Rated',
             highlights: ['Holistic Treatments', 'Organic Products', 'Private Suites'],
+            isDummy: true
           },
           {
-            id: '4',
+            id: 'dummy-4',
             name: 'Velvet Touch Salon',
             category: 'Premium Salon',
             rating: 4.7,
@@ -130,6 +138,7 @@ export function RecommendedSpaSalon() {
             image: 'https://images.unsplash.com/photo-1606851732918-bfec4a081ec8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHNiYWxheSUyMGhhaXJ8ZW58MXx8fHwxNzY4MDI2NzQ1fDA&ixlib=rb-4.1.0&q=80&w=1080',
             badge: 'Trending',
             highlights: ['Signature Styles', 'Premium Colors', 'Express Services'],
+            isDummy: true
           }
         ]);
       } finally {
@@ -214,10 +223,10 @@ export function RecommendedSpaSalon() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.7 }}
-              className="group relative"
+              className={`group relative ${place.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
             >
               {/* Premium Card - Original sizing preserved */}
-              <div className="relative h-full bg-gradient-to-br from-[#1a1a1a] via-[#1a1510] to-[#0f0f0f] border-2 border-[#037166]/30 rounded-3xl overflow-hidden">
+              <div className={`relative h-full bg-gradient-to-br from-[#1a1a1a] via-[#1a1510] to-[#0f0f0f] border-2 border-[#037166]/30 rounded-3xl overflow-hidden ${place.isDummy ? 'pointer-events-none' : ''}`}>
                 {/* Top Badge */}
                 <div className="absolute top-6 left-6 z-20 flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#d4af37]/90 to-[#037166]/90 backdrop-blur-md rounded-full">
                   <Award className="w-4 h-4 text-white" />
@@ -238,7 +247,7 @@ export function RecommendedSpaSalon() {
                   {/* Shimmer Effect */}
                   <motion.div
                     initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
+                    whileHover={place.isDummy ? {} : { x: '100%' }}
                     transition={{ duration: 1 }}
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"
                   />
@@ -248,7 +257,7 @@ export function RecommendedSpaSalon() {
                 <div className="p-8 -mt-20 relative z-10">
                   {/* Main Info Card */}
                   <motion.div
-                    whileHover={{ y: -5 }}
+                    whileHover={place.isDummy ? {} : { y: -5 }}
                     className="p-6 bg-[#1a1a1a]/90 backdrop-blur-xl border border-[#037166]/30 rounded-2xl mb-6 shadow-xl"
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -296,20 +305,22 @@ export function RecommendedSpaSalon() {
                   </motion.div>
 
                   {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className={`grid grid-cols-2 gap-4 ${place.isDummy ? 'opacity-50 pointer-events-none' : ''}`}>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => window.location.href = `/spa-salon?storeId=${place.id}`}
+                      onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
                       className="py-3 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] rounded-xl text-white font-semibold shadow-lg shadow-[#C06C84]/40 hover:shadow-xl hover:shadow-[#C06C84]/50 transition-all"
+                      disabled={place.isDummy}
                     >
                       Book Now
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => window.location.href = `/spa-salon?storeId=${place.id}`}
+                      onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
                       className="py-3 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#C06C84]/30 rounded-xl text-white font-semibold hover:bg-[#C06C84]/10 transition-all"
+                      disabled={place.isDummy}
                     >
                       View Details
                     </motion.button>
@@ -317,7 +328,9 @@ export function RecommendedSpaSalon() {
                 </div>
 
                 {/* Premium Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/20 via-[#d4af37]/20 to-[#037166]/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500 -z-10" />
+                {!place.isDummy && (
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/20 via-[#d4af37]/20 to-[#037166]/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500 -z-10" />
+                )}
               </div>
             </motion.div>
           ))}

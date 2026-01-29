@@ -9,12 +9,12 @@ const footerLinks = {
   company: [
     { name: 'About Us', href: '#' },
     { name: 'Careers', href: '#' },
-    { name: 'Press Kit', href: '#' },
+    // { name: 'Press Kit', href: '#' },
     { name: 'Contact', href: '#' },
   ],
   services: [
     { name: 'All Services', href: '#' },
-    { name: 'Become a Partner', href: '#' },
+    { name: 'Become a ServicePartner', href: '#' },
     { name: 'Service Centers', href: '#' },
     { name: 'Download App', href: '#' },
   ],
@@ -66,10 +66,10 @@ export function Footer() {
               {/* Contact Info */}
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+                  {/* <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                     <Phone className="w-4 h-4" />
-                  </div>
-                  <span className="text-sm">8886688666</span>
+                  </div> */}
+                  {/* <span className="text-sm">8886688666</span> */}
                 </div>
                 <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
@@ -77,12 +77,12 @@ export function Footer() {
                   </div>
                   <span className="text-sm">help@doorstephub.com</span>
                 </div>
-                <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
+                {/* <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <span className="text-sm">Hyderabad, Telangana</span>
-                </div>
+                </div> */}
               </div>
             </motion.div>
           </div>

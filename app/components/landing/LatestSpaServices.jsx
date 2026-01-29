@@ -82,7 +82,7 @@ export function LatestSpaServices() {
             className="text-4xl sm:text-5xl font-bold mb-4"
           >
             <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-              Recently Booked Spa & Salons
+              Recently Booked Spa & Saloons
             </span>
           </motion.h2>
 

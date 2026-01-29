@@ -41,7 +41,7 @@ export function LatestReligiousServices() {
       {/* Spiritual Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0a10] to-[#0a0a0a]" />
-        
+
         {/* Divine Ambient Glow */}
         <motion.div
           animate={{
@@ -89,20 +89,20 @@ export function LatestReligiousServices() {
               Spiritual World
             </span>
           </div>
-          
+
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-white via-[#9b59b6] to-white bg-clip-text text-transparent">
               Latest Religious Services
             </span>
           </h2>
-          
+
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Connect with your spiritual side through sacred ceremonies and community gatherings
           </p>
         </motion.div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-4 gap-8">
           {services.map((service, index) => (
             <motion.div
               key={index}
@@ -139,10 +139,10 @@ export function LatestReligiousServices() {
                       className="w-full h-full object-cover"
                     />
                   </motion.div>
-                  
+
                   {/* Divine Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
-                  
+
                   {/* Subtle Glow Animation */}
                   <motion.div
                     animate={{

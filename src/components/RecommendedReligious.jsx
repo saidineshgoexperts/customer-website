@@ -34,7 +34,7 @@ export function RecommendedReligious() {
       {/* Guided Journey Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0d12] to-[#0a0a0a]" />
-        
+
         {/* Path Animation */}
         <svg className="absolute inset-0 w-full h-full opacity-5">
           <defs>
@@ -92,20 +92,20 @@ export function RecommendedReligious() {
               Guided Spiritual Journey
             </span>
           </div>
-          
+
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-white via-[#9b59b6] to-white bg-clip-text text-transparent">
               Recommended Religious Journeys
             </span>
           </h2>
-          
+
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Embark on transformative spiritual experiences curated for seekers of all paths
           </p>
         </motion.div>
 
         {/* Journey Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
           {journeys.map((journey, index) => (
             <motion.div
               key={index}
@@ -124,9 +124,9 @@ export function RecommendedReligious() {
                     alt={journey.title}
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                   />
-                  
+
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-                  
+
                   {/* Compass Icon */}
                   <motion.div
                     animate={{ rotate: 360 }}
