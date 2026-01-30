@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Calendar, Clock, MapPin, User, CheckCircle, Sparkles, CreditCard, Wallet, Truck } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, CheckCircle, Sparkles, CreditCard, Wallet, Truck, Info } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/context/AuthContext';
@@ -58,23 +58,25 @@ export function BookingConfirmationPage({
   const getAvailableDates = () => {
     const now = new Date();
     const dates = [];
-    let startDate = new Date(now);
 
-    // Check if today is still available (current time + 3hr buffer < 9 PM)
+    // Check cutoff time (6 PM) for today
     const todayCutoff = new Date();
-    todayCutoff.setHours(SERVICE_END_HOUR - BUFFER_HOURS, 0, 0, 0); // 6 PM cutoff
+    todayCutoff.setHours(SERVICE_END_HOUR - BUFFER_HOURS, 0, 0, 0); // 18:00 (6 PM)
 
-    if (now > todayCutoff) {
-      // Skip today, start from tomorrow
-      startDate.setDate(startDate.getDate() + 1);
-    }
+    // Determine starting day index (0 = Today, 1 = Tomorrow)
+    const startDayIndex = (now > todayCutoff) ? 1 : 0; // If past 6 PM, start from tomorrow
 
-    for (let i = (now > todayCutoff ? 1 : 0); i < 7; i++) {
-      const date = new Date(startDate);
-      date.setDate(date.getDate() + i);
+    // Generate 7 days of availability
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + startDayIndex + i);
+
+      // Calculate the actual offset for labeling
+      const actualOffset = startDayIndex + i;
+
       dates.push({
         value: date.toISOString().split('T')[0],
-        label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', {
+        label: actualOffset === 0 ? 'Today' : actualOffset === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', {
           weekday: 'short',
           month: 'short',
           day: 'numeric'
@@ -250,15 +252,33 @@ export function BookingConfirmationPage({
         {/* Progress Indicator */}
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8 pb-6">
           <div className="flex items-center gap-2">
-            {['Service', directBookingItems ? 'Direct' : 'Cart', 'Address', 'Confirm'].map((step, index) => (
-              <React.Fragment key={step}>
+            {[
+              { label: 'Service', status: 'completed' },
+              { label: directBookingItems ? 'Direct' : 'Cart', status: 'completed' },
+              { label: 'Address', status: 'completed' },
+              { label: 'Confirm', status: 'active' }
+            ].map((step, index, arr) => (
+              <React.Fragment key={step.label}>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 text-white" />
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step.status === 'completed' || step.status === 'active'
+                    ? 'bg-gradient-to-r from-[#037166] to-[#04a99d]'
+                    : 'bg-white/10'
+                    }`}>
+                    {step.status === 'completed' ? (
+                      <CheckCircle className="w-5 h-5 text-white" />
+                    ) : (
+                      <div className={`w-3 h-3 rounded-full ${step.status === 'active' ? 'bg-white' : 'bg-white/30'}`} />
+                    )}
                   </div>
-                  <span className="text-white/90 text-sm font-medium hidden sm:inline">{step}</span>
+                  <span className={`text-sm font-medium hidden sm:inline ${step.status === 'active' ? 'text-white' : 'text-white/70'
+                    }`}>{step.label}</span>
                 </div>
-                {index < 3 && <div className="h-0.5 flex-1 bg-white/30" />}
+                {index < arr.length - 1 && (
+                  <div className={`h-0.5 flex-1 ${arr[index + 1].status === 'active' || step.status === 'completed'
+                    ? 'bg-[#037166]'
+                    : 'bg-white/10'
+                    }`} />
+                )}
               </React.Fragment>
             ))}
           </div>
@@ -448,9 +468,9 @@ export function BookingConfirmationPage({
                       </p>
                     </div>
                     {/* Item cost is effectively 0 for immediate payment */}
-                    <span className="text-white/90 font-medium">
+                    {/* <span className="text-white/90 font-medium">
                       ₹0
-                    </span>
+                    </span> */}
                   </div>
                 ))}
               </div>
@@ -459,27 +479,26 @@ export function BookingConfirmationPage({
 
               {/* Price Breakdown */}
               <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-white/80">
-                  <span>Subtotal</span>
-                  <span>₹0</span>
-                </div>
                 {bookingCost > 0 && (
                   <div className="flex justify-between text-white/80">
-                    <span>Service Booking Cost</span>
+                    <span>Online Consultation Fee</span>
+
                     <span>₹{bookingCost}</span>
                   </div>
                 )}
                 {/* Hidden inspection cost for summary since subtotal is zero logic applies */}
                 {inspectionCost > 0 && (
-                  <div className="flex justify-between text-white/80">
-                    <span>Inspection Cost</span>
-                    <span>₹{inspectionCost}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex justify-between text-white/80">
+                      <span>Doorstep Inspection Fee</span>
+                      <span>₹{inspectionCost}</span>
+                    </div>
+                    <div className="flex items-start gap-2 text-[10px] text-white/50 bg-white/5 p-2 rounded">
+                      <Info className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#04a99d]" />
+                      <p>Note: This is the online consultation fee only. The Doorstep Inspection Fee will be collected at Doorstep.</p>
+                    </div>
                   </div>
                 )}
-                <div className="flex justify-between text-white/80">
-                  <span>Tax (0%)</span>
-                  <span>₹{tax}</span>
-                </div>
               </div>
 
               <div className="h-px bg-white/10 mb-4" />
@@ -491,7 +510,8 @@ export function BookingConfirmationPage({
 
               <div className="p-3 mb-6 bg-[#037166]/10 border border-[#037166]/20 rounded-lg">
                 <p className="text-[#04a99d] text-xs text-center font-medium leading-relaxed">
-                  Note: This is the service booking cost only. The inspection/service cost will be collected at Doorstep.
+                  {/* Note: This is the online consultation fee only. The Doorstep Inspection Fee will be collected at Doorstep. */}
+                  Pay at Doorstep
                 </p>
               </div>
 
