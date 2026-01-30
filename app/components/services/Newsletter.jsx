@@ -21,7 +21,7 @@ export function Newsletter() {
     <section className="py-20 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0f1614] via-[#0a0a0a] to-[#0f1614]" />
-      
+
       {/* Animated Orbs */}
       <motion.div
         animate={{
@@ -139,7 +139,7 @@ export function Newsletter() {
           >
             <div className="flex items-center justify-center gap-2 text-[#04a99d]">
               <CheckCircle2 className="w-5 h-5" />
-              <span className="font-medium">Successfully subscribed! Check your inbox.</span>
+              <h6 className="font-medium">Successfully subscribed! Check your inbox.</h6>
             </div>
           </motion.div>
         </motion.form>

@@ -150,7 +150,7 @@ export function ServiceDetail() {
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6"
               >
                 <Star className="w-4 h-4 text-[#037166]" />
-                <span className="text-sm text-[#037166] font-medium">Top Rated Service</span>
+                <h6 className="text-sm text-[#037166] font-medium">Top Rated Service</h6>
               </motion.div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
@@ -323,9 +323,9 @@ export function ServiceDetail() {
                       {/* Icon */}
                       <div className="text-5xl mb-4">{issue.icon}</div>
 
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
+                      <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
                         {issue.title}
-                      </h3>
+                      </h4>
 
                       <p className="text-sm text-gray-400 mb-4">{issue.description}</p>
 
@@ -439,8 +439,8 @@ export function ServiceDetail() {
                               >
                                 <Star
                                   className={`w-5 h-5 ${i < review.rating
-                                      ? 'text-[#037166] fill-[#037166]'
-                                      : 'text-gray-600'
+                                    ? 'text-[#037166] fill-[#037166]'
+                                    : 'text-gray-600'
                                     }`}
                                 />
                               </motion.div>
@@ -530,7 +530,7 @@ export function ServiceDetail() {
 
               {/* Date Selection */}
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-white mb-4">Select Date</h3>
+                <h4 className="text-lg font-semibold text-white mb-4">Select Date</h4>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
                   {dates.map((dateItem, index) => (
                     <motion.button
@@ -540,10 +540,10 @@ export function ServiceDetail() {
                       whileHover={dateItem.available ? { y: -4 } : {}}
                       whileTap={dateItem.available ? { scale: 0.95 } : {}}
                       className={`p-4 rounded-xl transition-all ${selectedDate === dateItem.date
-                          ? 'bg-gradient-to-r from-[#037166] to-[#025951] border-2 border-[#037166] shadow-lg shadow-[#037166]/40'
-                          : dateItem.available
-                            ? 'bg-[#1a1a1a] border border-[#037166]/20 hover:border-[#037166]/40'
-                            : 'bg-[#1a1a1a]/50 border border-gray-800 opacity-50 cursor-not-allowed'
+                        ? 'bg-gradient-to-r from-[#037166] to-[#025951] border-2 border-[#037166] shadow-lg shadow-[#037166]/40'
+                        : dateItem.available
+                          ? 'bg-[#1a1a1a] border border-[#037166]/20 hover:border-[#037166]/40'
+                          : 'bg-[#1a1a1a]/50 border border-gray-800 opacity-50 cursor-not-allowed'
                         }`}
                     >
                       <div className={`text-sm ${selectedDate === dateItem.date ? 'text-white' : 'text-gray-400'}`}>
@@ -563,7 +563,7 @@ export function ServiceDetail() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <h3 className="text-lg font-semibold text-white mb-4">Select Time</h3>
+                  <h4 className="text-lg font-semibold text-white mb-4">Select Time</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
                     {timeSlots.map((time, index) => (
                       <motion.button
@@ -572,8 +572,8 @@ export function ServiceDetail() {
                         whileHover={{ y: -4 }}
                         whileTap={{ scale: 0.95 }}
                         className={`py-3 rounded-xl transition-all ${selectedTime === time
-                            ? 'bg-gradient-to-r from-[#037166] to-[#025951] border-2 border-[#037166] shadow-lg shadow-[#037166]/40 text-white'
-                            : 'bg-[#1a1a1a] border border-[#037166]/20 hover:border-[#037166]/40 text-gray-300'
+                          ? 'bg-gradient-to-r from-[#037166] to-[#025951] border-2 border-[#037166] shadow-lg shadow-[#037166]/40 text-white'
+                          : 'bg-[#1a1a1a] border border-[#037166]/20 hover:border-[#037166]/40 text-gray-300'
                           }`}
                       >
                         {time}

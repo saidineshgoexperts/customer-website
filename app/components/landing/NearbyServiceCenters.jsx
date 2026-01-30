@@ -304,12 +304,12 @@ export function NearbyServiceCenters() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Navigation className="w-4 h-4 text-[#037166]" />
-            <span className="text-sm text-[#037166] font-medium">Live Location Services</span>
+            <h6 className="text-sm text-[#037166] font-medium">Live Location Services</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-              Nearest Service Centers
+              Nearby Appliance Service Centers
             </span>
           </h2>
 
@@ -388,11 +388,11 @@ export function NearbyServiceCenters() {
                     : 'bg-[#1a1a1a]/50 border border-[#037166]/20'
                     }`}
                 >
-                  <h3 className="text-xl font-bold">{service.name}</h3>
+                  <h4 className="text-xl font-bold">{service.name}</h4>
                   <p className="text-gray-400 text-sm">{service.address}</p>
                   <div className="flex gap-4 mt-2">
                     <span className="flex items-center text-[#037166] text-sm"><Star className="w-4 h-4 mr-1" /> {service.rating}</span>
-                    <span className="text-sm text-gray-400">{service.status}</span>
+                    <h6 className="text-sm text-gray-400 font-normal">{service.status}</h6>
                   </div>
                 </motion.div>
               ))

@@ -131,9 +131,9 @@ export function AllServicesPage({
                     </div>
 
                     <div className="p-6">
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
+                      <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
                         Expert Service {id}
-                      </h3>
+                      </h4>
                       <p className="text-white/60 text-sm mb-4">Professional service provider</p>
                       <div className="flex items-center gap-1 mb-4">
                         <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
@@ -179,9 +179,9 @@ export function AllServicesPage({
                       </div>
 
                       <div className="flex-1 p-6">
-                        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
+                        <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
                           Service Center {id}
-                        </h3>
+                        </h4>
                         <p className="text-white/60 text-sm mb-4 flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
                           123 Main Street, City

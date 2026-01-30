@@ -29,7 +29,7 @@ export function DownloadApp() {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-6">
               <Smartphone className="w-3 h-3 text-[#04a99d]" />
-              <span className="text-xs font-medium text-[#04a99d]">MOBILE APP</span>
+              <h6 className="text-xs font-medium text-[#04a99d]">MOBILE APP</h6>
             </div>
 
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
@@ -43,7 +43,7 @@ export function DownloadApp() {
             </h2>
 
             <p className="text-white/60 text-lg mb-8 leading-relaxed">
-              Manage bookings, track earnings, and connect with customers—all from your mobile device. 
+              Manage bookings, track earnings, and connect with customers—all from your mobile device.
               Join thousands of service providers growing their business with us.
             </p>
 
@@ -66,7 +66,7 @@ export function DownloadApp() {
                   <div className="w-6 h-6 rounded-full bg-[#037166]/20 flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 className="w-4 h-4 text-[#04a99d]" />
                   </div>
-                  <span className="text-white/80">{feature}</span>
+                  <p className="text-white/80 font-normal">{feature}</p>
                 </motion.div>
               ))}
             </div>
@@ -81,7 +81,7 @@ export function DownloadApp() {
                 <Apple className="w-6 h-6" />
                 <div className="text-left">
                   <div className="text-xs opacity-80">Download on the</div>
-                  <div className="text-sm font-bold">App Store</div>
+                  <span className="text-sm font-bold">App Store</span>
                 </div>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform ml-2" />
               </motion.button>
@@ -94,7 +94,7 @@ export function DownloadApp() {
                 <Smartphone className="w-6 h-6" />
                 <div className="text-left">
                   <div className="text-xs opacity-80">Get it on</div>
-                  <div className="text-sm font-bold">Google Play</div>
+                  <span className="text-sm font-bold">Google Play</span>
                 </div>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform ml-2" />
               </motion.button>

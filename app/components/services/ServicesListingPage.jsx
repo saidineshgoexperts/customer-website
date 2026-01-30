@@ -148,14 +148,14 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
             className="hidden lg:block w-80 flex-shrink-0"
           >
             <div className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <Filter className="w-5 h-5 text-[#04a99d]" />
                 Filters
-              </h3>
+              </h4>
 
               {/* Price Range */}
               <div className="mb-6">
-                <label className="block text-white/80 mb-3 text-sm font-medium">Price Range</label>
+                <h6 className="block text-white/80 mb-3 text-sm font-medium">Price Range</h6>
                 <div className="flex items-center gap-4">
                   <input
                     type="number"
@@ -177,7 +177,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
 
               {/* Rating Filter */}
               <div className="mb-6">
-                <label className="block text-white/80 mb-3 text-sm font-medium">Minimum Rating</label>
+                <h6 className="block text-white/80 mb-3 text-sm font-medium">Minimum Rating</h6>
                 <div className="space-y-2">
                   {[4.5, 4.0, 3.5, 3.0].map((rating) => (
                     <button
@@ -197,7 +197,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
 
               {/* Availability */}
               <div>
-                <label className="block text-white/80 mb-3 text-sm font-medium">Availability</label>
+                <h6 className="block text-white/80 mb-3 text-sm font-medium">Availability</h6>
                 <div className="space-y-2">
                   <button className="w-full flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white/70 hover:bg-white/10 transition-all text-sm">
                     <Zap className="w-4 h-4 text-[#04a99d]" />
@@ -270,16 +270,16 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                             </div>
 
                             {/* Price Badge */}
-                            <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white font-bold">
+                            {/* <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white font-bold">
                               ₹{service.minFare}
-                            </div>
+                            </div> */}
                           </div>
 
                           {/* Content */}
                           <div className="p-6">
-                            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-2">
+                            <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-2">
                               {service.name}
-                            </h3>
+                            </h4>
                             <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
 
                             {/* Meta Info */}
@@ -368,9 +368,9 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
 
                             {/* Content */}
                             <div className="flex-1 p-6">
-                              <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
+                              <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
                                 {center.business_name || center.name}
-                              </h3>
+                              </h4>
                               <p className="text-white/60 text-sm mb-4 flex items-center gap-2">
                                 <MapPin className="w-4 h-4" />
                                 {center.address}
@@ -438,10 +438,10 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
               className="fixed bottom-0 left-0 right-0 z-50 max-h-[80vh] overflow-y-auto bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] rounded-t-3xl border-t border-white/10 p-6 lg:hidden"
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <h4 className="text-xl font-bold text-white flex items-center gap-2">
                   <Filter className="w-5 h-5 text-[#04a99d]" />
                   Filters
-                </h3>
+                </h4>
                 <button
                   onClick={() => setFilterOpen(false)}
                   className="p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -453,7 +453,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
               {/* Same filter content as desktop */}
               <div className="space-y-6">
                 <div>
-                  <label className="block text-white/80 mb-3 text-sm font-medium">Price Range</label>
+                  <h6 className="block text-white/80 mb-3 text-sm font-medium">Price Range</h6>
                   <div className="flex items-center gap-4">
                     <input
                       type="number"
@@ -474,7 +474,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                 </div>
 
                 <div>
-                  <label className="block text-white/80 mb-3 text-sm font-medium">Minimum Rating</label>
+                  <h6 className="block text-white/80 mb-3 text-sm font-medium">Minimum Rating</h6>
                   <div className="space-y-2">
                     {[4.5, 4.0, 3.5, 3.0].map((rating) => (
                       <button

@@ -295,9 +295,11 @@ const imageLoader = ({ src }) => {
 /* ---------- SERVICE NAME TO SLUG MAPPING ---------- */
 const serviceSlugMap = {
   'APPLIANCE SERVICE': 'appliances',
+  'Appliance Service': 'appliances',
   'PG Hostels': 'pg-hostel',
   'Religious Services': 'religious',
   'Spa Salons': 'spa-salon',
+  'Spa Saloons': 'spa-salon',
   'Daily Needs': 'daily-needs',
   'MEDICINE': 'medicine',
   'PARCEL': 'parcel',
@@ -402,9 +404,9 @@ function ServiceCardsSection({ services, loading, activeIndex }) {
                 />
               </div>
 
-              <p className={`text-xs font-medium text-center line-clamp-2 transition-colors duration-300 ${isActive ? 'text-[#04a99d]' : 'text-white group-hover:text-[#04a99d]'}`}>
+              <h5 className={`text-xs font-medium text-center line-clamp-2 transition-colors duration-300 ${isActive ? 'text-[#04a99d]' : 'text-white group-hover:text-[#04a99d]'}`}>
                 {service.name}
-              </p>
+              </h5>
             </motion.div>
           );
         })}
@@ -479,7 +481,7 @@ function HeroContent({ services = [], loading = false, error = null }) {
             className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-8"
           >
             <Sparkles className="w-4 h-4 text-[#037166]" />
-            <span className="text-sm text-[#037166] font-medium">Welcome to the Future of Services</span>
+            <h6 className="text-sm text-[#037166] font-medium">Welcome to the Future of Services</h6>
           </motion.div>
 
           {/* Main Heading */}

@@ -104,7 +104,7 @@ export function NearbyHostelsSection({ router }) {
                                     {index < 3 && (
                                         <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] shadow-lg">
                                             <TrendingUp className="w-3 h-3 text-white" />
-                                            <span className="text-xs font-medium text-white">Popular</span>
+                                            <h6 className="text-xs font-medium text-white">Popular</h6>
                                         </div>
                                     )}
 
@@ -120,7 +120,7 @@ export function NearbyHostelsSection({ router }) {
                                         </button>
 
                                         <div className="absolute bottom-4 left-4 right-4">
-                                            <h3 className="text-2xl font-bold text-white mb-2">{hostel.hostelName}</h3>
+                                            <h4 className="text-2xl font-bold text-white mb-2">{hostel.hostelName}</h4>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-white/90 flex items-center">
                                                     <MapPin className="w-4 h-4 mr-1" />

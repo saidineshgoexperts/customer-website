@@ -465,7 +465,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                         )}
 
                         {/* Service Name */}
-                        <h3 className="text-xl font-bold text-white mb-2">{service.name}</h3>
+                        <h4 className="text-xl font-bold text-white mb-2">{service.name}</h4>
 
                         {/* Service Description */}
                         <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
@@ -497,7 +497,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                         {/* Subcategory Badge */}
                         {service.subcategoryName && (
                           <div className="inline-block px-3 py-1 rounded-full bg-[#037166]/20 border border-[#037166]/30 mb-4">
-                            <span className="text-[#037166] text-xs font-semibold">{service.subcategoryName}</span>
+                            <h6 className="text-[#037166] text-xs font-semibold">{service.subcategoryName}</h6>
                           </div>
                         )}
 
@@ -560,7 +560,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                   <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mb-4">
                     <Users className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Expert Technicians</h3>
+                  <h4 className="text-xl font-bold text-white mb-2">Expert Technicians</h4>
                   <p className="text-white/60">Certified professionals with years of experience</p>
                 </div>
 
@@ -568,7 +568,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                   <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mb-4">
                     <Shield className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">90-Day Warranty</h3>
+                  <h4 className="text-xl font-bold text-white mb-2">90-Day Warranty</h4>
                   <p className="text-white/60">All repairs backed by our guarantee</p>
                 </div>
 
@@ -576,7 +576,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                   <div className="w-14 h-14 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mb-4">
                     <Clock className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Same-Day Service</h3>
+                  <h4 className="text-xl font-bold text-white mb-2">Same-Day Service</h4>
                   <p className="text-white/60">Fast turnaround for urgent repairs</p>
                 </div>
               </div>
@@ -716,7 +716,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                       <MapPin className="w-6 h-6 text-[#037166]" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white mb-2 text-lg">Address</h3>
+                      <h4 className="font-semibold text-white mb-2 text-lg">Address</h4>
                       <p className="text-white/60 leading-relaxed">
                         {locationData?.address || center.address}
                       </p>
@@ -730,7 +730,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                       <Calendar className="w-6 h-6 text-[#037166]" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white mb-2 text-lg">Get Directions</h3>
+                      <h4 className="font-semibold text-white mb-2 text-lg">Get Directions</h4>
                       <p className="text-white/60 leading-relaxed mb-3">
                         Located in Hyderabad, easily accessible.
                       </p>
@@ -792,7 +792,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h3 className="font-semibold text-white text-lg">{review.name}</h3>
+                            <h5 className="font-semibold text-white text-lg">{review.name}</h5>
                           </div>
                           <div className="flex gap-1">
                             {[...Array(5)].map((_, i) => (

@@ -126,7 +126,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4"
           >
             <Sparkles className="w-3 h-3 text-[#04a99d]" />
-            <span className="text-xs font-medium text-[#04a99d]">FEATURED</span>
+            <h6 className="text-xs font-medium text-[#04a99d]">FEATURED</h6>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -168,7 +168,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                   viewport={{ once: true }}
                   className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-xs font-medium text-white shadow-lg"
                 >
-                  ⭐ {service.serviceDelhiveryType || 'Featured'}
+                  <h6 className="m-0 text-inherit font-inherit">⭐ {service.serviceDelhiveryType || 'Featured'}</h6>
                 </motion.div>
 
                 {/* Image */}
@@ -196,13 +196,13 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                       <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
                       <span className="text-sm font-medium text-white">4.8</span>
                     </div>
-                    <span className="text-sm text-white/50">(New)</span>
+                    <span className="text-sm text-white/50 font-normal">(New)</span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                  <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
                     {service.serviceName}
-                  </h3>
+                  </h4>
 
                   {/* Description */}
                   <p className="text-white/60 text-sm mb-4 line-clamp-2">

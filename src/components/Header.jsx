@@ -228,7 +228,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-            {['Appliance Service', 'Spa Saloons', 'Pg Hostels', 'Religious Services'].map((item) => (
+            {['Appliance Service', 'Spa Saloons', 'PG Hostels', 'Religious Services'].map((item) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase().replace(/\s/g, '-')}`}
@@ -342,7 +342,7 @@ export function Header() {
             className="lg:hidden bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-[#037166]/30 shadow-2xl shadow-[#037166]/20"
           >
             <div className="px-4 py-6 space-y-4">
-              {['Services', 'Booking', 'Spa & Saloons', 'PG & Hostels', 'Religious Services', 'More'].map((item) => (
+              {['Services', 'Booking', 'Spa & Saloons', 'PG Hostels', 'Religious Services', 'More'].map((item) => (
                 <motion.a
                   key={item}
                   href={`#${item.toLowerCase().replace(/\s/g, '-')}`}

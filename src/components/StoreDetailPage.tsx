@@ -315,7 +315,7 @@ export default function StoreDetailPage({ storeId, onBack, onAddToCart, onGoToCa
                 <div className="flex gap-2">
                   <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2">
                     <Shield className="w-4 h-4 text-[#037166]" />
-                    <span className="text-white/80 text-sm">90-Day Warranty</span>
+                    <span className="text-white/80 text-sm">30-90 Days Warranty</span>
                   </div>
                   <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2">
                     <Clock className="w-4 h-4 text-[#037166]" />
@@ -791,16 +791,16 @@ export default function StoreDetailPage({ storeId, onBack, onAddToCart, onGoToCa
                         key={addon._id}
                         onClick={() => toggleAddonSelection(addon._id)}
                         className={`bg-white/5 border-2 rounded-2xl p-4 cursor-pointer transition-all hover:bg-white/10 ${selectedAddons.includes(addon._id)
-                            ? 'border-[#037166] shadow-lg shadow-[#037166]/20'
-                            : 'border-white/10'
+                          ? 'border-[#037166] shadow-lg shadow-[#037166]/20'
+                          : 'border-white/10'
                           }`}
                       >
                         <div className="flex items-start gap-4">
                           {/* Checkbox */}
                           <div
                             className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 mt-1 transition-colors ${selectedAddons.includes(addon._id)
-                                ? 'bg-[#037166] border-[#037166]'
-                                : 'border-white/30'
+                              ? 'bg-[#037166] border-[#037166]'
+                              : 'border-white/30'
                               }`}
                           >
                             {selectedAddons.includes(addon._id) && (

@@ -48,7 +48,7 @@ export function ServiceDetailsPage({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [serviceDetails, setServiceDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('services');
+  const [activeTab, setActiveTab] = useState('About Service');
   const [visibleReviews, setVisibleReviews] = useState(4);
   const [isExpanded, setIsExpanded] = useState(false);
   const accentColor = serviceAccents[category] || '#5a8b9d';
@@ -123,6 +123,22 @@ export function ServiceDetailsPage({
       exit={{ opacity: 0 }}
       className="min-h-screen pt-20"
     >
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(3, 113, 102, 0.5);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(3, 113, 102, 0.8);
+        }
+      `}</style>
       {/* Hero Section with Service Accent Color */}
       <section className="relative py-12 overflow-hidden">
         <div
@@ -173,66 +189,214 @@ export function ServiceDetailsPage({
             {category} → {subCategory} → {storeData.name}
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Left: Image Gallery */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="relative rounded-2xl overflow-hidden bg-black/20 backdrop-blur-sm border border-white/10">
-                <div className="relative h-64">
-                  <img
-                    src={images[currentImageIndex]}
-                    alt={storeData.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <div className="grid lg:grid-cols-2 gap-8 items-start relative">
+            {/* Left Column: Gallery + Tabs (Scrollable) */}
+            <div className="lg:col-span-1 space-y-8 h-auto lg:h-[calc(100vh-140px)] overflow-y-auto pr-2 custom-scrollbar">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="relative rounded-2xl overflow-hidden bg-black/20 backdrop-blur-sm border border-white/10">
+                  <div className="relative aspect-video">
+                    <img
+                      src={images[currentImageIndex]}
+                      alt={storeData.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 
-                  {/* Navigation Arrows */}
+                    {/* Navigation Arrows */}
+                    {images.length > 1 && (
+                      <>
+                        <button
+                          onClick={prevImage}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 transition-all flex items-center justify-center"
+                        >
+                          <ChevronLeft className="w-5 h-5 text-white" />
+                        </button>
+                        <button
+                          onClick={nextImage}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 transition-all flex items-center justify-center"
+                        >
+                          <ChevronRight className="w-5 h-5 text-white" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Thumbnail Navigation */}
                   {images.length > 1 && (
-                    <>
-                      <button
-                        onClick={prevImage}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 transition-all flex items-center justify-center"
-                      >
-                        <ChevronLeft className="w-5 h-5 text-white" />
-                      </button>
-                      <button
-                        onClick={nextImage}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 transition-all flex items-center justify-center"
-                      >
-                        <ChevronRight className="w-5 h-5 text-white" />
-                      </button>
-                    </>
+                    <div className="flex gap-2 p-4 overflow-x-auto">
+                      {images.map((img, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setCurrentImageIndex(idx)}
+                          className={`relative w-20 h-20 rounded-lg overflow-hidden transition-all flex-shrink-0 ${currentImageIndex === idx
+                            ? 'ring-2 ring-[#037166] scale-105'
+                            : 'opacity-60 hover:opacity-100'
+                            }`}
+                        >
+                          <img src={img} alt="" className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
                   )}
                 </div>
+              </motion.div>
 
-                {/* Thumbnail Navigation */}
-                {images.length > 1 && (
-                  <div className="flex gap-2 p-4 overflow-x-auto">
-                    {images.map((img, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setCurrentImageIndex(idx)}
-                        className={`relative w-20 h-20 rounded-lg overflow-hidden transition-all flex-shrink-0 ${currentImageIndex === idx
-                          ? 'ring-2 ring-[#037166] scale-105'
-                          : 'opacity-60 hover:opacity-100'
-                          }`}
-                      >
-                        <img src={img} alt="" className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                )}
+              {/* Tabbed Content Section (Moved Here) */}
+              <div className="bg-[#1a1a1a]/40 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden p-6 md:p-8">
+                {/* Tab Navigation */}
+                <div className="flex gap-2 mb-8 border-b border-white/10 pb-4 overflow-x-auto">
+                  {['About Service', 'Working Images', 'Ratings'].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-6 py-2.5 rounded-xl font-semibold transition-all whitespace-nowrap text-sm tracking-wide ${activeTab === tab
+                        ? 'bg-[#037166] text-white shadow-lg shadow-[#037166]/20'
+                        : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                        }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {/* About Service Tab */}
+                  {(activeTab === 'About Service' || activeTab === 'services') && (
+                    <motion.div
+                      key="services"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="mb-6">
+                        <h3 className="text-xl font-bold text-white mb-1">About Service</h3>
+                        <p className="text-white/40 text-xs italic">Approximate service rates</p>
+                      </div>
+                      <div className="grid gap-4">
+                        {provider_rate_cards.map((card, index) => (
+                          <div
+                            key={card.id || index}
+                            className="flex items-center justify-between p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-[#037166]/50 transition-all group"
+                          >
+                            <h6 className="text-white font-medium group-hover:text-[#04a99d] transition-colors pr-4">{card.title}</h6>
+                            <span className="text-[#04a99d] font-bold text-lg whitespace-nowrap">₹{card.price}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Working Images Tab */}
+                  {(activeTab === 'Working Images' || activeTab === 'portfolio') && (
+                    <motion.div
+                      key="portfolio"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <h3 className="text-xl font-bold text-white mb-6">Working Images</h3>
+                      {serviceImages.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          {serviceImages.map((img, idx) => (
+                            <div
+                              key={idx}
+                              className="aspect-square rounded-2xl overflow-hidden group cursor-pointer relative border border-white/10"
+                            >
+                              <img
+                                src={`https://api.doorstephub.com/${img}`}
+                                alt={`Portfolio ${idx + 1}`}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-12 text-white/60 bg-white/5 rounded-2xl border border-white/10 border-dashed">
+                          No portfolio images available
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* Ratings Tab */}
+                  {(activeTab === 'Ratings' || activeTab === 'reviews') && (
+                    <motion.div
+                      key="reviews"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <h3 className="text-xl font-bold text-white mb-6">Ratings</h3>
+                      {customerRatings.length > 0 ? (
+                        <div className="space-y-4">
+                          {customerRatings.slice(0, visibleReviews).map((review, idx) => (
+                            <div
+                              key={idx}
+                              className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#037166]/30 transition-all"
+                            >
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-[#037166] flex items-center justify-center font-bold text-white flex-shrink-0">
+                                  {review.name.charAt(0)}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h5 className="text-white font-bold">{review.name}</h5>
+                                    <span className="text-white/40 text-xs">
+                                      {new Date(review.date).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1 mb-3">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`w-3.5 h-3.5 ${i < review.rating
+                                          ? 'fill-[#fbbf24] text-[#fbbf24]'
+                                          : 'text-white/20'
+                                          }`}
+                                      />
+                                    ))}
+                                  </div>
+                                  <p className="text-white/80 leading-relaxed text-sm">{review.comment}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {customerRatings.length > visibleReviews && (
+                            <div className="flex justify-center mt-6">
+                              <button
+                                onClick={() => setVisibleReviews(prev => prev + 4)}
+                                className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl transition-colors border border-white/20"
+                              >
+                                Show More Reviews
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-center py-12 text-white/60 bg-white/5 rounded-2xl border border-white/10 border-dashed">
+                          No reviews available yet
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </motion.div>
+            </div>
 
-            {/* Right: Service Info */}
+            {/* Right: Service Info (Sticky) */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
+              className="lg:col-span-1 sticky top-28"
             >
               <h1 className="text-4xl font-bold text-white mb-4">
                 {storeData.name}
@@ -267,8 +431,8 @@ export function ServiceDetailsPage({
               {/* Service Highlights */}
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: Shield, text: 'Licensed & Insured' },
-                  { icon: Award, text: 'Certified Technicians' },
+                  { icon: Shield, text: 'Licensed Professionals' },
+                  { icon: Award, text: 'Verified Partners' },
                   { icon: Clock, text: 'Same-Day Service' },
                   { icon: ThumbsUp, text: 'Satisfaction Guaranteed' },
                 ].map((item, idx) => (
@@ -282,7 +446,7 @@ export function ServiceDetailsPage({
                     >
                       <item.icon className="w-5 h-5" style={{ color: accentColor }} />
                     </div>
-                    <span className="text-white/90 text-sm">{item.text}</span>
+                    <h6 className="text-white/90 text-sm font-normal">{item.text}</h6>
                   </div>
                 ))}
               </div>
@@ -334,243 +498,7 @@ export function ServiceDetailsPage({
         </div>
       </section>
 
-      {/* Tabbed Content Section */}
-      <section className="py-12 relative">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
-          {/* Tab Navigation */}
-          <div className="flex gap-4 mb-8 border-b border-white/10">
-            <button
-              onClick={() => setActiveTab('services')}
-              className={`px-8 py-3 font-semibold transition-all relative ${activeTab === 'services'
-                ? 'text-white bg-[#037166]'
-                : 'text-white/60 hover:text-white bg-white/5'
-                }`}
-              style={{
-                borderTopLeftRadius: '8px',
-                borderTopRightRadius: '8px',
-              }}
-            >
-              Services
-            </button>
-            <button
-              onClick={() => setActiveTab('portfolio')}
-              className={`px-8 py-3 font-semibold transition-all relative ${activeTab === 'portfolio'
-                ? 'text-white bg-[#037166]'
-                : 'text-white/60 hover:text-white bg-white/5'
-                }`}
-              style={{
-                borderTopLeftRadius: '8px',
-                borderTopRightRadius: '8px',
-              }}
-            >
-              Portfolio
-            </button>
-            <button
-              onClick={() => setActiveTab('reviews')}
-              className={`px-8 py-3 font-semibold transition-all relative ${activeTab === 'reviews'
-                ? 'text-white bg-[#037166]'
-                : 'text-white/60 hover:text-white bg-white/5'
-                }`}
-              style={{
-                borderTopLeftRadius: '8px',
-                borderTopRightRadius: '8px',
-              }}
-            >
-              Reviews
-            </button>
-          </div>
-
-          {/* Tab Content */}
-          <AnimatePresence mode="wait">
-            {/* Services Tab */}
-            {activeTab === 'services' && (
-              <motion.div
-                key="services"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 className="text-2xl font-bold text-white mb-6">Services</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {provider_rate_cards.map((card, index) => (
-                    <motion.div
-                      key={card.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10 hover:border-[#037166]/50 transition-all"
-                    >
-                      <span className="text-white font-medium">{card.title}</span>
-                      <span className="text-[#04a99d] font-bold text-xl">₹{card.price}</span>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Portfolio Tab */}
-            {activeTab === 'portfolio' && (
-              <motion.div
-                key="portfolio"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 className="text-2xl font-bold text-white mb-6">Portfolio</h3>
-                {serviceImages.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {serviceImages.map((img, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="relative aspect-square rounded-xl overflow-hidden group cursor-pointer"
-                      >
-                        <img
-                          src={`https://api.doorstephub.com/${img}`}
-                          alt={`Portfolio ${idx + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-white/60">
-                    No portfolio images available
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {/* Reviews Tab */}
-            {activeTab === 'reviews' && (
-              <motion.div
-                key="reviews"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 className="text-2xl font-bold text-white mb-6">Reviews</h3>
-                {customerRatings.length > 0 ? (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {customerRatings.slice(0, visibleReviews).map((review, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="p-6 rounded-xl bg-white/5 border border-white/10"
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 rounded-full bg-[#037166] flex items-center justify-center font-bold text-white flex-shrink-0">
-                            {review.name.charAt(0)}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="text-white font-bold">{review.name}</h4>
-                              <span className="text-white/40 text-sm">
-                                {new Date(review.date).toLocaleDateString('en-US', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  year: 'numeric'
-                                })}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1 mb-3">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`w-4 h-4 ${i < review.rating
-                                    ? 'fill-[#fbbf24] text-[#fbbf24]'
-                                    : 'text-white/20'
-                                    }`}
-                                />
-                              ))}
-                            </div>
-                            <p className="text-white/80 leading-relaxed">{review.comment}</p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-
-                    {customerRatings.length > visibleReviews && (
-                      <div className="flex justify-center mt-6">
-
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-white/60">
-                    No reviews available yet
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Booking Button Below Tabs */}
-          {/* <div className="flex justify-center mt-8">
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              onClick={() => {
-                const finalServiceId = storeData.id || storeData._id || serviceId;
-                if (!finalServiceId) {
-                  toast.error("Service information missing");
-                  return;
-                }
-
-                localStorage.setItem('last_service_id', finalServiceId);
-                const firstPackage = provider_rate_cards[0];
-
-                // Clean the price string (remove + and non-numeric chars)
-                const rawPrice = firstPackage?.price || 0;
-                const cleanPrice = typeof rawPrice === 'string'
-                  ? parseInt(rawPrice.replace(/[^0-9]/g, '')) || 0
-                  : rawPrice;
-
-                // Enrich the item with service details for the confirmation page
-                const itemsToBook = [{
-                  ...(firstPackage || {}),
-                  id: firstPackage?.id || `direct-${finalServiceId}`,
-                  serviceId: finalServiceId,
-                  serviceName: storeData.name || 'Professional Service',
-                  packageName: firstPackage?.title || 'Standard Package',
-                  price: cleanPrice,
-                  bookingCost: storeData.serviceBookingCost || 0,
-                  inspectionCost: storeData.inspectionCost || 0,
-                  quantity: 1
-                }];
-
-                localStorage.setItem('booking_package_details', JSON.stringify(itemsToBook));
-                router.push('/services/address');
-              }}
-              className="px-12 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg hover:shadow-2xl hover:shadow-[#037166]/40 transition-all flex items-center gap-3 group"
-            >
-              Book This Service Now
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-          </div> */}
-
-          {/* Show More Reviews Button */}
-          {activeTab === 'reviews' && customerRatings.length > visibleReviews && (
-            <div className="flex justify-center mt-6">
-              <button
-                onClick={() => setVisibleReviews(prev => prev + 4)}
-                className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors border border-white/20"
-              >
-                Show More Reviews
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Tabbed Content Moved to Main Grid */}
     </motion.div>
   );
 }

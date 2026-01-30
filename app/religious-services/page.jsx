@@ -289,7 +289,7 @@ export default function ReligiousServicesPage() {
               className="mb-6 inline-flex items-center space-x-2 rounded-full bg-white/80 backdrop-blur-sm px-5 py-2 border border-[var(--saffron)]/30 shadow-lg"
             >
               <Sparkles className="h-4 w-4 text-[var(--saffron)]" />
-              <span className="text-sm font-medium text-[var(--temple-red)]">Trusted by 50,000+ Devotees</span>
+              <h6 className="text-sm font-medium text-[var(--temple-red)]">Trusted by 50,000+ Devotees</h6>
             </motion.div>
 
             {/* Main Headline */}
@@ -650,9 +650,9 @@ export default function ReligiousServicesPage() {
                   <div className={`mb-4 mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br ${item.color} p-4 shadow-lg`}>
                     <item.icon className="h-full w-full text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2">
+                  <h4 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2">
                     {item.title}
-                  </h3>
+                  </h4>
                   <p className="text-sm text-[var(--muted-foreground)]">
                     {item.desc}
                   </p>
@@ -756,9 +756,9 @@ export default function ReligiousServicesPage() {
                   <div className="mb-3 mx-auto h-12 w-12 rounded-xl bg-[var(--saffron)]/10 p-2.5">
                     <step.icon className="h-full w-full text-[var(--saffron)]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2">
+                  <h5 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2">
                     {step.title}
-                  </h3>
+                  </h5>
                   <p className="text-sm text-[var(--muted-foreground)]">
                     {step.desc}
                   </p>

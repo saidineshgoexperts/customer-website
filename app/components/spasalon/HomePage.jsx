@@ -245,7 +245,7 @@ export function HomePage() {
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-[#E8ECF2] mb-6 shadow-sm"
                             >
                                 <Sparkles className="w-4 h-4 text-[#C06C84]" />
-                                <span className="text-[#0F172A] text-sm">Premium Wellness Services</span>
+                                <h6 className="text-[#0F172A] text-sm">Premium Wellness Services</h6>
                             </motion.div>
 
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#0F172A] mb-6 leading-tight">
@@ -374,7 +374,7 @@ export function HomePage() {
 
                                 <div className="absolute inset-0 p-6 flex flex-col justify-end">
                                     <div className="text-5xl mb-3">{category.icon}</div>
-                                    <h3 className="text-2xl font-bold text-[#0F172A] mb-2">{category.name}</h3>
+                                    <h4 className="text-2xl font-bold text-[#0F172A] mb-2">{category.name}</h4>
                                     <p className="text-[#64748B]">{category.description}</p>
                                 </div>
 
@@ -594,7 +594,7 @@ function StatCard({ icon, value, label }) {
                 {icon}
             </div>
             <p className="text-2xl font-bold text-[#0F172A]">{value}</p>
-            <p className="text-sm text-[#64748B]">{label}</p>
+            <h6 className="text-sm text-[#64748B]">{label}</h6>
         </motion.div>
     );
 }
@@ -626,7 +626,7 @@ function PackageCard({ package: pkg, index, router }) {
             </div>
 
             <div className="p-6">
-                <h3 className="text-xl font-semibold text-[#0F172A] mb-2">{pkg.name}</h3>
+                <h4 className="text-xl font-semibold text-[#0F172A] mb-2">{pkg.name}</h4>
 
                 <div className="flex items-center gap-4 mb-4">
                     <div className="flex items-center gap-1 text-[#FBBF24]">
@@ -676,7 +676,7 @@ function RecentlyBookedCard({ package: pkg, router }) {
             </div>
 
             <div className="p-4">
-                <h4 className="text-[#0F172A] font-semibold mb-1">{pkg.name}</h4>
+                <h5 className="text-[#0F172A] font-semibold mb-1">{pkg.name}</h5>
                 <div className="flex items-center gap-1 text-[#FBBF24] text-sm mb-2">
                     <Star className="w-3 h-3 fill-current" />
                     <span className="text-[#0F172A]">{pkg.rating}</span>
@@ -707,7 +707,7 @@ function NearbyCenterCard({ center, index, router }) {
             </div>
 
             <div className="p-4">
-                <h4 className="text-[#0F172A] font-semibold mb-2">{center.name}</h4>
+                <h5 className="text-[#0F172A] font-semibold mb-2">{center.name}</h5>
                 <div className="flex items-center gap-1 text-[#64748B] text-sm mb-2">
                     <MapPin className="w-4 h-4 text-[#C06C84]" />
                     <span>{center.location}</span>
@@ -745,7 +745,7 @@ function MoodCard({ mood, service, image, color, router }) {
                 >
                     {mood}
                 </div>
-                <h3 className="text-2xl font-bold text-white">{service}</h3>
+                <h4 className="text-2xl font-bold text-white">{service}</h4>
             </div>
         </motion.div>
     );
@@ -768,7 +768,7 @@ function BlogCard({ title, image, readTime }) {
                 />
             </div>
             <div className="p-6">
-                <h3 className="text-xl font-semibold text-[#0F172A] mb-3">{title}</h3>
+                <h4 className="text-xl font-semibold text-[#0F172A] mb-3">{title}</h4>
                 <div className="flex items-center gap-2 text-[#64748B]">
                     <BookOpen className="w-4 h-4" />
                     <span className="text-sm">{readTime}</span>

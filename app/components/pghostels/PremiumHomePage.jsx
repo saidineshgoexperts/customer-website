@@ -155,7 +155,7 @@ export function PremiumHomePage() {
                                 className="inline-block"
                             >
                                 <div className="px-4 py-2 bg-gradient-to-r from-[#037166]/20 to-transparent border border-[#037166]/30 rounded-full backdrop-blur-sm">
-                                    <span className="text-[#037166] text-sm font-semibold">✨ Find Your Perfect Stay</span>
+                                    <h6 className="text-[#037166] text-sm font-semibold">✨ Find Your Perfect Stay</h6>
                                 </div>
                             </motion.div>
 
@@ -225,7 +225,7 @@ export function PremiumHomePage() {
                                     <div className="w-10 h-10 bg-[#037166]/10 rounded-full flex items-center justify-center">
                                         <badge.icon className="w-5 h-5 text-[#037166]" />
                                     </div>
-                                    <span className="text-sm font-medium">{badge.text}</span>
+                                    <h6 className="text-sm font-medium">{badge.text}</h6>
                                 </div>
                             ))}
                         </motion.div>
@@ -408,7 +408,7 @@ export function PremiumHomePage() {
                                         <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#037166] transition-colors">
                                             <Users className="w-7 h-7 text-white" />
                                         </div>
-                                        <h3 className="text-2xl font-bold text-white mb-2">{cat.name}</h3>
+                                        <h4 className="text-2xl font-bold text-white mb-2">{cat.name}</h4>
                                     </div>
 
                                     {/* Hover Border Glow */}
@@ -499,9 +499,9 @@ function NearYouSection({ listings, router }) {
 
                                 {/* Content */}
                                 <div className="p-6">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-[#037166] transition-colors">
+                                    <h4 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-[#037166] transition-colors">
                                         {listing.name}
-                                    </h3>
+                                    </h4>
                                     <p className="text-gray-600 text-sm mb-4 flex items-center">
                                         <MapPin className="w-4 h-4 mr-1" />
                                         {listing.area}
@@ -582,7 +582,7 @@ function TopDealsSection({ router }) {
                                 >
                                     {deal.icon}
                                 </motion.div>
-                                <h3 className="text-2xl font-bold text-white mb-2">{deal.title}</h3>
+                                <h4 className="text-2xl font-bold text-white mb-2">{deal.title}</h4>
                                 <p className="text-white/90">{deal.desc}</p>
                             </div>
                             <button className="self-start px-6 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl font-medium hover:bg-white/30 transition-colors border border-white/30">
@@ -635,7 +635,7 @@ function HowItWorksSection() {
                             >
                                 <step.icon className="w-10 h-10 text-white" />
                             </motion.div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                            <h4 className="text-2xl font-bold text-gray-900 mb-3">{step.title}</h4>
                             <p className="text-gray-600">{step.desc}</p>
 
                             {i < steps.length - 1 && (
@@ -681,7 +681,7 @@ function TestimonialsSection({ testimonials }) {
                                     {test.avatar}
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-gray-900">{test.name}</h4>
+                                    <h5 className="font-bold text-gray-900">{test.name}</h5>
                                     <p className="text-sm text-gray-500">{test.role}</p>
                                 </div>
                             </div>
@@ -771,7 +771,7 @@ function FeaturedHostelsSection({ listings, loading, router }) {
                                         </button>
 
                                         <div className="absolute bottom-4 left-4 right-4">
-                                            <h3 className="text-2xl font-bold text-white mb-2">{hostelName}</h3>
+                                            <h4 className="text-2xl font-bold text-white mb-2">{hostelName}</h4>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-white/90 flex items-center">
                                                     <MapPin className="w-4 h-4 mr-1" />

@@ -72,7 +72,7 @@ export function LatestSpaServices() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Waves className="w-4 h-4 text-[#037166]" />
-            <span className="text-sm text-[#037166] font-medium">Calm Zen World</span>
+            <h6 className="text-sm text-[#037166] font-medium">Calm Zen World</h6>
           </div>
 
           <motion.h2
@@ -171,12 +171,12 @@ export function LatestSpaServices() {
                   {/* Content */}
                   <div className="p-4 flex flex-col flex-1">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-white group-hover:text-[#037166] transition-colors line-clamp-1">
+                      <h4 className="text-lg font-semibold text-white group-hover:text-[#037166] transition-colors line-clamp-1">
                         {store.storeName}
-                      </h3>
+                      </h4>
                       {/* Placeholder Rating/New Tag */}
                       <div className="flex items-center space-x-1 px-2 py-1 bg-[#037166]/20 rounded-lg">
-                        <span className="text-xs text-[#037166] font-bold uppercase">New</span>
+                        <h6 className="text-xs text-[#037166] font-bold uppercase">New</h6>
                       </div>
                     </div>
 

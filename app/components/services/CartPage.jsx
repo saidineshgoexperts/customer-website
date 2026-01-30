@@ -126,9 +126,9 @@ export function CartPage({
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h3 className="text-xl font-bold text-white mb-1">
+                            <h4 className="text-xl font-bold text-white mb-1">
                               {item.itemName}
-                            </h3>
+                            </h4>
                             {item.itemType === 'addon' && item.parentServiceName && (
                               <p className="text-white/50 text-sm flex items-center gap-1">
                                 <Tag className="w-3 h-3" />
@@ -150,9 +150,9 @@ export function CartPage({
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="px-3 py-1 rounded-full bg-[#037166]/20 border border-[#037166]/30 text-[#04a99d] text-xs font-semibold">
+                            <h6 className="px-3 py-1 rounded-full bg-[#037166]/20 border border-[#037166]/30 text-[#04a99d] text-xs font-semibold">
                               {item.itemType === 'service' ? 'Service' : 'Add-on'}
-                            </span>
+                            </h6>
                             <span className="text-white/60 text-sm">
                               Qty: {item.quantity}
                             </span>
@@ -182,7 +182,7 @@ export function CartPage({
                 transition={{ delay: 0.2 }}
                 className="sticky top-48 p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
               >
-                <h3 className="text-xl font-bold text-white mb-6">Order Summary</h3>
+                <h4 className="text-xl font-bold text-white mb-6">Order Summary</h4>
 
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-white/80">

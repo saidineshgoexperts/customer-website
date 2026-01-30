@@ -238,9 +238,9 @@ export function ViewAllPage({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
                   <div className="absolute inset-0 flex items-end p-8">
-                    <h3 className="text-2xl font-bold text-white group-hover:text-[#04a99d] transition-colors">
+                    <h4 className="text-2xl font-bold text-white group-hover:text-[#04a99d] transition-colors">
                       {category.title}
-                    </h3>
+                    </h4>
                   </div>
 
                   {/* Hover Glow */}
@@ -272,9 +272,9 @@ export function ViewAllPage({
                     </div>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                    <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
                       {service.serviceName}
-                    </h3>
+                    </h4>
                     <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
                     <div className="flex items-center justify-between mt-auto">
                       <div>
@@ -308,9 +308,9 @@ export function ViewAllPage({
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                    <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
                       {store.name}
-                    </h3>
+                    </h4>
                     <p className="text-white/60 text-sm mb-4 flex items-center gap-2 line-clamp-1">
                       <MapPin className="w-4 h-4 text-[#04a99d]" />
                       {store.address}
@@ -352,9 +352,9 @@ export function ViewAllPage({
                     </div>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                    <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
                       {service.title}
-                    </h3>
+                    </h4>
                     <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
                     <div className="flex items-center justify-between mt-auto">
                       <p className="text-2xl font-bold text-white">₹{service.price}</p>

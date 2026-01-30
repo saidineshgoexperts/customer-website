@@ -255,9 +255,9 @@ export function RecommendedReligious() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#9b59b6]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Compass className="w-4 h-4 text-[#9b59b6]" />
-            <span className="text-sm bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent font-medium">
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent font-medium">
               Guided Spiritual Journey
-            </span>
+            </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -306,7 +306,7 @@ export function RecommendedReligious() {
                   {/* Rating Badge */}
                   <div className="absolute top-6 right-6 px-4 py-2 bg-[#037166]/90 backdrop-blur-md rounded-full flex items-center space-x-2">
                     <Star className="w-4 h-4 text-white fill-white" />
-                    <span className="text-sm font-bold text-white">{journey.rating}</span>
+                    <h6 className="text-sm font-bold text-white">{journey.rating}</h6>
                   </div>
                 </div>
 
@@ -314,9 +314,9 @@ export function RecommendedReligious() {
                 <div className="p-8">
                   {/* Title & Description */}
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-[#9b59b6] transition-colors">
+                    <h4 className="text-2xl font-bold text-white mb-3 group-hover:text-[#9b59b6] transition-colors">
                       {journey.title}
-                    </h3>
+                    </h4>
                     <p className="text-gray-400 leading-relaxed">{journey.description}</p>
                   </div>
 
@@ -338,7 +338,7 @@ export function RecommendedReligious() {
                   <div className="mb-6">
                     <div className="flex items-center space-x-2 mb-3">
                       <BookOpen className="w-4 h-4 text-[#9b59b6]" />
-                      <span className="text-sm font-semibold text-white">Journey Highlights</span>
+                      <h5 className="text-sm font-semibold text-white">Journey Highlights</h5>
                     </div>
                     <div className="grid gap-2">
                       {journey.highlights.map((highlight, idx) => (

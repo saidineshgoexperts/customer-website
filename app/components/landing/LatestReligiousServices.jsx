@@ -178,9 +178,9 @@ export function LatestReligiousServices() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#9b59b6]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Church className="w-4 h-4 text-[#9b59b6]" />
-            <span className="text-sm bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent font-medium">
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent font-medium">
               Spiritual World
-            </span>
+            </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -209,7 +209,7 @@ export function LatestReligiousServices() {
               <div className="relative h-full bg-gradient-to-br from-[#1a1a1a]/70 to-[#1a0f1a]/70 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-2xl">
                 {/* Type Badge */}
                 <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-gradient-to-r from-[#9b59b6]/80 to-[#037166]/80 backdrop-blur-md rounded-full">
-                  <span className="text-xs font-bold text-white">{service.type}</span>
+                  <h6 className="text-xs font-bold text-white">{service.type}</h6>
                 </div>
 
                 {/* Bell Icon */}
@@ -249,15 +249,15 @@ export function LatestReligiousServices() {
 
                 {/* Content */}
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-[#9b59b6] transition-colors">
+                  <h4 className="text-xl font-bold text-white mb-4 group-hover:text-[#9b59b6] transition-colors">
                     {service.name}
-                  </h3>
+                  </h4>
 
                   {/* Details */}
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center space-x-3 text-sm">
                       <MapPin className="w-4 h-4 text-[#037166]" />
-                      <span className="text-gray-300">{service.location}</span>
+                      <span className="text-gray-300 font-normal">{service.location}</span>
                     </div>
                     <div className="flex items-center space-x-3 text-sm">
                       <Calendar className="w-4 h-4 text-[#037166]" />

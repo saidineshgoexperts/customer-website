@@ -58,7 +58,7 @@ export function ThankYouPage({ bookingDetails }) {
                         transition={{ delay: 0.4 }}
                         className="bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 rounded-2xl p-6 mb-8"
                     >
-                        <h3 className="text-lg font-bold text-white mb-4">Booking Details</h3>
+                        <h4 className="text-lg font-bold text-white mb-4">Booking Details</h4>
                         <div className="space-y-3">
                             {bookingDetails.date && (
                                 <div className="flex items-center gap-3 text-white/80">
@@ -109,7 +109,7 @@ export function ThankYouPage({ bookingDetails }) {
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#037166]/20 mb-4">
                             <Smartphone className="w-8 h-8 text-[#04a99d]" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Download Our Mobile App To Track Your Order</h3>
+                        <h4 className="text-xl font-bold text-white mb-2">Download Our Mobile App To Track Your Order</h4>
                         <p className="text-white/60 text-sm">Get exclusive deals and faster booking on our mobile app</p>
                     </div>
 
@@ -128,8 +128,8 @@ export function ThankYouPage({ bookingDetails }) {
                                     </svg>
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-white/60 text-xs mb-1">Download on the</p>
-                                    <p className="text-white font-bold text-lg">App Store</p>
+                                    <h6 className="text-white/60 text-xs mb-1">Download on the</h6>
+                                    <h5 className="text-white font-bold text-lg">App Store</h5>
                                 </div>
                                 <Download className="w-5 h-5 text-white/40 group-hover:text-[#04a99d] transition-colors" />
                             </div>
@@ -149,8 +149,8 @@ export function ThankYouPage({ bookingDetails }) {
                                     </svg>
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-white/60 text-xs mb-1">GET IT ON</p>
-                                    <p className="text-white font-bold text-lg">Google Play</p>
+                                    <h6 className="text-white/60 text-xs mb-1">GET IT ON</h6>
+                                    <h5 className="text-white font-bold text-lg">Google Play</h5>
                                 </div>
                                 <Download className="w-5 h-5 text-white/40 group-hover:text-[#04a99d] transition-colors" />
                             </div>

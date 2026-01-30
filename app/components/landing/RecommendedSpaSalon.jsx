@@ -198,9 +198,9 @@ export function RecommendedSpaSalon() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#d4af37]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Crown className="w-4 h-4 text-[#d4af37]" />
-            <span className="text-sm bg-gradient-to-r from-[#037166] to-[#d4af37] bg-clip-text text-transparent font-medium">
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#d4af37] bg-clip-text text-transparent font-medium">
               Luxury Glow World
-            </span>
+            </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -230,7 +230,7 @@ export function RecommendedSpaSalon() {
                 {/* Top Badge */}
                 <div className="absolute top-6 left-6 z-20 flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#d4af37]/90 to-[#037166]/90 backdrop-blur-md rounded-full">
                   <Award className="w-4 h-4 text-white" />
-                  <span className="text-xs font-bold text-white">{place.badge}</span>
+                  <h6 className="text-xs font-bold text-white">{place.badge}</h6>
                 </div>
 
                 {/* Image with Luxury Overlay - Original height preserved */}
@@ -262,12 +262,12 @@ export function RecommendedSpaSalon() {
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <div className="text-xs text-[#d4af37] font-semibold mb-2 uppercase tracking-wider">
+                        <h6 className="text-xs text-[#d4af37] font-semibold mb-2 uppercase tracking-wider">
                           {place.category}
-                        </div>
-                        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
+                        </h6>
+                        <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
                           {place.name}
-                        </h3>
+                        </h4>
                       </div>
                       <div className="px-3 py-1 bg-[#037166]/20 rounded-lg">
                         <span className="text-sm text-[#d4af37] font-bold">{place.price}</span>

@@ -87,7 +87,7 @@ export function Hero({ onViewServices, onBookService }) {
           {/* Trust Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-[#037166]/30 mb-8">
             <div className="w-2 h-2 rounded-full bg-[#04a99d]" />
-            <span className="text-sm text-white/80">Trusted by 50,000+ customers</span>
+            <h6 className="text-sm text-white/80">Trusted by 50,000+ customers</h6>
           </div>
 
           {/* Main Headline */}
@@ -138,8 +138,8 @@ export function Hero({ onViewServices, onBookService }) {
                   <item.icon className="w-6 h-6 text-white" />
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-white mb-1">{item.label}</div>
-                  <div className="text-sm text-white/60">{item.desc}</div>
+                  <h6 className="font-semibold text-white mb-1">{item.label}</h6>
+                  <p className="text-sm text-white/60">{item.desc}</p>
                 </div>
               </div>
             ))}

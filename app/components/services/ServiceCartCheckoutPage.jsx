@@ -219,10 +219,10 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             animate={{ opacity: 1, y: 0 }}
                             className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-[#04a99d]" />
                                 Select Date
-                            </h3>
+                            </h4>
                             {availableDates.length === 0 ? (
                                 <p className="text-white/70 text-sm">No dates available at this time</p>
                             ) : (
@@ -250,10 +250,10 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             transition={{ delay: 0.1 }}
                             className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-[#04a99d]" />
                                 Select Time Slot
-                            </h3>
+                            </h4>
                             {availableTimesForSelectedDate.length === 0 ? (
                                 <p className="text-white/70 text-sm">
                                     {bookedDate
@@ -286,10 +286,10 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             transition={{ delay: 0.2 }}
                             className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <User className="w-5 h-5 text-[#04a99d]" />
                                 Technician Preference (Optional)
-                            </h3>
+                            </h4>
                             <div className="grid md:grid-cols-3 gap-3">
                                 {[
                                     { value: 'any', label: 'Any Available' },
@@ -317,13 +317,13 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             transition={{ delay: 0.3 }}
                             className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <CreditCard className="w-5 h-5 text-[#04a99d]" />
                                 Select Payment Method
-                            </h3>
+                            </h4>
                             <div className="grid md:grid-cols-3 gap-3">
                                 {[
-                                    { id: 'COD', label: 'Cash on Delivery', icon: Truck },
+                                    { id: 'COD', label: 'Cash on ServiceDelivery', icon: Truck },
                                     { id: 'WALLET', label: 'Wallet Pay', icon: Wallet },
                                     { id: 'ONLINE', label: 'Online Payment', icon: CreditCard },
                                 ].map((method) => (
@@ -336,7 +336,7 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                                             }`}
                                     >
                                         <method.icon className={`w-6 h-6 ${paymentMethod === method.id ? 'text-white' : 'text-[#04a99d]'}`} />
-                                        <span className="text-sm font-medium">{method.label}</span>
+                                        <h6 className="text-sm font-medium">{method.label}</h6>
                                     </button>
                                 ))}
                             </div>
@@ -349,12 +349,12 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             transition={{ delay: 0.4 }}
                             className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <MapPin className="w-5 h-5 text-[#04a99d]" />
                                 Service Address
-                            </h3>
+                            </h4>
                             <div className="p-4 rounded-lg bg-white/5">
-                                <p className="text-white font-medium mb-1">{selectedAddress?.name}</p>
+                                <h6 className="text-white font-medium mb-1">{selectedAddress?.name}</h6>
                                 <p className="text-white/80">{selectedAddress?.flat}, {selectedAddress?.area}</p>
                                 <p className="text-white/60">{selectedAddress?.cityName}, {selectedAddress?.postalCode}</p>
                             </div>
@@ -369,14 +369,14 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             transition={{ delay: 0.4 }}
                             className="sticky top-48 p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
                         >
-                            <h3 className="text-xl font-bold text-white mb-6">Booking Summary</h3>
+                            <h4 className="text-xl font-bold text-white mb-6">Booking Summary</h4>
 
                             {/* Cart Items */}
                             <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
                                 {cartItems.map((item) => (
                                     <div key={item.itemId} className="flex justify-between text-sm">
                                         <div className="flex-1">
-                                            <p className="text-white/90 font-bold">{item.itemName}</p>
+                                            <h6 className="text-white/90 font-bold">{item.itemName}</h6>
                                             <p className="text-white/40 text-[10px]">Qty: {item.quantity || 1}</p>
                                         </div>
                                         <span className="text-white/90 font-medium">₹{item.subtotal.toFixed(2)}</span>

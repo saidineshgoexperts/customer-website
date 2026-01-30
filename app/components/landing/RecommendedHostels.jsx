@@ -175,9 +175,9 @@ export function RecommendedHostels() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 to-[#ff6b35]/10 border border-[#037166]/30 rounded-full mb-6">
             <Heart className="w-4 h-4 text-[#ff6b35]" />
-            <span className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">
               Warm Comfort World
-            </span>
+            </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -235,7 +235,7 @@ export function RecommendedHostels() {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <div className="text-xl font-bold text-white">{hostel.trustScore}</div>
-                      <div className="text-xs text-[#037166]">Trust</div>
+                      <h6 className="text-xs text-[#037166]">Trust</h6>
                     </div>
                   </motion.div>
                 </div>
@@ -262,9 +262,9 @@ export function RecommendedHostels() {
                 {/* Content */}
                 <div className="p-8">
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
+                    <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
                       {hostel.name}
-                    </h3>
+                    </h4>
                     <p className="text-gray-400 italic">{hostel.tagline}</p>
                   </div>
 
@@ -345,7 +345,7 @@ export function RecommendedHostels() {
             >
               <indicator.icon className="w-8 h-8 text-[#037166] mx-auto mb-3" />
               <div className="text-2xl font-bold text-white mb-1">{indicator.value}</div>
-              <div className="text-xs text-gray-400 uppercase tracking-wider">{indicator.label}</div>
+              <h6 className="text-xs text-gray-400 uppercase tracking-wider">{indicator.label}</h6>
             </motion.div>
           ))}
         </motion.div>

@@ -206,7 +206,7 @@ export function PremiumPGHostels() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Building2 className="w-4 h-4 text-[#037166]" />
-            <span className="text-sm text-[#037166] font-medium">Modern Architectural World</span>
+            <h6 className="text-sm text-[#037166] font-medium">Modern Architectural World</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -258,7 +258,7 @@ export function PremiumPGHostels() {
                 >
                   {/* Type Badge */}
                   <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-[#037166]/80 backdrop-blur-md border border-[#037166]/50 rounded-full">
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">{hostel.type}</span>
+                    <h6 className="text-xs font-bold text-white uppercase tracking-wider">{hostel.type}</h6>
                   </div>
 
                   {/* Image with Depth */}
@@ -281,9 +281,9 @@ export function PremiumPGHostels() {
 
                   {/* Content */}
                   <div className="p-6">
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
+                    <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
                       {hostel.name}
-                    </h3>
+                    </h4>
 
                     <div className="space-y-2 mb-6">
                       <div className="flex items-center justify-between text-sm">
@@ -298,7 +298,7 @@ export function PremiumPGHostels() {
 
                     {/* Price */}
                     <div className="mb-6 p-4 bg-[#037166]/10 border border-[#037166]/20 rounded-xl">
-                      <div className="text-sm text-gray-400 mb-1">Starting from</div>
+                      <h6 className="text-sm text-gray-400 mb-1">Starting from</h6>
                       <div className="text-3xl font-bold text-[#037166]">{hostel.price}</div>
                     </div>
 

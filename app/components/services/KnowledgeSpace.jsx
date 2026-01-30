@@ -74,7 +74,7 @@ export function KnowledgeSpace() {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4"
           >
             <BookOpen className="w-3 h-3 text-[#04a99d]" />
-            <span className="text-xs font-medium text-[#04a99d]">LEARN & EXPLORE</span>
+            <h6 className="text-xs font-medium text-[#04a99d]">LEARN & EXPLORE</h6>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -133,13 +133,13 @@ export function KnowledgeSpace() {
 
                     {/* Category Badge */}
                     <div className="absolute top-4 left-4 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/10">
-                      <span className="text-xs font-medium text-[#04a99d]">{article.category}</span>
+                      <h6 className="text-xs font-medium text-[#04a99d]">{article.category}</h6>
                     </div>
 
                     {/* Trending Badge */}
                     {article.isTrending && (
                       <div className="absolute top-4 right-4 px-3 py-1.5 rounded-lg bg-[#037166]/80 backdrop-blur-md border border-[#037166]">
-                        <span className="text-xs font-medium text-white">Trending</span>
+                        <h6 className="text-xs font-medium text-white">Trending</h6>
                       </div>
                     )}
 
@@ -169,9 +169,9 @@ export function KnowledgeSpace() {
 
                   {/* Content */}
                   <div className="p-5">
-                    <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-[#04a99d] transition-colors leading-snug">
+                    <h4 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-[#04a99d] transition-colors leading-snug">
                       {article.title}
-                    </h3>
+                    </h4>
                     <p className="text-white/60 text-sm mb-4 line-clamp-2">
                       {article.excerpt}
                     </p>

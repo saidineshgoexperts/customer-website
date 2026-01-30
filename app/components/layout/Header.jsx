@@ -39,13 +39,14 @@ export function Header({ theme = {}, navItems = [] }) {
   const defaultNavItems = [
     { name: 'Appliance Services', href: '/services' },
     { name: 'Religious Services', href: '/religious-services' },
-    { name: 'PG & Hostels', href: '/pghostels' },
+    { name: 'PG Hostels', href: '/pghostels' },
     {
       name: 'More',
       dropdown: [
         { name: 'Spa & Saloon', href: '/spa-salon' },
         { name: 'Share Ride', href: '#share-ride' },
-        { name: 'Order Medicine', href: '#order-medicine' }
+        { name: 'Order Medicine', href: '#order-medicine' },
+        { name: 'Become a partner', href: '#become-a-partner' }
       ]
     }
   ];
@@ -73,10 +74,10 @@ export function Header({ theme = {}, navItems = [] }) {
             const formattedName = name
               .toLowerCase()
               .split(' ')
-              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .map(word => word.toUpperCase() === 'PG' ? 'PG' : (word.charAt(0).toUpperCase() + word.slice(1)))
               .join(' ');
 
-            return { name: formattedName, href };
+            return { name: formattedName, href, originalService: service };
           });
 
           // Add 'More' dropdown for extra static items
@@ -105,7 +106,8 @@ export function Header({ theme = {}, navItems = [] }) {
       const serviceData = {
         id: item.originalService._id,
         name: item.originalService.name,
-        type: item.originalService.servicetypeName
+        servicetypeName: item.originalService.servicetypeName || item.originalService.name,
+        image: item.originalService.image
       };
       localStorage.setItem('selectedService', JSON.stringify(serviceData));
     }

@@ -42,7 +42,7 @@ export function AppDownload() {
             {/* Badge */}
             <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-8">
               <Download className="w-4 h-4 text-[#037166]" />
-              <span className="text-sm text-[#037166] font-medium">Download Our App</span>
+              <h6 className="text-sm text-[#037166] font-medium">Download Our App</h6>
             </div>
 
             {/* Heading */}
@@ -75,7 +75,7 @@ export function AppDownload() {
                   <div className="w-12 h-12 bg-gradient-to-br from-[#037166]/20 to-[#025951]/20 border border-[#037166]/30 rounded-xl flex items-center justify-center">
                     <feature.icon className="w-6 h-6 text-[#037166]" />
                   </div>
-                  <span className="text-lg text-white">{feature.text}</span>
+                  <h5 className="text-lg text-white">{feature.text}</h5>
                 </motion.div>
               ))}
             </div>
@@ -90,7 +90,7 @@ export function AppDownload() {
                 <Apple className="w-6 h-6" />
                 <div className="text-left">
                   <div className="text-xs">Download on the</div>
-                  <div className="text-base font-bold">App Store</div>
+                  <h5 className="text-base font-bold">App Store</h5>
                 </div>
               </motion.button>
 
@@ -102,7 +102,7 @@ export function AppDownload() {
                 <Smartphone className="w-6 h-6" />
                 <div className="text-left">
                   <div className="text-xs">Get it on</div>
-                  <div className="text-base font-bold">Google Play</div>
+                  <h5 className="text-base font-bold">Google Play</h5>
                 </div>
               </motion.button>
             </div>
@@ -116,17 +116,17 @@ export function AppDownload() {
             >
               <div>
                 <div className="text-3xl font-bold text-[#037166] mb-1">4.8★</div>
-                <div className="text-sm text-gray-400">App Rating</div>
+                <h6 className="text-sm text-gray-400">App Rating</h6>
               </div>
               <div className="h-12 w-px bg-[#037166]/20" />
               <div>
                 <div className="text-3xl font-bold text-[#037166] mb-1">50K+</div>
-                <div className="text-sm text-gray-400">Downloads</div>
+                <h6 className="text-sm text-gray-400">Downloads</h6>
               </div>
               <div className="h-12 w-px bg-[#037166]/20" />
               <div>
                 <div className="text-3xl font-bold text-[#037166] mb-1">10K+</div>
-                <div className="text-sm text-gray-400">Reviews</div>
+                <h6 className="text-sm text-gray-400">Reviews</h6>
               </div>
             </motion.div>
           </motion.div>

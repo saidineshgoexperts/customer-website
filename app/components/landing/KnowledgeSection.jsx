@@ -120,7 +120,7 @@ export function KnowledgeSection() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <BookOpen className="w-4 h-4 text-[#037166]" />
-            <span className="text-sm text-[#037166] font-medium">Creative Studio Cards</span>
+            <h6 className="text-sm text-[#037166] font-medium">Creative Studio Cards</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -156,7 +156,7 @@ export function KnowledgeSection() {
                   {article.trending && (
                     <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] rounded-full flex items-center space-x-1">
                       <TrendingUp className="w-3 h-3 text-white" />
-                      <span className="text-xs font-bold text-white">Trending</span>
+                      <h6 className="text-xs font-bold text-white">Trending</h6>
                     </div>
                   )}
 
@@ -171,17 +171,17 @@ export function KnowledgeSection() {
 
                     {/* Category Badge */}
                     <div className="absolute bottom-4 left-4 px-3 py-1 bg-[#037166]/80 backdrop-blur-md rounded-full">
-                      <span className="text-xs font-semibold text-white uppercase tracking-wider">
+                      <h6 className="text-xs font-semibold text-white uppercase tracking-wider">
                         {article.category}
-                      </span>
+                      </h6>
                     </div>
                   </div>
 
                   {/* Content */}
                   <div className="p-6">
-                    <h3 className="text-lg font-bold text-white mb-2 leading-snug group-hover:text-[#037166] transition-colors line-clamp-1">
+                    <h4 className="text-lg font-bold text-white mb-2 leading-snug group-hover:text-[#037166] transition-colors line-clamp-1">
                       {article.title}
-                    </h3>
+                    </h4>
                     <p className="text-white/60 text-sm mb-4 line-clamp-2">
                       {article.summary}
                     </p>

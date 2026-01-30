@@ -133,14 +133,22 @@ class LocationManager {
                     const result = results[0];
                     let city = '';
                     let area = '';
+                    let postalCode = '';
+                    let state = '';
 
-                    // Extract city and area from address components
+                    // Extract city, area, postal code, and state from address components
                     for (const component of result.address_components) {
                         if (component.types.includes('locality')) {
                             city = component.long_name;
                         }
                         if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
                             area = component.long_name;
+                        }
+                        if (component.types.includes('postal_code')) {
+                            postalCode = component.long_name;
+                        }
+                        if (component.types.includes('administrative_area_level_1')) {
+                            state = component.long_name;
                         }
                     }
 
@@ -151,6 +159,8 @@ class LocationManager {
                         lng,
                         city,
                         area,
+                        postalCode,
+                        state,
                         address: result.formatted_address,
                         shortAddress
                     });
@@ -312,6 +322,8 @@ class LocationManager {
 
                         let city = '';
                         let area = '';
+                        let postalCode = '';
+                        let state = '';
 
                         if (place.address_components) {
                             for (const component of place.address_components) {
@@ -320,6 +332,12 @@ class LocationManager {
                                 }
                                 if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
                                     area = component.long_name;
+                                }
+                                if (component.types.includes('postal_code')) {
+                                    postalCode = component.long_name;
+                                }
+                                if (component.types.includes('administrative_area_level_1')) {
+                                    state = component.long_name;
                                 }
                             }
                         }
@@ -331,6 +349,8 @@ class LocationManager {
                             lng,
                             city,
                             area,
+                            postalCode,
+                            state,
                             address: place.formatted_address,
                             shortAddress
                         };

@@ -70,7 +70,7 @@ export function PromoBanner() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#037166]/20 to-purple-600/20 border border-[#037166]/30 mb-4"
           >
             <Tag className="w-4 h-4 text-[#04a99d]" />
-            <span className="text-sm font-medium text-[#04a99d]">LIMITED TIME OFFER</span>
+            <h6 className="text-sm font-medium text-[#04a99d]">LIMITED TIME OFFER</h6>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -122,7 +122,7 @@ export function PromoBanner() {
                       transition={{ duration: 2, repeat: Infinity }}
                       className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg shadow-xl"
                     >
-                      Up to {product.discount} OFF
+                      <h6 className="text-inherit font-inherit">Up to {product.discount} OFF</h6>
                     </motion.div>
                   </div>
 
@@ -141,9 +141,9 @@ export function PromoBanner() {
 
                   {/* Product Info */}
                   <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
+                    <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
                       {product.name}
-                    </h3>
+                    </h4>
                     <motion.button
                       whileHover={{ x: 5 }}
                       className="flex items-center gap-2 text-[#04a99d] font-medium text-sm"

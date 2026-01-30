@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Home, Briefcase, MapPin, Plus, Check, X, Trash2, Edit2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { useLocationContext } from '@/context/LocationContext';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 export function AddressPage({
@@ -13,7 +14,8 @@ export function AddressPage({
   onBack,
   onContinue,
 }) {
-  const { token, isAuthenticated } = useAuth();
+  const { user, token, isAuthenticated } = useAuth();
+  const { detectWithGPS, loading: locationLoading } = useLocationContext();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -30,8 +32,13 @@ export function AddressPage({
     addressLineTwo: '',
     stateName: 'Telangana',
     cityName: 'Hyderabad',
-    defaultAddress: false
+    defaultAddress: false,
+    latitude: "17.450123",
+    longitude: "78.390456",
+    stateId: "680cbb3d2d42e474f451ace3", // Default IDs from user example
+    cityId: "684d704faa93650a05d5ff47"
   });
+  const [detectionSuccess, setDetectionSuccess] = useState(false);
 
   const fetchAddresses = useCallback(async () => {
     if (!token) return;
@@ -69,6 +76,31 @@ export function AddressPage({
     }
   }, [isAuthenticated, fetchAddresses]);
 
+  // No longer needed: Pre-fill logic moved to trigger button for better UX
+  // (prevents auto-restore when user clears the field manually)
+
+  const handleAutoDetect = async () => {
+    try {
+      const locationData = await detectWithGPS();
+      setNewAddress(prev => ({
+        ...prev,
+        area: locationData.area || '',
+        cityName: locationData.city || '',
+        postalCode: locationData.postalCode || '',
+        stateName: locationData.state || 'Telangana',
+        addressLineOne: locationData.address || '',
+        latitude: locationData.lat || prev.latitude,
+        longitude: locationData.lng || prev.longitude
+      }));
+      setDetectionSuccess(true);
+      toast.success('Location detected successfully!');
+      // Reset success check after 3 seconds
+      setTimeout(() => setDetectionSuccess(false), 3000);
+    } catch (error) {
+      toast.error('Failed to detect location. Please fill manually.');
+    }
+  };
+
   const handleAddOrUpdateAddress = async () => {
     if (!newAddress.name || !newAddress.phone || !newAddress.area || !newAddress.flat || !newAddress.postalCode) {
       toast.error('Please fill in all required fields');
@@ -78,7 +110,7 @@ export function AddressPage({
     setLoading(true);
     try {
       const url = editingAddress
-        ? `https://api.doorstephub.com/v1/dhubApi/app/useraddress/edituseraddress/${editingAddress._id}`
+        ? `https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/edituseraddress/${editingAddress._id}`
         : 'https://api.doorstephub.com/v1/dhubApi/app/useraddress/addaddress';
 
       const method = editingAddress ? 'PUT' : 'POST';
@@ -91,8 +123,8 @@ export function AddressPage({
         },
         body: JSON.stringify({
           ...newAddress,
-          latitude: "17.450123", // Placeholder coords
-          longitude: "78.390456",
+          latitude: newAddress.latitude.toString(),
+          longitude: newAddress.longitude.toString(),
           defaultAddress: addresses.length === 0 ? true : newAddress.defaultAddress
         })
       });
@@ -149,7 +181,11 @@ export function AddressPage({
       addressLineTwo: address.addressLineTwo,
       stateName: address.stateName || 'Telangana',
       cityName: address.cityName || 'Hyderabad',
-      defaultAddress: address.defaultAddress
+      defaultAddress: address.defaultAddress,
+      latitude: address.latitude || "17.450123",
+      longitude: address.longitude || "78.390456",
+      stateId: address.stateId || "680cbb3d2d42e474f451ace3",
+      cityId: address.cityId || "684d704faa93650a05d5ff47"
     });
     setShowAddForm(true);
   };
@@ -250,11 +286,11 @@ export function AddressPage({
 
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-bold text-white capitalize">{address.type}</h3>
+                          <h4 className="text-xl font-bold text-white capitalize">{address.type}</h4>
                           {address.defaultAddress && (
-                            <span className="px-2 py-0.5 rounded-full bg-[#037166]/20 text-[#04a99d] text-xs font-medium">
+                            <h6 className="px-2 py-0.5 rounded-full bg-[#037166]/20 text-[#04a99d] text-xs font-medium">
                               DEFAULT
-                            </span>
+                            </h6>
                           )}
                         </div>
                         <p className="font-medium text-white mb-1">{address.name}</p>
@@ -301,9 +337,19 @@ export function AddressPage({
               onClick={() => {
                 setEditingAddress(null);
                 setNewAddress({
-                  name: '', phone: '', type: 'Home', area: '', flat: '',
-                  postalCode: '', addressLineOne: '', addressLineTwo: '',
-                  stateName: 'Telangana', cityName: 'Hyderabad', defaultAddress: false
+                  name: user?.name || '',
+                  phone: user?.mobile || user?.phone || '',
+                  type: 'Home',
+                  area: '',
+                  flat: '',
+                  postalCode: '',
+                  addressLineOne: '',
+                  addressLineTwo: '',
+                  stateName: 'Telangana',
+                  cityName: 'Hyderabad',
+                  defaultAddress: false,
+                  latitude: "17.450123",
+                  longitude: "78.390456"
                 });
                 setShowAddForm(true);
               }}
@@ -327,9 +373,14 @@ export function AddressPage({
               >
                 <div className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-white">
-                      {editingAddress ? 'Edit Address' : 'Add New Address'}
-                    </h3>
+                    <div>
+                      <h4 className="text-xl font-bold text-white">
+                        {editingAddress ? 'Edit Address' : 'Add New Address'}
+                      </h4>
+                      {!editingAddress && (
+                        <p className="text-white/40 text-xs mt-1">Information pre-filled from your profile</p>
+                      )}
+                    </div>
                     <button
                       onClick={() => setShowAddForm(false)}
                       className="p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -355,26 +406,48 @@ export function AddressPage({
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
-                      <input
-                        placeholder="Full Name"
-                        value={newAddress.name}
-                        onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#037166] transition-all"
-                      />
-                      <input
-                        placeholder="Phone Number"
-                        value={newAddress.phone}
-                        onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#037166] transition-all"
-                      />
+                      <div className="flex flex-col gap-1">
+                        <input
+                          placeholder="Full Name"
+                          value={newAddress.name}
+                          onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
+                          className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#037166] transition-all"
+                        />
+                        <p className="text-[10px] text-white/30 px-1 italic">Recipient name for service reference</p>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <input
+                          placeholder="Phone Number"
+                          value={newAddress.phone}
+                          onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
+                          className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#037166] transition-all"
+                        />
+                        <p className="text-[10px] text-white/30 px-1 italic">Contact number for this address</p>
+                      </div>
                     </div>
 
-                    <input
-                      placeholder="Flat / Plot / House No."
-                      value={newAddress.flat}
-                      onChange={(e) => setNewAddress({ ...newAddress, flat: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#037166] transition-all"
-                    />
+                    <div className="relative">
+                      <input
+                        placeholder="Flat / Plot / House No."
+                        value={newAddress.flat}
+                        onChange={(e) => setNewAddress({ ...newAddress, flat: e.target.value })}
+                        className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#037166] transition-all pr-32"
+                      />
+                      <button
+                        onClick={handleAutoDetect}
+                        disabled={locationLoading}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#037166]/20 text-[#04a99d] text-[10px] font-bold border border-[#037166]/30 hover:bg-[#037166]/30 transition-all uppercase tracking-wider disabled:opacity-50"
+                      >
+                        {locationLoading ? (
+                          <Loader2 className="w-3 animate-spin" />
+                        ) : detectionSuccess ? (
+                          <Check className="w-3 text-[#04a99d]" />
+                        ) : (
+                          <MapPin className="w-3" />
+                        )}
+                        {detectionSuccess ? 'Detected' : 'Detect'}
+                      </button>
+                    </div>
 
                     <input
                       placeholder="Area / Locality"

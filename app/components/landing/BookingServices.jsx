@@ -86,7 +86,7 @@ export function BookingServices() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-1 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Calendar className="w-4 h-4 text-[#037166]" />
-            <span className="text-sm text-[#037166] font-medium">Futuristic Dashboard</span>
+            <h6 className="text-sm text-[#037166] font-medium">Futuristic Dashboard</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -117,7 +117,7 @@ export function BookingServices() {
                 <div className="relative flex-1 bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300 flex flex-col">
                   {/* Status Badge */}
                   <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-[#037166]/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
-                    {service.status}
+                    <h6 className="m-0 text-inherit font-inherit">{service.status}</h6>
                   </div>
 
                   {/* Image - Fixed height */}
@@ -135,15 +135,15 @@ export function BookingServices() {
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     {/* Category & Title */}
                     <div className="space-y-2">
-                      <div className="text-xs text-[#037166] font-medium uppercase tracking-wider">
+                      <h6 className="text-xs text-[#037166] font-medium uppercase tracking-wider">
                         {service.category}
-                      </div>
-                      <h3
+                      </h6>
+                      <h4
                         className="text-xl font-semibold text-white leading-tight line-clamp-2"
                         title={service.title}
                       >
                         {service.title}
-                      </h3>
+                      </h4>
                     </div>
 
                     {/* Rating & Bookings */}

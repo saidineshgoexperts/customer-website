@@ -210,15 +210,15 @@ export function CategoryPage({ category, categoryId }) {
               <div className="flex flex-wrap gap-3">
                 <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
                   <Shield className="w-4 h-4 text-[#037166]" />
-                  <span className="text-sm text-white/80">Verified Professionals</span>
+                  <h6 className="text-sm text-white/80">Verified Professionals</h6>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
                   <Zap className="w-4 h-4 text-[#037166]" />
-                  <span className="text-sm text-white/80">Same-Day Available</span>
+                  <h6 className="text-sm text-white/80">Same-Day Available</h6>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
                   <Award className="w-4 h-4 text-[#037166]" />
-                  <span className="text-sm text-white/80">90-Day Warranty</span>
+                  <h6 className="text-sm text-white/80">30-90 Days Warranty</h6>
                 </div>
               </div>
             </motion.div>
@@ -244,7 +244,7 @@ export function CategoryPage({ category, categoryId }) {
                       <IconComponent className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                    <div className="text-xs text-white/50">{stat.label}</div>
+                    <h6 className="text-xs text-white/50">{stat.label}</h6>
                   </motion.div>
                 );
               })}
@@ -328,7 +328,7 @@ export function CategoryPage({ category, categoryId }) {
                         <div className="relative h-full p-8 rounded-3xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border-2 border-white/10 hover:border-[#037166]/50 backdrop-blur-sm transition-all duration-300 overflow-hidden">
                           {/* Popular Badge */}
                           <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-semibold">
-                            Popular
+                            <h6 className="m-0 text-inherit font-inherit">Popular</h6>
                           </div>
 
                           {/* Background glow on hover */}
@@ -386,9 +386,9 @@ export function CategoryPage({ category, categoryId }) {
 
                           {/* Content */}
                           <div className="relative z-10">
-                            <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-[#04a99d] transition-colors">
+                            <h4 className="text-2xl font-bold text-white mb-3 group-hover:text-[#04a99d] transition-colors">
                               {subCategory.name}
-                            </h3>
+                            </h4>
                             <p className="text-white/60 text-sm mb-4 leading-relaxed">
                               Professional service by verified and experienced technicians
                             </p>

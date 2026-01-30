@@ -126,7 +126,7 @@ export function TopCategories({ onViewAll }) {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4"
             >
               <div className="w-2 h-2 rounded-full bg-[#04a99d] animate-pulse" />
-              <span className="text-xs font-medium text-[#04a99d]">POPULAR</span>
+              <h6 className="text-xs font-medium text-[#04a99d]">POPULAR</h6>
             </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -202,9 +202,9 @@ export function TopCategories({ onViewAll }) {
                       {/* Glass Card Overlay */}
                       <div className="absolute inset-0 flex flex-col justify-end p-6">
                         <div className="relative z-10">
-                          <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
+                          <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
                             {category.title}
-                          </h3>
+                          </h4>
                           <motion.div
                             initial={{ width: 0 }}
                             whileHover={{ width: '60px' }}

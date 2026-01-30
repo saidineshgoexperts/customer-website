@@ -275,10 +275,10 @@ export function BookingConfirmationPage({
               animate={{ opacity: 1, y: 0 }}
               className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
             >
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-[#04a99d]" />
                 Select Date
-              </h3>
+              </h4>
               {availableDates.length === 0 ? (
                 <p className="text-white/70 text-sm">No dates available at this time</p>
               ) : (
@@ -306,10 +306,10 @@ export function BookingConfirmationPage({
               transition={{ delay: 0.1 }}
               className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
             >
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-[#04a99d]" />
                 Select Time Slot
-              </h3>
+              </h4>
               {availableTimesForSelectedDate.length === 0 ? (
                 <p className="text-white/70 text-sm">
                   {selectedDate
@@ -343,10 +343,10 @@ export function BookingConfirmationPage({
               transition={{ delay: 0.2 }}
               className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
             >
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <User className="w-5 h-5 text-[#04a99d]" />
                 Technician Preference (Optional)
-              </h3>
+              </h4>
               <div className="grid md:grid-cols-3 gap-3">
                 {[
                   { value: 'any', label: 'Any Available' },
@@ -374,13 +374,13 @@ export function BookingConfirmationPage({
               transition={{ delay: 0.3 }}
               className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
             >
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-[#04a99d]" />
                 Select Payment Method
-              </h3>
+              </h4>
               <div className="grid md:grid-cols-3 gap-3">
                 {[
-                  { id: 'COD', label: 'Cash on Delivery', icon: Truck },
+                  { id: 'COD', label: 'Cash on Service Delivery', icon: Truck },
                   { id: 'wallet', label: 'Wallet Pay', icon: Wallet },
                   { id: 'online', label: 'Online Payment', icon: CreditCard },
                 ].map((method) => (
@@ -393,7 +393,7 @@ export function BookingConfirmationPage({
                       }`}
                   >
                     <method.icon className={`w-6 h-6 ${paymentMethod === method.id ? 'text-white' : 'text-[#04a99d]'}`} />
-                    <span className="text-sm font-medium">{method.label}</span>
+                    <h6 className="text-sm font-medium">{method.label}</h6>
                   </button>
                 ))}
               </div>
@@ -406,13 +406,13 @@ export function BookingConfirmationPage({
               transition={{ delay: 0.4 }}
               className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
             >
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-[#04a99d]" />
                 Service Address
-              </h3>
+              </h4>
               {address ? (
                 <div className="p-4 rounded-lg bg-white/5">
-                  <p className="text-white font-medium mb-1">{address.name}</p>
+                  <h6 className="text-white font-medium mb-1">{address.name}</h6>
                   <p className="text-white/80">{address.flat}, {address.area}</p>
                   <p className="text-white/60">{address.cityName || address.city}, {address.postalCode}</p>
                 </div>
@@ -432,14 +432,14 @@ export function BookingConfirmationPage({
               transition={{ delay: 0.4 }}
               className="sticky top-48 p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
             >
-              <h3 className="text-xl font-bold text-white mb-6">Booking Summary</h3>
+              <h4 className="text-xl font-bold text-white mb-6">Booking Summary</h4>
 
               {/* Services */}
               <div className="space-y-3 mb-6">
                 {cartItems.map((item, idx) => (
                   <div key={item.id || item._id || idx} className="flex justify-between text-sm">
                     <div className="flex-1">
-                      <p className="text-white/90 font-bold">{item.serviceName || 'Service'}</p>
+                      <h6 className="text-white/90 font-bold">{item.serviceName || 'Service'}</h6>
                       <p className="text-[#04a99d] text-xs font-semibold uppercase tracking-wider mb-1">
                         {item.packageName || item.title || 'Standard Package'}
                       </p>

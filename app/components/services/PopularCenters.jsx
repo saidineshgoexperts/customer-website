@@ -100,7 +100,7 @@ export function PopularCenters({ onStoreClick }) {
           <div className="mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4">
               <Award className="w-3 h-3 text-[#04a99d]" />
-              <span className="text-xs font-medium text-[#04a99d]">TOP RATED</span>
+              <h6 className="text-xs font-medium text-[#04a99d]">TOP RATED</h6>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-3">Explore Popular Services Center</h2>
             <p className="text-white/60">Most trusted and highly-rated service providers in your area</p>
@@ -144,7 +144,7 @@ export function PopularCenters({ onStoreClick }) {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4"
           >
             <Award className="w-3 h-3 text-[#04a99d]" />
-            <span className="text-xs font-medium text-[#04a99d]">TOP RATED</span>
+            <h6 className="text-xs font-medium text-[#04a99d]">TOP RATED</h6>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -184,7 +184,7 @@ export function PopularCenters({ onStoreClick }) {
                     {center.popular && (
                       <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] shadow-lg">
                         <TrendingUp className="w-3 h-3 text-white" />
-                        <span className="text-xs font-medium text-white">Most Popular</span>
+                        <h6 className="text-xs font-medium text-white">Most Popular</h6>
                       </div>
                     )}
 
@@ -210,9 +210,9 @@ export function PopularCenters({ onStoreClick }) {
 
                     {/* Content */}
                     <div className="p-5">
-                      <h3 className="text-xl font-bold text-white mb-1 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                      <h4 className="text-xl font-bold text-white mb-1 group-hover:text-[#04a99d] transition-colors line-clamp-1">
                         {center.name}
-                      </h3>
+                      </h4>
                       <p className="text-white/50 text-sm mb-3 flex items-center gap-1">
                         <MapPin className="w-3 h-3" />
                         {center.location}
@@ -220,7 +220,7 @@ export function PopularCenters({ onStoreClick }) {
 
                       {/* Speciality Badge */}
                       <div className="inline-block px-3 py-1 rounded-lg bg-[#037166]/20 border border-[#037166]/30 mb-4 max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                        <span className="text-xs font-medium text-[#04a99d] line-clamp-1">{center.speciality}</span>
+                        <h6 className="text-xs font-medium text-[#04a99d] line-clamp-1">{center.speciality}</h6>
                       </div>
 
                       {/* Rating & CTA */}

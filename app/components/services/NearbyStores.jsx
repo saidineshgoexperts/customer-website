@@ -215,7 +215,7 @@ export function NearbyServiceCenters({ onViewAll }) {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Navigation className="w-4 h-4 text-[#037166]" />
-            <span className="text-sm text-[#037166] font-medium">Live Location Services</span>
+            <h6 className="text-sm text-[#037166] font-medium">Live Location Services</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
@@ -227,9 +227,9 @@ export function NearbyServiceCenters({ onViewAll }) {
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Real-time service centers near {location ? location.shortAddress || 'you' : 'you'}
             {selectedService !== null && services[selectedService] && (
-              <span className="block mt-2 text-[#04a99d] font-medium">
+              <h4 className="block mt-2 text-[#04a99d] font-medium">
                 📍 {services[selectedService].name} ({services[selectedService].distance})
-              </span>
+              </h4>
             )}
           </p>
 
@@ -295,9 +295,9 @@ export function NearbyServiceCenters({ onViewAll }) {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white group-hover:text-[#04a99d] transition-colors">
+                      <h4 className="text-xl font-bold text-white group-hover:text-[#04a99d] transition-colors">
                         {service.name}
-                      </h3>
+                      </h4>
                       <p className="text-gray-400 text-sm mt-1">{service.address}</p>
                     </div>
                     <div className="text-right">
@@ -310,12 +310,12 @@ export function NearbyServiceCenters({ onViewAll }) {
                   </div>
 
                   <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${service.status === 'Open Now'
+                    <h6 className={`px-3 py-1 rounded-full text-xs font-medium ${service.status === 'Open Now'
                       ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                       : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                       }`}>
                       {service.status}
-                    </span>
+                    </h6>
                     <button className="px-4 py-2 bg-[#037166]/50 hover:bg-[#037166] text-white text-sm rounded-xl transition-all group-hover:scale-105">
                       Call Now
                     </button>

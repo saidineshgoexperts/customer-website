@@ -100,7 +100,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
           <div className="mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4">
               <TrendingUp className="w-3 h-3 text-[#04a99d]" />
-              <span className="text-xs font-medium text-[#04a99d]">TRENDING NOW</span>
+              <h6 className="text-xs font-medium text-[#04a99d]">TRENDING NOW</h6>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-3">Explore Our Recently Booked Services</h2>
             <p className="text-white/60">See what services your neighbors are booking right now</p>
@@ -168,7 +168,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4"
           >
             <TrendingUp className="w-3 h-3 text-[#04a99d]" />
-            <span className="text-xs font-medium text-[#04a99d]">TRENDING NOW</span>
+            <h6 className="text-xs font-medium text-[#04a99d]">TRENDING NOW</h6>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -208,7 +208,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                     {/* Booking Badge */}
                     <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
                       <Users className="w-4 h-4 text-[#04a99d]" />
-                      <span className="text-sm font-medium text-white">Booked {service.bookings} times</span>
+                      <h6 className="text-sm font-medium text-white">Booked {service.bookings} times</h6>
                     </div>
 
                     {/* Image */}
@@ -229,13 +229,28 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                         whileHover={{ opacity: 1 }}
                         className="absolute inset-0 bg-gradient-to-t from-[#037166]/30 to-transparent"
                       />
+
+                      {/* Book Now Button - Quick View Style */}
+                      <div className="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 z-20">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onServiceClick?.(service.id, service.categoryName, service.subcategoryName);
+                          }}
+                          className="px-8 py-3 bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-sm font-bold uppercase tracking-wider rounded-full shadow-2xl hover:shadow-[#037166]/50 border border-white/10"
+                        >
+                          Book Now
+                        </motion.button>
+                      </div>
                     </div>
 
                     {/* Content */}
                     <div className="p-5">
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-2">
+                      <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-2">
                         {service.title}
-                      </h3>
+                      </h4>
                       <p className="text-white/60 text-sm mb-4 line-clamp-2">
                         {service.description}
                       </p>
@@ -243,21 +258,9 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                       {/* Price & CTA */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs text-white/50 mb-1">From</p>
-                          <p className="text-2xl font-bold text-white">₹{service.price}</p>
+                          {/* <p className="text-xs text-white/50 mb-1">From</p>
+                          <p className="text-2xl font-bold text-white">₹{service.price}</p> */}
                         </div>
-                        <motion.button
-                          whileHover={{ scale: 1.1, rotate: 5 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onServiceClick?.(service.id, service.categoryName, service.subcategoryName);
-                          }}
-                          className="px-6 py-3 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium text-sm shadow-lg shadow-[#037166]/30 group-hover:shadow-[#037166]/50 transition-all flex items-center gap-2"
-                        >
-                          Book Now
-                          <ArrowRight className="w-4 h-4" />
-                        </motion.button>
                       </div>
                     </div>
 
