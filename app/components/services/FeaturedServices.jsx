@@ -196,7 +196,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                       <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
                       <span className="text-sm font-medium text-white">4.8</span>
                     </div>
-                    <span className="text-sm text-white/50 font-normal">(New)</span>
+                    {/* <span className="text-sm text-white/50 font-normal">(New)</span> */}
                   </div>
 
                   {/* Title */}

@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Hero } from '@/components/services/Hero';
+import { ServiceTypeSelectionModal } from '@/components/services/ServiceTypeSelectionModal';
 import { TopCategories } from '@/components/services/TopCategories';
 import { FeaturedServices } from '@/components/services/FeaturedServices';
 import { RecentlyBooked } from '@/components/services/RecentlyBooked';
@@ -14,6 +16,7 @@ import { Newsletter } from '@/components/services/Newsletter';
 
 export default function ServicesPage() {
     const router = useRouter();
+    const [showModal, setShowModal] = useState(false);
 
     const handleServiceClick = (serviceId, categoryName, subcategoryName) => {
         // Encode parameters for URL
@@ -24,11 +27,27 @@ export default function ServicesPage() {
         router.push(`/services/detail/${serviceId}?category=${categoryParam}&subCategory=${subCategoryParam}`);
     };
 
+    const handleTypeSelect = (type) => {
+        setShowModal(false);
+        if (type === 'partner') {
+            router.push('/services/verified');
+        } else if (type === 'center') {
+            router.push('/services/centers');
+        }
+    };
+
+    const openModal = () => setShowModal(true);
+
     return (
         <>
             <Hero
-                onBookService={() => router.push('/services/categories')}
-                onViewServices={() => router.push('/services/featured')}
+                onBookService={openModal}
+                onViewServices={openModal}
+            />
+            <ServiceTypeSelectionModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onSelect={handleTypeSelect}
             />
             <TopCategories onViewAll={() => router.push('/services/categories')} />
             <FeaturedServices
@@ -39,7 +58,7 @@ export default function ServicesPage() {
                 onServiceClick={handleServiceClick}
                 onViewAll={() => router.push('/services/recent')}
             />
-            <PromoBanner />
+            {/* <PromoBanner /> */}
             <DownloadApp />
             <NearbyStores />
             <PopularCenters />

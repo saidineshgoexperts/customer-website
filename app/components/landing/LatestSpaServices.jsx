@@ -160,12 +160,12 @@ export function LatestSpaServices() {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
 
                     {/* Floating Heart Icon */}
-                    <motion.div
+                    {/* <motion.div
                       whileHover={{ scale: 1.2, rotate: 360 }}
                       className="absolute top-4 right-4 w-12 h-12 bg-[#037166]/20 backdrop-blur-md border border-[#037166]/30 rounded-full flex items-center justify-center"
                     >
                       <Heart className="w-6 h-6 text-[#037166]" />
-                    </motion.div>
+                    </motion.div> */}
                   </div>
 
                   {/* Content */}
@@ -175,14 +175,14 @@ export function LatestSpaServices() {
                         {store.storeName}
                       </h4>
                       {/* Placeholder Rating/New Tag */}
-                      <div className="flex items-center space-x-1 px-2 py-1 bg-[#037166]/20 rounded-lg">
+                      {/* <div className="flex items-center space-x-1 px-2 py-1 bg-[#037166]/20 rounded-lg">
                         <h6 className="text-xs text-[#037166] font-bold uppercase">New</h6>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Location - Limited to 1 line to save space */}
                     <div className="flex-1 min-h-0 overflow-hidden">
-                      <div className="flex items-start gap-2 mb-2 text-white/60">
+                      <div className="flex items-start gap-2 mb-1 text-white/60">
                         <MapPin className="w-4 h-4 text-[#037166] mt-0.5 flex-shrink-0" />
                         <span className="text-sm line-clamp-1">
                           {store.address || store.cityName || 'Hyderabad'}
@@ -191,12 +191,12 @@ export function LatestSpaServices() {
                     </div>
 
                     {/* Price */}
-                    <div className="flex items-center justify-between mb-6 mt-auto">
+                    {/* <div className="flex items-center justify-between mb-6 mt-auto">
                       <div className="flex items-center space-x-2 text-gray-400">
                         <span className="text-sm">Starting from</span>
                       </div>
                       <div className="text-2xl font-bold text-[#037166]">₹{store.defaultPrice}</div>
-                    </div>
+                    </div> */}
 
                     {/* Book Button */}
                     <Link href={`/spa-salon/detail/${store._id}`} className="w-full mt-auto block">

@@ -230,13 +230,18 @@ class LocationManager {
      * Returns: Promise<LocationData>
      */
     async detectWithIP() {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
         try {
             const response = await fetch(LOCATION_CONFIG.IP_API_URL, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json'
-                }
+                },
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
                 throw new Error('IP detection failed');
@@ -257,6 +262,7 @@ class LocationManager {
             const savedData = this.saveLocation(locationData, LOCATION_CONFIG.SOURCES.IP);
             return savedData;
         } catch (error) {
+            clearTimeout(timeoutId);
             console.error('IP detection error:', error);
             throw new Error('Failed to detect location via IP');
         }

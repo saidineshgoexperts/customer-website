@@ -131,7 +131,7 @@ export function Hero({ onViewServices, onBookService }) {
             {[
               { icon: Shield, label: 'Licensed Professionals', desc: 'All verified & insured' },
               { icon: Clock, label: 'Same Day Service', desc: 'Book in 60 seconds' },
-              { icon: Sparkles, label: '90-Day Warranty', desc: 'On all services' },
+              { icon: Sparkles, label: '30-90 Days Warranty', desc: 'On all services' },
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-[#037166]/50 transition-all">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center">

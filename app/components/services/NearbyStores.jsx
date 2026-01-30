@@ -189,7 +189,7 @@ export function NearbyServiceCenters({ onViewAll }) {
   }
 
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section id="nearby-centers" className="relative py-32 overflow-hidden">
       {/* Dark Map Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a1410] to-[#0a0a0a]">
         <div className="absolute inset-0 opacity-5">

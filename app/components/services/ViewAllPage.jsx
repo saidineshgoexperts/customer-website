@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { RatingFilter } from './RatingFilter';
 import { motion } from 'motion/react';
-import { ArrowLeft, Star, MapPin, Zap, Loader2, Navigation, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Zap, ArrowRight } from 'lucide-react';
 import { fetchFeaturedServices, imageLoader } from '@/lib/api';
 import { useLocation } from '@/hooks/useLocation';
 
@@ -10,12 +11,14 @@ export function ViewAllPage({
   onServiceClick,
   onStoreClick,
   onCategoryClick,
+  enableRatingFilter = false,
 }) {
   const [categories, setCategories] = useState([]);
   const [featuredServices, setFeaturedServices] = useState([]);
   const [recentServices, setRecentServices] = useState([]);
   const [stores, setStores] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedRating, setSelectedRating] = useState(null);
   const { location, detectLocation } = useLocation();
 
   const ShimmerGrid = () => {
@@ -186,7 +189,7 @@ export function ViewAllPage({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-[#0a0a0a]"
+      className="min-h-screen bg-[#0a0a0a] text-white"
     >
       {/* Header */}
       <section className="bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] text-white py-12">
@@ -198,7 +201,15 @@ export function ViewAllPage({
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
-          <h1 className="text-4xl md:text-5xl font-bold">{getTitle()}</h1>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <h1 className="text-4xl md:text-5xl font-bold">{getTitle()}</h1>
+            {enableRatingFilter && (
+              <RatingFilter
+                selectedRating={selectedRating}
+                onSelectRating={setSelectedRating}
+              />
+            )}
+          </div>
         </div>
       </section>
 
@@ -220,153 +231,161 @@ export function ViewAllPage({
           </>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {type === 'categories' && categories.map((category, index) => (
-              <motion.div
-                key={category._id || index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ y: -8 }}
-                onClick={() => onCategoryClick?.(category)}
-                className="group cursor-pointer"
-              >
-                <div className="relative h-80 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 shadow-lg hover:shadow-[#037166]/20 transition-all duration-300">
-                  <img
-                    src={category.image}
-                    alt={category.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
-                  <div className="absolute inset-0 flex items-end p-8">
-                    <h4 className="text-2xl font-bold text-white group-hover:text-[#04a99d] transition-colors">
-                      {category.title}
-                    </h4>
-                  </div>
-
-                  {/* Hover Glow */}
-                  <div className="absolute inset-0 border-2 border-[#037166]/0 group-hover:border-[#037166]/50 rounded-3xl pointer-events-none transition-all duration-300" />
-                </div>
-              </motion.div>
-            ))}
-
-            {type === 'featured' && featuredServices.map((service, index) => (
-              <motion.div
-                key={service._id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ y: -8 }}
-                onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName)}
-                className="group cursor-pointer"
-              >
-                <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-[#1a1a1a] border border-white/10 h-full">
-                  <div className="relative h-48 overflow-hidden">
+            {type === 'categories' && categories
+              // Categories mock rating for filtering demo if needed, or skip filtering for categories
+              .map((category, index) => (
+                <motion.div
+                  key={category._id || index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -8 }}
+                  onClick={() => onCategoryClick?.(category)}
+                  className="group cursor-pointer"
+                >
+                  <div className="relative h-80 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 shadow-lg hover:shadow-[#037166]/20 transition-all duration-300">
                     <img
-                      src={imageLoader({ src: service.mainImage })}
-                      alt={service.serviceName}
+                      src={category.image}
+                      alt={category.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-bold flex items-center gap-1">
-                      <Zap className="w-3 h-3" />
-                      {service.serviceDelhiveryType || 'Featured'}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
+                    <div className="absolute inset-0 flex items-end p-8">
+                      <h4 className="text-2xl font-bold text-white group-hover:text-[#04a99d] transition-colors">
+                        {category.title}
+                      </h4>
                     </div>
+
+                    {/* Hover Glow */}
+                    <div className="absolute inset-0 border-2 border-[#037166]/0 group-hover:border-[#037166]/50 rounded-3xl pointer-events-none transition-all duration-300" />
                   </div>
-                  <div className="p-6">
-                    <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
-                      {service.serviceName}
-                    </h4>
-                    <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <div>
-                        <p className="text-2xl font-bold text-white">₹{service.serviceCharge}</p>
+                </motion.div>
+              ))}
+
+            {type === 'featured' && featuredServices
+              .filter(s => !selectedRating || (s.rating || 4.8) >= selectedRating)
+              .map((service, index) => (
+                <motion.div
+                  key={service._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -8 }}
+                  onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName)}
+                  className="group cursor-pointer"
+                >
+                  <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-[#1a1a1a] border border-white/10 h-full">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={imageLoader({ src: service.mainImage })}
+                        alt={service.serviceName}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-bold flex items-center gap-1">
+                        <Zap className="w-3 h-3" />
+                        {service.serviceDelhiveryType || 'Featured'}
                       </div>
-                      <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all text-sm">
-                        Book Now
-                      </button>
+                    </div>
+                    <div className="p-6">
+                      <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                        {service.serviceName}
+                      </h4>
+                      <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <div>
+                          <p className="text-2xl font-bold text-white">₹{service.serviceCharge}</p>
+                        </div>
+                        <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all text-sm">
+                          Book Now
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
 
-            {type === 'stores' && stores.map((store, index) => (
-              <motion.div
-                key={store.id || index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ y: -8 }}
-                onClick={() => onStoreClick?.(store.id)}
-                className="group cursor-pointer"
-              >
-                <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-[#1a1a1a] border border-white/10 h-full">
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={store.image}
-                      alt={store.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
-                      {store.name}
-                    </h4>
-                    <p className="text-white/60 text-sm mb-4 flex items-center gap-2 line-clamp-1">
-                      <MapPin className="w-4 h-4 text-[#04a99d]" />
-                      {store.address}
-                    </p>
-                    <div className="flex items-center gap-1 mb-4">
-                      <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
-                      <span className="text-white font-medium">{store.rating}</span>
-                      <span className="text-white/40">({store.reviews} reviews)</span>
+            {type === 'stores' && stores
+              .filter(s => !selectedRating || s.rating >= selectedRating)
+              .map((store, index) => (
+                <motion.div
+                  key={store.id || index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -8 }}
+                  onClick={() => onStoreClick?.(store.id)}
+                  className="group cursor-pointer"
+                >
+                  <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-[#1a1a1a] border border-white/10 h-full">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={store.image}
+                        alt={store.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
                     </div>
-                    <button className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all flex items-center justify-center gap-2">
-                      View Center
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-
-            {type === 'recent' && recentServices.map((service, index) => (
-              <motion.div
-                key={service.id || index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group cursor-pointer h-full"
-                onClick={() => onServiceClick?.(service.id, service.categoryName, service.subcategoryName)}
-              >
-                <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 shadow-lg">
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
-                      <Star className="w-4 h-4 text-[#04a99d] fill-[#04a99d]" />
-                      <span className="text-sm font-medium text-white">4.8</span>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
-                      {service.title}
-                    </h4>
-                    <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <p className="text-2xl font-bold text-white">₹{service.price}</p>
-                      <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg transition-all text-sm flex items-center gap-2">
-                        Book Now
+                    <div className="p-6">
+                      <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                        {store.name}
+                      </h4>
+                      <p className="text-white/60 text-sm mb-4 flex items-center gap-2 line-clamp-1">
+                        <MapPin className="w-4 h-4 text-[#04a99d]" />
+                        {store.address}
+                      </p>
+                      <div className="flex items-center gap-1 mb-4">
+                        <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                        <span className="text-white font-medium">{store.rating}</span>
+                        <span className="text-white/40">({store.reviews} reviews)</span>
+                      </div>
+                      <button className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all flex items-center justify-center gap-2">
+                        View Center
                         <ArrowRight className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+
+            {type === 'recent' && recentServices
+              .filter(s => !selectedRating || (s.rating || 4.5) >= selectedRating)
+              .map((service, index) => (
+                <motion.div
+                  key={service.id || index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  className="group cursor-pointer h-full"
+                  onClick={() => onServiceClick?.(service.id, service.categoryName, service.subcategoryName)}
+                >
+                  <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 shadow-lg">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={service.image}
+                        alt={service.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                        <Star className="w-4 h-4 text-[#04a99d] fill-[#04a99d]" />
+                        <span className="text-sm font-medium text-white">4.8</span>
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                        {service.title}
+                      </h4>
+                      <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <p className="text-2xl font-bold text-white">₹{service.price}</p>
+                        <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg transition-all text-sm flex items-center gap-2">
+                          Book Now
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
           </div>
         )}
       </section>

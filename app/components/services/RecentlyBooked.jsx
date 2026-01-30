@@ -206,10 +206,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                 >
                   <div className="relative w-full h-[380px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
                     {/* Booking Badge */}
-                    <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
-                      <Users className="w-4 h-4 text-[#04a99d]" />
-                      <h6 className="text-sm font-medium text-white">Booked {service.bookings} times</h6>
-                    </div>
+
 
                     {/* Image */}
                     <div className="relative h-48 overflow-hidden">

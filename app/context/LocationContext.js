@@ -30,7 +30,7 @@ const loadGoogleMapsScript = (callback) => {
 
     const script = document.createElement('script');
     script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${LOCATION_CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${LOCATION_CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places&loading=async&v=weekly`;
     script.async = true;
     script.defer = true;
     script.onload = () => callback();

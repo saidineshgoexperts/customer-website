@@ -230,24 +230,7 @@ export function CategoryPage({ category, categoryId }) {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="grid grid-cols-3 gap-4"
             >
-              {theme.stats.map((stat, index) => {
-                const IconComponent = stat.icon;
-                return (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 text-center hover:border-[#037166]/50 transition-all"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center mx-auto mb-3">
-                      <IconComponent className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                    <h6 className="text-xs text-white/50">{stat.label}</h6>
-                  </motion.div>
-                );
-              })}
+
             </motion.div>
           </div>
         </div>
@@ -327,9 +310,7 @@ export function CategoryPage({ category, categoryId }) {
                       >
                         <div className="relative h-full p-8 rounded-3xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border-2 border-white/10 hover:border-[#037166]/50 backdrop-blur-sm transition-all duration-300 overflow-hidden">
                           {/* Popular Badge */}
-                          <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-semibold">
-                            <h6 className="m-0 text-inherit font-inherit">Popular</h6>
-                          </div>
+
 
                           {/* Background glow on hover */}
                           <AnimatePresence>
@@ -402,10 +383,7 @@ export function CategoryPage({ category, categoryId }) {
                                 View Services
                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                               </div>
-                              <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 fill-[#037166] text-[#037166]" />
-                                <span className="text-sm text-white/80">4.9</span>
-                              </div>
+
                             </div>
                           </div>
 
