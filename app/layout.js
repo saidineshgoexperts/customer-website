@@ -5,7 +5,7 @@ import { AuthModalProvider } from './context/AuthModalContext';
 import { CartProvider } from './context/CartContext';
 import { ServiceCartProvider } from './context/ServiceCartContext';
 import { ClientProviders } from './components/providers/ClientProviders';
-import { WebsiteTour } from './components/tour/WebsiteTour';
+
 
 export const metadata = {
   title: 'Next-Gen Dark Mode Super App',
@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
               <CartProvider>
                 <ServiceCartProvider>
                   <ClientProviders>
-                    <WebsiteTour />
+
                     {children}
                   </ClientProviders>
                 </ServiceCartProvider>

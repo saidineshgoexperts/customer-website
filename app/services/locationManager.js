@@ -28,15 +28,23 @@ class LocationManager {
         if (typeof window === 'undefined') return;
 
         if (window.google && window.google.maps) {
-            if (!this.geocoder && window.google.maps.Geocoder) {
-                this.geocoder = new window.google.maps.Geocoder();
-            }
-            if (!this.autocompleteService && window.google.maps.places?.AutocompleteService) {
-                this.autocompleteService = new window.google.maps.places.AutocompleteService();
-            }
-            if (!this.placesService && window.google.maps.places?.PlacesService) {
-                const dummyNode = document.createElement('div');
-                this.placesService = new window.google.maps.places.PlacesService(dummyNode);
+            try {
+                if (!this.geocoder && window.google.maps.Geocoder) {
+                    this.geocoder = new window.google.maps.Geocoder();
+                }
+
+                // Handle different availability of library namespaces
+                if (window.google.maps.places) {
+                    if (!this.autocompleteService && window.google.maps.places.AutocompleteService) {
+                        this.autocompleteService = new window.google.maps.places.AutocompleteService();
+                    }
+                    if (!this.placesService && window.google.maps.places.PlacesService) {
+                        const dummyNode = document.createElement('div');
+                        this.placesService = new window.google.maps.places.PlacesService(dummyNode);
+                    }
+                }
+            } catch (e) {
+                console.warn("Google Maps services initialization warning:", e);
             }
         }
     }
@@ -231,7 +239,7 @@ class LocationManager {
      */
     async detectWithIP() {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
         try {
             const response = await fetch(LOCATION_CONFIG.IP_API_URL, {

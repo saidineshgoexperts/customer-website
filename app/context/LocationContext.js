@@ -18,22 +18,45 @@ const loadGoogleMapsScript = (callback) => {
         return;
     }
 
+    // Check if script is already present
     if (document.getElementById('google-maps-script')) {
-        const interval = setInterval(() => {
-            if (typeof window.google !== 'undefined' && window.google.maps) {
-                clearInterval(interval);
-                callback();
-            }
-        }, 100);
-        return;
+        // If script exists but window.google is not available, wait for it
+        if (typeof window.google === 'undefined' || !window.google.maps) {
+            const interval = setInterval(() => {
+                if (typeof window.google !== 'undefined' && window.google.maps) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 100);
+            return;
+        } else {
+            // Already loaded and ready
+            callback();
+            return;
+        }
     }
 
     const script = document.createElement('script');
     script.id = 'google-maps-script';
+    // Removed loading=async to ensure consistent callback behavior with older patterns if needed, 
+    // but kept async/defer attributes. Added callback param to URL just in case.
     script.src = `https://maps.googleapis.com/maps/api/js?key=${LOCATION_CONFIG.GOOGLE_MAPS_API_KEY}&libraries=places&loading=async&v=weekly`;
     script.async = true;
     script.defer = true;
-    script.onload = () => callback();
+    script.onload = () => {
+        // Double check initialization
+        if (window.google && window.google.maps) {
+            callback();
+        } else {
+            // Wait for partial load
+            const interval = setInterval(() => {
+                if (window.google && window.google.maps) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 100);
+        }
+    };
     document.head.appendChild(script);
 };
 
@@ -95,6 +118,31 @@ export function LocationProvider({ children }) {
         return () => clearTimeout(timer);
     }, []);
 
+    // 4. Active Cache Maintenance (Every 5 minutes)
+    // Why: Ensure location data doesn't go stale while user is on the site
+    useEffect(() => {
+        const refreshLocation = async () => {
+            // Check if current saved location is valid/fresh
+            const saved = locationManager.getSavedLocation();
+
+            if (!saved) {
+                console.log('Location cache expired, performing silent refresh...');
+                try {
+                    // Silent update (bypass setLoading to avoid UI flicker)
+                    const ipLocation = await locationManager.detectWithIP();
+                    setLocation(ipLocation);
+                } catch (err) {
+                    console.warn('Silent location refresh failed:', err);
+                }
+            }
+        };
+
+        // Align interval with cache duration
+        const intervalId = setInterval(refreshLocation, LOCATION_CONFIG.CACHE_DURATION);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
     /**
      * User-initiated GPS detection
      * Why: Only triggered by explicit button click
@@ -149,6 +197,10 @@ export function LocationProvider({ children }) {
      * Search for locations
      * Why: Enable manual location selection
      */
+    /**
+     * Search for locations
+     * Why: Enable manual location selection
+     */
     const searchLocation = async (query) => {
         if (!isMapsLoaded) {
             console.warn('Google Maps not loaded yet');
@@ -156,7 +208,10 @@ export function LocationProvider({ children }) {
         }
 
         try {
-            return await locationManager.searchLocation(query);
+            console.log('Searching for:', query);
+            const results = await locationManager.searchLocation(query);
+            console.log('Search results:', results);
+            return results;
         } catch (err) {
             console.error('Search failed:', err);
             return [];
@@ -177,6 +232,7 @@ export function LocationProvider({ children }) {
 
         try {
             const manualLocation = await locationManager.setManualLocation(placeId);
+            console.log('Manual location set:', manualLocation);
             setLocation(manualLocation);
             return manualLocation;
         } catch (err) {

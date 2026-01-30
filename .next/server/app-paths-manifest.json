@@ -1,4 +1,4 @@
 {
-  "/services/featured/page": "app/services/featured/page.js",
+  "/services/explore/page": "app/services/explore/page.js",
   "/services/page": "app/services/page.js"
 }

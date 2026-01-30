@@ -17,6 +17,7 @@ export default function FeaturedPage() {
             type="featured"
             onBack={() => router.back()}
             onServiceClick={handleServiceClick}
+            enableRatingFilter={true}
         />
     );
 }

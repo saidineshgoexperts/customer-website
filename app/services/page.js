@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Hero } from '@/components/services/Hero';
+import { ServiceBookingModal } from '@/components/services/ServiceBookingModal';
 import { ServiceTypeSelectionModal } from '@/components/services/ServiceTypeSelectionModal';
 import { TopCategories } from '@/components/services/TopCategories';
 import { FeaturedServices } from '@/components/services/FeaturedServices';
@@ -17,6 +18,7 @@ import { Newsletter } from '@/components/services/Newsletter';
 export default function ServicesPage() {
     const router = useRouter();
     const [showModal, setShowModal] = useState(false);
+    const [showExploreModal, setShowExploreModal] = useState(false);
 
     const handleServiceClick = (serviceId, categoryName, subcategoryName) => {
         // Encode parameters for URL
@@ -27,27 +29,29 @@ export default function ServicesPage() {
         router.push(`/services/detail/${serviceId}?category=${categoryParam}&subCategory=${subCategoryParam}`);
     };
 
-    const handleTypeSelect = (type) => {
-        setShowModal(false);
-        if (type === 'partner') {
-            router.push('/services/verified');
-        } else if (type === 'center') {
-            router.push('/services/centers');
-        }
-    };
-
     const openModal = () => setShowModal(true);
+    const openExploreModal = () => setShowExploreModal(true);
+
+    const handleExploreSelect = (type) => {
+        // Navigate to explore page with selected type
+        router.push(`/services/explore?type=${type}`);
+        setShowExploreModal(false);
+    };
 
     return (
         <>
             <Hero
                 onBookService={openModal}
-                onViewServices={openModal}
+                onViewServices={openExploreModal}
             />
-            <ServiceTypeSelectionModal
+            <ServiceBookingModal
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
-                onSelect={handleTypeSelect}
+            />
+            <ServiceTypeSelectionModal
+                isOpen={showExploreModal}
+                onClose={() => setShowExploreModal(false)}
+                onSelect={handleExploreSelect}
             />
             <TopCategories onViewAll={() => router.push('/services/categories')} />
             <FeaturedServices

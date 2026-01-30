@@ -46,7 +46,7 @@ export function Header({ theme = {}, navItems = [] }) {
         { name: 'Spa & Saloon', href: '/spa-salon' },
         { name: 'Share Ride', href: '#share-ride' },
         { name: 'Order Medicine', href: '#order-medicine' },
-        { name: 'Become a partner', href: '#become-a-partner' }
+        { name: 'Become a Partner', href: '/partner' }
       ]
     }
   ];

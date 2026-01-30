@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Navigation, Star, Phone, Clock } from 'lucide-react';
+import { MapPin, Navigation, Star, Phone, Clock, Loader2 } from 'lucide-react';
 import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
+import { useLocation } from '@/hooks/useLocation';
 
 const mapContainerStyle = {
   width: '100%',
@@ -78,7 +79,7 @@ const mapOptions = {
 
 export function NearbyServiceCenters() {
   const [isClient, setIsClient] = useState(false);
-  const [location, setLocation] = useState(null);
+  const { location, detectWithGPS, loading: contextLoading } = useLocation();
   const [selectedService, setSelectedService] = useState(0);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -88,29 +89,16 @@ export function NearbyServiceCenters() {
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   });
 
-  // Fix hydration + get localStorage location
   useEffect(() => {
     setIsClient(true);
-
-    // Get from localStorage (Punjagutta coords)
-    try {
-      const stored = localStorage.getItem('user_location_data');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setLocation({
-          lat: parsed.lat,
-          lng: parsed.lng,
-          shortAddress: parsed.shortAddress || 'Punjagutta, Hyderabad'
-        });
-      }
-    } catch (error) {
-      console.error('Error reading location:', error);
-    }
   }, []);
 
   // Fetch service centers
   useEffect(() => {
     const fetchNearestServiceCenters = async () => {
+      // Use location from context or fallback to Punjagutta for initial view if needed, 
+      // but logic relies on location being present to fetch "nearest".
+      // If no location, we don't fetch.
       if (!location || !isClient) return;
 
       try {
@@ -173,6 +161,15 @@ export function NearbyServiceCenters() {
 
     fetchNearestServiceCenters();
   }, [location, isClient]);
+
+  // Handle GPS detection via Context
+  const handleDetectLocation = async () => {
+    try {
+      await detectWithGPS();
+    } catch (err) {
+      console.error("Failed to detect location:", err);
+    }
+  };
 
   // Map Component - PERFECT FIT WITH DARK MODE
   const MapComponent = useCallback(() => {
@@ -320,22 +317,12 @@ export function NearbyServiceCenters() {
           {!location && (
             <div className="mt-4">
               <button
-                onClick={() => {
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition((pos) => {
-                      const newLoc = {
-                        lat: pos.coords.latitude,
-                        lng: pos.coords.longitude,
-                        shortAddress: 'Current Location'
-                      };
-                      localStorage.setItem('user_location_data', JSON.stringify(newLoc));
-                      setLocation(newLoc);
-                    });
-                  }
-                }}
-                className="px-6 py-2 bg-[#037166] hover:bg-[#025951] text-white rounded-full transition-all"
+                onClick={handleDetectLocation}
+                disabled={contextLoading}
+                className="px-6 py-2 bg-[#037166] hover:bg-[#025951] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full transition-all flex items-center justify-center gap-2 mx-auto"
               >
-                Detect My Location
+                {contextLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
+                {contextLoading ? 'Detecting...' : 'Detect My Location'}
               </button>
             </div>
           )}
