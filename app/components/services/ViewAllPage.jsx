@@ -230,7 +230,7 @@ export function ViewAllPage({
             `}</style>
           </>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={type === 'featured' ? "flex flex-col gap-6 max-w-5xl mx-auto" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
             {type === 'categories' && categories
               // Categories mock rating for filtering demo if needed, or skip filtering for categories
               .map((category, index) => (
@@ -270,33 +270,44 @@ export function ViewAllPage({
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  whileHover={{ y: -8 }}
+                  whileHover={{ x: 10 }} // Slight horizontal shift on hover instead of lift
                   onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName)}
                   className="group cursor-pointer"
                 >
-                  <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-[#1a1a1a] border border-white/10 h-full">
-                    <div className="relative h-48 overflow-hidden">
+                  <div className="flex flex-col md:flex-row gap-6 p-4 rounded-3xl bg-[#1a1a1a] border border-white/10 hover:border-[#037166]/50 transition-all duration-300 h-full overflow-hidden">
+                    <div className="relative w-full md:w-80 h-56 rounded-2xl overflow-hidden flex-shrink-0">
                       <img
                         src={imageLoader({ src: service.mainImage })}
                         alt={service.serviceName}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
-                      <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-bold flex items-center gap-1">
+                      <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-bold flex items-center gap-1 shadow-lg">
                         <Zap className="w-3 h-3" />
                         {service.serviceDelhiveryType || 'Featured'}
                       </div>
                     </div>
-                    <div className="p-6">
-                      <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
-                        {service.serviceName}
-                      </h4>
-                      <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
-                      <div className="flex items-center justify-between mt-auto">
-                        <div>
+                    <div className="flex-1 py-2 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="text-2xl font-bold text-white group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                            {service.serviceName}
+                          </h4>
+                          <div className="flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg border border-white/10">
+                            <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                            <span className="text-white font-medium text-sm">{service.rating || 4.8}</span>
+                          </div>
+                        </div>
+                        <p className="text-white/60 text-base mb-4 line-clamp-2">{service.description}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-white/40 mb-1">Service Cost</span>
                           <p className="text-2xl font-bold text-white">₹{service.serviceCharge}</p>
                         </div>
-                        <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all text-sm">
+                        <button className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all text-sm flex items-center gap-2">
                           Book Now
+                          <ArrowRight className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -376,7 +387,7 @@ export function ViewAllPage({
                       </h4>
                       <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
                       <div className="flex items-center justify-between mt-auto">
-                        <p className="text-2xl font-bold text-white">₹{service.price}</p>
+                        {/* <p className="text-2xl font-bold text-white">₹{service.price}</p> */}
                         <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg transition-all text-sm flex items-center gap-2">
                           Book Now
                           <ArrowRight className="w-4 h-4" />
