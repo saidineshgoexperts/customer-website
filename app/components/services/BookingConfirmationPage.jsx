@@ -480,17 +480,28 @@ export function BookingConfirmationPage({
               {/* Price Breakdown */}
               <div className="space-y-2 mb-4">
                 {bookingCost > 0 && (
-                  <div className="flex justify-between text-white/80">
-                    <span>Online Consultation Fee</span>
-
+                  <div className="flex justify-between items-start text-white/80">
+                    <div className="flex flex-col">
+                      <span>Online Consultation Fee</span>
+                      <div className="flex items-center gap-1 text-[#04a99d] text-xs font-normal">
+                        <Info className="w-3 h-3" />
+                        <span>pay online</span>
+                      </div>
+                    </div>
                     <span>₹{bookingCost}</span>
                   </div>
                 )}
                 {/* Hidden inspection cost for summary since subtotal is zero logic applies */}
                 {inspectionCost > 0 && (
                   <div className="flex flex-col gap-1">
-                    <div className="flex justify-between text-white/80">
-                      <span>Doorstep Inspection Fee</span>
+                    <div className="flex justify-between items-start text-white/80">
+                      <div className="flex flex-col">
+                        <span>Doorstep Inspection Fee</span>
+                        <div className="flex items-center gap-1 text-[#04a99d] text-xs font-normal">
+                          <Info className="w-3 h-3" />
+                          <span>pay at Doorstep</span>
+                        </div>
+                      </div>
                       <span>₹{inspectionCost}</span>
                     </div>
                     <div className="flex items-start gap-2 text-[10px] text-white/50 bg-white/5 p-2 rounded">
@@ -508,12 +519,7 @@ export function BookingConfirmationPage({
                 <span>₹{total}</span>
               </div>
 
-              <div className="p-3 mb-6 bg-[#037166]/10 border border-[#037166]/20 rounded-lg">
-                <p className="text-[#04a99d] text-xs text-center font-medium leading-relaxed">
-                  {/* Note: This is the online consultation fee only. The Doorstep Inspection Fee will be collected at Doorstep. */}
-                  Pay at Doorstep
-                </p>
-              </div>
+
 
               {/* Selected Date/Time Preview */}
               {selectedDate && selectedTime && (
