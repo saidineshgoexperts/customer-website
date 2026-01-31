@@ -19,20 +19,20 @@ export function RecommendedHostels() {
         const data = await response.json();
 
         if (data.success && data.hostels) {
-          const mappedHostels = data.hostels.slice(0, 2).map((hostel, index) => ({
+          const mappedHostels = data.hostels.map((hostel, index) => ({
             id: hostel._id,
             name: hostel.hostelName || `${hostel.firstName} ${hostel.lastName}`,
-            tagline: hostel.bio || 'Comfortable & Safe Stay',
-            rating: 4.8 + (index * 0.1),
-            residents: Math.floor(Math.random() * 20) + 30,
+            tagline: hostel.bio,
+            // rating: 4.8 + (index * 0.1),
+            // residents: Math.floor(Math.random() * 20) + 30,
             image: hostel.image ? `https://api.doorstephub.com/${hostel.image}` : 'https://images.unsplash.com/photo-1743116591552-9ff5e8c1ad31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3p5JTIwYmVkcm9vbSUyMGhvc3RlbHxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
             features: [
-              hostel.address || hostel.cityName || 'Prime Location',
-              '24/7 Security',
-              'Modern Amenities'
-            ],
-            price: hostel.serviceBookingCost || hostel.startingAt || 0,
-            trustScore: 95 + (index * 2)
+              hostel.address || hostel.cityName,
+              // '24/7 Security',
+              // 'Modern Amenities'
+            ].filter(Boolean),
+            price: hostel.startingAt || hostel.serviceBookingCost || 0,
+            // trustScore: 95 + (index * 2)
           }));
           setHostels(mappedHostels);
         }
@@ -206,7 +206,8 @@ export function RecommendedHostels() {
               {/* Trust-Focused Card */}
               <div className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#1a1410] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
 
-                <motion.div
+                {/* Trust Score Circle - Static, commented out as requested */}
+                {/* <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   className="absolute top-6 right-6 z-20 w-20 h-20"
                 >
@@ -228,7 +229,7 @@ export function RecommendedHostels() {
                       fill="none"
                       strokeDasharray={220}
                       initial={{ strokeDashoffset: 220 }}
-                      whileInView={{ strokeDashoffset: 220 - (220 * hostel.trustScore) / 100 }}
+                      whileInView={{ strokeDashoffset: 220 - (220 * (hostel.trustScore || 0)) / 100 }}
                       viewport={{ once: true }}
                       transition={{ duration: 1.5, delay: index * 0.3 }}
                     />
@@ -237,7 +238,7 @@ export function RecommendedHostels() {
                     <div className="text-xl font-bold text-white">{hostel.trustScore}</div>
                     <h6 className="text-xs text-[#037166]">Trust</h6>
                   </div>
-                </motion.div>
+                </motion.div> */}
 
                 {/* Image */}
                 <div className="relative h-72 overflow-hidden">
@@ -248,22 +249,22 @@ export function RecommendedHostels() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
 
-                  {/* Price Badge */}
-                  {/* {hostel.price > 0 && (
+                  {/* Price Badge - Dynamic */}
+                  {hostel.price > 0 && (
                     <div className="absolute bottom-6 right-6 z-20 bg-black/40 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-baseline space-x-1">
                       <span className="text-white font-bold">₹{hostel.price}</span>
                       <span className="text-white/70 text-xs">/mo</span>
                     </div>
-                  )} */}
+                  )}
 
                   {/* Heart Icon */}
-                  <motion.button
+                  {/* <motion.button
                     whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.9 }}
                     className="absolute top-6 left-6 w-12 h-12 bg-[#1a1a1a]/80 backdrop-blur-md border border-[#037166]/30 rounded-full flex items-center justify-center group/heart"
                   >
                     <Heart className="w-6 h-6 text-[#ff6b35] group-hover/heart:fill-[#ff6b35] transition-all" />
-                  </motion.button>
+                  </motion.button> */}
                 </div>
 
                 {/* Content */}
@@ -275,8 +276,8 @@ export function RecommendedHostels() {
                     <p className="text-gray-400 italic">{hostel.tagline}</p>
                   </div>
 
-                  {/* Stats */}
-                  <div className="flex items-center space-x-6 mb-6">
+                  {/* Stats - Static, commented out as requested */}
+                  {/* <div className="flex items-center space-x-6 mb-6">
                     <div className="flex items-center space-x-2">
                       <Star className="w-5 h-5 text-[#037166] fill-[#037166]" />
                       <span className="text-lg font-semibold text-white">{hostel.rating}</span>
@@ -285,7 +286,7 @@ export function RecommendedHostels() {
                       <Users className="w-5 h-5 text-[#037166]" />
                       <span className="text-sm text-gray-400">{hostel.residents} residents</span>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Features */}
                   <div className="space-y-3 mb-8">
