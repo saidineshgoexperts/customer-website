@@ -249,12 +249,12 @@ export function RecommendedHostels() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
 
                   {/* Price Badge */}
-                  {hostel.price > 0 && (
+                  {/* {hostel.price > 0 && (
                     <div className="absolute bottom-6 right-6 z-20 bg-black/40 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-baseline space-x-1">
                       <span className="text-white font-bold">₹{hostel.price}</span>
                       <span className="text-white/70 text-xs">/mo</span>
                     </div>
-                  )}
+                  )} */}
 
                   {/* Heart Icon */}
                   <motion.button

@@ -23,15 +23,15 @@ export function LatestReligiousServices() {
             id: service._id,
             name: service.serviceName || `${service.firstName} ${service.lastName}`,
             location: service.cityName || service.address || 'Hyderabad',
-            date: new Date().toLocaleDateString('en-IN', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric'
-            }),
-            time: '6:00 AM',
+            amenities: service.amenities[0],
+            // date: new Date().toLocaleDateString('en-IN', {
+            //   day: 'numeric',
+            //   month: 'short',
+            //   year: 'numeric'
+            // }),
             attendees: Math.floor(Math.random() * 50) + 80,
             image: service.image ? `https://api.doorstephub.com/${service.image}` : 'https://images.unsplash.com/photo-1712999533944-9200e6b20e27?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZW1wbGUlMjBzcGlyaXR1YWwlMjByZWxpZ2lvdXN8ZW58MXx8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
-            type: 'Pooja Service',
+            // type: 'Pooja Service',
             bio: service.bio
           }));
           setServices(mappedServices);
@@ -208,9 +208,9 @@ export function LatestReligiousServices() {
               {/* Spiritual Card */}
               <div className="relative h-full bg-gradient-to-br from-[#1a1a1a]/70 to-[#1a0f1a]/70 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-2xl">
                 {/* Type Badge */}
-                <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-gradient-to-r from-[#9b59b6]/80 to-[#037166]/80 backdrop-blur-md rounded-full">
+                {/* <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-gradient-to-r from-[#9b59b6]/80 to-[#037166]/80 backdrop-blur-md rounded-full">
                   <h6 className="text-xs font-bold text-white">{service.type}</h6>
-                </div>
+                </div> */}
 
                 {/* Bell Icon */}
                 <motion.div
@@ -260,13 +260,13 @@ export function LatestReligiousServices() {
                       <span className="text-gray-300 font-normal">{service.location}</span>
                     </div>
                     <div className="flex items-center space-x-3 text-sm">
-                      <Calendar className="w-4 h-4 text-[#037166]" />
-                      <span className="text-gray-300">{service.date} • {service.time}</span>
+                      {/* <Calendar className="w-4 h-4 text-[#037166]" /> */}
+                      <span className="text-gray-300">{service.amenities}</span>
                     </div>
-                    <div className="flex items-center space-x-3 text-sm">
+                    {/* <div className="flex items-center space-x-3 text-sm">
                       <Users className="w-4 h-4 text-[#037166]" />
                       <span className="text-gray-300">{service.attendees} attending</span>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Action Button */}

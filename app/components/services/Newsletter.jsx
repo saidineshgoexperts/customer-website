@@ -6,15 +6,78 @@ import { Mail, Send, CheckCircle2 } from 'lucide-react';
 
 export function Newsletter() {
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState('subscribe'); // 'subscribe' or 'verify'
+  const [loading, setLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
-    setIsSubscribed(true);
-    setTimeout(() => {
-      setIsSubscribed(false);
-      setEmail('');
-    }, 3000);
+    setLoading(true);
+    setMessage('');
+    setIsError(false);
+
+    try {
+      const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStep('verify');
+        setMessage('Verification OTP sent to your email.');
+      } else {
+        setIsError(true);
+        setMessage(data.message || 'Subscription failed. Please try again.');
+      }
+    } catch (error) {
+      setIsError(true);
+      setMessage('Network error. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    setIsError(false);
+
+    try {
+      const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/newsletter/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSubscribed(true);
+        setMessage('Successfully subscribed! Welcome to our newsletter.');
+        setTimeout(() => {
+          setStep('subscribe');
+          setEmail('');
+          setOtp('');
+          setIsSubscribed(false);
+          setMessage('');
+        }, 3000);
+      } else {
+        setIsError(true);
+        setMessage(data.message || 'Invalid OTP. Please try again.');
+      }
+    } catch (error) {
+      setIsError(true);
+      setMessage('Verification failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,7 +147,7 @@ export function Newsletter() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          onSubmit={handleSubmit}
+          onSubmit={step === 'subscribe' ? handleSubscribe : handleVerify}
           className="max-w-md mx-auto"
         >
           <div className="relative">
@@ -93,32 +156,48 @@ export function Newsletter() {
                 <Mail className="w-5 h-5 text-white/40" />
               </div>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
+                type={step === 'subscribe' ? "email" : "text"}
+                value={step === 'subscribe' ? email : otp}
+                onChange={(e) => step === 'subscribe' ? setEmail(e.target.value) : setOtp(e.target.value)}
+                placeholder={step === 'subscribe' ? "Enter your email address" : "Enter 6-digit OTP"}
                 required
+                disabled={loading || isSubscribed}
                 className="flex-1 bg-transparent text-white placeholder:text-white/40 outline-none py-2"
+                maxLength={step === 'subscribe' ? undefined : 6}
               />
               <motion.button
                 type="submit"
+                disabled={loading || isSubscribed}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium shadow-lg shadow-[#037166]/30 hover:shadow-[#037166]/50 transition-all flex items-center gap-2 group"
+                className={`px-6 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium shadow-lg shadow-[#037166]/30 hover:shadow-[#037166]/50 transition-all flex items-center gap-2 group ${loading ? 'opacity-70 cursor-wait' : ''}`}
               >
-                <span>Subscribe</span>
-                <motion.div
-                  animate={isSubscribed ? { scale: [1, 1.2, 1], rotate: 360 } : {}}
-                  transition={{ duration: 0.5 }}
-                >
-                  {isSubscribed ? (
-                    <CheckCircle2 className="w-5 h-5" />
-                  ) : (
-                    <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  )}
-                </motion.div>
+                <span>{loading ? 'Processing...' : step === 'subscribe' ? 'Subscribe' : 'Verify'}</span>
+                {!loading && (
+                  <motion.div
+                    animate={isSubscribed ? { scale: [1, 1.2, 1], rotate: 360 } : {}}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {isSubscribed ? (
+                      <CheckCircle2 className="w-5 h-5" />
+                    ) : (
+                      <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    )}
+                  </motion.div>
+                )}
               </motion.button>
             </div>
+
+            {/* Back to Email link if in verify step */}
+            {step === 'verify' && !isSubscribed && (
+              <button
+                type="button"
+                onClick={() => setStep('subscribe')}
+                className="mt-2 text-xs text-white/40 hover:text-white transition-colors"
+              >
+                Change email address
+              </button>
+            )}
 
             {/* Glow Effect */}
             <motion.div
@@ -128,18 +207,18 @@ export function Newsletter() {
             />
           </div>
 
-          {/* Success Message */}
+          {/* Status Message */}
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{
-              opacity: isSubscribed ? 1 : 0,
-              height: isSubscribed ? 'auto' : 0,
+              opacity: message ? 1 : 0,
+              height: message ? 'auto' : 0,
             }}
             className="mt-4 overflow-hidden"
           >
-            <div className="flex items-center justify-center gap-2 text-[#04a99d]">
-              <CheckCircle2 className="w-5 h-5" />
-              <h6 className="font-medium">Successfully subscribed! Check your inbox.</h6>
+            <div className={`flex items-center justify-center gap-2 ${isError ? 'text-red-400' : 'text-[#04a99d]'}`}>
+              {!isError && <CheckCircle2 className="w-5 h-5" />}
+              <h6 className="font-medium">{message}</h6>
             </div>
           </motion.div>
         </motion.form>
