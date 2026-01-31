@@ -2,39 +2,75 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Star, MapPin, Clock, DollarSign, Filter, X, Zap } from 'lucide-react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { ArrowLeft, Star, MapPin, Clock, DollarSign, Filter, X, Zap, RotateCcw } from 'lucide-react';
 import { useLocationContext } from '@/context/LocationContext';
 
-export function ServicesListingPage({ category, subCategory, subCategoryId }) {
+export function ServicesListingPage({ category, subCategory, subCategoryId, childCategoryId }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState('services');
   const [filterOpen, setFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [minRating, setMinRating] = useState(0);
+  const [minRating, setMinRating] = useState(parseFloat(searchParams.get('rating')) || 0);
   const [services, setServices] = useState([]);
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const { location } = useLocationContext();
 
+  const handleRatingChange = (rating) => {
+    const newRating = rating === minRating ? 0 : rating;
+    setMinRating(newRating);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (newRating > 0) {
+      params.set('rating', newRating.toString());
+    } else {
+      params.delete('rating');
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const resetFilters = () => {
+    setMinRating(0);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('rating');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   useEffect(() => {
     const fetchServices = async () => {
-      if (!subCategoryId || !location?.lat || !location?.lng) {
+      if ((!subCategoryId && !childCategoryId) || !location?.lat || !location?.lng) {
         setLoading(false);
         return;
       }
 
       setLoading(true);
       try {
-        // Fetch services and nearby centers from single API
-        const servicesResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/services_by_subcategory', {
+        let apiUrl = 'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/services_by_subcategory';
+        let body = {
+          lattitude: location.lat,
+          longitude: location.lng,
+        };
+
+        if (childCategoryId) {
+          apiUrl = 'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/services_by_childcategory';
+          body.childcategoryId = childCategoryId;
+        } else {
+          body.subcategoryId = subCategoryId;
+        }
+
+        // Add minRating to payload if set
+        if (minRating > 0) {
+          body.minRating = minRating;
+        }
+
+        // Fetch services and nearby centers from appropriate API
+        const servicesResponse = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lattitude: location.lat,
-            longitude: location.lng,
-            subcategoryId: subCategoryId
-          })
+          body: JSON.stringify(body)
         });
 
         if (!servicesResponse.ok) {
@@ -67,7 +103,11 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
     };
 
     fetchServices();
-  }, [subCategoryId, location?.lat, location?.lng]);
+  }, [subCategoryId, childCategoryId, location?.lat, location?.lng, minRating]);
+
+  // Local filtering as fallback/additional layer
+  const filteredServices = services.filter(s => (s.rating || 0) >= minRating);
+  const filteredCenters = centers.filter(c => (c.rating || 0) >= minRating);
 
 
   return (
@@ -154,7 +194,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
               </h4>
 
               {/* Price Range */}
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <h6 className="block text-white/80 mb-3 text-sm font-medium">Price Range</h6>
                 <div className="flex items-center gap-4">
                   <input
@@ -173,7 +213,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                     placeholder="Max"
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Rating Filter */}
               <div className="mb-6">
@@ -182,7 +222,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                   {[4.5, 4.0, 3.5, 3.0].map((rating) => (
                     <button
                       key={rating}
-                      onClick={() => setMinRating(rating)}
+                      onClick={() => handleRatingChange(rating)}
                       className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${minRating === rating
                         ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white'
                         : 'bg-white/5 text-white/70 hover:bg-white/10'
@@ -211,7 +251,11 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
               </div>
 
               {/* Reset Button */}
-              <button className="w-full mt-6 px-4 py-3 rounded-lg border border-white/20 text-white/80 hover:bg-white/5 transition-all text-sm font-medium">
+              <button
+                onClick={resetFilters}
+                className="w-full mt-6 px-4 py-3 rounded-lg border border-white/20 text-white/80 hover:bg-white/5 transition-all text-sm font-medium flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
                 Reset Filters
               </button>
             </div>
@@ -243,8 +287,8 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                     [1, 2, 3, 4].map((i) => (
                       <div key={i} className="h-80 rounded-2xl bg-white/5 animate-pulse" />
                     ))
-                  ) : services.length > 0 ? (
-                    services.map((service, index) => (
+                  ) : filteredServices.length > 0 ? (
+                    filteredServices.map((service, index) => (
                       <motion.div
                         key={service._id || index}
                         initial={{ opacity: 0, y: 30 }}
@@ -289,15 +333,15 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                                 <span className="text-white font-medium">{service.rating}</span>
                                 <span className="text-white/40">({service.totalOrders})</span>
                               </div>
-                              <div className="flex items-center gap-1 text-white/60">
+                              {/* <div className="flex items-center gap-1 text-white/60">
                                 <Clock className="w-4 h-4" />
                                 <span>60 mins</span>
-                              </div>
+                              </div> */}
                               {/* Distance placeholder if API doesn't provide */}
-                              <div className="flex items-center gap-1 text-white/60">
+                              {/* <div className="flex items-center gap-1 text-white/60">
                                 <MapPin className="w-4 h-4" />
                                 <span>2.5 km</span>
-                              </div>
+                              </div> */}
                             </div>
 
                             {/* CTA Button */}
@@ -339,8 +383,8 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                     [1, 2].map((i) => (
                       <div key={i} className="h-48 rounded-2xl bg-white/5 animate-pulse" />
                     ))
-                  ) : centers.length > 0 ? (
-                    centers.map((center, index) => (
+                  ) : filteredCenters.length > 0 ? (
+                    filteredCenters.map((center, index) => (
                       <motion.div
                         key={center._id || index}
                         initial={{ opacity: 0, y: 30 }}
@@ -386,9 +430,9 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                                   <MapPin className="w-4 h-4" />
                                   2.3 km away
                                 </div>
-                                <div className="text-white/60 text-sm">
+                                {/* <div className="text-white/60 text-sm">
                                   Min Fare: ₹{center.minFare}
-                                </div>
+                                </div> */}
                                 {center.totalViews !== undefined && (
                                   <div className="text-white/60 text-sm">
                                     Views: {center.totalViews}
@@ -479,7 +523,10 @@ export function ServicesListingPage({ category, subCategory, subCategoryId }) {
                     {[4.5, 4.0, 3.5, 3.0].map((rating) => (
                       <button
                         key={rating}
-                        onClick={() => setMinRating(rating)}
+                        onClick={() => {
+                          handleRatingChange(rating);
+                          setFilterOpen(false);
+                        }}
                         className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${minRating === rating
                           ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white'
                           : 'bg-white/5 text-white/70'

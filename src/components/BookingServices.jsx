@@ -36,7 +36,7 @@ export function BookingServices() {
       try {
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/latest_bookings_services');
         const data = await response.json();
-        
+
         if (data.success && data.services) {
           const transformedServices = data.services.slice(0, 4).map(service => ({
             id: service._id,
@@ -44,7 +44,7 @@ export function BookingServices() {
             category: service.categoryName,
             rating: 4.8,
             bookings: '2.3K',
-            image: service.mainImage 
+            image: service.mainImage
               ? `https://api.doorstephub.com/${service.mainImage}`
               : 'https://images.unsplash.com/photo-1594873604892-b599f847e859?w=400',
             status: service.status === 'active' ? 'Available' : 'Unavailable',
@@ -84,13 +84,13 @@ export function BookingServices() {
             <Calendar className="w-4 h-4 text-[#037166]" />
             <span className="text-sm text-[#037166] font-medium">Futuristic Dashboard</span>
           </div>
-          
+
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
               Latest Booking Services
             </span>
           </h2>
-          
+
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Book your favorite services instantly with our advanced booking platform
           </p>
@@ -129,7 +129,7 @@ export function BookingServices() {
                     <div className="text-xs text-[#037166] font-medium mb-2 uppercase tracking-wider">
                       {service.category}
                     </div>
-                    
+
                     <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-[#037166] transition-colors">
                       {service.title}
                     </h3>
@@ -139,10 +139,10 @@ export function BookingServices() {
                         <Star className="w-4 h-4 text-[#037166] fill-[#037166]" />
                         <span className="text-sm text-white font-medium">{service.rating}</span>
                       </div>
-                      <div className="flex items-center space-x-1 text-sm text-gray-400">
+                      {/* <div className="flex items-center space-x-1 text-sm text-gray-400">
                         <Clock className="w-4 h-4" />
                         <span>{service.bookings} bookings</span>
-                      </div>
+                      </div> */}
                     </div>
 
                     <motion.button

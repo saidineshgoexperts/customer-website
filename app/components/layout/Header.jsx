@@ -46,6 +46,8 @@ export function Header({ theme = {}, navItems = [] }) {
         { name: 'Spa & Saloon', href: '/spa-salon' },
         { name: 'Share Ride', href: '#share-ride' },
         { name: 'Order Medicine', href: '#order-medicine' },
+        { name: 'Verified Partners', href: '/services/child/683dbbfbb62d2a241de0f7e3?category=Services&name=Verified%20Partners' },
+        { name: 'Service Centers', href: '/services/child/683dbc04b62d2a241de0f7e8?category=Services&name=Service%20Centers' },
         { name: 'Become a Partner', href: '/partner' }
       ]
     }
@@ -85,7 +87,10 @@ export function Header({ theme = {}, navItems = [] }) {
             name: 'More',
             dropdown: [
               { name: 'Share Ride', href: '#share-ride' },
-              { name: 'Order Medicine', href: '#order-medicine' }
+              { name: 'Order Medicine', href: '#order-medicine' },
+              { name: 'Verified Partners', href: '/services/child/683dbbfbb62d2a241de0f7e3?category=Services&name=Verified%20Partners' },
+              { name: 'Service Centers', href: '/services/child/683dbc04b62d2a241de0f7e8?category=Services&name=Service%20Centers' },
+              { name: 'Become a Partner', href: '/partner' }
             ]
           });
 
@@ -128,7 +133,7 @@ export function Header({ theme = {}, navItems = [] }) {
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || pathname?.includes('/services')
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || pathname?.includes('/services') || pathname?.includes('/listings')
           ? `${currentTheme.bgScrolled} backdrop-blur-xl border-b ${currentTheme.border} shadow-lg shadow-[#037166]/5`
           : 'bg-transparent'
           }`}

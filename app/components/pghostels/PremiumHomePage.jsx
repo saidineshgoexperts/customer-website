@@ -216,6 +216,23 @@ export function PremiumHomePage() {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
+                                onClick={() => {
+                                    if (navigator.geolocation) {
+                                        navigator.geolocation.getCurrentPosition(
+                                            (position) => {
+                                                const { latitude, longitude } = position.coords;
+                                                router.push(`/pghostels/listings/nearby?lat=${latitude}&lng=${longitude}`);
+                                            },
+                                            (error) => {
+                                                console.error("Error getting location:", error);
+                                                // If error, just go to nearby (listings page will use fallback/localStorage)
+                                                router.push('/pghostels/listings/nearby');
+                                            }
+                                        );
+                                    } else {
+                                        router.push('/pghostels/listings/nearby');
+                                    }
+                                }}
                                 className="px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-900 rounded-2xl font-semibold hover:border-[#037166] transition-all flex items-center space-x-2"
                             >
                                 <MapPin className="w-5 h-5 text-[#037166]" />
@@ -307,9 +324,9 @@ export function PremiumHomePage() {
                         >
                             <div className="flex items-center space-x-2">
                                 <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
-                                <span className="text-2xl font-bold">4.8</span>
+                                <span className="text-2xl font-bold text-black">4.8</span>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">0.8 km away</div>
+                            <div className="text-xs text-black mt-1">0.8 km away</div>
                         </motion.div>
 
                         {/* Glow Effect */}
@@ -320,12 +337,12 @@ export function PremiumHomePage() {
 
             {/* Quick Search Strip */}
             <section className="relative -mt-20 z-20">
-                <div className="max-w-6xl mx-auto px-4">
+                <div className="max-w-7xl mx-auto px-4">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-gray-200 p-6"
+                        className="bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-gray-200 p-6 max-w-6xl"
                     >
                         <div className="flex flex-wrap items-center gap-4">
                             {/* Search Input */}
@@ -336,7 +353,7 @@ export function PremiumHomePage() {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     placeholder="Search by area, college, landmark..."
-                                    className="pl-12 h-14 bg-white/50 border-gray-200 focus:border-[#037166] text-lg"
+                                    className="pl-12 h-14 bg-white/50 border-gray-200 focus:border-[#037166] text-lg text-black placeholder:text-gray-500"
                                 />
                             </div>
 
@@ -349,8 +366,8 @@ export function PremiumHomePage() {
                                         whileInView={{ opacity: 1, scale: 1 }}
                                         viewport={{ once: true }}
                                         transition={{ delay: i * 0.05 }}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
+                                        whileHover={{ scale: 0.95 }}
+                                        whileTap={{ scale: 0.9 }}
                                         className="px-4 py-2 bg-gray-100 hover:bg-[#037166] hover:text-white text-gray-700 rounded-full text-sm font-medium transition-all"
                                     >
                                         {chip}
@@ -757,6 +774,52 @@ function TestimonialsSection({ testimonials }) {
 
 // Featured Hostels Section
 function FeaturedHostelsSection({ listings, loading, router }) {
+    const fallbackListings = [
+        {
+            _id: 'fallback-1',
+            hostelName: 'Premium Student Living',
+            address: 'North Campus, Delhi',
+            defaultPrice: '12500',
+            image: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=2070&auto=format&fit=crop',
+            rating: 4.8,
+            reviews: 120,
+            isFallback: true
+        },
+        {
+            _id: 'fallback-2',
+            hostelName: 'Urban Co-living Space',
+            address: 'Koramangala, Bangalore',
+            defaultPrice: '15000',
+            image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop',
+            rating: 4.5,
+            reviews: 85,
+            isFallback: true
+        },
+        {
+            _id: 'fallback-3',
+            hostelName: 'Elite Ladies Hostel',
+            address: 'Hitech City, Hyderabad',
+            defaultPrice: '11000',
+            image: 'https://images.unsplash.com/photo-1626015504767-542e58e4585c?q=80&w=1956&auto=format&fit=crop',
+            rating: 4.9,
+            reviews: 200,
+            isFallback: true
+        },
+        {
+            _id: 'fallback-4',
+            hostelName: 'Scholars Inn',
+            address: 'Anna Nagar, Chennai',
+            defaultPrice: '9500',
+            image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=2069&auto=format&fit=crop',
+            rating: 4.2,
+            reviews: 50,
+            isFallback: true
+        }
+    ];
+
+    const hasData = listings && listings.length > 0;
+    const displayListings = hasData ? listings.slice(0, 4) : fallbackListings;
+
     return (
         <section className="py-24 bg-gray-50/50">
             <div className="max-w-7xl mx-auto px-4">
@@ -764,41 +827,41 @@ function FeaturedHostelsSection({ listings, loading, router }) {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mb-12"
+                    className="flex justify-between items-end mb-12"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-                        Featured Hostels
-                    </h2>
-                    <p className="text-xl text-gray-600">Handpicked stays for you</p>
+                    <div>
+                        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                            Featured Hostels
+                        </h2>
+                        <p className="text-xl text-gray-600">Handpicked stays for you</p>
+                    </div>
+                    <button
+                        onClick={() => router.push('/pghostels/listings/all')}
+                        className="hidden md:flex items-center space-x-2 text-[#037166] font-semibold hover:text-[#025951] transition-colors"
+                    >
+                        <span>View All</span>
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
                 </motion.div>
 
                 <div className="grid md:grid-cols-2 gap-8">
                     {loading ? (
                         // Shimmer skeleton for featured hostels
                         [...Array(4)].map((_, i) => (
-                            <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 animate-pulse">
-                                <div className="relative h-72 bg-gray-200" />
-                                <div className="p-6 flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <div className="h-10 bg-gray-200 rounded w-32 mb-2" />
-                                        <div className="h-4 bg-gray-200 rounded w-24" />
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-5 h-5 bg-gray-200 rounded" />
-                                        <div className="h-6 bg-gray-200 rounded w-12" />
-                                    </div>
-                                </div>
-                            </div>
+                            <div key={i} className="bg-gray-200 rounded-[2.5rem] h-[30rem] animate-pulse" />
                         ))
                     ) : (
-                        listings.slice(0, 4).map((listing, i) => {
+                        displayListings.map((listing, i) => {
                             const hostelId = listing._id;
                             const hostelName = listing.hostelName;
                             const hostelArea = listing.address || listing.cityName;
                             const hostelPrice = parseInt(listing.defaultPrice);
-                            const hostelImage = `https://api.doorstephub.com/${listing.image}`;
+                            // Handle image URL: use directly if absolute (fallback), else prepend API URL
+                            const hostelImage = listing.image?.startsWith('http')
+                                ? listing.image
+                                : `https://api.doorstephub.com/${listing.image}`;
                             const hostelRating = listing.rating || 4.5;
-                            const hostelReviews = listing.reviews || 0;
+                            const isClickable = !listing.isFallback;
 
                             return (
                                 <motion.div
@@ -807,47 +870,60 @@ function FeaturedHostelsSection({ listings, loading, router }) {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.1 }}
-                                    whileHover={{ scale: 1.02, y: -5 }}
-                                    onClick={() => router.push(`/pghostels/hostel-detail/${hostelId}`)}
-                                    className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all border border-gray-100"
+                                    whileHover={isClickable ? { y: -5 } : {}}
+                                    onClick={() => isClickable && router.push(`/pghostels/hostel-detail/${hostelId}`)}
+                                    className={`group relative rounded-[2.5rem] overflow-hidden h-[30rem] bg-white ${isClickable ? 'cursor-pointer' : ''}`}
                                 >
-                                    <div className="relative h-72">
+                                    {/* Image Background */}
+                                    <div className="absolute inset-0">
                                         <div
-                                            className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                                             style={{ backgroundImage: `url("${hostelImage}")` }}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                        {/* Grey Finish Gradient */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-80" />
+                                    </div>
 
-                                        <button className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors border border-white/30">
-                                            <Heart className="w-5 h-5 text-white" />
-                                        </button>
+                                    {/* Content */}
+                                    <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                                        <div className="flex justify-between items-start">
+                                            <div className="px-4 py-2 bg-white/20 backdrop-blur-md border border-white/20 rounded-full">
+                                                <span className="text-white text-sm font-semibold tracking-wide">FEATURED</span>
+                                            </div>
+                                            <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white text-white hover:text-red-500 transition-all">
+                                                <Heart className="w-6 h-6" />
+                                            </button>
+                                        </div>
 
-                                        <div className="absolute bottom-4 left-4 right-4">
-                                            <h4 className="text-2xl font-bold text-white mb-2">{hostelName}</h4>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-white/90 flex items-center">
-                                                    <MapPin className="w-4 h-4 mr-1" />
-                                                    {hostelArea}
-                                                </span>
-                                                <div className="flex items-center space-x-2">
-                                                    {[Wifi, Utensils, Shirt].map((Icon, j) => (
-                                                        <div key={j} className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                                                            <Icon className="w-4 h-4 text-white" />
-                                                        </div>
-                                                    ))}
+                                        <div>
+                                            <div className="flex gap-3 mb-6">
+                                                {/* Amenities */}
+                                                {[Wifi, Utensils, Shirt].map((Icon, j) => (
+                                                    <div key={j} className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/90">
+                                                        <Icon className="w-5 h-5" />
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <h3 className="text-3xl font-bold text-white mb-2 leading-tight">{hostelName}</h3>
+                                            <div className="flex items-center text-white/80 text-lg mb-6">
+                                                <MapPin className="w-5 h-5 mr-2" />
+                                                {hostelArea}
+                                            </div>
+
+                                            <div className="flex items-center justify-between pt-6 border-t border-white/20">
+                                                <div>
+                                                    <p className="text-white/60 text-sm font-medium uppercase tracking-wider mb-1">Starting from</p>
+                                                    <div className="flex items-baseline gap-1">
+                                                        <span className="text-3xl font-bold text-white">₹{hostelPrice.toLocaleString()}</span>
+                                                        <span className="text-white/60">/mo</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl">
+                                                    <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                                                    <span className="text-white font-bold text-lg">{hostelRating}</span>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div className="p-6 flex items-center justify-between">
-                                        <div>
-                                            <span className="text-3xl font-bold text-gray-900">₹{hostelPrice.toLocaleString()}</span>
-                                            <span className="text-gray-500">/mo</span>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
-                                            <span className="font-semibold">{hostelRating}</span>
-                                            {hostelReviews > 0 && <span className="text-gray-500 text-sm">({hostelReviews})</span>}
                                         </div>
                                     </div>
                                 </motion.div>

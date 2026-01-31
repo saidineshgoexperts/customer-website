@@ -92,58 +92,67 @@ export function NearbyHostelsSection({ router }) {
                             {hostels.map((hostel, index) => (
                                 <motion.div
                                     key={hostel._id || index}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
+                                    initial={{ opacity: 0, x: 50 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: index * 0.1 }}
-                                    whileHover={{ scale: 1.02, y: -5 }}
+                                    whileHover={{ y: -12, scale: 1.02 }}
                                     onClick={() => router.push(`/pghostels/hostel-detail/${hostel._id}`)}
-                                    className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all border border-gray-100 w-80"
+                                    className="group relative flex-shrink-0 w-[22rem] cursor-pointer pl-2 py-4"
                                 >
-                                    {/* Popular Badge */}
-                                    {index < 3 && (
-                                        <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] shadow-lg">
-                                            <TrendingUp className="w-3 h-3 text-white" />
-                                            <h6 className="text-xs font-medium text-white">Popular</h6>
+                                    <div className="relative h-[30rem] rounded-[2.5rem] overflow-hidden bg-white">
+                                        <div className="absolute inset-0">
+                                            <div
+                                                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                                                style={{ backgroundImage: `url("https://api.doorstephub.com/${hostel.image}")` }}
+                                            />
+                                            {/* Grey Finish Gradient */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-90" />
                                         </div>
-                                    )}
 
-                                    <div className="relative h-72">
-                                        <div
-                                            className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-                                            style={{ backgroundImage: `url("https://api.doorstephub.com/${hostel.image}")` }}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-                                        <button className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors border border-white/30">
-                                            <Heart className="w-5 h-5 text-white" />
-                                        </button>
-
-                                        <div className="absolute bottom-4 left-4 right-4">
-                                            <h4 className="text-2xl font-bold text-white mb-2">{hostel.hostelName}</h4>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-white/90 flex items-center">
-                                                    <MapPin className="w-4 h-4 mr-1" />
-                                                    {hostel.address || hostel.cityName}
-                                                </span>
-                                                <div className="flex items-center space-x-2">
-                                                    {[Wifi, Utensils, Shirt].map((Icon, j) => (
-                                                        <div key={j} className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                                                            <Icon className="w-4 h-4 text-white" />
-                                                        </div>
-                                                    ))}
+                                        {/* Top Badges */}
+                                        <div className="absolute top-5 left-5 right-5 flex justify-between items-start z-10">
+                                            {index < 3 ? (
+                                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/20 shadow-lg">
+                                                    <TrendingUp className="w-3.5 h-3.5 text-[#ffcd3c]" />
+                                                    <span className="text-xs font-bold text-white tracking-wide uppercase">Popular</span>
                                                 </div>
+                                            ) : <div />}
+
+                                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md shadow-lg">
+                                                <Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
+                                                <span className="text-xs font-bold text-gray-900">{hostel.rating || 4.5}</span>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="p-6 flex items-center justify-between">
-                                        <div>
-                                            <span className="text-3xl font-bold text-gray-900">₹{parseInt(hostel.defaultPrice).toLocaleString()}</span>
-                                            <span className="text-gray-500">/mo</span>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
-                                            <span className="font-semibold">{hostel.rating || 4.5}</span>
+
+                                        {/* Content Overlay */}
+                                        <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
+                                            {/* Amenities Row */}
+                                            <div className="flex gap-2 mb-4">
+                                                {[Wifi, Utensils, Shirt].map((Icon, j) => (
+                                                    <div key={j} className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/90">
+                                                        <Icon className="w-3.5 h-3.5" />
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <h3 className="text-2xl font-bold text-white mb-2 line-clamp-1 leading-tight group-hover:text-[#4ddecb] transition-colors">
+                                                {hostel.hostelName}
+                                            </h3>
+
+                                            <div className="flex items-center text-white/70 text-sm mb-6">
+                                                <MapPin className="w-3.5 h-3.5 mr-1.5" />
+                                                <span className="truncate">{hostel.address || hostel.cityName}</span>
+                                            </div>
+
+                                            {/* Price & Action */}
+                                            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+
+
+                                                <div className="w-12 h-12 bg-white text-[#037166] rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-[#037166] group-hover:text-white transition-all shadow-lg">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -151,9 +160,7 @@ export function NearbyHostelsSection({ router }) {
                         </div>
                     </div>
 
-                    {/* Fade Edges */}
-                    <div className="absolute left-0 top-0 bottom-4 w-20 bg-gradient-to-r from-gray-50 to-transparent pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-4 w-20 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none" />
+
                 </div>
             </div>
         </section>

@@ -23,16 +23,94 @@ const options = {
   mapTypeControl: false,
   fullscreenControl: true,
   styles: [
+    { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+    {
+      featureType: "administrative.locality",
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#d59563" }],
+    },
+    {
+      featureType: "poi",
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#d59563" }],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "geometry",
+      stylers: [{ color: "#263c3f" }],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#6b9a76" }],
+    },
+    {
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [{ color: "#38414e" }],
+    },
+    {
+      featureType: "road",
+      elementType: "geometry.stroke",
+      stylers: [{ color: "#212a37" }],
+    },
+    {
+      featureType: "road",
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#9ca5b3" }],
+    },
+    {
+      featureType: "road.highway",
+      elementType: "geometry",
+      stylers: [{ color: "#746855" }],
+    },
+    {
+      featureType: "road.highway",
+      elementType: "geometry.stroke",
+      stylers: [{ color: "#1f2835" }],
+    },
+    {
+      featureType: "road.highway",
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#f3d19c" }],
+    },
+    {
+      featureType: "transit",
+      elementType: "geometry",
+      stylers: [{ color: "#2f3948" }],
+    },
+    {
+      featureType: "transit.station",
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#d59563" }],
+    },
+    {
+      featureType: "water",
+      elementType: "geometry",
+      stylers: [{ color: "#17263c" }],
+    },
+    {
+      featureType: "water",
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#515c6d" }],
+    },
+    {
+      featureType: "water",
+      elementType: "labels.text.stroke",
+      stylers: [{ color: "#17263c" }],
+    },
     {
       featureType: "poi",
       elementType: "labels",
       stylers: [{ visibility: "off" }]
     }
-  ]
+  ],
 };
 
 export function NearbyServiceCenters({ onViewAll }) {
-  const { location, detectLocation } = useLocation();
+  const { location, detectWithGPS, error: locationError } = useLocation();
   const [selectedService, setSelectedService] = useState(null);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -74,17 +152,17 @@ export function NearbyServiceCenters({ onViewAll }) {
             const offsetLng = location.lng + (Math.random() - 0.5) * 0.02;
 
             return {
-              id: service._id,
-              name: service.name || `${service.firstName} ${service.lastName}`,
+              id: service?._id || index,
+              name: service?.name || service?.business_name || `${service?.firstName || ''} ${service?.lastName || ''}` || 'Unknown Service',
               distance: `${(0.5 + index * 0.8).toFixed(1)} km`,
-              rating: parseFloat(service.rating) || 4.5,
-              status: service.storeHours || 'Open Now',
-              phone: service.phone || '+91 9876543210',
-              address: service.address || service.cityName || 'Hyderabad, Telangana',
+              rating: parseFloat(service?.rating) || 4.5,
+              status: service?.storeHours || 'Open Now',
+              phone: service?.phone || '+91 9876543210',
+              address: service?.address || service?.cityName || 'Hyderabad, Telangana',
               lat: offsetLat,
               lng: offsetLng,
-              image: service.image ? `https://api.doorstephub.com/${service.image}` : null,
-              logo: service.logo ? `https://api.doorstephub.com/${service.logo}` : null,
+              image: service?.image ? `https://api.doorstephub.com/${service.image}` : null,
+              logo: service?.logo ? `https://api.doorstephub.com/${service.logo}` : null,
             };
           });
 
@@ -234,13 +312,16 @@ export function NearbyServiceCenters({ onViewAll }) {
           </p>
 
           {!location && (
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col items-center">
               <button
-                onClick={detectLocation}
+                onClick={detectWithGPS}
                 className="px-8 py-3 bg-gradient-to-r from-[#037166] to-[#04a99d] hover:from-[#025951] text-white rounded-2xl font-medium transition-all shadow-lg shadow-[#037166]/30"
               >
                 🔍 Detect My Location
               </button>
+              {locationError && (
+                <p className="text-red-400 mt-2 text-sm max-w-md">{locationError}</p>
+              )}
             </div>
           )}
         </motion.div>
@@ -335,7 +416,7 @@ export function NearbyServiceCenters({ onViewAll }) {
                     <Navigation className="w-16 h-16 mx-auto mb-6 opacity-50" />
                     <p className="text-lg mb-2">Enable location access</p>
                     <button
-                      onClick={detectLocation}
+                      onClick={detectWithGPS}
                       className="mt-4 px-6 py-2 bg-[#037166] text-white rounded-xl"
                     >
                       Detect Location

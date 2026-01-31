@@ -14,7 +14,7 @@ const footerLinks = {
   ],
   services: [
 
-    { name: 'Become a ServicePartner', href: '#' },
+    { name: 'Become a ServicePartner', href: '/partner' },
 
     { name: 'Download App', href: '#' },
   ],

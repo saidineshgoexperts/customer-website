@@ -33,8 +33,18 @@ export default function ServicesPage() {
     const openExploreModal = () => setShowExploreModal(true);
 
     const handleExploreSelect = (type) => {
-        // Navigate to explore page with selected type
-        router.push(`/services/explore?type=${type}`);
+        // IDs provided by user for specific child categories
+        const typeToId = {
+            'partner': '683dbbfbb62d2a241de0f7e3', // Verified Partners
+            'center': '683dbc04b62d2a241de0f7e8'    // Service Center
+        };
+
+        const id = typeToId[type];
+        if (id) {
+            router.push(`/services/child/${id}?category=Services&name=${type === 'partner' ? 'Verified Partners' : 'Service Centers'}`);
+        } else {
+            console.error('Unknown explore type:', type);
+        }
         setShowExploreModal(false);
     };
 

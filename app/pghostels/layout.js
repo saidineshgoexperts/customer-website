@@ -1,4 +1,6 @@
 import { Header } from '@/components/layout/Header';
+import { NetworkStatus } from '@/components/ui/NetworkStatus';
+import { SessionManager } from '@/components/auth/SessionManager';
 
 export const metadata = {
     title: 'PG & Hostels Booking | SuperHub',
@@ -20,6 +22,8 @@ export default function PGHostelsLayout({ children }) {
 
     return (
         <>
+            <NetworkStatus />
+            <SessionManager />
             <Header theme={pgTheme} />
             {children}
         </>

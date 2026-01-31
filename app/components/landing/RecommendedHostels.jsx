@@ -27,10 +27,11 @@ export function RecommendedHostels() {
             residents: Math.floor(Math.random() * 20) + 30,
             image: hostel.image ? `https://api.doorstephub.com/${hostel.image}` : 'https://images.unsplash.com/photo-1743116591552-9ff5e8c1ad31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3p5JTIwYmVkcm9vbSUyMGhvc3RlbHxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
             features: [
-              hostel.address || 'Prime Location',
+              hostel.address || hostel.cityName || 'Prime Location',
               '24/7 Security',
               'Modern Amenities'
             ],
+            price: hostel.serviceBookingCost || hostel.startingAt || 0,
             trustScore: 95 + (index * 2)
           }));
           setHostels(mappedHostels);
@@ -204,41 +205,39 @@ export function RecommendedHostels() {
             >
               {/* Trust-Focused Card */}
               <div className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#1a1410] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
-                {/* Trust Score Badge */}
-                <div className="absolute top-6 right-6 z-20">
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    className="relative w-20 h-20"
-                  >
-                    <svg className="w-full h-full -rotate-90">
-                      <circle
-                        cx="40"
-                        cy="40"
-                        r="35"
-                        stroke="#1a1a1a"
-                        strokeWidth="6"
-                        fill="none"
-                      />
-                      <motion.circle
-                        cx="40"
-                        cy="40"
-                        r="35"
-                        stroke="#037166"
-                        strokeWidth="6"
-                        fill="none"
-                        strokeDasharray={220}
-                        initial={{ strokeDashoffset: 220 }}
-                        whileInView={{ strokeDashoffset: 220 - (220 * hostel.trustScore) / 100 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.5, delay: index * 0.3 }}
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="text-xl font-bold text-white">{hostel.trustScore}</div>
-                      <h6 className="text-xs text-[#037166]">Trust</h6>
-                    </div>
-                  </motion.div>
-                </div>
+
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="absolute top-6 right-6 z-20 w-20 h-20"
+                >
+                  <svg className="w-full h-full -rotate-90">
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="35"
+                      stroke="#1a1a1a"
+                      strokeWidth="6"
+                      fill="none"
+                    />
+                    <motion.circle
+                      cx="40"
+                      cy="40"
+                      r="35"
+                      stroke="#037166"
+                      strokeWidth="6"
+                      fill="none"
+                      strokeDasharray={220}
+                      initial={{ strokeDashoffset: 220 }}
+                      whileInView={{ strokeDashoffset: 220 - (220 * hostel.trustScore) / 100 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.5, delay: index * 0.3 }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="text-xl font-bold text-white">{hostel.trustScore}</div>
+                    <h6 className="text-xs text-[#037166]">Trust</h6>
+                  </div>
+                </motion.div>
 
                 {/* Image */}
                 <div className="relative h-72 overflow-hidden">
@@ -248,6 +247,14 @@ export function RecommendedHostels() {
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
+
+                  {/* Price Badge */}
+                  {hostel.price > 0 && (
+                    <div className="absolute bottom-6 right-6 z-20 bg-black/40 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-baseline space-x-1">
+                      <span className="text-white font-bold">₹{hostel.price}</span>
+                      <span className="text-white/70 text-xs">/mo</span>
+                    </div>
+                  )}
 
                   {/* Heart Icon */}
                   <motion.button
@@ -349,13 +356,13 @@ export function RecommendedHostels() {
             </motion.div>
           ))}
         </motion.div>
-      </div>
 
-      {hostels.length === 0 && !loading && (
-        <div className="text-center py-20">
-          <p className="text-gray-400 text-lg">No hostels available at the moment</p>
-        </div>
-      )}
+        {hostels.length === 0 && !loading && (
+          <div className="text-center py-20">
+            <p className="text-gray-400 text-lg">No hostels available at the moment</p>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

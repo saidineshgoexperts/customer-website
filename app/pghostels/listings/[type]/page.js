@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { useRouter, useSearchParams, useParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams, usePathname } from 'next/navigation';
 import {
     MapPin, Star, Search, Sliders, Heart, TrendingUp, X, Wifi, Utensils,
     Shirt, Zap, Shield, ChevronRight, Award, Sparkles, ArrowLeft
@@ -12,6 +12,7 @@ import { Input } from '@/components/pghostels/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/pghostels/ui/sheet';
 import { Slider } from '@/components/pghostels/ui/slider';
 import { Checkbox } from '@/components/pghostels/ui/checkbox';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 const mockListings = [
     {
@@ -118,6 +119,7 @@ export default function PGResultsPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const params = useParams();
+    const pathname = usePathname();
 
     // Since we don't have location.state in Next.js easily on refresh, 
     // we'll try to get basic filters from URL or default to empty
@@ -133,27 +135,114 @@ export default function PGResultsPage() {
     const [savedItems, setSavedItems] = useState([]);
     const [compareList, setCompareList] = useState([]);
     const [searchQuery, setSearchQuery] = useState(searchParams.get('query') || '');
-    const [filteredListings, setFilteredListings] = useState(mockListings);
+    const [filteredListings, setFilteredListings] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [usingFallback, setUsingFallback] = useState(false);
+    const [minRating, setMinRating] = useState(0);
+
+    // PG Hostels Service ID (from PremiumHomePage) - You might want to move these to a config file
+    const SERVICE_ID = '69524fb157bb211ca094e5ee';
+    const CATEGORY_ID = '65b2f234567890abcdef456'; // Replace with actual Category ID if known
+    const SUBCATEGORY_ID = '65b2f34567890abcdef789'; // Replace with actual Subcategory ID if known
+
+    const mapApiResponseToListing = (item) => {
+        if (!item) return null;
+        return {
+            id: item?._id || 'unknown',
+            name: item?.business_name || item?.hostelName || `${item?.firstName || ''} ${item?.lastName || ''}`.trim() || 'Professional Service',
+            location: item?.address || item?.cityName || 'Unknown Location',
+            rating: parseFloat(item?.rating) || 4.5,
+            orders: item?.totalOrders || 0,
+            basePrice: parseInt(item?.minFare) || 0,
+            monthlyPrice: item?.serviceBookingCost || parseInt(item?.minFare) || 6500, // Fallback price
+            image: item?.logo ? `https://api.doorstephub.com/${item.logo}` : mockListings[0]?.image,
+            distance: parseFloat(item?.distance?.replace(' km', '')) || 2.5,
+            matchScore: item?.matchScore || 90,
+            badges: item?.badges || ['Verified'],
+            amenities: item?.amenities?.length > 0 ? item.amenities : ['WiFi', 'Food', 'Laundry'],
+            availableBeds: 5,
+            description: item?.bio || ''
+        };
+    };
+
+    // Sync state with URL params on navigation
+    useEffect(() => {
+        const query = searchParams.get('query');
+        if (query !== null && query !== searchQuery) {
+            setSearchQuery(query);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
-        let filtered = mockListings;
+        const fetchListings = async () => {
+            setLoading(true);
+            try {
+                // Get location from URL params or localStorage
+                let lat = searchParams.get('lat') || "17.4483"; // Default Hyderabad
+                let lng = searchParams.get('lng') || "78.3915";
 
-        // Search Filter
-        if (searchQuery) {
-            const lowerQuery = searchQuery.toLowerCase();
-            filtered = filtered.filter(item =>
-                item.name.toLowerCase().includes(lowerQuery) ||
-                item.location.toLowerCase().includes(lowerQuery)
-            );
-        }
+                // If not in URL, try localStorage
+                if (!searchParams.get('lat') && typeof window !== 'undefined') {
+                    try {
+                        const storedLocation = localStorage.getItem('user_location_data');
+                        if (storedLocation) {
+                            const parsedLocation = JSON.parse(storedLocation);
+                            if (parsedLocation?.lat && parsedLocation?.lng) {
+                                lat = parsedLocation.lat.toString();
+                                lng = parsedLocation.lng.toString();
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error parsing stored location", e);
+                    }
+                }
 
-        // Price Filter
-        filtered = filtered.filter(item =>
-            item.monthlyPrice >= priceRange[0] && item.monthlyPrice <= priceRange[1]
-        );
+                // Construct API payload matching your Curl request
+                const payload = {
+                    lattitude: lat,
+                    longitude: lng,
+                    searchQuery: searchQuery || undefined,
+                    serviceId: SERVICE_ID,
+                    categoryId: CATEGORY_ID,
+                    subcategoryId: SUBCATEGORY_ID,
+                    minPrice: priceRange?.[0] || 0,
+                    maxPrice: priceRange?.[1] || 100000,
+                    minRating: minRating || 0
+                };
 
-        setFilteredListings(filtered);
-    }, [searchQuery, priceRange]);
+
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.professionalServices && data.professionalServices.length > 0) {
+                    const mapped = data.professionalServices.map(mapApiResponseToListing);
+                    setFilteredListings(mapped);
+                    setUsingFallback(false);
+                } else {
+                    // Don't fallback to mock data on search, let EmptyState handle it
+                    if (searchQuery) {
+                        setFilteredListings([]);
+                    } else {
+                        setFilteredListings(mockListings);
+                    }
+                    setUsingFallback(true);
+                }
+            } catch (error) {
+                console.error('Error fetching listings:', error);
+                setFilteredListings(mockListings);
+                setUsingFallback(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchListings();
+    }, [searchQuery, priceRange, minRating]); // Re-run when filters change
 
     const toggleSave = (id) => {
         setSavedItems(prev =>
@@ -185,7 +274,7 @@ export default function PGResultsPage() {
     const recommendedListings = sortedListings.slice(0, 3);
 
     const FilterPanel = () => (
-        <div className="space-y-6">
+        <div className="space-y-6 shadow-sm text-black">
             <div>
                 <h3 className="font-semibold text-gray-900 mb-4">Price Range</h3>
                 <Slider
@@ -195,7 +284,7 @@ export default function PGResultsPage() {
                     step={500}
                     value={priceRange}
                     onValueChange={setPriceRange}
-                    className="mb-2"
+                    className="mb-2 text-black"
                 />
                 <div className="flex justify-between text-sm text-gray-600">
                     <span>₹{priceRange[0].toLocaleString()}</span>
@@ -208,7 +297,10 @@ export default function PGResultsPage() {
                 <div className="space-y-2">
                     {[4.5, 4.0, 3.5, 3.0].map((rating) => (
                         <label key={rating} className="flex items-center space-x-2 cursor-pointer">
-                            <Checkbox />
+                            <Checkbox
+                                checked={minRating === rating}
+                                onCheckedChange={(checked) => setMinRating(checked ? rating : 0)}
+                            />
                             <div className="flex items-center">
                                 <Star className="w-4 h-4 fill-[#F59E0B] text-[#F59E0B] mr-1" />
                                 <span className="text-sm text-gray-700">{rating}+ stars</span>
@@ -223,19 +315,28 @@ export default function PGResultsPage() {
     const PGCard = ({ listing, isNearby, featured }) => {
         const isSaved = savedItems.includes(listing.id);
         const isComparing = compareList.includes(listing.id);
+        const isClickable = !usingFallback;
 
         return (
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -8 }}
-                className={`group cursor-pointer relative ${featured ? 'md:col-span-2' : ''}`}
+                whileHover={isClickable ? { y: -8 } : {}}
+                className={`group ${isClickable ? 'cursor-pointer' : 'select-none'} relative ${featured ? 'md:col-span-2' : ''}`}
             >
-                <div className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-[#037166]/30">
+                <div className={`bg-white rounded-3xl overflow-hidden shadow-lg border-2 border-gray-100 transition-all duration-300 ${isClickable ? 'hover:shadow-2xl hover:border-[#037166]/30' : 'blur-[2px] opacity-80'}`}>
+                    {/* Add Coming Soon Overlay */}
+                    {!isClickable && (
+                        <div className="absolute inset-0 z-50 flex items-center justify-center">
+                            <div className="bg-black/60 px-6 py-2 rounded-full backdrop-blur-md">
+                                <span className="text-white font-bold text-lg tracking-wide">Coming Soon</span>
+                            </div>
+                        </div>
+                    )}
                     {/* Image Section */}
                     <div className="relative h-64 overflow-hidden">
                         <div
-                            className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                            className={`absolute inset-0 bg-cover bg-center ${isClickable ? 'group-hover:scale-110' : ''} transition-transform duration-500`}
                             style={{ backgroundImage: `url(${listing.image})` }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
@@ -278,36 +379,38 @@ export default function PGResultsPage() {
                         )}
 
                         {/* Action Buttons */}
-                        <div className="absolute bottom-4 right-4 flex space-x-2">
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleSave(listing.id);
-                                }}
-                                className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
-                            >
-                                <Heart
-                                    className={`w-5 h-5 transition-all ${isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'
-                                        }`}
-                                />
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleCompare(listing.id);
-                                }}
-                                className={`px-4 py-2 backdrop-blur-sm rounded-full text-sm font-semibold transition-all shadow-lg ${isComparing
+                        {isClickable && (
+                            <div className="absolute bottom-4 right-4 flex space-x-2">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleSave(listing.id);
+                                    }}
+                                    className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
+                                >
+                                    <Heart
+                                        className={`w-5 h-5 transition-all ${isSaved ? 'fill-red-500 text-red-500' : 'text-gray-600'
+                                            }`}
+                                    />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleCompare(listing.id);
+                                    }}
+                                    className={`px-4 py-2 backdrop-blur-sm rounded-full text-sm font-semibold transition-all shadow-lg ${isComparing
                                         ? 'bg-[#037166] text-white'
                                         : 'bg-white/90 text-gray-900 hover:bg-white'
-                                    }`}
-                            >
-                                {isComparing ? '✓ Compare' : 'Compare'}
-                            </button>
-                        </div>
+                                        }`}
+                                >
+                                    {isComparing ? '✓ Compare' : 'Compare'}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Content Section */}
-                    <div className="p-6" onClick={() => router.push(`/pghostels/hostel-detail/${listing.id}`)}>
+                    <div className="p-6" onClick={() => isClickable && router.push(`/pghostels/hostel-detail/${listing.id}`)}>
                         {/* PG Name & Location */}
                         <div className="mb-4">
                             <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-[#037166] transition-colors">
@@ -363,9 +466,15 @@ export default function PGResultsPage() {
                                 </div>
                             </div>
 
-                            <button className="px-6 py-3 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-[#037166]/30 transition-all flex items-center space-x-2">
-                                <span>View Details</span>
-                                <ChevronRight className="w-4 h-4" />
+                            <button
+                                disabled={!isClickable}
+                                className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center space-x-2 ${isClickable
+                                    ? 'bg-gradient-to-r from-[#037166] to-[#025951] text-white hover:shadow-lg hover:shadow-[#037166]/30'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    }`}
+                            >
+                                <span>{isClickable ? 'View Details' : 'Preview Only'}</span>
+                                {isClickable && <ChevronRight className="w-4 h-4" />}
                             </button>
                         </div>
                     </div>
@@ -381,7 +490,7 @@ export default function PGResultsPage() {
                 <div className="max-w-7xl mx-auto px-4">
                     <button
                         onClick={() => router.back()}
-                        className="mb-8 flex items-center text-white/80 hover:text-white transition-colors"
+                        className="mb-8 mt-16 flex items-center text-white/80 hover:text-white transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5 mr-2" />
                         Back
@@ -430,9 +539,21 @@ export default function PGResultsPage() {
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <Input
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setSearchQuery(val);
+
+                                    // Update URL param while preserving other params (like lat, lng)
+                                    const currentParams = new URLSearchParams(searchParams.toString());
+                                    if (val) {
+                                        currentParams.set('query', val);
+                                    } else {
+                                        currentParams.delete('query');
+                                    }
+                                    router.replace(`${pathname}?${currentParams.toString()}`);
+                                }}
                                 placeholder="Search by area, landmark, hostel name..."
-                                className="pl-12 h-12 bg-gray-50 border-gray-200"
+                                className="pl-12 h-12 bg-gray-50 border-gray-200 text-black placeholder:text-gray-400"
                             />
                         </div>
                         <Sheet>
@@ -479,7 +600,31 @@ export default function PGResultsPage() {
                 )}
 
                 {/* Tabs */}
-                <Tabs defaultValue="all" className="space-y-6">
+                <Tabs
+                    defaultValue={searchParams.get('lat') ? "nearby" : "all"}
+                    onValueChange={(value) => {
+                        if (value === 'nearby') {
+                            // Try to get location from localStorage
+                            try {
+                                const storedLocation = localStorage.getItem('user_location_data');
+                                if (storedLocation) {
+                                    const parsedLocation = JSON.parse(storedLocation);
+                                    if (parsedLocation?.lat && parsedLocation?.lng) {
+                                        router.push(`/pghostels/listings/nearby?lat=${parsedLocation.lat}&lng=${parsedLocation.lng}`);
+                                        return;
+                                    }
+                                }
+                            } catch (e) {
+                                console.error("Error reading location for nearby tab", e);
+                            }
+                            // Fallback if no storage or error
+                            router.push('/pghostels/listings/nearby');
+                        } else {
+                            router.push('/pghostels/listings/all');
+                        }
+                    }}
+                    className="space-y-6 text-black shadow-sm"
+                >
                     <div className="flex items-center justify-between">
                         <TabsList className="bg-white border border-gray-200 p-1 shadow-sm">
                             <TabsTrigger
@@ -522,20 +667,34 @@ export default function PGResultsPage() {
                         {/* Listings Grid */}
                         <div className="flex-1">
                             <TabsContent value="all" className="mt-0">
-                                {sortedListings.length > 0 ? (
+                                {loading ? (
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        {[...Array(6)].map((_, i) => (
+                                            <div key={i} className="animate-pulse">
+                                                <div className="bg-gray-200 h-64 rounded-2xl mb-4" />
+                                                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                                                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : sortedListings.length > 0 ? (
                                     <div className="grid md:grid-cols-2 gap-6">
                                         {sortedListings.map((listing) => (
                                             <PGCard key={listing.id} listing={listing} />
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-20 bg-gray-50 rounded-3xl">
-                                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Search className="w-8 h-8 text-gray-400" />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">No PGs found</h3>
-                                        <p className="text-gray-500">Try adjusting your budget or filters</p>
-                                    </div>
+                                    <EmptyState
+                                        icon="search"
+                                        title="No PGs found"
+                                        description="We couldn't find any PGs matching your criteria. Try adjusting your price range or filters."
+                                        actionLabel="Reset Filters"
+                                        onAction={() => {
+                                            setPriceRange([5000, 20000]);
+                                            setSearchQuery('');
+                                        }}
+                                        className="bg-white rounded-3xl border border-gray-100 shadow-sm"
+                                    />
                                 )}
                             </TabsContent>
 
@@ -550,8 +709,8 @@ export default function PGResultsPage() {
                             </TabsContent>
                         </div>
                     </div>
-                </Tabs>
-            </div>
-        </div>
+                </Tabs >
+            </div >
+        </div >
     );
 }
