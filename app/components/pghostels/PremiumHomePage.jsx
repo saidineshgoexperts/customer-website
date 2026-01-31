@@ -36,6 +36,8 @@ export function PremiumHomePage() {
     const isHeroInView = useInView(heroRef, { once: true });
     const isCategoriesInView = useInView(categoriesRef, { once: true });
 
+    const [searchQuery, setSearchQuery] = useState('');
+
     useEffect(() => {
         const handleMouseMove = (e) => {
             setMousePosition({ x: e.clientX, y: e.clientY });
@@ -43,6 +45,18 @@ export function PremiumHomePage() {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
+
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            router.push(`/pghostels/listings/all?query=${encodeURIComponent(searchQuery)}`);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     // Fetch Featured Hostels
     useEffect(() => {
@@ -318,6 +332,9 @@ export function PremiumHomePage() {
                             <div className="flex-1 min-w-[300px] relative">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <Input
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={handleKeyDown}
                                     placeholder="Search by area, college, landmark..."
                                     className="pl-12 h-14 bg-white/50 border-gray-200 focus:border-[#037166] text-lg"
                                 />
@@ -345,6 +362,7 @@ export function PremiumHomePage() {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
+                                onClick={handleSearch}
                                 className="px-8 py-3.5 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-2xl font-semibold shadow-lg shadow-[#037166]/30"
                             >
                                 Search
@@ -369,7 +387,7 @@ export function PremiumHomePage() {
                         <p className="text-xl text-gray-600">Choose what fits your comfort & budget</p>
                     </motion.div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {loading ? (
                             // Shimmer skeleton for categories
                             [...Array(6)].map((_, i) => (
@@ -383,38 +401,72 @@ export function PremiumHomePage() {
                                 </div>
                             ))
                         ) : (
-                            apiCategories.map((cat, i) => (
-                                <motion.div
-                                    key={cat._id}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.1 }}
-                                    whileHover={{ y: -8, scale: 1.02 }}
-                                    onClick={() => handleCategoryClick(cat._id, cat.name)}
-                                    className="group cursor-pointer relative h-80 rounded-3xl overflow-hidden"
-                                >
-                                    {/* Image */}
-                                    <div
-                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                        style={{ backgroundImage: `url("https://api.doorstephub.com/${cat.image}")` }}
-                                    />
+                            apiCategories.map((cat, i) => {
+                                // Helper to get the best image for the category
+                                const getCategoryImage = (categoryName, apiImage) => {
+                                    const name = categoryName.toLowerCase();
+                                    const images = {
+                                        'boys': 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=2069&auto=format&fit=crop', // Modern room
+                                        'girls': 'https://images.unsplash.com/photo-1626015504767-542e58e4585c?q=80&w=1956&auto=format&fit=crop', // Cozy aesthetic room
+                                        'co-living': 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop', // Group/Social
+                                        'dorm': 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=2070&auto=format&fit=crop', // Bunk beds
+                                        'with food': 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1980&auto=format&fit=crop', // Healthy food
+                                    };
 
-                                    {/* Gradient Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
+                                    // Check for exact match or partial match
+                                    for (const [key, url] of Object.entries(images)) {
+                                        if (name.includes(key)) return url;
+                                    }
 
-                                    {/* Content */}
-                                    <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                                        <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#037166] transition-colors">
-                                            <Users className="w-7 h-7 text-white" />
+                                    // Fallback to API image or a default generic one
+                                    if (apiImage) {
+                                        return apiImage.startsWith('http') ? apiImage : `https://api.doorstephub.com/${apiImage}`;
+                                    }
+
+                                    return 'https://images.unsplash.com/photo-1520277739336-7bf67edfa768?q=80&w=2070&auto=format&fit=crop'; // Default fancy interior
+                                };
+
+                                const bgImage = getCategoryImage(cat.name, cat.image);
+
+                                return (
+                                    <motion.div
+                                        key={cat._id}
+                                        initial={{ opacity: 0, y: 30 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: i * 0.1 }}
+                                        whileHover={{ y: -12, scale: 1.03 }}
+                                        onClick={() => handleCategoryClick(cat._id, cat.name)}
+                                        className="group cursor-pointer relative h-96 rounded-[2.5rem] overflow-hidden shadow-xl"
+                                    >
+                                        {/* Image */}
+                                        <div
+                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                                            style={{
+                                                backgroundImage: `url("${bgImage}")`,
+                                                backgroundPosition: 'center',
+                                                backgroundSize: 'cover',
+                                                backgroundRepeat: 'no-repeat'
+                                            }}
+                                        />
+
+                                        {/* Gradient Overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+
+                                        {/* Content */}
+                                        <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                                            <div className="w-16 h-16 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#037166] group-hover:border-[#037166] group-hover:scale-110 transition-all duration-300 shadow-lg">
+                                                <Users className="w-8 h-8 text-white" />
+                                            </div>
+                                            <h4 className="text-3xl font-bold text-white mb-3 tracking-tight">{cat.name}</h4>
+                                            <div className="h-1 w-12 bg-[#037166] rounded-full group-hover:w-24 transition-all duration-300" />
                                         </div>
-                                        <h4 className="text-2xl font-bold text-white mb-2">{cat.name}</h4>
-                                    </div>
 
-                                    {/* Hover Border Glow */}
-                                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#037166] rounded-3xl transition-colors" />
-                                </motion.div>
-                            ))
+                                        {/* Hover Border Glow */}
+                                        <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#037166]/50 rounded-[2.5rem] transition-colors duration-300" />
+                                    </motion.div>
+                                );
+                            })
                         )}
                     </div>
                 </div>
