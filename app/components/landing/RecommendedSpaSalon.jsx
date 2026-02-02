@@ -8,6 +8,15 @@ import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 export function RecommendedSpaSalon() {
   const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Fetch featured spa stores from API
   useEffect(() => {
@@ -172,18 +181,29 @@ export function RecommendedSpaSalon() {
 
   return (
     <section className="relative py-32 overflow-hidden">
-      {/* Luxury Glow Background */}
+      {/* Architectural World Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#12100a] to-[#0a0a0a]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
 
-        {/* Golden Accent Gradients */}
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+        {/* Gradient Orbs - Intensified */}
         <motion.div
           animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.1, 0.15, 0.1],
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
           }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-[#037166]/20 via-[#d4af37]/10 to-transparent rounded-full blur-3xl"
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
         />
       </div>
 
@@ -198,13 +218,13 @@ export function RecommendedSpaSalon() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#d4af37]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Crown className="w-4 h-4 text-[#d4af37]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#d4af37] bg-clip-text text-transparent font-medium">
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">
               Luxury Glow World
             </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Recommended Spa & Salon
             </span>
           </h2>
@@ -228,7 +248,7 @@ export function RecommendedSpaSalon() {
               {/* Premium Card - Original sizing preserved */}
               <div className={`relative h-full bg-gradient-to-br from-[#1a1a1a] via-[#1a1510] to-[#0f0f0f] border-2 border-[#037166]/30 rounded-3xl overflow-hidden ${place.isDummy ? 'pointer-events-none' : ''}`}>
                 {/* Top Badge */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 px-8 py-1 bg-gradient-to-r from-[#d4af37]/90 to-[#037166]/90 backdrop-blur-md rounded-full rounded-t-none border border-t-0 border-[#d4af37]/30 shadow-lg whitespace-nowrap">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 px-8 py-1 bg-gradient-to-r from-[#d4af37]/90 to-[#037166]/90 backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#d4af37]/30 shadow-lg whitespace-nowrap">
                   <Award className="w-3 h-3 text-white" />
                   <h6 className="text-xs font-bold text-white">{place.badge}</h6>
                 </div>
@@ -244,18 +264,17 @@ export function RecommendedSpaSalon() {
                   {/* Premium Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
 
-                  {/* View Details Overlay Button */}
-                  <div className={`absolute bottom-20 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${place.isDummy ? 'pointer-events-none' : ''}`}>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
-                      className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap"
-                      disabled={place.isDummy}
-                    >
-                      View Details
-                    </motion.button>
-                  </div>
+                  {/* View Details Button Badge - Bottom Center */}
+                  {!place.isDummy && (
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div
+                        onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
+                        className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
+                      >
+                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">View Details</h6>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Shimmer Effect */}
                   <motion.div
@@ -278,7 +297,7 @@ export function RecommendedSpaSalon() {
                         <h6 className="text-xs text-[#d4af37] font-semibold mb-2 uppercase tracking-wider">
                           {place.category}
                         </h6>
-                        <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
+                        <h4 className="text-l  bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
                           {place.name}
                         </h4>
                       </div>

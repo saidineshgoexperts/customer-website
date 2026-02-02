@@ -59,6 +59,15 @@ const dummyJourneys = [
 export function RecommendedReligious() {
   const [journeys, setJourneys] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Fetch featured religious services from API
   useEffect(() => {
@@ -211,50 +220,30 @@ export function RecommendedReligious() {
 
   return (
     <section className="relative py-22 overflow-hidden">
-      {/* Guided Journey Background */}
+      {/* Architectural World Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0d12] to-[#0a0a0a]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
 
-        {/* Path Animation */}
-        <svg className="absolute inset-0 w-full h-full opacity-5">
-          <defs>
-            <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#037166" />
-              <stop offset="100%" stopColor="#9b59b6" />
-            </linearGradient>
-          </defs>
-          <motion.path
-            d="M 0 300 Q 400 100, 800 300 T 1600 300"
-            stroke="url(#pathGradient)"
-            strokeWidth="3"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            whileInView={{ pathLength: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 3 }}
-          />
-        </svg>
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
 
-        {/* Floating Orbs */}
-        {[...Array(5)].map((_, i) => (
-          <motion.div
-            key={i}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.2, 0.5, 0.2],
-            }}
-            transition={{
-              duration: 3 + i,
-              repeat: Infinity,
-              delay: i * 0.5,
-            }}
-            className="absolute w-2 h-2 bg-[#037166] rounded-full blur-sm"
-            style={{
-              left: `${20 + i * 20}%`,
-              top: `${30 + i * 10}%`,
-            }}
-          />
-        ))}
+        {/* Gradient Orbs - Intensified */}
+        <motion.div
+          animate={{
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
+        />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -268,13 +257,13 @@ export function RecommendedReligious() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#9b59b6]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Compass className="w-4 h-4 text-[#9b59b6]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent font-medium">
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">
               Guided Spiritual Journey
             </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white via-[#9b59b6] to-white bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Recommended Pandit's
             </span>
           </h2>
@@ -307,19 +296,17 @@ export function RecommendedReligious() {
 
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
 
-                  {/* Overlay Button */}
-                  <div
-                    className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-                  >
-                    <motion.button
-                      whileHover={journey.isDummy ? {} : { scale: 1.05 }}
-                      whileTap={journey.isDummy ? {} : { scale: 0.95 }}
-                      className={`px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap ${journey.isDummy ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      disabled={journey.isDummy}
-                    >
-                      Begin Journey
-                    </motion.button>
-                  </div>
+                  {/* Begin Journey Button Badge - Bottom Center */}
+                  {!journey.isDummy && (
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div
+                        onClick={() => !journey.isDummy && (window.location.href = `/religious-services?serviceId=${journey.id}`)}
+                        className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
+                      >
+                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Begin Journey</h6>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Compass Icon */}
                   <motion.div
@@ -341,7 +328,9 @@ export function RecommendedReligious() {
                 <div className="p-8">
                   {/* Title & Description */}
                   <div className="mb-6">
-                    <h4 className="text-lg font-bold text-white mb-3 group-hover:text-[#9b59b6] transition-colors">
+                    <h4 className="text-lg font-bold mb-3
+      bg-gradient-to-r from-[#037166] to-[#ff6b35]
+      bg-clip-text text-transparent">
                       {journey.title}
                     </h4>
                     <p className="text-gray-400 text-sm leading-relaxed">{journey.description}</p>

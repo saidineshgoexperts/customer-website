@@ -9,6 +9,15 @@ import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 export function RecommendedHostels() {
   const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Fetch latest PG hostels from API
   useEffect(() => {
@@ -152,18 +161,29 @@ export function RecommendedHostels() {
 
   return (
     <section className="relative py-32 overflow-hidden">
-      {/* Warm Comfort Background */}
+      {/* Architectural World Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0f0a0a] to-[#0a0a0a]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
 
-        {/* Warm Glow */}
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+        {/* Gradient Orbs - Intensified */}
         <motion.div
           animate={{
-            opacity: [0.15, 0.25, 0.15],
-            scale: [1, 1.1, 1],
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
           }}
-          transition={{ duration: 6, repeat: Infinity }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-[#037166]/20 via-[#ff6b35]/10 to-transparent rounded-full blur-3xl"
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
         />
       </div>
 
@@ -184,7 +204,7 @@ export function RecommendedHostels() {
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Recommended Hostels
             </span>
           </h2>
@@ -247,21 +267,18 @@ export function RecommendedHostels() {
                   <ImageWithFallback
                     src={hostel.image}
                     alt={hostel.name}
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                    className="w-full h-full  object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
 
-                  {/* Overlay Button */}
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {/* Schedule Visit Button Badge - Bottom Center */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <Link href={`/pghostels/hostel-detail/${hostel.id}`}>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap flex items-center space-x-2"
+                      <div
+                        className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
                       >
-                        <Home className="w-3 h-3" />
-                        <span>Schedule Visit</span>
-                      </motion.button>
+                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Schedule Your Space</h6>
+                      </div>
                     </Link>
                   </div>
 
@@ -281,7 +298,7 @@ export function RecommendedHostels() {
                 {/* Content */}
                 <div className="p-4 flex-1 flex flex-col">
                   <div className="mb-2">
-                    <h4 className="text-xl font-bold text-white mb-1 group-hover:text-[#037166] transition-colors line-clamp-1">
+                    <h4 className="text-xl font-bold bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent mb-1 group-hover:text-[#037166] transition-colors line-clamp-1">
                       {hostel.name}
                     </h4>
                     <p className="text-gray-400 italic text-sm line-clamp-2">{hostel.tagline}</p>

@@ -52,6 +52,15 @@ const dummyArticles = [
 export function KnowledgeSection() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -101,13 +110,31 @@ export function KnowledgeSection() {
   );
 
   return (
-    <section className="relative py-32 overflow-hidden">
-      {/* Creative Studio Background */}
+    <section className="relative py-18 overflow-hidden">
+      {/* Architectural World Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0f0d] to-[#0a0a0a]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+        {/* Gradient Orbs - Intensified */}
+        <motion.div
+          animate={{
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
+        />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,11 +148,11 @@ export function KnowledgeSection() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <BookOpen className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Creative Studio Cards</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Creative Studio Cards</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Knowledge Hub
             </span>
           </h2>
@@ -155,7 +182,7 @@ export function KnowledgeSection() {
                 >
                   {/* Trending Badge */}
                   {article.trending && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-8 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] backdrop-blur-md rounded-full rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-8 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2">
                       <TrendingUp className="w-3 h-3 text-white" />
                       <h6 className="text-xs font-bold text-white">Trending</h6>
                     </div>
@@ -167,7 +194,7 @@ export function KnowledgeSection() {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap"
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
                       >
                         Read Article
                       </motion.button>
@@ -193,7 +220,7 @@ export function KnowledgeSection() {
 
                   {/* Content */}
                   <div className="p-6">
-                    <h4 className="text-lg font-bold text-white mb-2 leading-snug group-hover:text-[#037166] transition-colors line-clamp-1">
+                    <h4 className="text-lg font-bold bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent mb-2 leading-snug group-hover:text-[#037166] transition-colors line-clamp-1">
                       {article.title}
                     </h4>
                     <p className="text-white/60 text-sm mb-4 line-clamp-2">

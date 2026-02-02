@@ -22,6 +22,15 @@ export function BookingServices() {
   const router = useRouter();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -61,9 +70,30 @@ export function BookingServices() {
 
   return (
     <section id="booking-services" className="relative py-22 overflow-hidden">
+      {/* Architectural World Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d1410] to-[#0a0a0a]" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgzLDExMywxMDIsMC4xKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
+
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+        {/* Gradient Orbs - Intensified */}
+        <motion.div
+          animate={{
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
+        />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,11 +106,11 @@ export function BookingServices() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-1 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Calendar className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Futuristic Dashboard</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Futuristic Service Partners</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Latest Booking Services
             </span>
           </h2>
@@ -106,9 +136,9 @@ export function BookingServices() {
               >
                 <div className="relative flex-1 bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300 flex flex-col">
                   {/* Status Badge - Top Center */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 px-3 py-1 bg-[#037166]/90 backdrop-blur-md rounded-b-full rounded-t-none text-xs  text-white shadow-lg border border-t-0 border-[#037166]/20 whitespace-nowrap">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 px-3 py-1 bg-[#037166]/90 backdrop-blur-md rounded-b-lg rounded-t-none text-[15px]  text-white shadow-lg border border-t-0 border-[#037166]/20 whitespace-nowrap">
 
-                    <h6 className="text   font-intro tracking-wide">{service.status}</h6>
+                    <h6 className="text-[10px] font-ubuntu tracking-wide">{service.status}</h6>
                   </div>
 
                   {/* Image - Fixed height */}
@@ -121,43 +151,51 @@ export function BookingServices() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
 
-                    {/* Book Now Button Overlay - Bottom Center */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <motion.button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleServiceClick(service);
-                        }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="px-4 py-2 bg-[#037166] rounded-full text-white text-xs font-bold tracking-wider flex items-center space-x-2 shadow-xl shadow-black/20 border border-white/10 hover:bg-[#025951] whitespace-nowrap"
-                      >
-                        <span>Book Now</span>
-                        <ChevronRight className="w-2 h-2" />
-                      </motion.button>
+                    {/* Book Now Button Badge - Bottom Center */}
+                    <div
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-[#025951]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleServiceClick(service);
+                      }}
+                    >
+                      <h6 className="text-[12px] font-ubuntu  tracking-wider ">Book Now</h6>
                     </div>
                   </div>
 
                   {/* Content */}
                   <div className="p-4 flex flex-col">
                     <div className="space-y-1">
-                      <h6 className="text-[10px] text-[#037166] font-medium uppercase tracking-wider">
-                        {service.category}
-                      </h6>
+
+                      {/* Category + Rating */}
+                      <div className="flex items-center justify-between">
+
+                        {/* Category */}
+                        <h6 className="text-[10px] text-[#037166] font-medium uppercase tracking-wider">
+                          {service.category}
+                        </h6>
+
+                        {/* Rating */}
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-[#037166] fill-[#037166]" />
+                          <span className="text-xs text-gray-300 font-medium">
+                            {service.rating}
+                          </span>
+                        </div>
+
+                      </div>
+
+                      {/* Title */}
                       <h4
-                        className="text-sm font text-white leading-tight line-clamp-2"
+                        className="text-[12px] font-medium bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent leading-tight line-clamp-2"
                         title={service.title}
                       >
                         {service.title}
                       </h4>
 
-                      {/* Rating moved here */}
-                      <div className="flex  space-x-1">
-                        <Star className="w-3 h-5 text-[#ffbd00] fill-[#ffbd00]" />
-                        <span className="text-xs text-gray-300 font-medium">{service.rating}</span>
-                      </div>
                     </div>
                   </div>
+
 
                   {/* Hover glow effect */}
                   <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/0 via-[#037166]/20 to-[#037166]/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />

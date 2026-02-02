@@ -404,7 +404,7 @@ function ServiceCardsSection({ services, loading, activeIndex }) {
                 />
               </div>
 
-              <h5 className={`text-xs font-medium text-center line-clamp-2 transition-colors duration-300 ${isActive ? 'text-[#04a99d]' : 'text-white group-hover:text-[#04a99d]'}`}>
+              <h5 className={`text-xs mt-2 font-medium text-center line-clamp-2 transition-colors duration-300 ${isActive ? 'text-[#04a99d]' : 'text-white group-hover:text-[#04a99d]'}`}>
                 {service.name}
               </h5>
             </motion.div>
@@ -442,27 +442,29 @@ function HeroContent({ services = [], loading = false, error = null }) {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      {/* Animated Background */}
+      {/* Standardized Architectural World Background */}
       <div className="absolute inset-0">
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
 
-        {/* Gradient Orbs */}
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+        {/* Gradient Orbs - Intensified */}
         <motion.div
           animate={{
             x: mousePosition.x * 0.02,
             y: mousePosition.y * 0.02,
           }}
           transition={{ type: 'spring', damping: 30 }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#037166]/20 rounded-full blur-[100px]"
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/30 rounded-full blur-[120px]"
         />
         <motion.div
           animate={{
-            x: -mousePosition.x * 0.015,
-            y: -mousePosition.y * 0.015,
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
           }}
           transition={{ type: 'spring', damping: 30 }}
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#025951]/20 rounded-full blur-[100px]"
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/20 rounded-full blur-[120px]"
         />
       </div>
 
@@ -481,14 +483,15 @@ function HeroContent({ services = [], loading = false, error = null }) {
             className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-8"
           >
             <Sparkles className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Welcome to the Future of Services</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">We are Committed to Provide you a Safe Service Experience
+            </h6>
           </motion.div>
 
           {/* Main Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold mb-6">
+          <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold mb-6 italic">
             {/* SVG Text for Stroke Animation */}
 
-            Everything You Need.
+            <span className="block bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Everything You Need.</span>
 
 
 
@@ -498,7 +501,7 @@ function HeroContent({ services = [], loading = false, error = null }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="block mt-2 bg-gradient-to-r from-[#037166] via-[#02b39a] to-[#037166] bg-clip-text text-transparent min-h-[1.2em]"
+              className="block mt-2 bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent min-h-[1.2em]"
             >
               {services.length > 0 ? services[activeIndex]?.name : "One Hub."}
             </motion.span>

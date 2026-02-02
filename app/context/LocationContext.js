@@ -110,12 +110,9 @@ export function LocationProvider({ children }) {
             }
         };
 
-        // Small delay to ensure client-side hydration complete
-        const timer = setTimeout(() => {
-            detectIPLocation();
-        }, 1000);
-
-        return () => clearTimeout(timer);
+        // Start IP-based detection immediately if no saved location
+        // Why: Provide city-level location as fast as possible
+        detectIPLocation();
     }, []);
 
     // 4. Active Cache Maintenance (Every 5 minutes)

@@ -6,28 +6,42 @@ import { Smartphone, Download, Star, Shield, Zap, Apple } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 export function AppDownload() {
-  return (
-    <section id="app-download" className="relative py-32 overflow-hidden">
-      {/* Dynamic Background */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a1412] to-[#0a0a0a]" />
+  const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
 
-        {/* Animated Waves */}
-        <svg className="absolute bottom-0 w-full h-64 opacity-10">
-          <motion.path
-            d="M0,160 Q400,100 800,160 T1600,160 L1600,256 L0,256 Z"
-            fill="url(#wave-gradient)"
-            initial={{ d: "M0,160 Q400,100 800,160 T1600,160 L1600,256 L0,256 Z" }}
-            animate={{ d: "M0,140 Q400,180 800,140 T1600,140 L1600,256 L0,256 Z" }}
-            transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
-          />
-          <defs>
-            <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#037166" />
-              <stop offset="100%" stopColor="#02b39a" />
-            </linearGradient>
-          </defs>
-        </svg>
+  React.useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  return (
+    <section id="app-download" className="relative py-16 overflow-hidden">
+      {/* Architectural World Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
+
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+        {/* Gradient Orbs - Intensified */}
+        <motion.div
+          animate={{
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
+        />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,13 +56,13 @@ export function AppDownload() {
             {/* Badge */}
             <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-8">
               <Download className="w-4 h-4 text-[#037166]" />
-              <h6 className="text-sm text-[#037166] font-medium">Download Our App</h6>
+              <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Download Our App</h6>
             </div>
 
             {/* Heading */}
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
               <span className="text-white">Everything in </span>
-              <span className="bg-gradient-to-r from-[#037166] to-[#02b39a] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
                 Your Pocket
               </span>
             </h2>

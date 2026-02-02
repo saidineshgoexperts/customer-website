@@ -228,11 +228,11 @@ export function PremiumPGHostels() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Building2 className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Modern Architectural World</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Modern Architectural World</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Premium PG & Hostels
             </span>
           </h2>
@@ -307,7 +307,7 @@ export function PremiumPGHostels() {
 
                   {/* Content */}
                   <div className="p-6">
-                    <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors h-16 line-clamp-2">
+                    <h4 className="text-2xl font-bold bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent mb-2 group-hover:text-[#037166] transition-colors h-16 line-clamp-2">
                       {hostel.name}
                     </h4>
 

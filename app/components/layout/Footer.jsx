@@ -164,7 +164,7 @@ export function Footer() {
               viewport={{ once: true }}
               className="text-white/40 text-sm"
             >
-              © {new Date().getFullYear()} DoorstepHub. All rights reserved.
+              © {new Date().getFullYear()} Doorstep Hub Pvt Ltd. All rights reserved.
             </motion.p>
 
             {/* Social Links */}
@@ -201,9 +201,7 @@ export function Footer() {
             transition={{ delay: 0.2 }}
             className="text-center mt-8"
           >
-            <p className="text-white/30 text-sm">
-              Built with ❤️ for seamless service experiences
-            </p>
+
           </motion.div>
         </div>
       </div>

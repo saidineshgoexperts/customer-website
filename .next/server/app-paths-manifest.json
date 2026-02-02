@@ -1,1 +1,5 @@
-{}
+{
+  "/(landing)/page": "app/(landing)/page.js",
+  "/services/page": "app/services/page.js",
+  "/pghostels/page": "app/pghostels/page.js"
+}

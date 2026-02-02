@@ -111,7 +111,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-comfortaa), cursive;
+    font-family: var(--font-ubuntu), sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -129,9 +129,12 @@
   button,
   input,
   label {
-    font-family: var(--font-comfortaa), cursive;
+    font-family: var(--font-ubuntu), sans-serif;
   }
+
 }
+
+
 
 /**
  * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.

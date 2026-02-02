@@ -10,6 +10,15 @@ import { toast } from 'sonner';
 export function LatestSpaServices() {
   const [spaStores, setSpaStores] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const fetchSpaServices = async () => {
@@ -38,26 +47,29 @@ export function LatestSpaServices() {
 
   return (
     <section className="relative py-22 overflow-hidden">
-      {/* Zen World Background */}
+      {/* Architectural World Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a120f] to-[#0a0a0a]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
 
-        {/* Breathing Animation Circles */}
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+        {/* Gradient Orbs - Intensified */}
         <motion.div
           animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.1, 0.2, 0.1],
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
           }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#037166]/20 rounded-full blur-3xl"
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
         />
         <motion.div
           animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.1, 0.2],
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
           }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#025951]/20 rounded-full blur-3xl"
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
         />
       </div>
 
@@ -72,7 +84,7 @@ export function LatestSpaServices() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Waves className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Calm Zen World</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Calm Zen World</h6>
           </div>
 
           <motion.h2
@@ -81,7 +93,7 @@ export function LatestSpaServices() {
             viewport={{ once: true }}
             className="text-4xl sm:text-5xl font-bold mb-4"
           >
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Recently Booked Spa & Saloons
             </span>
           </motion.h2>
@@ -159,16 +171,14 @@ export function LatestSpaServices() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
 
-                    {/* View Details Overlay Button */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {/* View Details Button Badge - Bottom Center */}
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <Link href={`/spa-salon/detail/${store._id}`}>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap"
+                        <div
+                          className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
                         >
-                          View Details
-                        </motion.button>
+                          <h6 className="text-[12px] font-ubuntu  tracking-wider">Book Appointment</h6>
+                        </div>
                       </Link>
                     </div>
 
@@ -184,7 +194,7 @@ export function LatestSpaServices() {
                   {/* Content */}
                   <div className="p-4 flex flex-col flex-1">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="text-lg font-semibold text-white group-hover:text-[#037166] transition-colors line-clamp-1">
+                      <h4 className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
                         {store.storeName}
                       </h4>
                       {/* Placeholder Rating/New Tag */}

@@ -12,7 +12,11 @@ module.exports = {
 
       fontFamily: {
         comfortaa: ['Comfortaa', 'cursive'],
-        // ubuntu: ['Ubuntu', 'sans-serif'], // since you're already using this
+        intro: ['Poppins', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+
+        ubuntu: ['var(--font-ubuntu)', 'sans-serif'], // since you're already using this
       },
       keyframes: {
         shimmer: {

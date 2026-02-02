@@ -91,7 +91,7 @@ export function Hero({ onViewServices, onBookService }) {
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight text-white">
+          <h1 className="text-6xl md:text-5xl lg:text-8xl font-bold !font-poppins  mb-6 leading-tight text-white">
             Expert Home Services
             <br />
             <span className="bg-gradient-to-r from-[#037166] via-[#04a99d] to-[#037166] bg-clip-text text-transparent">

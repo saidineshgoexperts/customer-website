@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Navigation, Star, Phone, Clock, Loader2 } from 'lucide-react';
-import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 import { useLocation } from '@/hooks/useLocation';
 
 const mapContainerStyle = {
@@ -79,43 +79,24 @@ const mapOptions = {
 
 export function NearbyServiceCenters() {
   const [isClient, setIsClient] = useState(false);
-  const { location, detectWithGPS, loading: contextLoading } = useLocation();
+  const { location, detectWithGPS, loading: contextLoading, isMapsLoaded } = useLocation();
   const [selectedService, setSelectedService] = useState(0);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [loadingProgress, setLoadingProgress] = useState(0); // Progress for map loading script
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
-  });
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  // Simulate progress for map script loading
-  useEffect(() => {
-    if (isLoaded) {
-      setLoadingProgress(100);
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setLoadingProgress(prev => {
-        if (prev >= 90) return prev; // Stall at 90% until loaded
-
-        // Dynamic random increments for organic feel
-        const randomJump = Math.random() * 2;
-        const speedFactor = prev < 30 ? 3 : prev < 60 ? 1.5 : 0.5;
-        const increment = (Math.random() * speedFactor) + randomJump;
-
-        return Math.min(prev + increment, 90);
-      });
-    }, 150); // Slightly slower update rate for smoother feel
-
-    return () => clearInterval(interval);
-  }, [isLoaded]);
 
   // Fetch service centers
   useEffect(() => {
@@ -197,7 +178,7 @@ export function NearbyServiceCenters() {
 
   // Map Component - PERFECT FIT WITH DARK MODE
   const MapComponent = useCallback(() => {
-    if (!isLoaded || !location) return null;
+    if (!isMapsLoaded || !location) return null;
 
     return (
       <div className="absolute inset-0 w-full h-full">
@@ -237,7 +218,7 @@ export function NearbyServiceCenters() {
         </GoogleMap>
       </div>
     );
-  }, [isLoaded, location, services, selectedService]);
+  }, [isMapsLoaded, location, services, selectedService]);
 
   // Skeleton (YOUR ORIGINAL)
   const SkeletonService = () => (
@@ -300,19 +281,30 @@ export function NearbyServiceCenters() {
   // YOUR EXACT ORIGINAL UI WITH DARK MAP & INSTANT LOAD
   return (
     <section className="relative py-12 overflow-hidden">
-      {/* Dark Map World Background - YOUR ORIGINAL */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a1410] to-[#0a0a0a]">
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-perfect">
-            <defs>
-              <pattern id="map-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-                <path d="M 10 10 L 90 10 L 90 90 L 10 90 Z" fill="none" stroke="rgba(3,113,102,0.3)" strokeWidth="0.5" />
-                <circle cx="50" cy="50" r="3" fill="rgba(3,113,102,0.5)" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#map-pattern)" />
-          </svg>
-        </div>
+      {/* Architectural World Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
+
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+        {/* Gradient Orbs - Intensified */}
+        <motion.div
+          animate={{
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
+        />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -325,11 +317,11 @@ export function NearbyServiceCenters() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Navigation className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Live Location Services</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Live Location Services</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Nearby Appliance Service Centers
             </span>
           </h2>
@@ -363,38 +355,14 @@ export function NearbyServiceCenters() {
             {/* Map fills entire card perfectly - DARK MODE */}
             <MapComponent />
 
-            {/* ULTRA-FAST FALLBACK - 0.5s max */}
-            {!isLoaded && (
+            {/* Simple FAST FALLBACK */}
+            {!isMapsLoaded && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#1a1a1a]/95 backdrop-blur-sm z-50">
-                <div className="w-64 space-y-4">
-                  <div className="flex justify-between text-[#037166] text-sm font-medium">
-                    <span className="animate-pulse">
-                      {loadingProgress < 30 ? "Initializing map engine..." :
-                        loadingProgress < 60 ? "Loading geolocation assets..." :
-                          loadingProgress < 85 ? "Connecting satellite feed..." : "Finalizing..."}
-                    </span>
-                    <span>{Math.round(loadingProgress)}%</span>
-                  </div>
-
-                  {/* Progress Bar Container */}
-                  <div className="h-2 w-full bg-[#2a2a2a] rounded-full overflow-hidden relative">
-                    {/* Shimmer Effect Background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffffff]/10 to-transparent w-1/2 h-full -translate-x-full animate-[shimmer_1.5s_infinite]" />
-
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-[#037166] to-[#04a99d] rounded-full relative overflow-hidden"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${loadingProgress}%` }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {/* Inner moving gloss */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent w-full h-full -translate-x-full animate-[shimmer_1s_infinite]" />
-                    </motion.div>
-                  </div>
-
-                  <div className="text-center text-xs text-gray-500">
-                    Optimizing routes & locations...
-                  </div>
+                <div className="flex flex-col items-center space-y-4">
+                  <Loader2 className="w-10 h-10 text-[#037166] animate-spin" />
+                  <span className="text-[#037166] text-sm font-medium animate-pulse">
+                    Loading Map...
+                  </span>
                 </div>
               </div>
             )}
@@ -419,7 +387,7 @@ export function NearbyServiceCenters() {
                     : 'bg-[#1a1a1a]/50 border border-[#037166]/20'
                     }`}
                 >
-                  <h4 className="text-xl font-bold">{service.name}</h4>
+                  <h4 className="text-xl font-bold bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">{service.name}</h4>
                   <p className="text-gray-400 text-sm">{service.address}</p>
                   <div className="flex gap-4 mt-2">
                     <span className="flex items-center text-[#037166] text-sm"><Star className="w-4 h-4 mr-1" /> {service.rating}</span>
