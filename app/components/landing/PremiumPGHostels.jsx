@@ -47,6 +47,15 @@ export function PremiumPGHostels() {
   const router = useRouter();
   const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Fetch featured PG hostels from API
   useEffect(() => {
@@ -167,32 +176,33 @@ export function PremiumPGHostels() {
   return (
     <section className="relative py-22 overflow-hidden">
       {/* Architectural World Background */}
+      {/* Animated Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
 
-        {/* Geometric Patterns */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,transparent_48%,#037166_48%,#037166_52%,transparent_52%)] bg-[length:60px_60px]" />
-        </div>
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
 
-        {/* Depth Layers */}
+        {/* Gradient Orbs - Intensified */}
         <motion.div
-          style={{ perspective: 1000 }}
-          className="absolute inset-0"
-        >
-          {[...Array(3)].map((_, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.05 + i * 0.02 }}
-              transition={{ delay: i * 0.2 }}
-              className="absolute inset-0 border-2 border-[#037166]"
-              style={{
-                transform: `translateZ(${i * 50}px) scale(${1 - i * 0.1})`,
-              }}
-            />
-          ))}
-        </motion.div>
+          animate={{
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#037166]/40 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{
+            x: -mousePosition.x * 0.02,
+            y: -mousePosition.y * 0.02,
+          }}
+          transition={{ type: 'spring', damping: 30 }}
+          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
+        />
+
+        {/* Central Highlight Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#ff6b35]/20 rounded-full blur-[150px] mix-blend-screen" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

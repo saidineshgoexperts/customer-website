@@ -370,7 +370,7 @@ export function NearbyServiceCenters() {
                 <motion.div
                   key={service.id}
                   onClick={() => setSelectedService(index)}
-                  className={`p-6 rounded-2xl cursor-pointer transition-all duration-300 ${selectedService === index
+                  className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${selectedService === index
                     ? 'bg-gradient-to-r from-[#037166]/20 to-[#025951]/20 border-2 border-[#037166]'
                     : 'bg-[#1a1a1a]/50 border border-[#037166]/20'
                     }`}
