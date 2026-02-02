@@ -1,124 +1,20 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Navigation, Star, Phone, Clock } from 'lucide-react';
-import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
+import { MapPin, Navigation, Star, Phone, Clock, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useLocation } from '@/hooks/useLocation';
 import { toast } from 'sonner';
 
-const mapContainerStyle = {
-  width: '100%',
-  height: '500px'
-};
 
-const center = {
-  lat: 17.3850, // Hyderabad default
-  lng: 78.4867
-};
-
-const options = {
-  zoomControl: true,
-  streetViewControl: false,
-  mapTypeControl: false,
-  fullscreenControl: true,
-  styles: [
-    { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-    { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-    { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-    {
-      featureType: "administrative.locality",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#d59563" }],
-    },
-    {
-      featureType: "poi",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#d59563" }],
-    },
-    {
-      featureType: "poi.park",
-      elementType: "geometry",
-      stylers: [{ color: "#263c3f" }],
-    },
-    {
-      featureType: "poi.park",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#6b9a76" }],
-    },
-    {
-      featureType: "road",
-      elementType: "geometry",
-      stylers: [{ color: "#38414e" }],
-    },
-    {
-      featureType: "road",
-      elementType: "geometry.stroke",
-      stylers: [{ color: "#212a37" }],
-    },
-    {
-      featureType: "road",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#9ca5b3" }],
-    },
-    {
-      featureType: "road.highway",
-      elementType: "geometry",
-      stylers: [{ color: "#746855" }],
-    },
-    {
-      featureType: "road.highway",
-      elementType: "geometry.stroke",
-      stylers: [{ color: "#1f2835" }],
-    },
-    {
-      featureType: "road.highway",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#f3d19c" }],
-    },
-    {
-      featureType: "transit",
-      elementType: "geometry",
-      stylers: [{ color: "#2f3948" }],
-    },
-    {
-      featureType: "transit.station",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#d59563" }],
-    },
-    {
-      featureType: "water",
-      elementType: "geometry",
-      stylers: [{ color: "#17263c" }],
-    },
-    {
-      featureType: "water",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#515c6d" }],
-    },
-    {
-      featureType: "water",
-      elementType: "labels.text.stroke",
-      stylers: [{ color: "#17263c" }],
-    },
-    {
-      featureType: "poi",
-      elementType: "labels",
-      stylers: [{ visibility: "off" }]
-    }
-  ],
-};
 
 export function NearbyServiceCenters({ onViewAll }) {
+  const router = useRouter();
   const { location, detectWithGPS, error: locationError } = useLocation();
-  const [selectedService, setSelectedService] = useState(null);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
-  });
 
   // Fetch nearest service centers
   useEffect(() => {
@@ -145,32 +41,19 @@ export function NearbyServiceCenters({ onViewAll }) {
         const data = await response.json();
 
         if (data.success && data.nearestServiceCenters) {
-          // Add coordinates to services (using location as fallback with offset)
-          const transformedServices = data.nearestServiceCenters.slice(0, 8).map((service, index) => {
-            // Simulate coordinates around user's location
-            const offsetLat = location.lat + (Math.random() - 0.5) * 0.02;
-            const offsetLng = location.lng + (Math.random() - 0.5) * 0.02;
-
-            return {
-              id: service?._id || index,
-              name: service?.name || service?.business_name || `${service?.firstName || ''} ${service?.lastName || ''}` || 'Unknown Service',
-              distance: `${(0.5 + index * 0.8).toFixed(1)} km`,
-              rating: parseFloat(service?.rating) || 4.5,
-              status: service?.storeHours || 'Open Now',
-              phone: service?.phone || '+91 9876543210',
-              address: service?.address || service?.cityName || 'Hyderabad, Telangana',
-              lat: offsetLat,
-              lng: offsetLng,
-              image: service?.image ? `https://api.doorstephub.com/${service.image}` : null,
-              logo: service?.logo ? `https://api.doorstephub.com/${service.logo}` : null,
-            };
-          });
+          const transformedServices = data.nearestServiceCenters.slice(0, 4).map((service, index) => ({
+            id: service?._id || index,
+            name: service?.name || service?.business_name || `${service?.firstName || ''} ${service?.lastName || ''}` || 'Unknown Service',
+            distance: `${(0.5 + index * 0.8).toFixed(1)} km`,
+            rating: parseFloat(service?.rating) || 4.5,
+            status: service?.storeHours || 'Open Now',
+            phone: service?.phone || '+91 9876543210',
+            address: service?.address || service?.cityName || 'Hyderabad, Telangana',
+            image: service?.image ? `https://api.doorstephub.com/${service.image}` : null,
+            logo: service?.logo ? `https://api.doorstephub.com/${service.logo}` : null,
+          }));
 
           setServices(transformedServices);
-          // Auto-select first service
-          if (transformedServices.length > 0) {
-            setSelectedService(0);
-          }
         } else {
           setServices([]);
         }
@@ -186,85 +69,7 @@ export function NearbyServiceCenters({ onViewAll }) {
     fetchNearestServiceCenters();
   }, [location]);
 
-  const MapComponent = useCallback(() => {
-    if (!isLoaded || !location) return null;
 
-    return (
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        center={{ lat: location.lat, lng: location.lng }}
-        zoom={13}
-        options={options}
-      >
-        {/* User's Location */}
-        <Marker
-          position={{ lat: location.lat, lng: location.lng }}
-          icon={{
-            url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            scaledSize: new window.google.maps.Size(40, 40)
-          }}
-          title="Your Location"
-        />
-
-        {/* Service Centers */}
-        {services.map((service, index) => (
-          <Marker
-            key={service.id}
-            position={{ lat: service.lat, lng: service.lng }}
-            title={service.name}
-            icon={{
-              url: selectedService === index
-                ? 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-                : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-              scaledSize: new window.google.maps.Size(32, 32)
-            }}
-            onClick={() => setSelectedService(index)}
-          />
-        ))}
-      </GoogleMap>
-    );
-  }, [isLoaded, location, services, selectedService]);
-
-  // Skeleton
-  const SkeletonService = () => (
-    <div className="p-6 rounded-2xl bg-[#1a1a1a]/50 backdrop-blur-sm border border-[#037166]/20 overflow-hidden relative">
-      <div className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none" />
-      <div className="flex items-start justify-between mb-3 relative z-10">
-        <div className="flex-1 space-y-2">
-          <div className="h-5 w-32 bg-[#2a2a2a] rounded animate-pulse" />
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <div className="w-4 h-4 bg-[#2a2a2a] rounded-full animate-pulse" />
-              <div className="h-3 w-12 bg-[#2a2a2a] rounded animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center justify-between relative z-10">
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-[#2a2a2a] rounded-full animate-pulse" />
-          <div className="h-4 w-20 bg-[#2a2a2a] rounded animate-pulse" />
-        </div>
-        <div className="h-10 w-20 bg-[#2a2a2a] rounded-lg animate-pulse" />
-      </div>
-    </div>
-  );
-
-  if (loadError) {
-    return (
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-red-400 mb-4">Failed to load Google Maps</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-[#037166] text-white rounded-full"
-          >
-            Retry
-          </button>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section id="nearby-centers" className="relative py-12 overflow-hidden">
@@ -296,19 +101,17 @@ export function NearbyServiceCenters({ onViewAll }) {
             <h6 className="text-sm text-[#037166] font-medium">Live Location Services</h6>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-              Nearest Appliance Service Centers
+          <h2 className="text-4xl sm:text-5xl font-bold mb-4 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => router.push('/services/child/683dbc04b62d2a241de0f7e8?category=Services&name=Service Centers')}
+          >
+            <span className="text-white">Nearest Appliance </span>
+            <span className="bg-gradient-to-r from-[#037166] via-[#04a99d] to-[#037166] bg-clip-text text-transparent">
+              Service Centers
             </span>
           </h2>
 
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            {/* Real-time service centers near {location ? location.shortAddress || 'you' : 'you'} */}
-            {selectedService !== null && services[selectedService] && (
-              <h4 className="block mt-2 text-[#04a99d] font-medium">
-                📍 {services[selectedService].name} ({services[selectedService].distance})
-              </h4>
-            )}
+            Find expert repair centers near you for all your home appliances.
           </p>
 
           {!location && (
@@ -326,106 +129,130 @@ export function NearbyServiceCenters({ onViewAll }) {
           )}
         </motion.div>
 
-        {/* Map & List */}
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
-          {/* Google Map */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative h-[500px] rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a]/90 to-[#0f0f0f]/90 border-2 border-[#037166]/20 shadow-2xl"
-          >
-            {!isLoaded ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-12 h-12 border-4 border-[#037166]/20 border-t-[#04a99d] rounded-full animate-spin mx-auto mb-4" />
-                  <p className="text-gray-400">Loading map...</p>
-                </div>
-              </div>
-            ) : !location ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-gray-400">
-                  <MapPin className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p>Enable location to see nearby centers</p>
-                </div>
-              </div>
-            ) : (
-              <MapComponent />
-            )}
-          </motion.div>
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {loading ? (
+            Array(4).fill(0).map((_, i) => (
+              <div key={i} className="h-96 rounded-3xl bg-white/5 animate-pulse border border-white/10" />
+            ))
+          ) : services.length > 0 ? (
+            services.map((service, index) => (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+                className="group cursor-pointer"
+                onClick={() => router.push(`/services/store/${service.id}`)}
+              >
+                <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
+                  {/* Distance Badge */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-6 py-1 bg-gradient-to-r from-[#037166] to-[#04a99d] backdrop-blur-md rounded-full rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2"
+                  >
+                    <MapPin className="w-3 h-3 text-white" />
+                    <span className="text-white text-xs font-bold">{service.distance} away</span>
+                  </motion.div>
 
-          {/* Services List */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-4 lg:max-h-[500px] "
-          >
-            {loading ? (
-              Array(4).fill(0).map((_, i) => <SkeletonService key={i} />)
-            ) : services.length > 0 ? (
-              services.map((service, index) => (
-                <motion.div
-                  key={service.id}
-                  onClick={() => setSelectedService(index)}
-                  whileHover={{ scale: 1.02 }}
-                  className={`p-3 rounded-2xl cursor-pointer transition-all duration-300 group ${selectedService === index
-                    ? 'bg-gradient-to-r from-[#037166]/30 to-[#04a99d]/20 border-2 border-[#037166] shadow-2xl shadow-[#037166]/40'
-                    : 'bg-[#1a1a1a]/70 border border-[#037166]/20 hover:border-[#037166]/40 hover:bg-[#1a1a1a]/90'
-                    }`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-white group-hover:text-[#04a99d] transition-colors">
-                        {service.name}
-                      </h4>
-                      <p className="text-gray-400 text-sm mt-1">{service.address}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-2 text-sm text-[#04a99d] mb-1">
-                        <Star className="w-4 h-4 fill-current" />
-                        {service.rating}
+                  {/* Image Container */}
+                  <div className="relative h-48 overflow-hidden bg-[#2a2a2a]">
+                    {service.image ? (
+                      <img
+                        src={service.image}
+                        alt={service.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <MapPin className="w-12 h-12 text-white/10" />
                       </div>
-                      <div className="text-xs text-gray-500">{service.distance}</div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                    {/* Hover Glow */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                      className="absolute inset-0 bg-gradient-to-t from-[#037166]/30 to-transparent"
+                    />
+
+                    {/* View Details Button - Bottom Right */}
+                    <div className="absolute bottom-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="w-10 h-10 rounded-full bg-[#037166] flex items-center justify-center shadow-lg shadow-black/40 border border-white/20"
+                      >
+                        <ArrowRight className="w-5 h-5 text-white" />
+                      </motion.button>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                    <h6 className={`px-3 py-1 rounded-full text-xs font-medium ${service.status === 'Open Now'
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                      : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                      }`}>
-                      {service.status}
-                    </h6>
-                    <button className="px-4 py-2 bg-[#037166]/50 hover:bg-[#037166] text-white text-sm rounded-xl transition-all group-hover:scale-105">
+                  {/* Card Content */}
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-[#037166]/20">
+                        <Star className="w-3.5 h-3.5 fill-[#04a99d] text-[#04a99d]" />
+                        <span className="text-xs font-bold text-white">{service.rating}</span>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${service.status === 'Open Now'
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                        : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                        }`}>
+                        {service.status.toUpperCase()}
+                      </span>
+                    </div>
+
+                    <h4 className="text-lg font-bold text-white mb-1 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                      {service.name}
+                    </h4>
+                    <p className="text-white/40 text-xs line-clamp-1 mb-4">
+                      {service.address}
+                    </p>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = `tel:${service.phone}`;
+                      }}
+                      className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-[#037166] border border-white/10 hover:border-[#037166] text-white text-sm font-semibold transition-all flex items-center justify-center gap-2"
+                    >
+                      <Phone className="w-4 h-4" />
                       Call Now
                     </button>
                   </div>
-                </motion.div>
-              ))
-            ) : (
-              <div className="text-center py-20 text-gray-500 border-2 border-dashed border-gray-700 rounded-3xl">
-                {location ? (
-                  <>
-                    <MapPin className="w-16 h-16 mx-auto mb-6 opacity-50" />
-                    <p className="text-lg mb-2">No service centers found nearby</p>
-                    <p className="text-sm">Try adjusting your location</p>
-                  </>
-                ) : (
-                  <>
-                    <Navigation className="w-16 h-16 mx-auto mb-6 opacity-50" />
-                    <p className="text-lg mb-2">Enable location access</p>
-                    <button
-                      onClick={detectWithGPS}
-                      className="mt-4 px-6 py-2 bg-[#037166] text-white rounded-xl"
-                    >
-                      Detect Location
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-          </motion.div>
+
+                  {/* Glass Border on Hover */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    className="absolute inset-0 rounded-2xl border-2 border-[#037166]/50 pointer-events-none"
+                  />
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-20 text-gray-500 border-2 border-dashed border-gray-700 rounded-3xl">
+              {location ? (
+                <>
+                  <MapPin className="w-16 h-16 mx-auto mb-6 opacity-50" />
+                  <p className="text-lg mb-2">No service centers found nearby</p>
+                  <button onClick={detectWithGPS} className="mt-4 px-6 py-2 bg-[#037166] text-white rounded-xl">Retry Detection</button>
+                </>
+              ) : (
+                <>
+                  <Navigation className="w-16 h-16 mx-auto mb-6 opacity-50" />
+                  <p className="text-lg mb-2">Enable location to see nearby stores</p>
+                  <button onClick={detectWithGPS} className="mt-4 px-8 py-3 bg-gradient-to-r from-[#037166] to-[#04a99d] text-white rounded-2xl shadow-lg">Detect My Location</button>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* View All Button */}
