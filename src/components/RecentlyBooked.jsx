@@ -51,7 +51,7 @@ const recentServices = [
 
 export function RecentlyBooked() {
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-5 relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-12">
@@ -112,7 +112,7 @@ export function RecentlyBooked() {
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      
+
                       {/* Hover Glow */}
                       <motion.div
                         initial={{ opacity: 0 }}

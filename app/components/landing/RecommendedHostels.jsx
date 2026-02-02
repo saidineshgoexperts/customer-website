@@ -51,7 +51,7 @@ export function RecommendedHostels() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#1a1410] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl"
+      className="relative h-full flex flex-col bg-gradient-to-br from-[#1a1a1a] to-[#1a1410] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl"
     >
       {/* Skeleton Trust Badge */}
       <div className="absolute top-6 right-6 z-20">
@@ -61,14 +61,14 @@ export function RecommendedHostels() {
       </div>
 
       {/* Skeleton Image */}
-      <div className="relative h-72 overflow-hidden">
+      <div className="relative h-40 overflow-hidden">
         <div className="w-full h-full bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 animate-shimmer rounded-t-3xl" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
         <div className="absolute top-6 left-6 w-12 h-12 bg-[#1a1a1a]/80 backdrop-blur-md border border-[#037166]/30 rounded-full animate-shimmer" />
       </div>
 
       {/* Skeleton Content */}
-      <div className="p-8">
+      <div className="p-4 flex-1 flex flex-col">
         <div className="mb-6">
           <div className="h-8 w-64 mb-3 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-shimmer" />
           <div className="h-5 w-48 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
@@ -97,7 +97,7 @@ export function RecommendedHostels() {
         </div>
 
         {/* Button */}
-        <div className="h-14 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-xl animate-shimmer" />
+        <div className="mt-auto h-10 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-xl animate-shimmer" />
       </div>
     </motion.div>
   );
@@ -127,7 +127,7 @@ export function RecommendedHostels() {
             <div className="h-5 w-64 mx-auto bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             <SkeletonCard />
             <SkeletonCard />
           </div>
@@ -193,7 +193,7 @@ export function RecommendedHostels() {
         </motion.div>
 
         {/* Hostels Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {hostels.map((hostel, index) => (
             <motion.div
               key={hostel.id || index}
@@ -204,7 +204,7 @@ export function RecommendedHostels() {
               className="group"
             >
               {/* Trust-Focused Card */}
-              <div className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#1a1410] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative h-full flex flex-col bg-gradient-to-br from-[#1a1a1a] to-[#1a1410] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
 
                 {/* Trust Score Circle - Static, commented out as requested */}
                 {/* <motion.div
@@ -241,7 +241,7 @@ export function RecommendedHostels() {
                 </motion.div> */}
 
                 {/* Image */}
-                <div className="relative h-72 overflow-hidden">
+                <div className="relative h-40 overflow-hidden">
                   <ImageWithFallback
                     src={hostel.image}
                     alt={hostel.name}
@@ -250,12 +250,7 @@ export function RecommendedHostels() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
 
                   {/* Price Badge - Dynamic */}
-                  {hostel.price > 0 && (
-                    <div className="absolute bottom-6 right-6 z-20 bg-black/40 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-baseline space-x-1">
-                      <span className="text-white font-bold">₹{hostel.price}</span>
-                      <span className="text-white/70 text-xs">/mo</span>
-                    </div>
-                  )}
+
 
                   {/* Heart Icon */}
                   {/* <motion.button
@@ -268,12 +263,12 @@ export function RecommendedHostels() {
                 </div>
 
                 {/* Content */}
-                <div className="p-8">
-                  <div className="mb-6">
-                    <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
+                <div className="p-4 flex-1 flex flex-col">
+                  <div className="mb-2">
+                    <h4 className="text-xl font-bold text-white mb-1 group-hover:text-[#037166] transition-colors line-clamp-1">
                       {hostel.name}
                     </h4>
-                    <p className="text-gray-400 italic">{hostel.tagline}</p>
+                    <p className="text-gray-400 italic text-sm line-clamp-2">{hostel.tagline}</p>
                   </div>
 
                   {/* Stats - Static, commented out as requested */}
@@ -289,7 +284,7 @@ export function RecommendedHostels() {
                   </div> */}
 
                   {/* Features */}
-                  <div className="space-y-3 mb-8">
+                  <div className="space-y-1 mb-3">
                     {hostel.features.map((feature, idx) => (
                       <motion.div
                         key={idx}
@@ -308,14 +303,14 @@ export function RecommendedHostels() {
                   </div>
 
                   {/* Action Button */}
-                  <div className="w-full">
+                  <div className="w-full mt-auto">
                     <Link href={`/pghostels/hostel-detail/${hostel.id}`}>
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/50 transition-all flex items-center justify-center space-x-2"
+                        className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/50 transition-all flex items-center justify-center space-x-2 text-sm"
                       >
-                        <Home className="w-5 h-5" />
+                        <Home className="w-4 h-4" />
                         <span>Schedule a Visit</span>
                       </motion.button>
                     </Link>

@@ -275,7 +275,7 @@ export function NearbyServiceCenters() {
 
   // YOUR EXACT ORIGINAL UI WITH DARK MAP & INSTANT LOAD
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section className="relative py-12 overflow-hidden">
       {/* Dark Map World Background - YOUR ORIGINAL */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a1410] to-[#0a0a0a]">
         <div className="absolute inset-0 opacity-10">

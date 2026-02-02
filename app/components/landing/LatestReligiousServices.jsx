@@ -130,7 +130,7 @@ export function LatestReligiousServices() {
   }
 
   return (
-    <section className="relative py-22 overflow-hidden">
+    <section className="relative py-18 overflow-hidden">
       {/* Spiritual Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0a10] to-[#0a0a0a]" />

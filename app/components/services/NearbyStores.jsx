@@ -267,7 +267,7 @@ export function NearbyServiceCenters({ onViewAll }) {
   }
 
   return (
-    <section id="nearby-centers" className="relative py-32 overflow-hidden">
+    <section id="nearby-centers" className="relative py-12 overflow-hidden">
       {/* Dark Map Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a1410] to-[#0a0a0a]">
         <div className="absolute inset-0 opacity-5">
@@ -298,12 +298,12 @@ export function NearbyServiceCenters({ onViewAll }) {
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-              Nearest Service Centers
+              Nearest Appliance Service Centers
             </span>
           </h2>
 
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Real-time service centers near {location ? location.shortAddress || 'you' : 'you'}
+            {/* Real-time service centers near {location ? location.shortAddress || 'you' : 'you'} */}
             {selectedService !== null && services[selectedService] && (
               <h4 className="block mt-2 text-[#04a99d] font-medium">
                 📍 {services[selectedService].name} ({services[selectedService].distance})

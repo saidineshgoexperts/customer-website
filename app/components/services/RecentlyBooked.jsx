@@ -94,7 +94,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
   // Loading state
   if (loading) {
     return (
-      <section className="py-20 relative overflow-hidden">
+      <section className="py-5 relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
           {/* Section Header */}
           <div className="mb-12">
@@ -157,7 +157,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
   }
 
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-5 relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-12">

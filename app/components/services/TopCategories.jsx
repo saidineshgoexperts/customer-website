@@ -114,7 +114,7 @@ export function TopCategories({ onViewAll }) {
   );
 
   return (
-    <section ref={sectionRef} className="py-20 relative overflow-hidden">
+    <section ref={sectionRef} className="py-5 relative overflow-hidden">
       <motion.div style={{ opacity, y }} className="max-w-[1400px] mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-12">
