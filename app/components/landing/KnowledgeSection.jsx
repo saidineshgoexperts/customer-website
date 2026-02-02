@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'motion/react';
 import { BookOpen, TrendingUp, Clock, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
@@ -154,11 +155,24 @@ export function KnowledgeSection() {
                 >
                   {/* Trending Badge */}
                   {article.trending && (
-                    <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] rounded-full flex items-center space-x-1">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-8 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] backdrop-blur-md rounded-full rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2">
                       <TrendingUp className="w-3 h-3 text-white" />
                       <h6 className="text-xs font-bold text-white">Trending</h6>
                     </div>
                   )}
+
+                  {/* Read Article Overlay Button */}
+                  <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${article.isDummy ? 'pointer-events-none' : ''}`}>
+                    <Link href={article.isDummy ? '#' : `/knowledge/${article.slug}`}>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap"
+                      >
+                        Read Article
+                      </motion.button>
+                    </Link>
+                  </div>
 
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden">
@@ -192,14 +206,7 @@ export function KnowledgeSection() {
                         <span>{article.readTime}</span>
                       </div>
 
-                      <motion.button
-                        whileHover={article.isDummy ? {} : { x: 5 }}
-                        className={`text-[#037166] font-medium text-sm flex items-center space-x-1 group/btn ${article.isDummy ? 'opacity-50' : ''}`}
-                        disabled={article.isDummy}
-                      >
-                        <span>Read</span>
-                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                      </motion.button>
+
                     </div>
                   </div>
 
@@ -245,12 +252,12 @@ export function KnowledgeSection() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-6 py-4 bg-[#0a0a0a]/80 border border-[#037166]/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#037166] transition-colors"
+              className="flex-1 px-6 py-4 bg-[#0a0a0a]/80 border border-[#037166]/30 rounded-full text-white placeholder-gray-500 focus:outline-none focus:border-[#037166] transition-colors"
             />
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold shadow-lg shadow-[#037166]/40 hover:shadow-xl hover:shadow-[#037166]/50 transition-all whitespace-nowrap"
+              className="px-8 py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full text-white font-semibold shadow-lg shadow-[#037166]/40 hover:shadow-xl hover:shadow-[#037166]/50 transition-all whitespace-nowrap"
             >
               Subscribe Now
             </motion.button>

@@ -359,7 +359,7 @@ export function NearbyServiceCenters({ onViewAll }) {
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-4 lg:max-h-[500px] lg:overflow-y-auto"
+            className="space-y-4 lg:max-h-[500px] "
           >
             {loading ? (
               Array(4).fill(0).map((_, i) => <SkeletonService key={i} />)
@@ -369,7 +369,7 @@ export function NearbyServiceCenters({ onViewAll }) {
                   key={service.id}
                   onClick={() => setSelectedService(index)}
                   whileHover={{ scale: 1.02 }}
-                  className={`p-6 rounded-2xl cursor-pointer transition-all duration-300 group ${selectedService === index
+                  className={`p-3 rounded-2xl cursor-pointer transition-all duration-300 group ${selectedService === index
                     ? 'bg-gradient-to-r from-[#037166]/30 to-[#04a99d]/20 border-2 border-[#037166] shadow-2xl shadow-[#037166]/40'
                     : 'bg-[#1a1a1a]/70 border border-[#037166]/20 hover:border-[#037166]/40 hover:bg-[#1a1a1a]/90'
                     }`}

@@ -41,6 +41,18 @@ const dummyJourneys = [
     image: 'https://images.unsplash.com/photo-1604360699049-7414bc918667?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwaWxvZyUyMHRlbXBsZXxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
     highlights: ['Traditional Chants', 'Ceremonial Fire', 'Spiritual Discourse'],
     isDummy: true
+  },
+  {
+    id: 'dummy-4',
+    title: 'Havan & Puja',
+    description: 'Perform sacred fire rituals for peace and prosperity',
+    duration: '2.5 hours',
+    difficulty: 'Easy',
+    rating: 4.9,
+    participants: 18,
+    image: 'https://images.unsplash.com/photo-1609109282717-d64e81561f36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaXJlJTIwcml0dWFsfGVufDF8fHwxNzY4MDI2NzQ5fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    highlights: ['Vedic Mantras', 'Sacred Fire', 'Blessings'],
+    isDummy: true
   }
 ];
 
@@ -73,7 +85,7 @@ export function RecommendedReligious() {
             ],
             isDummy: false
           }));
-          setJourneys(mappedJourneys);
+          setJourneys(mappedJourneys.slice(0, 4));
         } else {
           setJourneys(dummyJourneys);
         }
@@ -172,7 +184,8 @@ export function RecommendedReligious() {
             <div className="h-5 w-64 mx-auto bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
@@ -272,7 +285,7 @@ export function RecommendedReligious() {
         </motion.div>
 
         {/* Journey Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {journeys.map((journey, index) => (
             <motion.div
               key={journey.id || index}
@@ -294,6 +307,20 @@ export function RecommendedReligious() {
 
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
 
+                  {/* Overlay Button */}
+                  <div
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                  >
+                    <motion.button
+                      whileHover={journey.isDummy ? {} : { scale: 1.05 }}
+                      whileTap={journey.isDummy ? {} : { scale: 0.95 }}
+                      className={`px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap ${journey.isDummy ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      disabled={journey.isDummy}
+                    >
+                      Begin Journey
+                    </motion.button>
+                  </div>
+
                   {/* Compass Icon */}
                   <motion.div
                     animate={{ rotate: 360 }}
@@ -314,10 +341,10 @@ export function RecommendedReligious() {
                 <div className="p-8">
                   {/* Title & Description */}
                   <div className="mb-6">
-                    <h4 className="text-2xl font-bold text-white mb-3 group-hover:text-[#9b59b6] transition-colors">
+                    <h4 className="text-lg font-bold text-white mb-3 group-hover:text-[#9b59b6] transition-colors">
                       {journey.title}
                     </h4>
-                    <p className="text-gray-400 leading-relaxed">{journey.description}</p>
+                    <p className="text-gray-400 text-sm leading-relaxed">{journey.description}</p>
                   </div>
 
                   {/* Journey Details */}
@@ -370,15 +397,6 @@ export function RecommendedReligious() {
                       </div>
                       <span>{journey.participants}+ joined</span>
                     </div>
-
-                    <motion.button
-                      whileHover={journey.isDummy ? {} : { scale: 1.05 }}
-                      whileTap={journey.isDummy ? {} : { scale: 0.95 }}
-                      className={`px-6 py-3 bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-[length:200%_100%] rounded-xl text-white font-semibold shadow-lg shadow-[#037166]/40 transition-all duration-500 ${journey.isDummy ? 'opacity-50 cursor-not-allowed' : 'hover:bg-right'}`}
-                      disabled={journey.isDummy}
-                    >
-                      Begin Journey
-                    </motion.button>
                   </div>
                 </div>
 

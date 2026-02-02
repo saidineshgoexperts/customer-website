@@ -147,8 +147,8 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
           </motion.p>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+        {/* Services Horizontal Scroller */}
+        <div className="flex overflow-x-auto gap-6 scroll-smooth snap-x snap-mandatory py-6">
           {services.map((service, index) => (
             <motion.div
               key={service._id}
@@ -157,7 +157,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8 }}
-              className="group cursor-pointer"
+              className="flex-shrink-0 w-[85%] sm:w-[50%] md:w-[33%] lg:w-[22%] xl:w-[15.5%] snap-start group cursor-pointer"
               onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName)}
             >
               <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
@@ -166,9 +166,9 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-xs font-medium text-white shadow-lg"
+                  className="absolute top-0 inset-x-0 mx-auto w-fit z-20 px-6 py-1 bg-gradient-to-r from-[#037166] to-[#04a99d] backdrop-blur-md rounded-full rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2"
                 >
-                  <h6 className="m-0 text-inherit font-inherit">⭐ {service.serviceDelhiveryType || 'Featured'}</h6>
+                  <h6 className="m-0 text-white text-xs font-bold w-full text-center">⭐ {service.serviceDelhiveryType || 'Featured'}</h6>
                 </motion.div>
 
                 {/* Image */}
@@ -186,6 +186,17 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                     whileHover={{ opacity: 1 }}
                     className="absolute inset-0 bg-gradient-to-t from-[#037166]/30 to-transparent"
                   />
+
+                  {/* Arrow Button - Bottom Right */}
+                  <div className="absolute bottom-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="w-10 h-10 rounded-full bg-[#037166] flex items-center justify-center shadow-lg shadow-black/40 border border-white/20"
+                    >
+                      <ArrowRight className="w-5 h-5 text-white" />
+                    </motion.button>
+                  </div>
                 </div>
 
                 {/* Content */}
@@ -209,20 +220,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                     {service.description}
                   </p>
 
-                  {/* Price & CTA */}
-                  <div className="flex items-center justify-end">
-                    {/* <div>
-                      <p className="text-xs text-white/50 mb-1">Starting from</p>
-                      <p className="text-2xl font-bold text-white">₹{service.serviceCharge}</p>
-                    </div> */}
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="w-12 h-12 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center shadow-lg shadow-[#037166]/30 group-hover:shadow-[#037166]/50 transition-all"
-                    >
-                      <ArrowRight className="w-5 h-5 text-white" />
-                    </motion.button>
-                  </div>
+
                 </div>
 
                 {/* Glass Border on Hover */}

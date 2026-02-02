@@ -8,7 +8,19 @@ module.exports = {
     './src/**/*.{js,jsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+
+      fontFamily: {
+        comfortaa: ['Comfortaa', 'cursive'],
+        // ubuntu: ['Ubuntu', 'sans-serif'], // since you're already using this
+      },
+      keyframes: {
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        }
+      },
+    },
   },
   plugins: [],
 };

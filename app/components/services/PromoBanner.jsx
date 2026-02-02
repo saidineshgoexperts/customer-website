@@ -122,7 +122,7 @@ export function PromoBanner() {
                       transition={{ duration: 2, repeat: Infinity }}
                       className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg shadow-xl"
                     >
-                      <h6 className="text-inherit font-inherit">Up to {product.discount} OFF</h6>
+                      <h6 className="text-inherit font-intro">Up to {product.discount} OFF</h6>
                     </motion.div>
                   </div>
 

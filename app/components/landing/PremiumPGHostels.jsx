@@ -26,7 +26,7 @@ const dummyHostels = [
     location: 'Hitech City, Hyderabad',
     price: '₹15,000/month',
     occupancy: 'Single',
-    image: 'https://images.unsplash.com/photo-1522771753062-5a496b63115a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBiZWRyb29tfGVufDF8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1594873604892-b599f847e859?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njc5NTMwMzR8MA&ixlib=rb-4.1.0&q=80&w=1080',
     amenities: ['AC Rooms', 'Food Included', 'Laundry', 'Gym Access'],
     isDummy: true
   },
@@ -37,8 +37,19 @@ const dummyHostels = [
     location: 'Madhapur, Hyderabad',
     price: '₹10,000/month',
     occupancy: 'Double/Triple',
-    image: 'https://images.unsplash.com/photo-1505693416388-b0346efee539?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwgY296eSUyMHJvb218ZW58MXx8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwgc3R1ZGVudCUyMHJvb218ZW58MXx8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
     amenities: ['Housekeeping', 'Recreation', 'Study Rooms', 'Cafeteria'],
+    isDummy: true
+  },
+  {
+    id: 'dummy-4',
+    name: 'Urban Nest Hostel',
+    type: 'Student Living',
+    location: 'Kukatpally, Hyderabad',
+    price: '₹9,500/month',
+    occupancy: 'Double/Triple',
+    image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwgc3R1ZGVudCUyMHJvb218ZW58MXx8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    amenities: ['Wi-Fi', 'Study Area', 'Mess', 'CCTV'],
     isDummy: true
   }
 ];
@@ -141,7 +152,7 @@ export function PremiumPGHostels() {
         {/* Amenities */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex items-center space-x-2 p-2 bg-[#1a1a1a]/50 rounded-lg">
+            <div key={i} className="flex items-center space-x-2 p-1 bg-[#1a1a1a]/50 rounded-lg">
               <div className="w-4 h-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
               <div className="h-4 w-20 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
             </div>
@@ -201,8 +212,9 @@ export function PremiumPGHostels() {
           className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#025951]/40 rounded-full blur-[120px]"
         />
 
-        {/* Central Highlight Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#ff6b35]/20 rounded-full blur-[150px] mix-blend-screen" />
+
+        {/* Central Highlight Glow - Warm Warmth */}
+
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -243,13 +255,14 @@ export function PremiumPGHostels() {
 
         {/* Content or Skeleton */}
         {loading ? (
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {hostels.map((hostel, index) => (
               <motion.div
                 key={hostel.id || index}
@@ -267,9 +280,12 @@ export function PremiumPGHostels() {
                   style={{ transformStyle: 'preserve-3d' }}
                 >
                   {/* Type Badge */}
-                  <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-[#037166]/80 backdrop-blur-md border border-[#037166]/50 rounded-full">
-                    <h6 className="text-xs font-bold text-white uppercase tracking-wider">{hostel.type}</h6>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-8 py-1 bg-[#037166]/90 backdrop-blur-md rounded-full rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap">
+                    <h6 className="text-xs font-intro text-white  tracking-wider">
+                      {hostel.type}
+                    </h6>
                   </div>
+
 
                   {/* Image with Depth */}
                   <div className="relative h-64 overflow-hidden">
@@ -291,26 +307,54 @@ export function PremiumPGHostels() {
 
                   {/* Content */}
                   <div className="p-6">
-                    <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
+                    <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors h-16 line-clamp-2">
                       {hostel.name}
                     </h4>
 
-                    <div className="space-y-2 mb-6">
+                    <div className="space-y-1 mb-3">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-400">Location</span>
-                        <span className="text-white font-medium">{hostel.location}</span>
+                        <span className="text-white font-intro text-right flex-1 ml-4">{hostel.location}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-400">Occupancy</span>
-                        <span className="text-white font-medium">{hostel.occupancy}</span>
+                        <span className="text-white font-intro text-right flex-1 ml-4">{hostel.occupancy}</span>
                       </div>
                     </div>
 
                     {/* Price */}
-                    <div className="mb-6 p-4 bg-[#037166]/10 border border-[#037166]/20 rounded-xl">
-                      <h6 className="text-sm text-gray-400 mb-1">Starting from</h6>
-                      <div className="text-3xl font-bold text-[#037166]">{hostel.price}</div>
+                    <div className="mb-2 p-2 border border-[#037166]/20 rounded-xl flex items-center justify-between gap-2">
+
+                      {/* Left: Price */}
+                      <div>
+                        <h6 className="text-[10px] text-gray-400 mb-0.5 font-intro">
+                          Starting from
+                        </h6>
+                        <div className="text-sm font-bold text-[#037166] font-intro">
+                          {hostel.price}
+                        </div>
+                      </div>
+
+
+
+                      {/* Right: Book Now */}
+                      <div className={`${hostel.isDummy ? 'opacity-100 pointer-events-none' : ''}`}>
+                        <Link
+                          href={hostel.isDummy ? '#' : `/pghostels/hostel-detail/${hostel.id}`}
+                        >
+                          <motion.button
+                            whileHover={{ scale: 1.04 }}
+                            whileTap={{ scale: 0.97 }}
+                            disabled={hostel.isDummy}
+                            className="px-2 py-1.5 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full text-white font-semibold text-[10px] shadow-lg shadow-[#037166]/30 whitespace-nowrap"
+                          >
+                            Book Now
+                          </motion.button>
+                        </Link>
+                      </div>
+
                     </div>
+
 
                     {/* Amenities */}
                     <div className="grid grid-cols-2 gap-3 mb-6">
@@ -333,28 +377,7 @@ export function PremiumPGHostels() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className={`grid grid-cols-2 gap-3 ${hostel.isDummy ? 'opacity-50 pointer-events-none' : ''}`}>
-                      <Link href={hostel.isDummy ? '#' : `/pghostels/hostel-detail/${hostel.id}`} className="w-full">
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold text-sm shadow-lg shadow-[#037166]/30"
-                          disabled={hostel.isDummy}
-                        >
-                          Book Tour
-                        </motion.button>
-                      </Link>
-                      <Link href={hostel.isDummy ? '#' : `/pghostels/hostel-detail/${hostel.id}`} className="w-full">
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full py-3 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#037166]/30 rounded-xl text-white font-semibold text-sm hover:bg-[#037166]/10 transition-all"
-                          disabled={hostel.isDummy}
-                        >
-                          Details
-                        </motion.button>
-                      </Link>
-                    </div>
+
                   </div>
 
                   {/* 3D Depth Effect */}

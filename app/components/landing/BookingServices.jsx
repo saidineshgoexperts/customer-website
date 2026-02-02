@@ -8,21 +8,11 @@ import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 function SkeletonCard() {
   return (
-    <div className="h-[440px] bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden">
-      <div className="h-48 bg-gradient-to-r from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] animate-pulse" />
-      <div className="p-6 space-y-4 h-[192px] flex flex-col justify-between">
-        <div className="space-y-2">
-          <div className="h-3 w-24 bg-[#2a2a2a] rounded animate-pulse" />
-          <div className="h-5 bg-[#2a2a2a] rounded animate-pulse w-3/4" />
-          <div className="h-5 bg-[#2a2a2a] rounded animate-pulse w-full" />
-        </div>
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <div className="h-4 w-16 bg-[#2a2a2a] rounded animate-pulse" />
-            <div className="h-4 w-24 bg-[#2a2a2a] rounded animate-pulse" />
-          </div>
-          <div className="h-12 bg-[#2a2a2a] rounded-xl animate-pulse" />
-        </div>
+    <div className="h-auto bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden">
+      <div className="h-40 bg-gradient-to-r from-[#1a1a1a] via-[#2a2a2a] to-[#1a1a1a] animate-pulse" />
+      <div className="p-4 space-y-2">
+        <div className="h-3 w-24 bg-[#2a2a2a] rounded animate-pulse" />
+        <div className="h-5 bg-[#2a2a2a] rounded animate-pulse w-3/4" />
       </div>
     </div>
   );
@@ -40,7 +30,7 @@ export function BookingServices() {
         const data = await response.json();
 
         if (data.success && data.services) {
-          const transformedServices = data.services.slice(0, 4).map(service => ({
+          const transformedServices = data.services.slice(0, 6).map(service => ({
             id: service._id,
             title: service.serviceName,
             category: service.categoryName,
@@ -49,7 +39,7 @@ export function BookingServices() {
             image: service.mainImage
               ? `https://api.doorstephub.com/${service.mainImage}`
               : 'https://images.unsplash.com/photo-1594873604892-b599f847e859?w=400',
-            status: service.status === 'active' ? 'Available' : 'Unavailable',
+            status: service.status === 'active' ? 'Save 10% On Services' : 'Unavailable',
           }));
           setServices(transformedServices);
         }
@@ -100,9 +90,9 @@ export function BookingServices() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {loading ? (
-            [1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)
+            [1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)
           ) : (
             services.map((service, index) => (
               <motion.div
@@ -112,62 +102,61 @@ export function BookingServices() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="group relative h-[440px] flex flex-col"
+                className="group relative h-auto flex flex-col"
               >
                 <div className="relative flex-1 bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300 flex flex-col">
-                  {/* Status Badge */}
-                  <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-[#037166]/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
-                    <h6 className="m-0 text-inherit font-inherit">{service.status}</h6>
+                  {/* Status Badge - Top Center */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10 px-3 py-1 bg-[#037166]/90 backdrop-blur-md rounded-b-full rounded-t-none text-xs  text-white shadow-lg border border-t-0 border-[#037166]/20 whitespace-nowrap">
+
+                    <h6 className="text   font-intro tracking-wide">{service.status}</h6>
                   </div>
 
                   {/* Image - Fixed height */}
-                  <div className="relative h-48 overflow-hidden flex-shrink-0">
+                  <div className="relative h-40 overflow-hidden flex-shrink-0">
                     <ImageWithFallback
                       src={service.image}
                       alt={service.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       style={{ width: '100%', height: '100%' }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+
+                    {/* Book Now Button Overlay - Bottom Center */}
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleServiceClick(service);
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-4 py-2 bg-[#037166] rounded-full text-white text-xs font-bold tracking-wider flex items-center space-x-2 shadow-xl shadow-black/20 border border-white/10 hover:bg-[#025951] whitespace-nowrap"
+                      >
+                        <span>Book Now</span>
+                        <ChevronRight className="w-2 h-2" />
+                      </motion.button>
+                    </div>
                   </div>
 
-                  {/* Content - Fixed height with 2-line title */}
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    {/* Category & Title */}
-                    <div className="space-y-2">
-                      <h6 className="text-xs text-[#037166] font-medium uppercase tracking-wider">
+                  {/* Content */}
+                  <div className="p-4 flex flex-col">
+                    <div className="space-y-1">
+                      <h6 className="text-[10px] text-[#037166] font-medium uppercase tracking-wider">
                         {service.category}
                       </h6>
                       <h4
-                        className="text-xl font-semibold text-white leading-tight line-clamp-2"
+                        className="text-sm font text-white leading-tight line-clamp-2"
                         title={service.title}
                       >
                         {service.title}
                       </h4>
-                    </div>
 
-                    {/* Rating & Bookings */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-[#037166] fill-[#037166]" />
-                        <span className="text-sm text-white font-medium">{service.rating}</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-sm text-gray-400">
-                        <Clock className="w-4 h-4" />
-                        <span>{service.bookings} bookings</span>
+                      {/* Rating moved here */}
+                      <div className="flex  space-x-1">
+                        <Star className="w-3 h-5 text-[#ffbd00] fill-[#ffbd00]" />
+                        <span className="text-xs text-gray-300 font-medium">{service.rating}</span>
                       </div>
                     </div>
-
-                    {/* FIXED BOTTOM BUTTON */}
-                    <motion.button
-                      onClick={() => handleServiceClick(service)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-medium flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-[#037166]/40 transition-all flex-shrink-0 mt-auto"
-                    >
-                      <span>Book Now</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </motion.button>
                   </div>
 
                   {/* Hover glow effect */}

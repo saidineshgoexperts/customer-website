@@ -34,7 +34,7 @@ export function LatestReligiousServices() {
             // type: 'Pooja Service',
             bio: service.bio
           }));
-          setServices(mappedServices);
+          setServices(mappedServices.slice(0, 4));
         }
       } catch (err) {
         console.error('Error fetching religious services:', err);
@@ -107,7 +107,8 @@ export function LatestReligiousServices() {
             <div className="h-5 w-64 mx-auto bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
@@ -195,7 +196,7 @@ export function LatestReligiousServices() {
         </motion.div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((service, index) => (
             <motion.div
               key={service.id || index}
@@ -236,6 +237,19 @@ export function LatestReligiousServices() {
                   {/* Divine Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
 
+                  {/* Overlay Button */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <Link href={`/religious-services/service/${service.id}`}>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap"
+                      >
+                        Join Service
+                      </motion.button>
+                    </Link>
+                  </div>
+
                   {/* Subtle Glow Animation */}
                   <motion.div
                     animate={{
@@ -249,7 +263,7 @@ export function LatestReligiousServices() {
 
                 {/* Content */}
                 <div className="p-6">
-                  <h4 className="text-xl font-bold text-white mb-4 group-hover:text-[#9b59b6] transition-colors">
+                  <h4 className="text-lg font-bold text-white mb-4 group-hover:text-[#9b59b6] transition-colors">
                     {service.name}
                   </h4>
 
@@ -269,18 +283,7 @@ export function LatestReligiousServices() {
                     </div> */}
                   </div>
 
-                  {/* Action Button */}
-                  <div className="w-full">
-                    <Link href={`/religious-services/service/${service.id}`}>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full py-3 bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-[length:200%_100%] hover:bg-right rounded-xl text-white font-semibold transition-all duration-500 shadow-lg shadow-[#037166]/30"
-                      >
-                        Join Service
-                      </motion.button>
-                    </Link>
-                  </div>
+
                 </div>
 
                 {/* Divine Glow Effect */}

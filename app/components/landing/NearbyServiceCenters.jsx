@@ -84,6 +84,7 @@ export function NearbyServiceCenters() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [loadingProgress, setLoadingProgress] = useState(0); // Progress for map loading script
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -92,6 +93,29 @@ export function NearbyServiceCenters() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Simulate progress for map script loading
+  useEffect(() => {
+    if (isLoaded) {
+      setLoadingProgress(100);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev >= 90) return prev; // Stall at 90% until loaded
+
+        // Dynamic random increments for organic feel
+        const randomJump = Math.random() * 2;
+        const speedFactor = prev < 30 ? 3 : prev < 60 ? 1.5 : 0.5;
+        const increment = (Math.random() * speedFactor) + randomJump;
+
+        return Math.min(prev + increment, 90);
+      });
+    }, 150); // Slightly slower update rate for smoother feel
+
+    return () => clearInterval(interval);
+  }, [isLoaded]);
 
   // Fetch service centers
   useEffect(() => {
@@ -147,7 +171,7 @@ export function NearbyServiceCenters() {
             };
           });
 
-          setServices(transformedServices.slice(0, 5));
+          setServices(transformedServices.slice(0, 4));
         } else {
           setServices([]);
         }
@@ -341,16 +365,36 @@ export function NearbyServiceCenters() {
 
             {/* ULTRA-FAST FALLBACK - 0.5s max */}
             {!isLoaded && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#1a1a1a]/95 backdrop-blur-sm">
-                <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="w-10 h-10 bg-[#037166] rounded-full shadow-lg shadow-[#037166]/50 mb-4 border-2 border-[#025951]"
-                >
-                  <div className="absolute inset-0 bg-[#037166] rounded-full animate-ping opacity-75" />
-                </motion.div>
-                <div className="text-center text-gray-400">
-                  <div className="text-sm mb-1">Loading dark map...</div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#1a1a1a]/95 backdrop-blur-sm z-50">
+                <div className="w-64 space-y-4">
+                  <div className="flex justify-between text-[#037166] text-sm font-medium">
+                    <span className="animate-pulse">
+                      {loadingProgress < 30 ? "Initializing map engine..." :
+                        loadingProgress < 60 ? "Loading geolocation assets..." :
+                          loadingProgress < 85 ? "Connecting satellite feed..." : "Finalizing..."}
+                    </span>
+                    <span>{Math.round(loadingProgress)}%</span>
+                  </div>
+
+                  {/* Progress Bar Container */}
+                  <div className="h-2 w-full bg-[#2a2a2a] rounded-full overflow-hidden relative">
+                    {/* Shimmer Effect Background */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffffff]/10 to-transparent w-1/2 h-full -translate-x-full animate-[shimmer_1.5s_infinite]" />
+
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-[#037166] to-[#04a99d] rounded-full relative overflow-hidden"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${loadingProgress}%` }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {/* Inner moving gloss */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent w-full h-full -translate-x-full animate-[shimmer_1s_infinite]" />
+                    </motion.div>
+                  </div>
+
+                  <div className="text-center text-xs text-gray-500">
+                    Optimizing routes & locations...
+                  </div>
                 </div>
               </div>
             )}

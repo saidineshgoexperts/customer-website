@@ -151,7 +151,7 @@ export function Newsletter() {
           className="max-w-md mx-auto"
         >
           <div className="relative">
-            <div className="relative flex items-center gap-3 p-2 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-[#037166]/50 transition-all">
+            <div className="relative flex items-center gap-3 p-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 hover:border-[#037166]/50 transition-all">
               <div className="pl-3">
                 <Mail className="w-5 h-5 text-white/40" />
               </div>
@@ -170,7 +170,7 @@ export function Newsletter() {
                 disabled={loading || isSubscribed}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`px-6 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium shadow-lg shadow-[#037166]/30 hover:shadow-[#037166]/50 transition-all flex items-center gap-2 group ${loading ? 'opacity-70 cursor-wait' : ''}`}
+                className={`px-6 py-3 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium shadow-lg shadow-[#037166]/30 hover:shadow-[#037166]/50 transition-all flex items-center gap-2 group ${loading ? 'opacity-70 cursor-wait' : ''}`}
               >
                 <span>{loading ? 'Processing...' : step === 'subscribe' ? 'Subscribe' : 'Verify'}</span>
                 {!loading && (
@@ -203,7 +203,7 @@ export function Newsletter() {
             <motion.div
               initial={{ opacity: 0 }}
               whileHover={{ opacity: 1 }}
-              className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#037166]/20 to-[#04a99d]/20 blur-xl -z-10"
+              className="absolute inset-0 rounded-full bg-gradient-to-r from-[#037166]/20 to-[#04a99d]/20 blur-xl -z-10"
             />
           </div>
 

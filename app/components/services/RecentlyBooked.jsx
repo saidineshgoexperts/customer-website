@@ -228,7 +228,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                       />
 
                       {/* Book Now Button - Quick View Style */}
-                      <div className="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 z-20">
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 z-20">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -236,7 +236,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                             e.stopPropagation();
                             onServiceClick?.(service.id, service.categoryName, service.subcategoryName);
                           }}
-                          className="px-8 py-3 bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-sm font-bold uppercase tracking-wider rounded-full shadow-2xl hover:shadow-[#037166]/50 border border-white/10"
+                          className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap"
                         >
                           Book Now
                         </motion.button>
@@ -252,13 +252,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                         {service.description}
                       </p>
 
-                      {/* Price & CTA */}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {/* <p className="text-xs text-white/50 mb-1">From</p>
-                          <p className="text-2xl font-bold text-white">₹{service.price}</p> */}
-                        </div>
-                      </div>
+
                     </div>
 
                     {/* Glass Border on Hover */}

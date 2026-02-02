@@ -34,7 +34,7 @@ export function RecommendedHostels() {
             price: hostel.startingAt || hostel.serviceBookingCost || 0,
             // trustScore: 95 + (index * 2)
           }));
-          setHostels(mappedHostels);
+          setHostels(mappedHostels.slice(0, 4));
         }
       } catch (err) {
         console.error('Error fetching latest hostels:', err);
@@ -127,7 +127,9 @@ export function RecommendedHostels() {
             <div className="h-5 w-64 mx-auto bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            <SkeletonCard />
+            <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
           </div>
@@ -193,7 +195,7 @@ export function RecommendedHostels() {
         </motion.div>
 
         {/* Hostels Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {hostels.map((hostel, index) => (
             <motion.div
               key={hostel.id || index}
@@ -249,6 +251,20 @@ export function RecommendedHostels() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
 
+                  {/* Overlay Button */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <Link href={`/pghostels/hostel-detail/${hostel.id}`}>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap flex items-center space-x-2"
+                      >
+                        <Home className="w-3 h-3" />
+                        <span>Schedule Visit</span>
+                      </motion.button>
+                    </Link>
+                  </div>
+
                   {/* Price Badge - Dynamic */}
 
 
@@ -302,19 +318,7 @@ export function RecommendedHostels() {
                     ))}
                   </div>
 
-                  {/* Action Button */}
-                  <div className="w-full mt-auto">
-                    <Link href={`/pghostels/hostel-detail/${hostel.id}`}>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full py-3 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/50 transition-all flex items-center justify-center space-x-2 text-sm"
-                      >
-                        <Home className="w-4 h-4" />
-                        <span>Schedule a Visit</span>
-                      </motion.button>
-                    </Link>
-                  </div>
+
                 </div>
 
                 {/* Warm Glow Effect */}

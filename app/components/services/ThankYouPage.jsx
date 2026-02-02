@@ -116,7 +116,7 @@ export function ThankYouPage({ bookingDetails }) {
                     <div className="grid md:grid-cols-2 gap-4">
                         {/* iOS App */}
                         <a
-                            href="https://apps.apple.com/app/doorstep-hub"
+                            href="https://apps.apple.com/in/app/doorstep-hub/id6475340236"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group relative overflow-hidden rounded-xl bg-white/5 border border-white/10 hover:border-[#037166]/50 p-4 transition-all hover:bg-white/10"
@@ -137,7 +137,7 @@ export function ThankYouPage({ bookingDetails }) {
 
                         {/* Android App */}
                         <a
-                            href="https://play.google.com/store/apps/details?id=com.doorstephub"
+                            href="https://play.google.com/store/apps/details?id=com.doorstephub.customer&pcampaignid=web_share"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group relative overflow-hidden rounded-xl bg-white/5 border border-white/10 hover:border-[#037166]/50 p-4 transition-all hover:bg-white/10"

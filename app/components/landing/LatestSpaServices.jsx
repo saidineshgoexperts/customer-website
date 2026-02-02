@@ -101,7 +101,7 @@ export function LatestSpaServices() {
           {loading ? (
             // Skeleton Loading
             [1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="group relative w-[calc(100%/1.5)] md:w-[calc(100%/3.5)] lg:w-[calc(100%/6.5)] h-[380px] flex-shrink-0 snap-start">
+              <div key={i} className="group relative w-[calc(100%/1.5)] md:w-[calc(100%/3.5)] lg:w-[calc(100%/6.5)] h-auto flex-shrink-0 snap-start">
                 <div className="relative h-full flex flex-col bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden animate-pulse">
                   {/* Image skeleton */}
                   <div className="relative h-40 bg-white/10 flex-shrink-0" />
@@ -136,7 +136,7 @@ export function LatestSpaServices() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="group relative w-[calc(100%/1.5)] md:w-[calc(100%/3.5)] lg:w-[calc(100%/6.5)] h-[380px] flex-shrink-0 snap-start"
+                className="group relative w-[calc(100%/1.5)] md:w-[calc(100%/3.5)] lg:w-[calc(100%/6.5)] h-auto flex-shrink-0 snap-start"
               >
                 {/* Card with Breathing Effect */}
                 <motion.div
@@ -158,6 +158,19 @@ export function LatestSpaServices() {
                       className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+
+                    {/* View Details Overlay Button */}
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Link href={`/spa-salon/detail/${store._id}`}>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap"
+                        >
+                          View Details
+                        </motion.button>
+                      </Link>
+                    </div>
 
                     {/* Floating Heart Icon */}
                     {/* <motion.div
@@ -198,16 +211,7 @@ export function LatestSpaServices() {
                       <div className="text-2xl font-bold text-[#037166]">₹{store.defaultPrice}</div>
                     </div> */}
 
-                    {/* Book Button */}
-                    <Link href={`/spa-salon/detail/${store._id}`} className="w-full mt-auto block">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full py-3 bg-gradient-to-r from-[#037166]/80 to-[#025951]/80 backdrop-blur-sm rounded-xl text-white font-medium hover:from-[#037166] hover:to-[#025951] transition-all"
-                      >
-                        View Details
-                      </motion.button>
-                    </Link>
+
                   </div>
 
                   {/* Subtle Glow */}

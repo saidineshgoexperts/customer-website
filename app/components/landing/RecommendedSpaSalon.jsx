@@ -151,7 +151,7 @@ export function RecommendedSpaSalon() {
 
   if (loading) {
     return (
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-22 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
@@ -228,8 +228,8 @@ export function RecommendedSpaSalon() {
               {/* Premium Card - Original sizing preserved */}
               <div className={`relative h-full bg-gradient-to-br from-[#1a1a1a] via-[#1a1510] to-[#0f0f0f] border-2 border-[#037166]/30 rounded-3xl overflow-hidden ${place.isDummy ? 'pointer-events-none' : ''}`}>
                 {/* Top Badge */}
-                <div className="absolute top-6 left-6 z-20 flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#d4af37]/90 to-[#037166]/90 backdrop-blur-md rounded-full">
-                  <Award className="w-4 h-4 text-white" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 px-8 py-1 bg-gradient-to-r from-[#d4af37]/90 to-[#037166]/90 backdrop-blur-md rounded-full rounded-t-none border border-t-0 border-[#d4af37]/30 shadow-lg whitespace-nowrap">
+                  <Award className="w-3 h-3 text-white" />
                   <h6 className="text-xs font-bold text-white">{place.badge}</h6>
                 </div>
 
@@ -243,6 +243,19 @@ export function RecommendedSpaSalon() {
 
                   {/* Premium Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
+
+                  {/* View Details Overlay Button */}
+                  <div className={`absolute bottom-20 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${place.isDummy ? 'pointer-events-none' : ''}`}>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
+                      className="px-4 py-2 bg-[#037166] rounded-full text-white font-bold text-xs shadow-lg shadow-black/40 border border-white/20 whitespace-nowrap"
+                      disabled={place.isDummy}
+                    >
+                      View Details
+                    </motion.button>
+                  </div>
 
                   {/* Shimmer Effect */}
                   <motion.div
@@ -304,27 +317,7 @@ export function RecommendedSpaSalon() {
                     </div>
                   </motion.div>
 
-                  {/* Action Buttons */}
-                  <div className={`grid grid-cols-2 gap-4 ${place.isDummy ? 'opacity-50 pointer-events-none' : ''}`}>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
-                      className="py-3 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] rounded-xl text-white font-semibold shadow-lg shadow-[#C06C84]/40 hover:shadow-xl hover:shadow-[#C06C84]/50 transition-all"
-                      disabled={place.isDummy}
-                    >
-                      Book Now
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
-                      className="py-3 bg-[#1a1a1a]/80 backdrop-blur-sm border border-[#C06C84]/30 rounded-xl text-white font-semibold hover:bg-[#C06C84]/10 transition-all"
-                      disabled={place.isDummy}
-                    >
-                      View Details
-                    </motion.button>
-                  </div>
+
                 </div>
 
                 {/* Premium Glow Effect */}

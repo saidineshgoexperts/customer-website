@@ -82,29 +82,41 @@ export function AppDownload() {
 
             {/* Download Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <motion.button
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-2xl text-white font-semibold shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/50 transition-all"
+              <a
+                href="https://apps.apple.com/in/app/doorstep-hub/id6475340236"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Apple className="w-6 h-6" />
-                <div className="text-left">
-                  <div className="text-xs">Download on the</div>
-                  <h5 className="text-base font-bold">App Store</h5>
-                </div>
-              </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-2xl text-white font-semibold shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/50 transition-all w-full"
+                >
+                  <Apple className="w-6 h-6" />
+                  <div className="text-left">
+                    <div className="text-xs">Download on the</div>
+                    <h5 className="text-base font-bold">App Store</h5>
+                  </div>
+                </motion.button>
+              </a>
 
-              <motion.button
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-center justify-center space-x-3 px-8 py-4 bg-[#1a1a1a]/80 backdrop-blur-sm border-2 border-[#037166]/30 rounded-2xl text-white font-semibold hover:bg-[#037166]/10 transition-all"
+              <a
+                href="https://play.google.com/store/apps/details?id=com.doorstephub.customer&pcampaignid=web_share"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Smartphone className="w-6 h-6" />
-                <div className="text-left">
-                  <div className="text-xs">Get it on</div>
-                  <h5 className="text-base font-bold">Google Play</h5>
-                </div>
-              </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-[#1a1a1a]/80 backdrop-blur-sm border-2 border-[#037166]/30 rounded-2xl text-white font-semibold hover:bg-[#037166]/10 transition-all w-full"
+                >
+                  <Smartphone className="w-6 h-6" />
+                  <div className="text-left">
+                    <div className="text-xs">Get it on</div>
+                    <h5 className="text-base font-bold">Google Play</h5>
+                  </div>
+                </motion.button>
+              </a>
             </div>
 
             {/* Stats */}
