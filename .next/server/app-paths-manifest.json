@@ -1,3 +1,6 @@
 {
-  "/(landing)/page": "app/(landing)/page.js"
+  "/partner/page": "app/partner/page.js",
+  "/services/category/[categoryId]/page": "app/services/category/[categoryId]/page.js",
+  "/(landing)/page": "app/(landing)/page.js",
+  "/services/page": "app/services/page.js"
 }

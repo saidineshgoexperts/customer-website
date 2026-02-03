@@ -67,6 +67,7 @@ export default function BecomePartnerPage() {
                                     <button className="flex items-center gap-3 px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all transform hover:-translate-y-1">
                                         <Download className="w-6 h-6" />
                                         <div>
+
                                             <span className="block text-xs font-normal opacity-80">Download for</span>
                                             <span className="text-lg leading-none">iOS</span>
                                         </div>

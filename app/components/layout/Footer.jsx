@@ -3,7 +3,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 const footerLinks = {
   company: [
@@ -16,7 +18,9 @@ const footerLinks = {
 
     { name: 'Become a ServicePartner', href: '/partner' },
 
-    { name: 'Download App', href: '/#app-download' },
+    { name: 'Download Android App', href: 'https://play.google.com/store/apps/details?id=com.doorstephub.partner' },
+
+    { name: 'Download Ios App', href: 'https://apps.apple.com/in/app/doorstep-hub/id6448539336' },
   ],
   support: [
     { name: 'Help Center', href: '#' },
@@ -35,12 +39,100 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const [serviceGroups, setServiceGroups] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        // Step 1: Fetch Categories
+        const catResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getallcategorys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lattitude: '17.4391296', longitude: '78.4433152' })
+        });
+        const catData = await catResponse.json();
+
+        if (catData.success && Array.isArray(catData.data)) {
+          // Step 2: Fetch subcategories for each category
+          const groups = await Promise.all(catData.data.map(async (category) => {
+            try {
+              const subResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getsubcategorysbycategoryid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ categoryId: category._id })
+              });
+              const subData = await subResponse.json();
+              return {
+                id: category._id,
+                name: category.name,
+                subcategories: subData.success && Array.isArray(subData.data) ? subData.data : []
+              };
+            } catch (err) {
+              console.error(`Error fetching subcategories for ${category.name}:`, err);
+              return { id: category._id, name: category.name, subcategories: [] };
+            }
+          }));
+
+          setServiceGroups(groups);
+        }
+      } catch (error) {
+        console.error('Error fetching footer data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFooterData();
+  }, []);
+
   return (
     <footer className="relative bg-gradient-to-b from-[#0a0a0a] to-black border-t border-white/5">
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#037166]/5 to-transparent pointer-events-none" />
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-8 py-16">
+        {/* Explore Services Dynamic Section */}
+        {!isLoading && serviceGroups.some(group => group.subcategories.length > 0) && (
+          <div className="mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-8"
+            >
+              <h3 className="text-xl font-bold text-white mb-6">Explore Services</h3>
+              <div className="grid grid-cols-1 gap-6">
+                {serviceGroups.map((group) => (
+                  group.subcategories.length > 0 && (
+                    <div key={group.id} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+                      <Link
+                        href={`/services/category/${group.id}?name=${encodeURIComponent(group.name)}`}
+                        className="text-white font-semibold hover:text-[#04a99d] transition-colors whitespace-nowrap"
+                      >
+                        {group.name}:
+                      </Link>
+                      {group.subcategories.map((sub, idx) => (
+                        <React.Fragment key={sub._id}>
+                          <Link
+                            href={`/services/listing/${sub._id}?category=${encodeURIComponent(group.name)}&name=${encodeURIComponent(sub.name)}`}
+                            className="text-white/60 hover:text-[#04a99d] transition-colors"
+                          >
+                            {sub.name}
+                          </Link>
+                          {idx < group.subcategories.length - 1 && (
+                            <span className="text-white/20">|</span>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  )
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
+
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand Column */}
@@ -154,56 +246,54 @@ export function Footer() {
           </motion.div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-white/5 pt-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Copyright */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="text-white/40 text-sm"
-            >
-              © {new Date().getFullYear()} Doorstep Hub Pvt Ltd. All rights reserved.
-            </motion.p>
 
-            {/* Social Links */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="flex items-center gap-3"
-            >
-              {socialLinks.map((social, index) => (
-                <motion.a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  whileHover={{ scale: 1.1, y: -3 }}
-                  whileTap={{ scale: 0.9 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-gradient-to-r hover:from-[#037166] hover:to-[#04a99d] border border-white/10 hover:border-[#037166]/50 flex items-center justify-center text-white/60 hover:text-white transition-all group"
-                >
-                  <social.icon className="w-5 h-5" />
-                </motion.a>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Tagline */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          {/* Copyright */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-center mt-8"
+            className="text-white/40 text-sm"
           >
+            © {new Date().getFullYear()} Doorstep Hub Pvt Ltd. All rights reserved.
+          </motion.p>
 
+          {/* Social Links */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="flex items-center gap-3"
+          >
+            {socialLinks.map((social, index) => (
+              <motion.a
+                key={social.label}
+                href={social.href}
+                aria-label={social.label}
+                whileHover={{ scale: 1.1, y: -3 }}
+                whileTap={{ scale: 0.9 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="w-10 h-10 rounded-full bg-white/5 hover:bg-gradient-to-r hover:from-[#037166] hover:to-[#04a99d] border border-white/10 hover:border-[#037166]/50 flex items-center justify-center text-white/60 hover:text-white transition-all group"
+              >
+                <social.icon className="w-5 h-5" />
+              </motion.a>
+            ))}
           </motion.div>
         </div>
+
+        {/* Tagline */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="text-center mt-8"
+        >
+
+        </motion.div>
       </div>
 
       {/* Bottom Gradient */}

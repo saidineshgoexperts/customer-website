@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Menu, X, Search, User, ShoppingCart } from 'lucide-react';
+import { Menu, X, Search, User, ShoppingCart, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LocationBar } from '../location/LocationBar';
 import { AuthModal } from '../auth/AuthModal';
@@ -18,6 +18,7 @@ export function Header({ theme = {}, navItems = [] }) {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const { cartItems } = useCart();
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   // Default Theme (Landing Page / Dark)
   const defaultTheme = {
@@ -121,6 +122,17 @@ export function Header({ theme = {}, navItems = [] }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.nav-item-dropdown')) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <>
       <motion.header
@@ -155,31 +167,38 @@ export function Header({ theme = {}, navItems = [] }) {
             {/* Desktop Navigation */}
             <nav id="navbar-services" className="hidden lg:flex items-center space-x-8">
               {menuItems.map((item, index) => (
-                <div key={index} className="relative group">
+                <div key={index} className="relative nav-item-dropdown">
                   {item.dropdown ? (
                     <>
                       <motion.button
+                        onClick={() => setActiveDropdown(activeDropdown === index ? null : index)}
                         whileHover={{ y: -2 }}
-                        className={`${currentTheme.textMain} hover:text-[#037166] transition-colors relative font-medium whitespace-nowrap`}
+                        className={`${currentTheme.textMain} hover:text-[#037166] transition-colors relative font-medium whitespace-nowrap flex items-center gap-1`}
                       >
                         {item.name}
-                        <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r ${currentTheme.accentGradientFrom} ${currentTheme.accentGradientTo} group-hover:w-full transition-all duration-300`} />
+                        <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${activeDropdown === index ? 'rotate-90' : ''}`} />
+                        <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r ${currentTheme.accentGradientFrom} ${currentTheme.accentGradientTo} ${activeDropdown === index ? 'w-full' : ''} transition-all duration-300`} />
                       </motion.button>
 
                       {/* Dropdown */}
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        whileHover={{ opacity: 1, y: 0 }}
-                        className={`absolute top-full left-0 mt-2 w-48 ${currentTheme.bgMobile} backdrop-blur-xl border ${currentTheme.border} rounded-xl shadow-2xl z-50 overflow-hidden`}
-                      >
-                        {item.dropdown.map((subItem, idx) => (
-                          <Link key={idx} href={subItem.href}>
-                            <span className={`block px-4 py-3 text-sm ${currentTheme.textMain} hover:text-[#037166] hover:bg-[#037166]/10 transition-all cursor-pointer`}>
-                              {subItem.name}
-                            </span>
-                          </Link>
-                        ))}
-                      </motion.div>
+                      <AnimatePresence>
+                        {activeDropdown === index && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className={`absolute top-full left-0 mt-2 w-48 ${currentTheme.bgMobile} backdrop-blur-xl border ${currentTheme.border} rounded-xl shadow-2xl z-50 overflow-hidden`}
+                          >
+                            {item.dropdown.map((subItem, idx) => (
+                              <Link key={idx} href={subItem.href} onClick={() => setActiveDropdown(null)}>
+                                <span className={`block px-4 py-3 text-sm ${currentTheme.textMain} hover:text-[#037166] hover:bg-[#037166]/10 transition-all cursor-pointer`}>
+                                  {subItem.name}
+                                </span>
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </>
                   ) : (
                     <Link href={item.href} onClick={() => handleServiceClick(item)}>

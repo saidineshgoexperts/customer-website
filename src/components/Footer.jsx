@@ -15,7 +15,8 @@ const footerLinks = {
     { name: 'All Services', href: '#' },
     { name: 'Become a Partner', href: '#' },
     { name: 'Service Centers', href: '#' },
-    { name: 'Download App', href: '#' },
+    { name: 'Download Android App', href: 'https://play.google.com/store/apps/details?id=com.doorstephub.partner' },
+    { name: 'Download IOS App', href: 'https://apps.apple.com/in/app/doorstep-hub/id6448539336' },
   ],
   support: [
     { name: 'Help Center', href: '#' },
