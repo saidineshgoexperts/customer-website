@@ -217,14 +217,14 @@ export function RecommendedSpaSalon() {
           className="text-center mb-16"
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#d4af37]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
-            <Crown className="w-4 h-4 text-[#d4af37]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">
+            < Crown className="w-4 h-4 text-[#d4af37]" />
+            <h6 className="text-sm text-[#037166] font-medium">
               Luxury Glow World
             </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
               Recommended Spa & Salon
             </span>
           </h2>
@@ -248,9 +248,9 @@ export function RecommendedSpaSalon() {
               {/* Premium Card - Original sizing preserved */}
               <div className={`relative h-full bg-gradient-to-br from-[#1a1a1a] via-[#1a1510] to-[#0f0f0f] border-2 border-[#037166]/30 rounded-3xl overflow-hidden ${place.isDummy ? 'pointer-events-none' : ''}`}>
                 {/* Top Badge */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 px-8 py-1 bg-gradient-to-r from-[#d4af37]/90 to-[#037166]/90 backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#d4af37]/30 shadow-lg whitespace-nowrap">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 px-8 py-1 bg-[#037166]/90 backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap">
                   <Award className="w-3 h-3 text-white" />
-                  <h6 className="text-xs font-bold text-white">{place.badge}</h6>
+                  <h6 className="text-xs font-bold text-white uppercase tracking-wider">{place.badge}</h6>
                 </div>
 
                 {/* Image with Luxury Overlay - Original height preserved */}
@@ -297,7 +297,7 @@ export function RecommendedSpaSalon() {
                         <h6 className="text-xs text-[#d4af37] font-semibold mb-2 uppercase tracking-wider">
                           {place.category}
                         </h6>
-                        <h4 className="text-l  bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
+                        <h4 className="text-l bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
                           {place.name}
                         </h4>
                       </div>

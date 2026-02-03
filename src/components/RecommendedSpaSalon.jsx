@@ -87,9 +87,9 @@ export function RecommendedSpaSalon() {
               {/* Premium Card */}
               <div className="relative h-full bg-gradient-to-br from-[#1a1a1a] via-[#1a1510] to-[#0f0f0f] border-2 border-[#037166]/30 rounded-3xl overflow-hidden">
                 {/* Top Badge */}
-                <div className="absolute top-6 left-6 z-20 flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#d4af37]/90 to-[#037166]/90 backdrop-blur-md rounded-full">
+                <div className="absolute top-6 left-6 z-20 flex items-center space-x-2 px-4 py-2 bg-[#037166]/90 backdrop-blur-md rounded-full border border-[#037166]/30 shadow-lg">
                   <Award className="w-4 h-4 text-white" />
-                  <span className="text-xs font-bold text-white">{place.badge}</span>
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">{place.badge}</span>
                 </div>
 
                 {/* Image with Luxury Overlay */}

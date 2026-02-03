@@ -69,7 +69,7 @@ export function BookingServices() {
   };
 
   return (
-    <section id="booking-services" className="relative py-22 overflow-hidden">
+    <section id="booking-services" className="relative py-22  overflow-hidden">
       {/* Architectural World Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
@@ -96,7 +96,7 @@ export function BookingServices() {
         />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto mt-10 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -106,13 +106,12 @@ export function BookingServices() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-1 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Calendar className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Futuristic Service Partners</h6>
+            <h6 className="text-sm  bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Futuristic Service Partners</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
-              Latest Booking Services
-            </span>
+            <span className="text-white">Latest Booking </span>
+            <span className="text-[#037166]">Services</span>
           </h2>
 
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -187,7 +186,7 @@ export function BookingServices() {
 
                       {/* Title */}
                       <h4
-                        className="text-[12px] font-medium bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent leading-tight line-clamp-2"
+                        className="text-[12px] font-medium text-white group-hover:text-[#037166] transition-colors leading-tight line-clamp-2"
                         title={service.title}
                       >
                         {service.title}

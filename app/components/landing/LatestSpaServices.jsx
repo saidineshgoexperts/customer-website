@@ -84,7 +84,7 @@ export function LatestSpaServices() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Waves className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Calm Zen World</h6>
+            <h6 className="text-sm text-[#037166] font-medium">Calm Zen World</h6>
           </div>
 
           <motion.h2
@@ -93,7 +93,7 @@ export function LatestSpaServices() {
             viewport={{ once: true }}
             className="text-4xl sm:text-5xl font-bold mb-4"
           >
-            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
               Recently Booked Spa & Saloons
             </span>
           </motion.h2>
@@ -194,7 +194,7 @@ export function LatestSpaServices() {
                   {/* Content */}
                   <div className="p-4 flex flex-col flex-1">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
+                      <h4 className="bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
                         {store.storeName}
                       </h4>
                       {/* Placeholder Rating/New Tag */}

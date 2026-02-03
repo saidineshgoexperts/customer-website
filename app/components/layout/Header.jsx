@@ -43,12 +43,8 @@ export function Header({ theme = {}, navItems = [] }) {
     {
       name: 'More',
       dropdown: [
-        { name: 'Spa & Saloon', href: '/spa-salon' },
-        { name: 'Share Ride', href: '#share-ride' },
-        // { name: 'Order Medicine', href: '#order-medicine' },
-        // { name: 'Verified Partners', href: '/services/child/683dbbfbb62d2a241de0f7e3?category=Services&name=Verified%20Partners' },
-        // { name: 'Service Centers', href: '/services/child/683dbc04b62d2a241de0f7e8?category=Services&name=Service%20Centers' },
-        { name: 'Become a Partner', href: '/partner' }
+        { name: 'Become a Partner', href: '/partner' },
+        { name: 'Share Ride', href: '#share-ride' }
       ]
     }
   ];
@@ -86,11 +82,8 @@ export function Header({ theme = {}, navItems = [] }) {
           mappedItems.push({
             name: 'More',
             dropdown: [
-              { name: 'Share Ride', href: '#share-ride' },
-              { name: 'Order Medicine', href: '#order-medicine' },
-              { name: 'Verified Partners', href: '/services/child/683dbbfbb62d2a241de0f7e3?category=Services&name=Verified%20Partners' },
-              { name: 'Service Centers', href: '/services/child/683dbc04b62d2a241de0f7e8?category=Services&name=Service%20Centers' },
-              { name: 'Become a Partner', href: '/partner' }
+              { name: 'Become a Partner', href: '/partner' },
+              { name: 'Share Ride', href: '#share-ride' }
             ]
           });
 

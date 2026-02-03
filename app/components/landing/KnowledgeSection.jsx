@@ -148,13 +148,12 @@ export function KnowledgeSection() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <BookOpen className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Creative Studio Cards</h6>
+            <h6 className="text-sm text-[#037166] font-medium">Creative Studio Cards</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
-              Knowledge Hub
-            </span>
+            <span className="text-white">Knowledge </span>
+            <span className="text-[#037166]">Hub</span>
           </h2>
 
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -175,73 +174,63 @@ export function KnowledgeSection() {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 className={`group ${article.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
               >
-                {/* Studio Card */}
-                <motion.div
-                  whileHover={article.isDummy ? {} : { y: -10 }}
-                  className={`relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300 ${article.isDummy ? 'pointer-events-none' : ''}`}
-                >
-                  {/* Trending Badge */}
-                  {article.trending && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-8 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2">
-                      <TrendingUp className="w-3 h-3 text-white" />
-                      <h6 className="text-xs font-bold text-white">Trending</h6>
-                    </div>
-                  )}
-
-                  {/* Read Article Overlay Button */}
-                  <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${article.isDummy ? 'pointer-events-none' : ''}`}>
-                    <Link href={article.isDummy ? '#' : `/knowledge/${article.slug}`}>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
-                      >
-                        Read Article
-                      </motion.button>
-                    </Link>
-                  </div>
-
-                  {/* Image */}
-                  <div className="relative h-48 overflow-hidden">
-                    <ImageWithFallback
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-
-                    {/* Category Badge */}
-                    <div className="absolute bottom-4 left-4 px-3 py-1 bg-[#037166]/80 backdrop-blur-md rounded-full">
-                      <h6 className="text-xs font-semibold text-white uppercase tracking-wider">
-                        {article.category}
-                      </h6>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6">
-                    <h4 className="text-lg font-bold bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent mb-2 leading-snug group-hover:text-[#037166] transition-colors line-clamp-1">
-                      {article.title}
-                    </h4>
-                    <p className="text-white/60 text-sm mb-4 line-clamp-2">
-                      {article.summary}
-                    </p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 text-sm text-gray-400">
-                        <Clock className="w-4 h-4 text-[#037166]" />
-                        <span>{article.readTime}</span>
+                <Link href={article.isDummy ? '#' : `/knowledge/${article.slug}`}>
+                  {/* Studio Card */}
+                  <motion.div
+                    whileHover={article.isDummy ? {} : { y: -10 }}
+                    className={`relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300 ${article.isDummy ? 'pointer-events-none' : ''}`}
+                  >
+                    {/* Trending Badge */}
+                    {article.trending && (
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-8 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2">
+                        <TrendingUp className="w-3 h-3 text-white" />
+                        <h6 className="text-xs font-bold text-white">Trending</h6>
                       </div>
+                    )}
 
 
+                    {/* Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <ImageWithFallback
+                        src={article.image}
+                        alt={article.title}
+                        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+
+                      {/* Category Badge */}
+                      <div className="absolute bottom-4 left-4 px-3 py-1 bg-[#037166]/80 backdrop-blur-md rounded-full">
+                        <h6 className="text-xs font-semibold text-white uppercase tracking-wider">
+                          {article.category}
+                        </h6>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Hover Glow */}
-                  {!article.isDummy && (
-                    <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/0 via-[#037166]/20 to-[#037166]/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
-                  )}
-                </motion.div>
+                    {/* Content */}
+                    <div className="p-6">
+                      <h4 className="text-lg font-bold text-white mb-2 leading-snug group-hover:text-[#037166] transition-colors line-clamp-1">
+                        {article.title}
+                      </h4>
+                      <p className="text-white/60 text-sm mb-4 line-clamp-2">
+                        {article.summary}
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-sm text-gray-400">
+                          <Clock className="w-4 h-4 text-[#037166]" />
+                          <span>{article.readTime}</span>
+                        </div>
+
+
+                      </div>
+                    </div>
+
+                    {/* Hover Glow */}
+                    {!article.isDummy && (
+                      <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/0 via-[#037166]/20 to-[#037166]/0 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
+                    )}
+                  </motion.div>
+                </Link>
               </motion.div>
             ))}
         </div>

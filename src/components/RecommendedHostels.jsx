@@ -61,7 +61,7 @@ export function RecommendedHostels() {
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
               Recommended Hostels
             </span>
           </h2>
@@ -142,7 +142,7 @@ export function RecommendedHostels() {
                 {/* Content */}
                 <div className="p-8">
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#037166] transition-colors">
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent mb-2 group-hover:text-[#037166] transition-colors">
                       {hostel.name}
                     </h3>
                     <p className="text-gray-400 italic">{hostel.tagline}</p>

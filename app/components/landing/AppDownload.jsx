@@ -56,13 +56,13 @@ export function AppDownload() {
             {/* Badge */}
             <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-8">
               <Download className="w-4 h-4 text-[#037166]" />
-              <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Download Our App</h6>
+              <h6 className="text-sm text-[#037166] font-medium">Download Our App</h6>
             </div>
 
             {/* Heading */}
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
               <span className="text-white">Everything in </span>
-              <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#037166] to-[#02b39a] bg-clip-text text-transparent">
                 Your Pocket
               </span>
             </h2>
