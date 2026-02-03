@@ -79,7 +79,7 @@ export function RecommendedSpaSalon() {
               category: 'Premium Spa & Salon',
               rating: 4.8,
               reviews: '500+',
-              price: store.startingAt ? `Starts ₹${store.startingAt}` : '$$',
+              price: store.startingAt ? `₹${store.startingAt}` : '$$',
               image: store.image ? `https://api.doorstephub.com/${store.image}` : 'https://images.unsplash.com/photo-1582498674105-ad104fcc5784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcGElMjB0cmVhdG1lbnR8ZW58MXx8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
               badge: index === 0 ? 'Top Rated' : 'Trending',
               highlights: displayedAmenities,
@@ -308,17 +308,6 @@ export function RecommendedSpaSalon() {
                   {/* Premium Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
 
-                  {/* View Details Button Badge - Bottom Center */}
-                  {!place.isDummy && (
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div
-                        onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
-                        className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
-                      >
-                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">View Details</h6>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Shimmer Effect */}
                   <motion.div
@@ -336,28 +325,42 @@ export function RecommendedSpaSalon() {
                     whileHover={place.isDummy ? {} : { y: -5 }}
                     className="p-6 bg-[#1a1a1a]/90 backdrop-blur-xl border border-[#037166]/30 rounded-2xl mb-6 shadow-xl"
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h6 className="text-xs bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent font-semibold mb-2 uppercase tracking-wider">
-                          {place.category}
-                        </h6>
-                        <h4 className="text-l bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent">
-                          {place.name}
-                        </h4>
-                      </div>
-                      <div className="px-3 py-1 bg-[#037166]/20 rounded-lg">
-                        <span className="text-sm text-[#d4af37] font-bold">{place.price}</span>
-                      </div>
+                    <div className="mb-4">
+                      <h6 className="text-xs bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent font-semibold mb-2 uppercase tracking-wider">
+                        {place.category}
+                      </h6>
+                      <h4 className="text-lg font-bold bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent truncate w-full" title={place.name}>
+                        {place.name}
+                      </h4>
                     </div>
 
-                    {/* Rating */}
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="flex items-center space-x-1">
-                        <Sparkles className="w-5 h-5 text-[#d4af37] fill-[#d4af37]" />
-                        <span className="text-lg font-bold text-white">{place.rating}</span>
+                    {/* Rating Space */}
+                    <div className="flex items-center space-x-1 mb-4">
+                      <Sparkles className="w-5 h-5 text-[#d4af37] fill-[#d4af37]" />
+                      <span className="text-lg font-bold text-white">{place.rating}</span>
+                    </div>
+
+                    {/* Price & Action Card - Matches PG Styling */}
+                    <div className="mb-4 p-2 border border-[#037166]/20 rounded-xl flex items-center justify-between gap-2 bg-[#037166]/5">
+                      {/* Left: Price */}
+                      <div>
+                        <h6 className="text-[10px] text-gray-400 mb-0.5 font-ubuntu">
+                          Starting at
+                        </h6>
+                        <div className="text-sm font-bold text-[#037166] font-ubuntu">
+                          {place.price}
+                        </div>
                       </div>
 
-                      {/* <TrendingUp className="w-5 h-5 text-[#037166] ml-auto" /> */}
+                      {/* Right: View Details Button - Inline */}
+                      <div
+                        onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
+                        className={`cursor-pointer ${place.isDummy ? 'pointer-events-none opacity-50' : ''}`}
+                      >
+                        <div className="px-3 py-1.5 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full text-white font-semibold text-[10px] shadow-lg shadow-[#037166]/30 whitespace-nowrap hover:scale-105 transition-transform">
+                          View Details
+                        </div>
+                      </div>
                     </div>
 
                     {/* Highlights */}

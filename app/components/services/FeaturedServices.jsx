@@ -132,7 +132,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold mb-3"
+            className="text-4xl  bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent md:text-5xl font-bold mb-3"
           >
             Explore Our Featured Service
           </motion.h2>
@@ -211,7 +211,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                   </div>
 
                   {/* Title */}
-                  <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
+                  <h4 className="text-xl bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-bold mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">
                     {service.serviceName}
                   </h4>
 
@@ -244,7 +244,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 text-white font-medium transition-all duration-300 flex items-center gap-2 group"
+            className="px-8 py-4 rounded-full  bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 text-white font-medium transition-all duration-300 flex items-center gap-2 group"
             onClick={onViewAll}
           >
             View All Services

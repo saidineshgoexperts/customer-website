@@ -38,6 +38,73 @@ const socialLinks = [
   { icon: Youtube, href: 'https://www.youtube.com/channel/UCTn8lV-nEbdWdwXolLAsMZA', label: 'YouTube' },
 ];
 
+const additionalServices = [
+  {
+    title: 'PG & Hostels',
+    basePath: '/pghostels',
+    groups: [
+      {
+        id: 'pg', name: 'PG Services', subcategories: [
+          { _id: 'men-pg', name: "Men's PG", query: 'type=men' },
+          { _id: 'women-pg', name: "Women's PG", query: 'type=women' },
+          { _id: 'coliving', name: "Co-living PG", query: 'type=coliving' },
+          { _id: 'luxury-pg', name: "Luxury PG", query: 'type=luxury' }
+        ]
+      },
+      {
+        id: 'hostels', name: 'Hostels', subcategories: [
+          { _id: 'student-hostel', name: 'Student Hostels', query: 'type=student' },
+          { _id: 'working-hostel', name: 'Working Professionals Hostels', query: 'type=working' },
+          { _id: 'backpackers', name: 'Backpacker Hostels', query: 'type=backpacker' }
+        ]
+      }
+    ]
+  },
+  {
+    title: 'Religious Services',
+    basePath: '/religious-services',
+    groups: [
+      {
+        id: 'pooja', name: 'Pooja Services', subcategories: [
+          { _id: 'ganesh-pooja', name: 'Ganesh Pooja', query: 'service=ganesh' },
+          { _id: 'satyanarayan', name: 'Satyanarayan Pooja', query: 'service=satyanarayan' },
+          { _id: 'griha-pravesh', name: 'Griha Pravesh', query: 'service=grihapravesh' },
+          { _id: 'office-pooja', name: 'Office Pooja', query: 'service=office' }
+        ]
+      },
+      {
+        id: 'pandit', name: 'Pandit Booking', subcategories: [
+          { _id: 'wedding-pandit', name: 'Wedding Pandit', query: 'service=wedding' },
+          { _id: 'funeral-priest', name: 'Funeral Services', query: 'service=funeral' },
+          { _id: 'astrology', name: 'Vedic Astrology', query: 'service=astrology' }
+        ]
+      }
+    ]
+  },
+  {
+    title: 'Spa & Salon',
+    basePath: '/spa-salon',
+    groups: [
+      {
+        id: 'spa', name: 'Spa Therapies', subcategories: [
+          { _id: 'thai-massage', name: 'Thai Massage', query: 'category=thai' },
+          { _id: 'swedish-massage', name: 'Swedish Massage', query: 'category=swedish' },
+          { _id: 'deep-tissue', name: 'Deep Tissue', query: 'category=deeptissue' },
+          { _id: 'ayurvedic', name: 'Ayurvedic Spa', query: 'category=ayurvedic' }
+        ]
+      },
+      {
+        id: 'salon', name: 'Salon Services', subcategories: [
+          { _id: 'haircut', name: 'Haircut & Styling', query: 'category=haircut' },
+          { _id: 'facial', name: 'Facial Treatments', query: 'category=facial' },
+          { _id: 'manicure', name: 'Manicure & Pedicure', query: 'category=manicure' },
+          { _id: 'makeup', name: 'Bridal Makeup', query: 'category=makeup' }
+        ]
+      }
+    ]
+  }
+];
+
 export function Footer() {
   const [serviceGroups, setServiceGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -101,37 +168,91 @@ export function Footer() {
               viewport={{ once: true }}
               className="space-y-8"
             >
-              <h3 className="text-xl font-bold text-white mb-6">Explore Services</h3>
-              <div className="grid grid-cols-1 gap-6">
-                {serviceGroups.map((group) => (
+              <h3 className="text-xl font-bold text-white mb-6">Appliance Services</h3>
+              <div className="text-sm leading-8 text-gray-400">
+                {serviceGroups.map((group, groupIdx) => (
                   group.subcategories.length > 0 && (
-                    <div key={group.id} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+                    <span key={group.id} className="inline mr-1">
+                      {/* Group Name */}
                       <Link
                         href={`/services/category/${group.id}?name=${encodeURIComponent(group.name)}`}
-                        className="text-white font-semibold hover:text-[#04a99d] transition-colors whitespace-nowrap"
+                        className="text-white font-bold hover:text-[#04a99d] transition-colors whitespace-nowrap mr-2"
                       >
                         {group.name}:
                       </Link>
+
+                      {/* Subcategories */}
                       {group.subcategories.map((sub, idx) => (
-                        <React.Fragment key={sub._id}>
+                        <span key={sub._id} className="inline">
                           <Link
                             href={`/services/listing/${sub._id}?category=${encodeURIComponent(group.name)}&name=${encodeURIComponent(sub.name)}`}
-                            className="text-white/60 hover:text-[#04a99d] transition-colors"
+                            className="text-white/70 hover:text-[#04a99d] transition-colors"
                           >
                             {sub.name}
                           </Link>
+                          {/* Separator between subcategories */}
                           {idx < group.subcategories.length - 1 && (
-                            <span className="text-white/20">|</span>
+                            <span className="mx-2 text-white/20">|</span>
                           )}
-                        </React.Fragment>
+                        </span>
                       ))}
-                    </div>
+
+                      {/* Separator between Groups - Render unless it's the last group */}
+                      {groupIdx < serviceGroups.length - 1 && (
+                        <span className="mx-4 text-[#037166] opacity-50">||</span>
+                      )}
+                    </span>
                   )
                 ))}
               </div>
             </motion.div>
           </div>
         )}
+
+        {/* Additional Services Sections */}
+        {additionalServices.map((section, sIdx) => (
+          <div key={sIdx} className="mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <h3 className="text-xl font-bold text-white mb-4">{section.title}</h3>
+              <div className="text-sm leading-8 text-gray-400">
+                {section.groups.map((group, groupIdx) => (
+                  <span key={group.id} className="inline mr-1">
+                    {/* Group Name */}
+                    <span className="text-white font-bold whitespace-nowrap mr-2">
+                      {group.name}:
+                    </span>
+
+                    {/* Subcategories */}
+                    {group.subcategories.map((sub, idx) => (
+                      <span key={sub._id} className="inline">
+                        <Link
+                          href={`${section.basePath}?${sub.query}`}
+                          className="text-white/70 hover:text-[#04a99d] transition-colors"
+                        >
+                          {sub.name}
+                        </Link>
+                        {/* Separator between subcategories */}
+                        {idx < group.subcategories.length - 1 && (
+                          <span className="mx-2 text-white/20">|</span>
+                        )}
+                      </span>
+                    ))}
+
+                    {/* Separator between Groups - Render unless it's the last group */}
+                    {groupIdx < section.groups.length - 1 && (
+                      <span className="mx-4 text-[#037166] opacity-50">||</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        ))}
 
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">

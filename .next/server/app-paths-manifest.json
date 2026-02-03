@@ -1,4 +1,7 @@
 {
-  "/partner/page": "app/partner/page.js",
-  "/(landing)/page": "app/(landing)/page.js"
+  "/spa-salon/page": "app/spa-salon/page.js",
+  "/(landing)/page": "app/(landing)/page.js",
+  "/services/page": "app/services/page.js",
+  "/services/child/[childCategoryId]/page": "app/services/child/[childCategoryId]/page.js",
+  "/religious-services/page": "app/religious-services/page.js"
 }

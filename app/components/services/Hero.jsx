@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Sparkles, Shield, Clock } from 'lucide-react';
+import { ArrowRight, Sparkles, Shield, Clock, Search } from 'lucide-react';
 import { ServicePreviewCard } from '@/components/services/ServicePreviewCard';
 
 export function Hero({ onViewServices, onBookService }) {
@@ -91,13 +91,14 @@ export function Hero({ onViewServices, onBookService }) {
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-6xl md:text-5xl lg:text-8xl font-bold !font-poppins  mb-6 leading-tight text-white">
+          <h1 className="italic text-5xl md:text-6xl lg:text-7xl font-bold !font-poppins mb-6 leading-tight text-white">
             Expert Home Services
             <br />
-            <span className="bg-gradient-to-r from-[#037166] via-[#04a99d] to-[#037166] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
               At Your Doorstep
             </span>
           </h1>
+
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-white/70 mb-12 leading-relaxed max-w-3xl mx-auto">
@@ -105,8 +106,8 @@ export function Hero({ onViewServices, onBookService }) {
             Book verified experts in minutes.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          {/* CTA Buttons - Separated and Rounded */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
             <button
               onClick={onBookService}
               className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold text-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-[#037166]/50 hover:scale-105"
@@ -120,10 +121,12 @@ export function Hero({ onViewServices, onBookService }) {
 
             <button
               onClick={onViewServices}
-              className="px-8 py-4 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold text-lg hover:bg-white/10 hover:border-[#037166]/50 transition-all"
+              className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold text-lg hover:bg-white/10 hover:border-[#037166]/50 transition-all hover:scale-105"
             >
-              Explore Services
+              Find Services
+              <Search className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
+
           </div>
 
           {/* Trust Indicators */}

@@ -42,7 +42,7 @@ export function KnowledgeSection() {
       {/* Creative Studio Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0f0d] to-[#0a0a0a]" />
-        
+
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(3,113,102,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(3,113,102,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
       </div>
@@ -60,13 +60,13 @@ export function KnowledgeSection() {
             <BookOpen className="w-4 h-4 text-[#037166]" />
             <span className="text-sm text-[#037166] font-medium">Creative Studio Cards</span>
           </div>
-          
+
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
               Knowledge Hub
             </span>
           </h2>
-          
+
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Explore insights, tips, and stories from our community of service providers and users
           </p>
@@ -90,7 +90,7 @@ export function KnowledgeSection() {
               >
                 {/* Trending Badge */}
                 {article.trending && (
-                  <div className="absolute top-4 right-4 z-10 px-3 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] rounded-full flex items-center space-x-1">
+                  <div className="absolute top-4 right-4 z-10 px-3 py-1  rounded-full flex items-center space-x-1">
                     <TrendingUp className="w-3 h-3 text-white" />
                     <span className="text-xs font-bold text-white">Trending</span>
                   </div>
@@ -104,7 +104,7 @@ export function KnowledgeSection() {
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-                  
+
                   {/* Category Badge */}
                   <div className="absolute bottom-4 left-4 px-3 py-1 bg-[#037166]/80 backdrop-blur-md rounded-full">
                     <span className="text-xs font-semibold text-white uppercase tracking-wider">

@@ -514,8 +514,8 @@ function HeroContent({ services = [], loading = false, error = null }) {
             transition={{ delay: 0.7 }}
             className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto"
           >
-            Your premium gateway to services, spa, salon, hostels, religious experiences, and more.
-            All in one beautifully crafted platform.
+            Your Premium Gateway to Appliance Services, Spa & Salon, PG & Hostels, Religious Services, and More.
+            All in One Beautifully Crafted Platform.
           </motion.p>
 
           {/* Tour Trigger Button */}

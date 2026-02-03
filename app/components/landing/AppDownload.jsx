@@ -17,7 +17,7 @@ export function AppDownload() {
   }, []);
 
   return (
-    <section id="app-download" className="relative py-16 overflow-hidden">
+    <section id="app-download" className="relative min-h-screen flex items-center overflow-hidden py-16">
       {/* Architectural World Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
@@ -54,14 +54,16 @@ export function AppDownload() {
             transition={{ duration: 0.7 }}
           >
             {/* Badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-white/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-8">
-              <Download className="w-4 h-4 text-[#037166]" />
-              <h6 className="text-sm bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-medium">Download Our App</h6>
-            </div>
+            <a href="https://play.google.com/store/apps/details?id=com.doorstephub.customer&pcampaignid=web_share" target="_blank" rel="noopener noreferrer">
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-white/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-8">
+                <Download className="w-4 h-4 text-[#037166]" />
+                <h6 className="text-sm bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-medium">Download Our App</h6>
+              </div>
+            </a>
 
             {/* Heading */}
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent whitespace-nowrap">
                 Everything in Your Pocket
               </span>
             </h2>

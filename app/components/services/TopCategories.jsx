@@ -132,7 +132,7 @@ export function TopCategories({ onViewAll }) {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-bold mb-3"
+              className="text-4xl bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent  md:text-5xl font-bold mb-3"
             >
               Explore Top Categories
             </motion.h2>
@@ -202,7 +202,7 @@ export function TopCategories({ onViewAll }) {
                       {/* Glass Card Overlay */}
                       <div className="absolute inset-0 flex flex-col justify-end p-6">
                         <div className="relative z-10">
-                          <h4 className="text-2xl font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors">
+                          <h4 className="text-2xl  bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-bold mb-2 group-hover:text-[#04a99d] transition-colors">
                             {category.title}
                           </h4>
                           <motion.div

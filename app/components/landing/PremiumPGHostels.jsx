@@ -317,7 +317,7 @@ export function PremiumPGHostels() {
 
 
                   {/* Image with Depth */}
-                  <div className="relative h-64 overflow-hidden">
+                  <div className="relative h-48 overflow-hidden">
                     <motion.div
                       whileHover={hostel.isDummy ? {} : { scale: 1.1 }}
                       transition={{ duration: 0.6 }}
@@ -335,13 +335,13 @@ export function PremiumPGHostels() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-6">
-                    <h4 className="text-2xl font-bold bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent mb-2 h-16 line-clamp-2">
+                  <div className="p-4">
+                    <h4 className="text-xl font-bold bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent mb-2 h-14 line-clamp-2">
                       {hostel.name}
                     </h4>
 
-                    {/* Description - 5 lines */}
-                    <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-5">
+                    {/* Description - 2 lines */}
+                    <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2 min-h-[2.5em]">
                       {hostel.description || "Experience premium living with the perfect blend of comfort, style, and community. Our state-of-the-art facilities ensure a hassle-free lifestyle."}
                     </p>
 
