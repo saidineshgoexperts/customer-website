@@ -1,14 +1,14 @@
 {
   "pages": {
-    "/services/detail/[serviceId]/page": [
+    "/(landing)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/detail/[serviceId]/page.js"
+      "static/chunks/app/(landing)/page.js"
     ],
-    "/services/layout": [
+    "/(landing)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/layout.js"
+      "static/chunks/app/(landing)/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -26,21 +26,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/(landing)/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/page.js"
-    ],
-    "/(landing)/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/layout.js"
-    ],
-    "/services/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/services/page.js"
-    ],
     "/appliances/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -51,10 +36,30 @@
       "static/chunks/main-app.js",
       "static/chunks/app/appliances/layout.js"
     ],
-    "/_not-found/page": [
+    "/services/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/services/page.js"
+    ],
+    "/services/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/layout.js"
+    ],
+    "/services/category/[categoryId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/category/[categoryId]/page.js"
+    ],
+    "/services/listing/[subCategoryId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/listing/[subCategoryId]/page.js"
+    ],
+    "/services/detail/[serviceId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/detail/[serviceId]/page.js"
     ]
   }
 }
