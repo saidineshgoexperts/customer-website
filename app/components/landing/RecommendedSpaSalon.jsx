@@ -202,6 +202,23 @@ export function RecommendedSpaSalon() {
     fetchFeaturedSpaStores();
   }, []);
 
+  // Auto-scroller logic
+  const scrollRef = React.useRef(null);
+  useEffect(() => {
+    if (loading || featured.length === 0) return;
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [loading, featured]);
+
   if (loading) {
     return (
       <section className="relative py-20 overflow-hidden">
@@ -279,7 +296,10 @@ export function RecommendedSpaSalon() {
         </motion.div>
 
         {/* Featured Cards - Horizontal Scroller */}
-        <div className="flex overflow-x-auto gap-4 pb-8 scrollbar-hide snap-x snap-mandatory">
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-4 pb-8 scrollbar-hide snap-x snap-mandatory px-4 sm:px-0"
+        >
           {featured.map((place, index) => (
             <motion.div
               key={place.id || index}
@@ -358,7 +378,7 @@ export function RecommendedSpaSalon() {
                         className={`cursor-pointer ${place.isDummy ? 'pointer-events-none opacity-50' : ''}`}
                       >
                         <div className="px-3 py-1.5 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full font-semibold text-[10px] shadow-lg shadow-[#037166]/30 whitespace-nowrap hover:scale-105 transition-transform">
-                          <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+                          <span className="text-white">
                             View Details
                           </span>
                         </div>

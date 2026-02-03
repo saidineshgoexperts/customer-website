@@ -275,7 +275,7 @@ export function RecommendedReligious() {
                       onClick={() => (window.location.href = `/religious-services?serviceId=${journey.id}`)}
                       className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
                     >
-                      <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Begin Journey</h6>
+                      <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Begin Pandit </h6>
                     </div>
                   </div>
 
@@ -287,14 +287,14 @@ export function RecommendedReligious() {
                 </div>
 
                 {/* Content */}
-                <div className="p-6 h-[280px] flex flex-col justify-between">
+                <div className="p-6 h-[200px] flex flex-col justify-between">
                   {/* Title & Description */}
                   <div className="mb-4">
                     <h4 className="text-lg font-bold bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent line-clamp-1">
                       {journey.title}
                     </h4>
                     <h6 className="text-[#9b59b6] text-xs font-medium mb-2 uppercase tracking-wider">{journey.providerName}</h6>
-                    <p className="text-gray-400 text-sm leading-relaxed line-clamp-2 mb-4">{journey.description}</p>
+                    {/* <p className="text-gray-400 text-sm leading-relaxed line-clamp-2 mb-4">{journey.description}</p> */}
 
                     {/* Amenities Grid */}
                     <div className="grid grid-cols-2 gap-3 mb-2">

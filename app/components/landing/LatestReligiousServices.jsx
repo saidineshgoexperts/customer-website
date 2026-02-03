@@ -86,6 +86,23 @@ export function LatestReligiousServices() {
     fetchLatestServices();
   }, []);
 
+  // Auto-scroller logic
+  const scrollRef = React.useRef(null);
+  useEffect(() => {
+    if (loading || services.length === 0) return;
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [loading, services]);
+
   // Skeleton Shimmer Component
   const SkeletonCard = () => (
     <motion.div
@@ -225,16 +242,19 @@ export function LatestReligiousServices() {
           </p>
         </motion.div>
 
-        {/* Services Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Services - Horizontal Scroller */}
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-8 pb-12 scrollbar-hide snap-x snap-mandatory px-4 sm:px-0"
+        >
           {services.map((service, index) => (
             <motion.div
               key={service.id || index}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.15, duration: 0.6 }}
-              className="group"
+              className="flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[24%] snap-start group"
             >
               {/* Spiritual Card */}
               <div className="relative h-full bg-gradient-to-br from-[#1a1a1a]/70 to-[#1a0f1a]/70 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-2xl">
@@ -273,7 +293,7 @@ export function LatestReligiousServices() {
                       <div
                         className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
                       >
-                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">Join Service</h6>
+                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider text-white">Join Service</h6>
                       </div>
                     </Link>
                   </div>

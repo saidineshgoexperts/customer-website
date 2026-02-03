@@ -45,6 +45,23 @@ export function LatestSpaServices() {
     fetchSpaServices();
   }, []);
 
+  // Auto-scroller logic
+  const scrollRef = React.useRef(null);
+  useEffect(() => {
+    if (loading || spaStores.length === 0) return;
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [loading, spaStores]);
+
   return (
     <section className="relative py-22 overflow-hidden">
       {/* Architectural World Background */}
@@ -109,7 +126,10 @@ export function LatestSpaServices() {
         </motion.div>
 
         {/* Spa Services Slider */}
-        <div className="flex overflow-x-auto pb-8 gap-6 snap-x scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto pb-8 gap-6 snap-x scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0"
+        >
           {loading ? (
             // Skeleton Loading
             [1, 2, 3, 4, 5, 6].map((i) => (

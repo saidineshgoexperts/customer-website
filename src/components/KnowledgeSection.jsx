@@ -86,7 +86,10 @@ export function KnowledgeSection() {
               {/* Studio Card */}
               <motion.div
                 whileHover={{ y: -10 }}
-                className="relative h-full bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300"
+                className="relative h-full 
+                
+                
+                backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300"
               >
                 {/* Trending Badge */}
                 {article.trending && (

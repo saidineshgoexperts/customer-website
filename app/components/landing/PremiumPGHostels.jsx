@@ -117,6 +117,23 @@ export function PremiumPGHostels() {
     fetchFeaturedPGHostels();
   }, []);
 
+  // Auto-scroller logic
+  const scrollRef = React.useRef(null);
+  useEffect(() => {
+    if (loading || hostels.length === 0) return;
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [loading, hostels]);
+
   // Skeleton Shimmer Component
   const SkeletonCard = () => (
     <motion.div
@@ -291,7 +308,10 @@ export function PremiumPGHostels() {
             <SkeletonCard />
           </div>
         ) : (
-          <div className="flex overflow-x-auto gap-8 pb-8 scrollbar-hide snap-x snap-mandatory">
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto gap-8 pb-8 scrollbar-hide snap-x snap-mandatory"
+          >
             {hostels.map((hostel, index) => (
               <motion.div
                 key={hostel.id || index}
@@ -382,7 +402,7 @@ export function PremiumPGHostels() {
                             disabled={hostel.isDummy}
                             className="px-2 py-1.5 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full font-semibold text-[10px] shadow-lg shadow-[#037166]/30 whitespace-nowrap"
                           >
-                            <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+                            <span className="text-white">
                               Book Now
                             </span>
                           </motion.button>

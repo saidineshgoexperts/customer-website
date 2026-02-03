@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Calendar, Clock, Star, ChevronRight } from 'lucide-react';
@@ -62,6 +62,23 @@ export function BookingServices() {
     fetchServices();
   }, []);
 
+  // Auto-scroller for the horizontal container
+  const scrollRef = React.useRef(null);
+  useEffect(() => {
+    if (loading || services.length === 0) return;
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+        }
+      }
+    }, 5000); // Scroll every 5 seconds
+    return () => clearInterval(interval);
+  }, [loading, services]);
+
   const handleServiceClick = (service) => {
     const categoryParam = encodeURIComponent(service.category);
     const subCategoryParam = encodeURIComponent(service.title);
@@ -120,9 +137,16 @@ export function BookingServices() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-4 pb-8 scrollbar-hide snap-x snap-mandatory"
+        >
           {loading ? (
-            [1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)
+            [1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="flex-shrink-0 w-[85%] sm:w-[45%] md:w-[30%] lg:w-[15.8%] snap-start">
+                <SkeletonCard />
+              </div>
+            ))
           ) : (
             services.map((service, index) => (
               <motion.div
@@ -132,7 +156,7 @@ export function BookingServices() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="group relative h-auto flex flex-col"
+                className="group relative flex-shrink-0 w-[85%] sm:w-[45%] md:w-[30%] lg:w-[15.8%] snap-start flex flex-col"
               >
                 <div className="relative flex-1 bg-gradient-to-br from-[#1a1a1a]/80 to-[#0f0f0f]/80 backdrop-blur-xl border border-[#037166]/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-[#037166]/20 transition-all duration-300 flex flex-col">
                   {/* Status Badge - Top Center */}
@@ -159,7 +183,7 @@ export function BookingServices() {
                         handleServiceClick(service);
                       }}
                     >
-                      <h6 className="text-[12px] font-ubuntu tracking-wider bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">Book Now</h6>
+                      <h6 className="text-[12px] font-ubuntu tracking-wider text-white bg-clip-text text-transparent">Book Now</h6>
                     </div>
                   </div>
 

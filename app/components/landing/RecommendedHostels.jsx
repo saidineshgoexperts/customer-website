@@ -64,6 +64,23 @@ export function RecommendedHostels() {
     fetchLatestHostels();
   }, []);
 
+  // Auto-scroller logic
+  const scrollRef = React.useRef(null);
+  useEffect(() => {
+    if (loading || hostels.length === 0) return;
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [loading, hostels]);
+
   // Skeleton Shimmer Component
   const SkeletonCard = () => (
     <motion.div
@@ -274,22 +291,33 @@ export function RecommendedHostels() {
           </p>
         </motion.div>
 
-        {/* Hostels Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {hostels.map((hostel, index) => (
-            <motion.div
-              key={hostel.id || index}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2, duration: 0.6 }}
-              className="group"
-            >
-              {/* Trust-Focused Card */}
-              <div className="relative h-full flex flex-col bg-gradient-to-br from-[#1a1a1a] to-[#1a1410] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
+        {/* Hostels - Horizontal Scroller */}
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-8 pb-12 scrollbar-hide snap-x snap-mandatory px-4 sm:px-0"
+        >
+          {loading ? (
+            // Skeleton Loading State
+            [1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[24%] snap-start">
+                <SkeletonCard />
+              </div>
+            ))
+          ) : (
+            hostels.map((hostel, index) => (
+              <motion.div
+                key={hostel.id || index}
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.15, duration: 0.6 }}
+                className="flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[24%] snap-start group"
+              >
+                {/* Trust-Focused Card */}
+                <div className="relative h-full flex flex-col bg-gradient-to-br from-[#1a1a1a] to-[#1a1410] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
 
-                {/* Trust Score Circle - Static, commented out as requested */}
-                {/* <motion.div
+                  {/* Trust Score Circle - Static, commented out as requested */}
+                  {/* <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   className="absolute top-6 right-6 z-20 w-20 h-20"
                 >
@@ -322,50 +350,50 @@ export function RecommendedHostels() {
                   </div>
                 </motion.div> */}
 
-                {/* Image */}
-                <div className="relative h-40 overflow-hidden">
-                  <ImageWithFallback
-                    src={hostel.image}
-                    alt={hostel.name}
-                    className="w-full h-full  object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
+                  {/* Image */}
+                  <div className="relative h-40 overflow-hidden">
+                    <ImageWithFallback
+                      src={hostel.image}
+                      alt={hostel.name}
+                      className="w-full h-full  object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
 
-                  {/* Schedule Visit Button Badge - Bottom Center */}
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Link href={`/pghostels/hostel-detail/${hostel.id}`}>
-                      <div
-                        className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
-                      >
-                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Schedule Your Space</h6>
-                      </div>
-                    </Link>
-                  </div>
+                    {/* Schedule Visit Button Badge - Bottom Center */}
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Link href={`/pghostels/hostel-detail/${hostel.id}`}>
+                        <div
+                          className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
+                        >
+                          <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Schedule Your Space</h6>
+                        </div>
+                      </Link>
+                    </div>
 
-                  {/* Price Badge - Dynamic */}
+                    {/* Price Badge - Dynamic */}
 
 
-                  {/* Heart Icon */}
-                  {/* <motion.button
+                    {/* Heart Icon */}
+                    {/* <motion.button
                     whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.9 }}
                     className="absolute top-6 left-6 w-12 h-12 bg-[#1a1a1a]/80 backdrop-blur-md border border-[#037166]/30 rounded-full flex items-center justify-center group/heart"
                   >
                     <Heart className="w-6 h-6 text-[#ff6b35] group-hover/heart:fill-[#ff6b35] transition-all" />
                   </motion.button> */}
-                </div>
-
-                {/* Content */}
-                <div className="p-4 flex-1 flex flex-col">
-                  <div className="mb-2">
-                    <h4 className="text-xl font-bold bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent mb-1 line-clamp-1">
-                      {hostel.name}
-                    </h4>
-                    <p className="text-gray-400 italic text-sm line-clamp-2">{hostel.tagline}</p>
                   </div>
 
-                  {/* Stats - Static, commented out as requested */}
-                  {/* <div className="flex items-center space-x-6 mb-6">
+                  {/* Content */}
+                  <div className="p-4 flex-1 flex flex-col">
+                    <div className="mb-2">
+                      <h4 className="text-xl font-bold bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent mb-1 line-clamp-1">
+                        {hostel.name}
+                      </h4>
+                      {/* <p className="text-gray-400 italic text-sm line-clamp-2">{hostel.tagline}</p> */}
+                    </div>
+
+                    {/* Stats - Static, commented out as requested */}
+                    {/* <div className="flex items-center space-x-6 mb-6">
                     <div className="flex items-center space-x-2">
                       <Star className="w-5 h-5 text-[#037166] fill-[#037166]" />
                       <span className="text-lg font-semibold text-white">{hostel.rating}</span>
@@ -376,34 +404,35 @@ export function RecommendedHostels() {
                     </div>
                   </div> */}
 
-                  {/* Amenities */}
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    {hostel.amenities.slice(0, 4).map((amenity, idx) => {
-                      const Icon = amenityIcons[amenity] || Building2;
-                      return (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, x: -10 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: index * 0.1 + idx * 0.05 }}
-                          className="flex items-center space-x-2 p-2 bg-[#1a1a1a]/50 rounded-lg"
-                        >
-                          <Icon className="w-4 h-4 text-[#037166]" />
-                          <span className="text-xs text-gray-300 line-clamp-1">{amenity}</span>
-                        </motion.div>
-                      );
-                    })}
+                    {/* Amenities */}
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {hostel.amenities.slice(0, 4).map((amenity, idx) => {
+                        const Icon = amenityIcons[amenity] || Building2;
+                        return (
+                          <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, x: -10 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1 + idx * 0.05 }}
+                            className="flex items-center space-x-2 p-2 bg-[#1a1a1a]/50 rounded-lg"
+                          >
+                            <Icon className="w-4 h-4 text-[#037166]" />
+                            <span className="text-xs text-gray-300 line-clamp-1">{amenity}</span>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+
+
                   </div>
 
-
+                  {/* Warm Glow Effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-br from-[#037166]/20 via-[#ff6b35]/10 to-transparent opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500 -z-10" />
                 </div>
-
-                {/* Warm Glow Effect */}
-                <div className="absolute -inset-1 bg-gradient-to-br from-[#037166]/20 via-[#ff6b35]/10 to-transparent opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500 -z-10" />
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          )}
         </div>
 
         {/* Trust Indicators */}
