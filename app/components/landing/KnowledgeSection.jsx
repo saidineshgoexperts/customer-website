@@ -146,14 +146,13 @@ export function KnowledgeSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-white/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <BookOpen className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Creative Studio Cards</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-medium">Creative Studio Cards</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="text-white">Knowledge </span>
-            <span className="text-[#037166]">Hub</span>
+            <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">Knowledge Hub</span>
           </h2>
 
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -182,9 +181,9 @@ export function KnowledgeSection() {
                   >
                     {/* Trending Badge */}
                     {article.trending && (
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-8 py-1 bg-gradient-to-r from-[#037166] to-[#02b39a] backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2">
-                        <TrendingUp className="w-3 h-3 text-white" />
-                        <h6 className="text-xs font-bold text-white">Trending</h6>
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-8 py-1 bg-gradient-to-r from-[#037166] via-white to-[#037166] backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2">
+                        <TrendingUp className="w-3 h-3 text-[#037166]" />
+                        <h6 className="text-xs font-bold text-[#037166]">Trending</h6>
                       </div>
                     )}
 
@@ -208,7 +207,7 @@ export function KnowledgeSection() {
 
                     {/* Content */}
                     <div className="p-6">
-                      <h4 className="text-lg font-bold text-white mb-2 leading-snug group-hover:text-[#037166] transition-colors line-clamp-1">
+                      <h4 className="text-lg font-bold bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent mb-2 leading-snug line-clamp-1">
                         {article.title}
                       </h4>
                       <p className="text-white/60 text-sm mb-4 line-clamp-2">

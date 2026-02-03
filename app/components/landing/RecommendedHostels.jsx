@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { Heart, Users, Star, Check, Home } from 'lucide-react';
+import { Heart, Users, Star, Check, Home, Wifi, Shield, Building2, Bed, Coffee, Flame, Scroll, Flower2, Utensils, Bell, Clock, BookOpen } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 export function RecommendedHostels() {
@@ -28,21 +28,30 @@ export function RecommendedHostels() {
         const data = await response.json();
 
         if (data.success && data.hostels) {
-          const mappedHostels = data.hostels.map((hostel, index) => ({
-            id: hostel._id,
-            name: hostel.hostelName || `${hostel.firstName} ${hostel.lastName}`,
-            tagline: hostel.bio,
-            // rating: 4.8 + (index * 0.1),
-            // residents: Math.floor(Math.random() * 20) + 30,
-            image: hostel.image ? `https://api.doorstephub.com/${hostel.image}` : 'https://images.unsplash.com/photo-1743116591552-9ff5e8c1ad31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3p5JTIwYmVkcm9vbSUyMGhvc3RlbHxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-            features: [
-              hostel.address || hostel.cityName,
-              // '24/7 Security',
-              // 'Modern Amenities'
-            ].filter(Boolean),
-            price: hostel.startingAt || hostel.serviceBookingCost || 0,
-            // trustScore: 95 + (index * 2)
-          }));
+          const mappedHostels = data.hostels.map((hostel, index) => {
+            let displayedAmenities = [];
+            if (hostel.amenities && hostel.amenities.length > 0 && hostel.amenities[0].title !== 'test') {
+              displayedAmenities = hostel.amenities.map(a => a.title);
+            } else {
+              displayedAmenities = (hostel.otherAmenities || "")
+                .split(/\r?\n/)
+                .map(item => item.trim())
+                .filter(item => item.length > 0 && !item.toLowerCase().includes("amenities"));
+            }
+
+            if (displayedAmenities.length === 0) {
+              displayedAmenities = ['Verified Property', '24/7 Security', 'High-Speed WiFi', 'Modern Amenities'];
+            }
+
+            return {
+              id: hostel._id,
+              name: hostel.hostelName || `${hostel.firstName} ${hostel.lastName}`,
+              tagline: hostel.bio || "Premium living space for your comfort and safety.",
+              image: hostel.image ? `https://api.doorstephub.com/${hostel.image}` : 'https://images.unsplash.com/photo-1743116591552-9ff5e8c1ad31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3p5JTIwYmVkcm9vbSUyMGhvc3RlbHxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
+              amenities: displayedAmenities.slice(0, 3),
+              price: hostel.startingAt || hostel.serviceBookingCost || 0,
+            };
+          });
           setHostels(mappedHostels.slice(0, 4));
         }
       } catch (err) {
@@ -113,7 +122,7 @@ export function RecommendedHostels() {
 
   if (loading) {
     return (
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0f0a0a] to-[#0a0a0a]" />
           <motion.div
@@ -159,8 +168,59 @@ export function RecommendedHostels() {
     );
   }
 
+  const amenityIcons = {
+    'High-Speed WiFi': Wifi,
+    'Wi-Fi': Wifi,
+    'Wi-Fi access': Wifi,
+    'High-speed Wi-Fi': Wifi,
+    '24/7 Security': Shield,
+    'CCTV': Shield,
+    'Security': Shield,
+    'Housekeeping': Building2,
+    'Gym Access': Users,
+    'Cafeteria': Coffee,
+    'Mess': Coffee,
+    'Food Included': Coffee,
+    'Study Rooms': Building2,
+    'Study Area': Building2,
+    'Laundry': Building2,
+    'Power Backup': Building2,
+    'Fully Furnished': Bed,
+    'Fully furnished rooms': Bed,
+    'Bed with mattress': Bed,
+    'Individual wardrobe / locker': Building2,
+    'Study table & chair': Building2,
+    'Ceiling fan / AC': Building2,
+    'Mirror & dustbin': Building2,
+    'AC Rooms': Building2,
+    'Recreation': Users,
+    'Bunk beds with mattresses': Bed,
+    'Individual lockers': Shield,
+    'Shared charging points': Building2,
+    'Ceiling fans': Building2,
+    'Shared bathroom facilities': Building2,
+    'Bunk beds or single beds': Bed,
+    'Mattress + pillows': Bed,
+    'Bed linens': Bed,
+    'Lockable storage lockers': Shield,
+    'Personal reading light & power outlet': Building2,
+    'Curtains or privacy partitions': Building2,
+    'Single bed with mattress': Bed,
+    'Personal wardrobe / locker': Building2,
+    'Study table and chair': Building2,
+    'Attached bathroom': Building2,
+    'Charging points': Building2,
+    'Separate beds or bunk beds': Bed,
+    'Individual storage space': Building2,
+    'Common study table': Building2,
+    'Ceiling fan': Building2,
+    'Wi-Fi connectivity': Wifi,
+    'Adequate lighting & ventilation': Building2,
+    'Shared bathroom': Building2,
+  };
+
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section className="relative py-20 overflow-hidden">
       {/* Architectural World Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
@@ -196,15 +256,15 @@ export function RecommendedHostels() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 to-[#ff6b35]/10 border border-[#037166]/30 rounded-full mb-6">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#ff6b35]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Heart className="w-4 h-4 text-[#ff6b35]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent font-medium">
               Warm Comfort World
             </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent">
               Recommended Hostels
             </span>
           </h2>
@@ -298,7 +358,7 @@ export function RecommendedHostels() {
                 {/* Content */}
                 <div className="p-4 flex-1 flex flex-col">
                   <div className="mb-2">
-                    <h4 className="text-xl font-bold bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent mb-1 group-hover:text-[#037166] transition-colors line-clamp-1">
+                    <h4 className="text-xl font-bold bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent mb-1 line-clamp-1">
                       {hostel.name}
                     </h4>
                     <p className="text-gray-400 italic text-sm line-clamp-2">{hostel.tagline}</p>
@@ -316,23 +376,24 @@ export function RecommendedHostels() {
                     </div>
                   </div> */}
 
-                  {/* Features */}
-                  <div className="space-y-1 mb-3">
-                    {hostel.features.map((feature, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.2 + idx * 0.1 }}
-                        className="flex items-center space-x-3"
-                      >
-                        <div className="w-6 h-6 bg-[#037166]/20 border border-[#037166]/40 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Check className="w-4 h-4 text-[#037166]" />
-                        </div>
-                        <span className="text-sm text-gray-300">{feature}</span>
-                      </motion.div>
-                    ))}
+                  {/* Amenities */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {hostel.amenities.slice(0, 4).map((amenity, idx) => {
+                      const Icon = amenityIcons[amenity] || Building2;
+                      return (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: index * 0.1 + idx * 0.05 }}
+                          className="flex items-center space-x-2 p-2 bg-[#1a1a1a]/50 rounded-lg"
+                        >
+                          <Icon className="w-4 h-4 text-[#037166]" />
+                          <span className="text-xs text-gray-300 line-clamp-1">{amenity}</span>
+                        </motion.div>
+                      );
+                    })}
                   </div>
 
 

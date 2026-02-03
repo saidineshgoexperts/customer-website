@@ -2,59 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Compass, Star, Clock, Heart, BookOpen } from 'lucide-react';
+import { Compass, Star, Clock, Heart, BookOpen, Flame, User, Scroll, Flower2, Utensils, Home, Bell, Building2 } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
-
-const dummyJourneys = [
-  {
-    id: 'dummy-1',
-    title: 'Sacred Temple Tour',
-    description: 'A guided spiritual journey through ancient temples',
-    duration: '4 hours',
-    difficulty: 'Easy',
-    rating: 4.9,
-    participants: 45,
-    image: 'https://images.unsplash.com/photo-1741798037832-6c0c86a6262a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoaW5kdSUyMHRlbXBsZSUyMHByYXllcnxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    highlights: ['Expert Guide', 'Prayer Session', 'Cultural Insights'],
-    isDummy: true
-  },
-  {
-    id: 'dummy-2',
-    title: 'Meditation Retreat',
-    description: 'Deep meditation and spiritual awakening experience',
-    duration: '2 days',
-    difficulty: 'Moderate',
-    rating: 5.0,
-    participants: 30,
-    image: 'https://images.unsplash.com/photo-1618425977996-bebc5afe88f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZWRpdGF0aW9uJTIwc3Bpcml0dWFsJTIwcGVhY2V8ZW58MXx8fHwxNzY4MDI2NzQ5fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    highlights: ['Silent Meditation', 'Yoga Sessions', 'Organic Meals'],
-    isDummy: true
-  },
-  {
-    id: 'dummy-3',
-    title: 'Vedic Ceremonies',
-    description: 'Experience traditional vedic rituals and chants',
-    duration: '3 hours',
-    difficulty: 'Easy',
-    rating: 4.8,
-    participants: 25,
-    image: 'https://images.unsplash.com/photo-1604360699049-7414bc918667?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwaWxvZyUyMHRlbXBsZXxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    highlights: ['Traditional Chants', 'Ceremonial Fire', 'Spiritual Discourse'],
-    isDummy: true
-  },
-  {
-    id: 'dummy-4',
-    title: 'Havan & Puja',
-    description: 'Perform sacred fire rituals for peace and prosperity',
-    duration: '2.5 hours',
-    difficulty: 'Easy',
-    rating: 4.9,
-    participants: 18,
-    image: 'https://images.unsplash.com/photo-1609109282717-d64e81561f36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaXJlJTIwcml0dWFsfGVufDF8fHwxNzY4MDI2NzQ5fDA&ixlib=rb-4.1.0&q=80&w=1080',
-    highlights: ['Vedic Mantras', 'Sacred Fire', 'Blessings'],
-    isDummy: true
-  }
-];
 
 export function RecommendedReligious() {
   const [journeys, setJourneys] = useState([]);
@@ -69,6 +18,27 @@ export function RecommendedReligious() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const amenityIcons = {
+    'Experienced Vedic Pandit': User,
+    'Panditji': User,
+    'Certified Priest': User,
+    'Vedic Rituals': BookOpen,
+    'Pooja Samagri': Flower2,
+    'Homam Samagri': Flower2,
+    'Pooja materials provided': Flower2,
+    'Mantra Chanting': Scroll,
+    'Vedic Procedures': Scroll,
+    'Prasadam Distribution': Utensils,
+    'Prasadam provided': Utensils,
+    'Havan Setup': Flame,
+    'Havan kundam setup': Flame,
+    'Pure Ghee & Herbs': Flame,
+    'Home Pooja': Home,
+    'Office Pooja': Building2,
+    'On-Time Service': Clock,
+    'Ganapathi Pooja': Bell,
+  };
+
   // Fetch featured religious services from API
   useEffect(() => {
     const fetchFeaturedServices = async () => {
@@ -77,30 +47,37 @@ export function RecommendedReligious() {
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/featured_religious_services');
         const data = await response.json();
 
-        if (data.success && data.services && data.services.length > 0) {
-          const mappedJourneys = data.services.map((service, index) => ({
-            id: service._id,
-            title: service.serviceName || `${service.firstName} ${service.lastName}`,
-            description: service.bio || 'Authentic spiritual service with traditional rituals',
-            duration: '2-4 hours',
-            difficulty: 'Easy',
-            rating: 4.9 - (index * 0.1),
-            participants: Math.floor(Math.random() * 20) + 25,
-            image: service.image ? `https://api.doorstephub.com/${service.image}` : 'https://images.unsplash.com/photo-1741798037832-6c0c86a6262a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoaW5kdSUyMHRlbXBsZSUyMHByYXllcnxlbnwxfHx8fDE3NjgwMjY3NDh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-            highlights: [
-              service.cityName || service.address || 'Hyderabad Location',
-              'Experienced Pandits',
-              'Traditional Rituals'
-            ],
-            isDummy: false
-          }));
+        if (data.success && data.services) {
+          const mappedJourneys = data.services.map((service, index) => {
+            let displayedAmenities = [];
+            if (service.amenities && service.amenities.length > 0) {
+              displayedAmenities = service.amenities.map(a => a.title);
+            } else {
+              displayedAmenities = (service.otherAmenities || "")
+                .split(/\r?\n/)
+                .map(item => item.trim())
+                .filter(item => item.length > 0 && !item.toLowerCase().includes("amenities"));
+            }
+
+            if (displayedAmenities.length === 0) {
+              displayedAmenities = ['Vedic Rituals', 'Pooja Samagri', 'Mantra Chanting', 'Prasadam Distribution'];
+            }
+
+            return {
+              id: service._id,
+              title: service.serviceName,
+              providerName: `${service.firstName} ${service.lastName}`,
+              description: service.bio,
+              rating: 5.0,
+              image: service.image ? `https://api.doorstephub.com/${service.image}` : '/placeholder-religious.jpg',
+              address: service.address || service.cityName,
+              amenities: displayedAmenities
+            };
+          });
           setJourneys(mappedJourneys.slice(0, 4));
-        } else {
-          setJourneys(dummyJourneys);
         }
       } catch (err) {
         console.error('Error fetching featured religious services:', err);
-        setJourneys(dummyJourneys);
       } finally {
         setLoading(false);
       }
@@ -117,7 +94,7 @@ export function RecommendedReligious() {
       className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f1a] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl"
     >
       {/* Skeleton Image */}
-      <div className="relative h-80 overflow-hidden">
+      <div className="relative h-64 overflow-hidden">
         <div className="w-full h-full bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 animate-shimmer rounded-t-3xl" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
 
@@ -129,38 +106,13 @@ export function RecommendedReligious() {
       </div>
 
       {/* Skeleton Content */}
-      <div className="p-8">
+      <div className="p-6">
         {/* Title & Description */}
-        <div className="mb-6">
-          <div className="h-8 w-80 mb-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-shimmer" />
-          <div className="h-5 w-72 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
-        </div>
-
-        {/* Journey Details */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {[1, 2].map((i) => (
-            <div key={i} className="p-4 bg-[#037166]/10 border border-[#037166]/20 rounded-xl animate-shimmer">
-              <div className="w-5 h-5 bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 rounded-full mb-2" />
-              <div className="h-3 w-20 mb-1 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded" />
-              <div className="h-5 w-24 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded" />
-            </div>
-          ))}
-        </div>
-
-        {/* Highlights */}
-        <div className="mb-6">
-          <div className="flex items-center space-x-2 mb-3 animate-shimmer">
-            <div className="w-4 h-4 bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 rounded" />
-            <div className="h-5 w-32 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded" />
-          </div>
-          <div className="grid gap-2">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 rounded-full" />
-                <div className="h-4 w-48 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
-              </div>
-            ))}
-          </div>
+        <div className="mb-4">
+          <div className="h-8 w-4/5 mb-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-shimmer" />
+          <div className="h-4 w-full mb-2 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+          <div className="h-4 w-full mb-2 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+          <div className="h-4 w-3/4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
         </div>
 
         {/* Participants & CTA */}
@@ -173,7 +125,6 @@ export function RecommendedReligious() {
             </div>
             <div className="h-4 w-20 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded" />
           </div>
-          <div className="h-12 w-32 bg-gradient-to-r from-[#037166]/40 via-[#9b59b6]/40 to-[#037166]/40 rounded-xl animate-shimmer" />
         </div>
       </div>
     </motion.div>
@@ -282,99 +233,63 @@ export function RecommendedReligious() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
-              className={`group ${journey.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
+              className="group"
             >
               {/* Journey Card */}
-              <div className={`relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f1a] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl ${journey.isDummy ? 'pointer-events-none' : ''}`}>
-                {/* Image with Compass Overlay */}
-                <div className="relative h-80 overflow-hidden">
+              <div className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f1a] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
+                {/* Image */}
+                <div className="relative h-64 overflow-hidden">
                   <ImageWithFallback
                     src={journey.image}
                     alt={journey.title}
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                   />
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
 
                   {/* Begin Journey Button Badge - Bottom Center */}
-                  {!journey.isDummy && (
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div
-                        onClick={() => !journey.isDummy && (window.location.href = `/religious-services?serviceId=${journey.id}`)}
-                        className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
-                      >
-                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Begin Journey</h6>
-                      </div>
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div
+                      onClick={() => (window.location.href = `/religious-services?serviceId=${journey.id}`)}
+                      className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
+                    >
+                      <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Begin Journey</h6>
                     </div>
-                  )}
-
-                  {/* Compass Icon */}
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"
-                  >
-                    <Compass className="w-32 h-32 text-[#037166]" />
-                  </motion.div>
+                  </div>
 
                   {/* Rating Badge */}
-                  <div className="absolute top-6 right-6 px-4 py-2 bg-[#037166]/90 backdrop-blur-md rounded-full flex items-center space-x-2">
+                  {/* <div className="absolute top-6 right-6 px-4 py-2 bg-[#037166]/90 backdrop-blur-md rounded-full flex items-center space-x-2">
                     <Star className="w-4 h-4 text-white fill-white" />
                     <h6 className="text-sm font-bold text-white">{journey.rating}</h6>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Content */}
-                <div className="p-8">
+                <div className="p-6">
                   {/* Title & Description */}
-                  <div className="mb-6">
-                    <h4 className="text-lg font-bold mb-3
-      bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166]
-      bg-clip-text text-transparent">
+                  <div className="mb-4">
+                    <h4 className="text-lg font-bold bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent line-clamp-1">
                       {journey.title}
                     </h4>
-                    <p className="text-gray-400 text-sm leading-relaxed">{journey.description}</p>
-                  </div>
+                    <h6 className="text-[#9b59b6] text-xs font-medium mb-2 uppercase tracking-wider">{journey.providerName}</h6>
+                    <p className="text-gray-400 text-sm leading-relaxed line-clamp-2 mb-4">{journey.description}</p>
 
-                  {/* Journey Details */}
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="p-4 bg-[#037166]/10 border border-[#037166]/20 rounded-xl">
-                      <Clock className="w-5 h-5 text-[#037166] mb-2" />
-                      <div className="text-xs text-gray-400 mb-1">Duration</div>
-                      <div className="text-sm font-semibold text-white">{journey.duration}</div>
-                    </div>
-                    <div className="p-4 bg-[#037166]/10 border border-[#037166]/20 rounded-xl">
-                      <Heart className="w-5 h-5 text-[#037166] mb-2" />
-                      <div className="text-xs text-gray-400 mb-1">Difficulty</div>
-                      <div className="text-sm font-semibold text-white">{journey.difficulty}</div>
-                    </div>
-                  </div>
-
-                  {/* Highlights */}
-                  <div className="mb-6">
-                    <div className="flex items-center space-x-2 mb-3">
-                      <BookOpen className="w-4 h-4 text-[#9b59b6]" />
-                      <h5 className="text-sm font-semibold text-white">Journey Highlights</h5>
-                    </div>
-                    <div className="grid gap-2">
-                      {journey.highlights.map((highlight, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: idx * 0.1 }}
-                          className="flex items-center space-x-2"
-                        >
-                          <div className="w-1.5 h-1.5 bg-gradient-to-r from-[#037166] to-[#9b59b6] rounded-full" />
-                          <span className="text-sm text-gray-300">{highlight}</span>
-                        </motion.div>
-                      ))}
+                    {/* Amenities Grid */}
+                    <div className="grid grid-cols-2 gap-3 mb-2">
+                      {journey.amenities.slice(0, 4).map((amenity, idx) => {
+                        const Icon = amenityIcons[amenity] || Flame;
+                        return (
+                          <div key={idx} className="flex items-center space-x-2 p-2 bg-[#1a1a1a]/50 rounded-lg border border-[#037166]/10">
+                            <Icon className="w-3 h-3 text-[#9b59b6]" />
+                            <span className="text-[10px] text-gray-300 line-clamp-1">{amenity}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* Participants & CTA */}
-                  <div className="flex items-center justify-between">
+                  {/* Participants */}
+                  {/* <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-sm text-gray-400">
                       <div className="flex -space-x-2">
                         {[...Array(3)].map((_, i) => (
@@ -386,13 +301,11 @@ export function RecommendedReligious() {
                       </div>
                       <span>{journey.participants}+ joined</span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Spiritual Glow */}
-                {!journey.isDummy && (
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/20 via-[#9b59b6]/20 to-[#037166]/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-700 -z-10" />
-                )}
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#037166]/20 via-[#9b59b6]/20 to-[#037166]/20 opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-700 -z-10" />
               </div>
             </motion.div>
           ))}

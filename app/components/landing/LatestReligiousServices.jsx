@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { Church, Calendar, MapPin, Users, Bell } from 'lucide-react';
+import { Church, Calendar, MapPin, Users, Bell, Flame, User, Scroll, Flower2, Utensils, Home, Clock, BookOpen, Building2 } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 export function LatestReligiousServices() {
@@ -19,6 +19,27 @@ export function LatestReligiousServices() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const amenityIcons = {
+    'Experienced Vedic Pandit': User,
+    'Panditji': User,
+    'Certified Priest': User,
+    'Vedic Rituals': BookOpen,
+    'Pooja Samagri': Flower2,
+    'Homam Samagri': Flower2,
+    'Pooja materials provided': Flower2,
+    'Mantra Chanting': Scroll,
+    'Vedic Procedures': Scroll,
+    'Prasadam Distribution': Utensils,
+    'Prasadam provided': Utensils,
+    'Havan Setup': Flame,
+    'Havan kundam setup': Flame,
+    'Pure Ghee & Herbs': Flame,
+    'Home Pooja': Home,
+    'Office Pooja': Building2,
+    'On-Time Service': Clock,
+    'Ganapathi Pooja': Bell,
+  };
+
   // Fetch latest religious services from API
   useEffect(() => {
     const fetchLatestServices = async () => {
@@ -28,21 +49,31 @@ export function LatestReligiousServices() {
         const data = await response.json();
 
         if (data.success && data.services) {
-          const mappedServices = data.services.map((service) => ({
-            id: service._id,
-            name: service.serviceName || `${service.firstName} ${service.lastName}`,
-            location: service.cityName || service.address || 'Hyderabad',
-            amenities: service.amenities[0],
-            // date: new Date().toLocaleDateString('en-IN', {
-            //   day: 'numeric',
-            //   month: 'short',
-            //   year: 'numeric'
-            // }),
-            attendees: Math.floor(Math.random() * 50) + 80,
-            image: service.image ? `https://api.doorstephub.com/${service.image}` : 'https://images.unsplash.com/photo-1712999533944-9200e6b20e27?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZW1wbGUlMjBzcGlyaXR1YWwlMjByZWxpZ2lvdXN8ZW58MXx8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
-            // type: 'Pooja Service',
-            bio: service.bio
-          }));
+          const mappedServices = data.services.map((service) => {
+            let displayedAmenities = [];
+            if (service.amenities && service.amenities.length > 0) {
+              displayedAmenities = service.amenities.map(a => a.title);
+            } else {
+              displayedAmenities = (service.otherAmenities || "")
+                .split(/\r?\n/)
+                .map(item => item.trim())
+                .filter(item => item.length > 0 && !item.toLowerCase().includes("amenities"));
+            }
+
+            if (displayedAmenities.length === 0) {
+              displayedAmenities = ['Vedic Rituals', 'Pooja Samagri', 'Mantra Chanting', 'Prasadam Distribution'];
+            }
+
+            return {
+              id: service._id,
+              name: service.serviceName || `${service.firstName} ${service.lastName}`,
+              location: service.cityName || service.address || 'Hyderabad',
+              amenities: displayedAmenities,
+              attendees: Math.floor(Math.random() * 50) + 80,
+              image: service.image ? `https://api.doorstephub.com/${service.image}` : 'https://images.unsplash.com/photo-1712999533944-9200e6b20e27?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZW1wbGUlMjBzcGlyaXR1YWwlMjByZWxpZ2lvdXN8ZW58MXx8fHwxNzY4MDI2NzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080',
+              bio: service.bio
+            };
+          });
           setServices(mappedServices.slice(0, 4));
         }
       } catch (err) {
@@ -267,19 +298,24 @@ export function LatestReligiousServices() {
                   </h4>
 
                   {/* Details */}
-                  <div className="space-y-3 mb-6">
+                  <div className="space-y-3 mb-4">
                     <div className="flex items-center space-x-3 text-sm">
                       <MapPin className="w-4 h-4 text-[#037166]" />
-                      <span className="text-gray-300 font-normal">{service.location}</span>
+                      <span className="text-gray-300 font-normal line-clamp-1">{service.location}</span>
                     </div>
-                    <div className="flex items-center space-x-3 text-sm">
-                      {/* <Calendar className="w-4 h-4 text-[#037166]" /> */}
-                      <span className="text-gray-300">{service.amenities}</span>
-                    </div>
-                    {/* <div className="flex items-center space-x-3 text-sm">
-                      <Users className="w-4 h-4 text-[#037166]" />
-                      <span className="text-gray-300">{service.attendees} attending</span>
-                    </div> */}
+                  </div>
+
+                  {/* Amenities Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-2">
+                    {service.amenities.slice(0, 4).map((amenity, idx) => {
+                      const Icon = amenityIcons[amenity] || Flame;
+                      return (
+                        <div key={idx} className="flex items-center space-x-2 p-2 bg-[#1a1a1a]/50 rounded-lg border border-[#037166]/10">
+                          <Icon className="w-3 h-3 text-[#9b59b6]" />
+                          <span className="text-[10px] text-gray-300 line-clamp-1">{amenity}</span>
+                        </div>
+                      );
+                    })}
                   </div>
 
 

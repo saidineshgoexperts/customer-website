@@ -77,22 +77,31 @@ export function PremiumPGHostels() {
         const data = await response.json();
 
         if (data.success && data.hostels && data.hostels.length > 0) {
-          const mappedHostels = data.hostels.map((hostel, index) => ({
-            id: hostel._id,
-            name: hostel.hostelName || `${hostel.firstName} ${hostel.lastName}`,
-            type: 'Premium PG',
-            location: hostel.cityName || 'Hyderabad Area',
-            price: `₹${hostel.defaultPrice}/month`,
-            occupancy: 'Single/Double',
-            image: hostel.image ? `https://api.doorstephub.com/${hostel.image}` : 'https://images.unsplash.com/photo-1594873604892-b599f847e859?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njc5NTMwMzR8MA&ixlib=rb-4.1.0&q=80&w=1080',
-            amenities: [
-              hostel.bio || 'Fully Furnished',
-              '24/7 Security',
-              'High-Speed WiFi',
-              'Power Backup'
-            ],
-            isDummy: false
-          }));
+          const mappedHostels = data.hostels.map((hostel, index) => {
+            let displayedAmenities = hostel.amenities && hostel.amenities.length > 0
+              ? hostel.amenities
+              : (hostel.otherAmenities || "")
+                .split(/\r?\n/)
+                .map(item => item.trim())
+                .filter(item => item.length > 0 && !item.toLowerCase().includes("amenities"));
+
+            if (displayedAmenities.length === 0) {
+              displayedAmenities = ['Fully Furnished', '24/7 Security', 'High-Speed WiFi', 'Power Backup'];
+            }
+
+            return {
+              id: hostel._id,
+              name: hostel.hostelName || `${hostel.firstName} ${hostel.lastName}`,
+              type: 'Premium PG',
+              location: hostel.cityName || 'Hyderabad Area',
+              price: `₹${hostel.startingAt}/month`,
+              occupancy: 'Single/Double',
+              image: hostel.image ? `https://api.doorstephub.com/${hostel.image}` : 'https://images.unsplash.com/photo-1594873604892-b599f847e859?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njc5NTMwMzR8MA&ixlib=rb-4.1.0&q=80&w=1080',
+              description: hostel.bio,
+              amenities: displayedAmenities,
+              isDummy: false
+            };
+          });
           setHostels(mappedHostels);
         } else {
           setHostels(dummyHostels);
@@ -130,6 +139,15 @@ export function PremiumPGHostels() {
       <div className="p-6">
         {/* Title */}
         <div className="h-8 w-3/4 mb-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-shimmer" />
+
+        {/* Description Placeholder - 5 lines */}
+        <div className="space-y-2 mb-6">
+          <div className="h-4 w-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+          <div className="h-4 w-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+          <div className="h-4 w-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+          <div className="h-4 w-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+          <div className="h-4 w-2/3 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded animate-shimmer" />
+        </div>
 
         {/* Location & Occupancy */}
         <div className="space-y-3 mb-6">
@@ -171,16 +189,27 @@ export function PremiumPGHostels() {
 
   const amenityIcons = {
     'High-Speed WiFi': Wifi,
+    'Wi-Fi': Wifi,
     '24/7 Security': Shield,
+    'CCTV': Shield,
+    'Security': Shield,
     'Housekeeping': Building2,
     'Gym Access': Users,
     'Cafeteria': Coffee,
+    'Mess': Coffee,
+    'Food Included': Coffee,
     'Study Rooms': Building2,
+    'Study Area': Building2,
     'Laundry': Building2,
     'Power Backup': Building2,
     'Fully Furnished': Bed,
+    'Fully furnished rooms': Bed,
+    'Bed with mattress': Bed,
+    'Individual wardrobe / locker': Building2,
+    'Study table & chair': Building2,
+    'Ceiling fan / AC': Building2,
+    'Mirror & dustbin': Building2,
     'AC Rooms': Building2,
-    'Food Included': Coffee,
     'Recreation': Users,
   };
 
@@ -226,13 +255,13 @@ export function PremiumPGHostels() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#ff6b35]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Building2 className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Modern Architectural World</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent font-medium">Modern Architectural World</h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent">
               Premium PG & Hostels
             </span>
           </h2>
@@ -307,19 +336,24 @@ export function PremiumPGHostels() {
 
                   {/* Content */}
                   <div className="p-6">
-                    <h4 className="text-2xl font-bold bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent mb-2 group-hover:text-[#037166] transition-colors h-16 line-clamp-2">
+                    <h4 className="text-2xl font-bold bg-gradient-to-r from-[#037166] via-[#ff6b35] to-[#037166] bg-clip-text text-transparent mb-2 h-16 line-clamp-2">
                       {hostel.name}
                     </h4>
 
-                    <div className="space-y-1 mb-3">
+                    {/* Description - 5 lines */}
+                    <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-5">
+                      {hostel.description || "Experience premium living with the perfect blend of comfort, style, and community. Our state-of-the-art facilities ensure a hassle-free lifestyle."}
+                    </p>
+
+                    <div className="space-y-1 mb-4">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-400">Location</span>
-                        <span className="text-white font-intro text-right flex-1 ml-4">{hostel.location}</span>
+                        <span className="text-white font-intro text-right flex-1 ml-4 line-clamp-1">{hostel.location}</span>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
+                      {/* <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-400">Occupancy</span>
                         <span className="text-white font-intro text-right flex-1 ml-4">{hostel.occupancy}</span>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Price */}

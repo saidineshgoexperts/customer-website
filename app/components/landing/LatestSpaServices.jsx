@@ -82,9 +82,9 @@ export function LatestSpaServices() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#d4af37]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Waves className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Calm Zen World</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent font-medium">Calm Zen World</h6>
           </div>
 
           <motion.h2
@@ -93,7 +93,7 @@ export function LatestSpaServices() {
             viewport={{ once: true }}
             className="text-4xl sm:text-5xl font-bold mb-4"
           >
-            <span className="bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent">
               Recently Booked Spa & Saloons
             </span>
           </motion.h2>
@@ -160,7 +160,7 @@ export function LatestSpaServices() {
                     ],
                   }}
                   transition={{ duration: 4, repeat: Infinity, delay: index * 0.5 }}
-                  className="relative h-full flex flex-col bg-gradient-to-br from-[#1a1a1a]/60 to-[#0f0f0f]/60 backdrop-blur-2xl border border-[#037166]/20 rounded-2xl overflow-hidden"
+                  className="relative h-full flex flex-col bg-gradient-to-br from-[#1a1a1a]/60 via-[#1a1510]/60 to-[#0f0f0f]/60 backdrop-blur-2xl border border-[#037166]/20 rounded-2xl overflow-hidden"
                 >
                   {/* Image */}
                   <div className="relative h-40 overflow-hidden flex-shrink-0">
@@ -194,7 +194,7 @@ export function LatestSpaServices() {
                   {/* Content */}
                   <div className="p-4 flex flex-col flex-1">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
+                      <h4 className="font-bold bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent line-clamp-1">
                         {store.storeName}
                       </h4>
                       {/* Placeholder Rating/New Tag */}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, Award, TrendingUp, Crown } from 'lucide-react';
+import { Sparkles, Award, TrendingUp, Crown, CloudFog, HandHeart, Coffee, Flame, Droplets, Scissors, Palette, Wind } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 export function RecommendedSpaSalon() {
@@ -18,6 +18,24 @@ export function RecommendedSpaSalon() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const amenityIcons = {
+    'Steam room or sauna': CloudFog,
+    'Steam room': CloudFog,
+    'Sauna': Flame,
+    'Hot towel service': HandHeart,
+    'Relaxation lounges': Coffee,
+    'Complimentary beverages': Coffee,
+    'Robes & slippers': Crown,
+    'Lockers & secure storage': Award,
+    'Lockers & secure storage for personal items': Award,
+    'Haircut': Scissors,
+    'Hair Coloring': Palette,
+    'Styling': Wind,
+    'Facial': Sparkles,
+    'Massage': HandHeart,
+    'Premium Products': Droplets,
+  };
+
   // Fetch featured spa stores from API
   useEffect(() => {
     const fetchFeaturedSpaStores = async () => {
@@ -27,22 +45,48 @@ export function RecommendedSpaSalon() {
         const data = await response.json();
 
         if (data.success && data.stores && data.stores.length > 0) {
-          const mappedStores = data.stores.map((store, index) => ({
-            id: store._id,
-            name: store.storeName || `${store.firstName} ${store.lastName}`,
-            category: 'Premium Spa & Salon',
-            rating: 4.8,
-            reviews: '500+',
-            price: '$$',
-            image: store.image ? `https://api.doorstephub.com/${store.image}` : 'https://images.unsplash.com/photo-1582498674105-ad104fcc5784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcGElMjB0cmVhdG1lbnR8ZW58MXx8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
-            badge: index === 0 ? 'Top Rated' : 'Trending',
-            highlights: [
-              store.bio || 'Experienced professional',
-              'Premium Services',
-              `${store.cityName || 'Hyderabad'} Location`
-            ],
-            isDummy: false
-          }));
+          const mappedStores = data.stores.map((store, index) => {
+            let displayedAmenities = [];
+
+            if (store.amenities && store.amenities.length > 0) {
+              displayedAmenities = store.amenities.map(a => a.title || a);
+            } else {
+              displayedAmenities = (store.otherAmenities || "")
+                .split(/\r?\n/)
+                .map(item => item.trim())
+                .filter(item => {
+                  const lower = item.toLowerCase();
+                  return item.length > 0 &&
+                    !lower.includes("amenities") &&
+                    !lower.includes("relaxation & comfort") &&
+                    !item.trim().endsWith(":");
+                });
+            }
+
+            // Limit to top 4 amenities
+            if (displayedAmenities.length > 4) {
+              displayedAmenities = displayedAmenities.slice(0, 4);
+            }
+
+            // Fallback if still empty
+            if (displayedAmenities.length === 0) {
+              displayedAmenities = ['Premium Services', 'Expert Therapists', 'Relaxation Lounge', 'Hygienic Environment'];
+            }
+
+            return {
+              id: store._id,
+              name: store.storeName || `${store.firstName} ${store.lastName}`,
+              category: 'Premium Spa & Salon',
+              rating: 4.8,
+              reviews: '500+',
+              price: store.startingAt ? `Starts ₹${store.startingAt}` : '$$',
+              image: store.image ? `https://api.doorstephub.com/${store.image}` : 'https://images.unsplash.com/photo-1582498674105-ad104fcc5784?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcGElMjB0cmVhdG1lbnR8ZW58MXx8fHwxNzY3OTU0MDk4fDA&ixlib=rb-4.1.0&q=80&w=1080',
+              badge: index === 0 ? 'Top Rated' : 'Trending',
+              highlights: displayedAmenities,
+              description: store.bio,
+              isDummy: false
+            };
+          });
           setFeatured(mappedStores);
         } else {
           // Fallback to original hardcoded data - expanded to 4 items
@@ -160,7 +204,7 @@ export function RecommendedSpaSalon() {
 
   if (loading) {
     return (
-      <section className="relative py-22 overflow-hidden">
+      <section className="relative py-20 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
@@ -170,7 +214,7 @@ export function RecommendedSpaSalon() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="bg-gray-800 h-80 rounded-3xl" />
+                <div className="bg-gray-800 h-64 rounded-3xl" />
               </div>
             ))}
           </div>
@@ -180,7 +224,7 @@ export function RecommendedSpaSalon() {
   }
 
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section className="relative py-20 overflow-hidden">
       {/* Architectural World Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
@@ -218,13 +262,13 @@ export function RecommendedSpaSalon() {
         >
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#d4af37]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             < Crown className="w-4 h-4 text-[#d4af37]" />
-            <h6 className="text-sm text-[#037166] font-medium">
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent font-medium">
               Luxury Glow World
             </h6>
           </div>
 
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent">
               Recommended Spa & Salon
             </span>
           </h2>
@@ -248,13 +292,13 @@ export function RecommendedSpaSalon() {
               {/* Premium Card - Original sizing preserved */}
               <div className={`relative h-full bg-gradient-to-br from-[#1a1a1a] via-[#1a1510] to-[#0f0f0f] border-2 border-[#037166]/30 rounded-3xl overflow-hidden ${place.isDummy ? 'pointer-events-none' : ''}`}>
                 {/* Top Badge */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 px-8 py-1 bg-[#037166]/90 backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 px-8 py-1 bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] backdrop-blur-md rounded-lg rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap">
                   <Award className="w-3 h-3 text-white" />
                   <h6 className="text-xs font-bold text-white uppercase tracking-wider">{place.badge}</h6>
                 </div>
 
                 {/* Image with Luxury Overlay - Original height preserved */}
-                <div className="relative h-80 overflow-hidden">
+                <div className="relative h-64 overflow-hidden">
                   <ImageWithFallback
                     src={place.image}
                     alt={place.name}
@@ -294,10 +338,10 @@ export function RecommendedSpaSalon() {
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h6 className="text-xs text-[#d4af37] font-semibold mb-2 uppercase tracking-wider">
+                        <h6 className="text-xs bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent font-semibold mb-2 uppercase tracking-wider">
                           {place.category}
                         </h6>
-                        <h4 className="text-l bg-gradient-to-r from-white via-[#d4af37] to-white bg-clip-text text-transparent">
+                        <h4 className="text-l bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent">
                           {place.name}
                         </h4>
                       </div>
@@ -312,28 +356,29 @@ export function RecommendedSpaSalon() {
                         <Sparkles className="w-5 h-5 text-[#d4af37] fill-[#d4af37]" />
                         <span className="text-lg font-bold text-white">{place.rating}</span>
                       </div>
-                      <div className="text-sm text-gray-400">
-                        {place.reviews} reviews
-                      </div>
-                      <TrendingUp className="w-5 h-5 text-[#037166] ml-auto" />
+
+                      {/* <TrendingUp className="w-5 h-5 text-[#037166] ml-auto" /> */}
                     </div>
 
                     {/* Highlights */}
-                    <div className="space-y-2">
-                      {place.highlights.map((highlight, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: index * 0.1 + idx * 0.05 }}
-                          className="flex items-center space-x-2"
-                        >
-                          <div className="w-1.5 h-1.5 bg-[#037166] rounded-full" />
-                          <span className="text-sm text-gray-300">{highlight}</span>
-                        </motion.div>
-                      ))}
+                    {/* Highlights (Amenities) */}
+                    <div className="grid grid-cols-2 gap-3 mb-2">
+                      {place.highlights.map((highlight, idx) => {
+                        const Icon = amenityIcons[highlight] || Sparkles;
+                        return (
+                          <div key={idx} className="flex items-center space-x-2 p-2 bg-[#1a1a1a]/50 rounded-lg border border-[#037166]/10">
+                            <Icon className="w-3 h-3 text-[#d4af37]" />
+                            <span className="text-[10px] text-gray-300 line-clamp-1">{highlight}</span>
+                          </div>
+                        );
+                      })}
                     </div>
+                    {/* Description */}
+                    {!place.isDummy && place.description && (
+                      <p className="text-gray-400 text-xs leading-relaxed line-clamp-4 mt-3 border-t border-[#037166]/20 pt-3">
+                        {place.description}
+                      </p>
+                    )}
                   </motion.div>
 
 
