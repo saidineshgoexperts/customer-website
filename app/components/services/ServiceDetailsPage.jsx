@@ -65,6 +65,7 @@ export function ServiceDetailsPage({
           headers: {
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({}),
         });
 
         if (!response.ok) throw new Error('Failed to fetch details');
@@ -142,7 +143,7 @@ export function ServiceDetailsPage({
         }
       `}</style>
       {/* Hero Section with Service Accent Color */}
-      <section className="relative py-12 overflow-hidden">
+      <section className="relative py-12">
         <div
           className="absolute inset-0 opacity-30"
           style={{

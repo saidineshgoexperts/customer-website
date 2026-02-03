@@ -75,7 +75,11 @@ export default function ServicesPage() {
             {/* <PromoBanner /> */}
             <DownloadApp />
             <NearbyStores />
-            <PopularCenters />
+            <PopularCenters onStoreClick={(store) => {
+                const categoryParam = encodeURIComponent('General');
+                const subCategoryParam = encodeURIComponent(store.speciality || 'Service');
+                router.push(`/services/detail/${store.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
+            }} />
             <KnowledgeSpace />
             <Newsletter />
         </>
