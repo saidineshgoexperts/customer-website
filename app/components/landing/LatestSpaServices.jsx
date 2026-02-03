@@ -58,7 +58,7 @@ export function LatestSpaServices() {
           scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
         }
       }
-    }, 5000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [loading, spaStores]);
 

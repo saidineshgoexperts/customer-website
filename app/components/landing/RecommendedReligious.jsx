@@ -101,7 +101,7 @@ export function RecommendedReligious() {
           scrollRef.current.scrollBy({ left: clientWidth / 2, behavior: 'smooth' });
         }
       }
-    }, 5000); // Scroll every 5 seconds
+    }, 3000); // Scroll every 3 seconds
     return () => clearInterval(interval);
   }, [loading, journeys]);
 

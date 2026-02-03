@@ -75,7 +75,7 @@ export function BookingServices() {
           scrollRef.current.scrollBy({ left: clientWidth, behavior: 'smooth' });
         }
       }
-    }, 5000); // Scroll every 5 seconds
+    }, 3000); // Scroll every 3 seconds
     return () => clearInterval(interval);
   }, [loading, services]);
 
