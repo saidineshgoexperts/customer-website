@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Star, Clock, Shield, CheckCircle, Award, ThumbsUp, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Star, Clock, Shield, CheckCircle, Award, ThumbsUp, ChevronLeft, ChevronRight, ArrowRight, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Service-specific accent colors
@@ -51,6 +51,8 @@ export function ServiceDetailsPage({
   const [activeTab, setActiveTab] = useState('About Service');
   const [visibleReviews, setVisibleReviews] = useState(4);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const accentColor = serviceAccents[category] || '#5a8b9d';
 
   useEffect(() => {
@@ -150,6 +152,7 @@ export function ServiceDetailsPage({
 
         {/* Animated glow orb */}
         <motion.div
+
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.2, 0.3, 0.2],
@@ -190,21 +193,27 @@ export function ServiceDetailsPage({
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-8 items-start relative">
-            {/* Left Column: Gallery + Tabs (Scrollable) */}
-            <div className="lg:col-span-1 space-y-8 h-auto lg:h-[calc(100vh-140px)] overflow-y-auto pr-2 custom-scrollbar">
+            {/* Left Column: Gallery + Tabs */}
+            <div className="lg:col-span-1 space-y-8 h-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
                 <div className="relative rounded-2xl overflow-hidden bg-black/20 backdrop-blur-sm border border-white/10">
-                  <div className="relative aspect-video">
+                  <div
+                    className="relative aspect-video cursor-pointer"
+                    onClick={() => {
+                      setSelectedImageIndex(currentImageIndex);
+                      setIsLightboxOpen(true);
+                    }}
+                  >
                     <img
                       src={images[currentImageIndex]}
                       alt={storeData.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
                     {/* Navigation Arrows */}
                     {images.length > 1 && (
@@ -231,7 +240,11 @@ export function ServiceDetailsPage({
                       {images.map((img, idx) => (
                         <button
                           key={idx}
-                          onClick={() => setCurrentImageIndex(idx)}
+                          onClick={() => {
+                            setCurrentImageIndex(idx);
+                            setSelectedImageIndex(idx);
+                            setIsLightboxOpen(true);
+                          }}
                           className={`relative w-20 h-20 rounded-lg overflow-hidden transition-all flex-shrink-0 ${currentImageIndex === idx
                             ? 'ring-2 ring-[#037166] scale-105'
                             : 'opacity-60 hover:opacity-100'
@@ -306,6 +319,12 @@ export function ServiceDetailsPage({
                           {serviceImages.map((img, idx) => (
                             <div
                               key={idx}
+                              onClick={() => {
+                                // The images array has [banner, ...serviceImages]
+                                // So the index for the lightbox should be idx + 1
+                                setSelectedImageIndex(idx + 1);
+                                setIsLightboxOpen(true);
+                              }}
                               className="aspect-square rounded-2xl overflow-hidden group cursor-pointer relative border border-white/10"
                             >
                               <img
@@ -313,7 +332,7 @@ export function ServiceDetailsPage({
                                 alt={`Portfolio ${idx + 1}`}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                               />
-                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                             </div>
                           ))}
                         </div>
@@ -498,7 +517,72 @@ export function ServiceDetailsPage({
         </div>
       </section>
 
-      {/* Tabbed Content Moved to Main Grid */}
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {isLightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 md:p-8"
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsLightboxOpen(false)}
+              className="absolute top-6 right-6 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all z-10"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Navigation Arrows */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length);
+                  }}
+                  className="absolute left-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all z-10"
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImageIndex((prev) => (prev + 1) % images.length);
+                  }}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all z-10"
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </button>
+              </>
+            )}
+
+            {/* Main Image Container */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative max-w-5xl w-full h-full flex items-center justify-center"
+            >
+              <img
+                src={images[selectedImageIndex]}
+                alt={`Gallery Image ${selectedImageIndex + 1}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedImageIndex((prev) => (prev + 1) % images.length);
+                }}
+                className="max-w-full max-h-full object-contain pointer-events-auto shadow-2xl rounded-lg cursor-pointer"
+              />
+
+              {/* Pagination Info */}
+              <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 text-white/60 text-sm font-medium">
+                {selectedImageIndex + 1} / {images.length}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
