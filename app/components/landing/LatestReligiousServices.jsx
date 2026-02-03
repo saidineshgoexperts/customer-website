@@ -273,7 +273,7 @@ export function LatestReligiousServices() {
                       <div
                         className="px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all hover:bg-[#025951]"
                       >
-                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider">Join Service</h6>
+                        <h6 className="text-[12px] font-ubuntu font-bold tracking-wider bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">Join Service</h6>
                       </div>
                     </Link>
                   </div>

@@ -112,9 +112,9 @@ export function Hero({ onViewServices, onBookService }) {
               onClick={onBookService}
               className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold text-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-[#037166]/50 hover:scale-105"
             >
-              <span className="relative z-10 flex items-center gap-2">
+              <span className="relative z-10 flex items-center gap-2 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
                 Book a Service Now
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-white" />
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-[#04a99d] to-[#037166] opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
@@ -123,8 +123,10 @@ export function Hero({ onViewServices, onBookService }) {
               onClick={onViewServices}
               className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold text-lg hover:bg-white/10 hover:border-[#037166]/50 transition-all hover:scale-105"
             >
-              Find Services
-              <Search className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+                Find Services
+              </span>
+              <Search className="w-5 h-5 group-hover:translate-x-1 transition-transform text-white" />
             </button>
 
           </div>

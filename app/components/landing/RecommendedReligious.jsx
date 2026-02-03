@@ -84,7 +84,26 @@ export function RecommendedReligious() {
     };
 
     fetchFeaturedServices();
+    const interval = setInterval(fetchFeaturedServices, 60000); // 1 minute refresh
+    return () => clearInterval(interval);
   }, []);
+
+  // Auto-scroller for the horizontal container
+  const scrollRef = React.useRef(null);
+  useEffect(() => {
+    if (loading || journeys.length === 0) return;
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          scrollRef.current.scrollBy({ left: clientWidth / 2, behavior: 'smooth' });
+        }
+      }
+    }, 5000); // Scroll every 5 seconds
+    return () => clearInterval(interval);
+  }, [loading, journeys]);
 
   // Skeleton Shimmer Component
   const SkeletonCard = () => (
@@ -224,16 +243,19 @@ export function RecommendedReligious() {
           </p>
         </motion.div>
 
-        {/* Journey Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+        {/* Journey Cards - Horizontal Scroller */}
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-8 pb-12 scrollbar-hide snap-x snap-mandatory"
+        >
           {journeys.map((journey, index) => (
             <motion.div
               key={journey.id || index}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+              initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className="group"
+              transition={{ delay: index * 0.1, duration: 0.7 }}
+              className="flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[24%] snap-start group"
             >
               {/* Journey Card */}
               <div className="relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f1a] border-2 border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl">
@@ -265,7 +287,7 @@ export function RecommendedReligious() {
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
+                <div className="p-6 h-[280px] flex flex-col justify-between">
                   {/* Title & Description */}
                   <div className="mb-4">
                     <h4 className="text-lg font-bold bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent line-clamp-1">

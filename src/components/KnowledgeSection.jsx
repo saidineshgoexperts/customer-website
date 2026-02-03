@@ -129,8 +129,8 @@ export function KnowledgeSection() {
                       whileHover={{ x: 5 }}
                       className="text-[#037166] font-medium text-sm flex items-center space-x-1 group/btn"
                     >
-                      <span>Read</span>
-                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">Read</span>
+                      <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform text-[#037166]" />
                     </motion.button>
                   </div>
                 </div>
@@ -154,8 +154,10 @@ export function KnowledgeSection() {
             whileTap={{ scale: 0.95 }}
             className="px-8 py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full text-white font-semibold shadow-xl shadow-[#037166]/40 hover:shadow-2xl hover:shadow-[#037166]/50 transition-all inline-flex items-center space-x-2"
           >
-            <span>Explore All Articles</span>
-            <ArrowRight className="w-5 h-5" />
+            <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+              Explore All Articles
+            </span>
+            <ArrowRight className="w-5 h-5 text-white" />
           </motion.button>
         </motion.div>
 
@@ -182,7 +184,9 @@ export function KnowledgeSection() {
               whileTap={{ scale: 0.98 }}
               className="px-8 py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-xl text-white font-semibold shadow-lg shadow-[#037166]/40 hover:shadow-xl hover:shadow-[#037166]/50 transition-all whitespace-nowrap"
             >
-              Subscribe Now
+              <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+                Subscribe Now
+              </span>
             </motion.button>
           </div>
         </motion.div>

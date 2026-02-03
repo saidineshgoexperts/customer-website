@@ -8,25 +8,24 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
 const footerLinks = {
-  company: [
+
+  Quicklinks: [
     { name: 'About Us', href: '#' },
     { name: 'Careers', href: '#' },
     // { name: 'Press Kit', href: '#' },
     { name: 'Contact', href: '#' },
-  ],
-  services: [
-
     { name: 'Become a ServicePartner', href: '/partner' },
 
     { name: 'Download Android App', href: 'https://play.google.com/store/apps/details?id=com.doorstephub.partner' },
 
     { name: 'Download Ios App', href: 'https://apps.apple.com/in/app/doorstep-hub/id6448539336' },
   ],
-  support: [
-    { name: 'Help Center', href: '#' },
+  Moreinfo: [
+    { name: 'FAQs', href: '#' },
     { name: 'Terms of Service', href: '#' },
     { name: 'Privacy Policy', href: '#' },
-    { name: 'FAQs', href: '#' },
+    { name: 'Help Center', href: '#' },
+    { name: 'All Services', href: '#' },
   ],
 };
 
@@ -257,7 +256,7 @@ export function Footer() {
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand Column */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -301,7 +300,7 @@ export function Footer() {
           </div>
 
           {/* Company Links */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -320,7 +319,7 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </motion.div> */}
 
           {/* Services Links */}
           <motion.div
@@ -329,9 +328,9 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            <h4 className="text-white font-bold mb-4">Services</h4>
+            <h4 className="text-white font-bold mb-4">Quick Links</h4>
             <ul className="space-y-3">
-              {footerLinks.services.map((link) => (
+              {footerLinks.Quicklinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
@@ -351,9 +350,9 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            <h4 className="text-white font-bold mb-4">Support</h4>
+            <h4 className="text-white font-bold mb-4">More Info</h4>
             <ul className="space-y-3">
-              {footerLinks.support.map((link) => (
+              {footerLinks.Moreinfo.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}

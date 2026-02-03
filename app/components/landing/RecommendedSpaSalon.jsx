@@ -278,16 +278,16 @@ export function RecommendedSpaSalon() {
           </p>
         </motion.div>
 
-        {/* Featured Cards - Changed to 4 per row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Featured Cards - Horizontal Scroller */}
+        <div className="flex overflow-x-auto gap-4 pb-8 scrollbar-hide snap-x snap-mandatory">
           {featured.map((place, index) => (
             <motion.div
               key={place.id || index}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.7 }}
-              className={`group relative ${place.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
+              className={`flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[24%] snap-start group relative ${place.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
             >
               {/* Premium Card - Original sizing preserved */}
               <div className={`relative h-full bg-gradient-to-br from-[#1a1a1a] via-[#1a1510] to-[#0f0f0f] border-2 border-[#037166]/30 rounded-3xl overflow-hidden ${place.isDummy ? 'pointer-events-none' : ''}`}>
@@ -323,7 +323,7 @@ export function RecommendedSpaSalon() {
                   {/* Main Info Card */}
                   <motion.div
                     whileHover={place.isDummy ? {} : { y: -5 }}
-                    className="p-6 bg-[#1a1a1a]/90 backdrop-blur-xl border border-[#037166]/30 rounded-2xl mb-6 shadow-xl"
+                    className="p-6 bg-[#1a1a1a]/90 backdrop-blur-xl border border-[#037166]/30 rounded-2xl mb-6 shadow-xl h-[340px] flex flex-col justify-between"
                   >
                     <div className="mb-4">
                       <h6 className="text-xs bg-gradient-to-r from-[#037166] via-[#d4af37] to-[#037166] bg-clip-text text-transparent font-semibold mb-2 uppercase tracking-wider">
@@ -357,15 +357,17 @@ export function RecommendedSpaSalon() {
                         onClick={() => !place.isDummy && (window.location.href = `/spa-salon?storeId=${place.id}`)}
                         className={`cursor-pointer ${place.isDummy ? 'pointer-events-none opacity-50' : ''}`}
                       >
-                        <div className="px-3 py-1.5 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full text-white font-semibold text-[10px] shadow-lg shadow-[#037166]/30 whitespace-nowrap hover:scale-105 transition-transform">
-                          View Details
+                        <div className="px-3 py-1.5 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full font-semibold text-[10px] shadow-lg shadow-[#037166]/30 whitespace-nowrap hover:scale-105 transition-transform">
+                          <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+                            View Details
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Highlights */}
                     {/* Highlights (Amenities) */}
-                    <div className="grid grid-cols-2 gap-3 mb-2">
+                    <div className="grid grid-cols-2 gap-3 mb-2 h-[88px] content-start">
                       {place.highlights.map((highlight, idx) => {
                         const Icon = amenityIcons[highlight] || Sparkles;
                         return (
@@ -377,11 +379,11 @@ export function RecommendedSpaSalon() {
                       })}
                     </div>
                     {/* Description */}
-                    {!place.isDummy && place.description && (
+                    {/* {!place.isDummy && place.description && (
                       <p className="text-gray-400 text-xs leading-relaxed line-clamp-4 mt-3 border-t border-[#037166]/20 pt-3">
                         {place.description}
                       </p>
-                    )}
+                    )} */}
                   </motion.div>
 
 
@@ -404,7 +406,7 @@ export function RecommendedSpaSalon() {
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6"
         >
           {[
-            { icon: Crown, label: 'Premium Partners', value: '50+' },
+            { icon: Crown, label: 'Premium Partners', value: '50K+' },
             { icon: Award, label: 'Quality Certified', value: '100%' },
             { icon: Sparkles, label: 'Satisfied Clients', value: '15K+' },
             { icon: TrendingUp, label: 'Growth Rate', value: '250%' },

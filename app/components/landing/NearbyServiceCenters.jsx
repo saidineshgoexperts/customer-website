@@ -135,11 +135,13 @@ export function NearbyServiceCenters() {
 
             return {
               id: service._id,
-              name: service.name || `${service.firstName} ${service.lastName}`,
+              name: service.business_name || service.name || `${service.firstName} ${service.lastName}`,
               distance: `${distance.toFixed(1)} km`,
               rating: parseFloat(service.rating) || 4.5,
               status: service.storeHours ? service.storeHours : 'Open',
               phone: service.phone || '+91XXXXXXXXXX',
+              description: service.description || 'No description available',
+              businessname: service.business_name || 'No business name available',
               address: service.address || service.cityName || 'Hyderabad',
               lat: location.lat + latOffset,
               lng: location.lng + lngOffset,
@@ -204,7 +206,7 @@ export function NearbyServiceCenters() {
             <Marker
               key={service.id}
               position={{ lat: service.lat, lng: service.lng }}
-              title={service.name}
+              title={service.businessname}
               icon={{
                 url: selectedService === index
                   ? 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png'

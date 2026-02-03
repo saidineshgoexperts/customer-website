@@ -159,7 +159,7 @@ export function BookingServices() {
                         handleServiceClick(service);
                       }}
                     >
-                      <h6 className="text-[12px] font-ubuntu  tracking-wider ">Book Now</h6>
+                      <h6 className="text-[12px] font-ubuntu tracking-wider bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">Book Now</h6>
                     </div>
                   </div>
 
@@ -171,7 +171,7 @@ export function BookingServices() {
                       <div className="flex items-center justify-between">
 
                         {/* Category */}
-                        <h6 className="text-[10px] text-[#037166] font-medium uppercase tracking-wider">
+                        <h6 className="text-[10px] text-[#037166] font-medium  tracking-wider">
                           {service.category}
                         </h6>
 

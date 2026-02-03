@@ -69,7 +69,7 @@ export function AppDownload() {
             </h2>
 
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              Access all services, book appointments, track orders, and manage your spiritual journey—all from one powerful app.
+              Access All Services, Book Appointments, Track Orders, and Manage Your Daily Needs — All from One Powerful App.
             </p>
 
             {/* Features */}
@@ -109,8 +109,8 @@ export function AppDownload() {
                 >
                   <Apple className="w-6 h-6" />
                   <div className="text-left">
-                    <div className="text-xs">Download on the</div>
-                    <h5 className="text-base font-bold">App Store</h5>
+                    <div className="text-xs text-white/90">Download on the</div>
+                    <h5 className="text-base font-bold bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">App Store</h5>
                   </div>
                 </motion.button>
               </a>
@@ -127,8 +127,8 @@ export function AppDownload() {
                 >
                   <Smartphone className="w-6 h-6" />
                   <div className="text-left">
-                    <div className="text-xs">Get it on</div>
-                    <h5 className="text-base font-bold">Google Play</h5>
+                    <div className="text-xs text-white/90">Get it on</div>
+                    <h5 className="text-base font-bold bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">Google Play</h5>
                   </div>
                 </motion.button>
               </a>
@@ -172,7 +172,7 @@ export function AppDownload() {
                 y: [0, -20, 0],
               }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute top-20 left-1/2 -translate-x-1/2 z-10"
+              className="absolute top-20 left-[32%] -translate-x-1/2 z-10"
             >
               <div className="relative w-72 h-[580px] bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-[3rem] border-8 border-[#2a2a2a] shadow-2xl overflow-hidden">
                 {/* Notch */}
@@ -198,17 +198,17 @@ export function AppDownload() {
                 y: [0, 20, 0],
               }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-              className="absolute top-28 left-1/2 -translate-x-1/2 opacity-40 scale-90 -rotate-12"
+              className="absolute top-28 left-[32%] -translate-x-1/2 opacity-40 scale-90 -rotate-12"
             >
               <div className="w-72 h-[580px] bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-[3rem] border-8 border-[#2a2a2a] shadow-2xl" />
             </motion.div>
 
             {/* Floating Icons */}
             {[
-              { Icon: Download, position: { top: '10%', left: '10%' } },
-              { Icon: Star, position: { top: '20%', right: '10%' } },
-              { Icon: Shield, position: { bottom: '20%', left: '15%' } },
-              { Icon: Zap, position: { bottom: '15%', right: '15%' } },
+              { Icon: Download, position: { top: '15%', right: '20%' } },
+              { Icon: Star, position: { top: '30%', right: '5%' } },
+              { Icon: Shield, position: { bottom: '25%', right: '20%' } },
+              { Icon: Zap, position: { bottom: '15%', right: '5%' } },
             ].map(({ Icon, position }, index) => (
               <motion.div
                 key={index}

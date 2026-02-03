@@ -79,7 +79,7 @@ export function PremiumPGHostels() {
         if (data.success && data.hostels && data.hostels.length > 0) {
           const mappedHostels = data.hostels.map((hostel, index) => {
             let displayedAmenities = hostel.amenities && hostel.amenities.length > 0
-              ? hostel.amenities
+              ? hostel.amenities.map(a => (typeof a === 'object' && a.title ? a.title : a))
               : (hostel.otherAmenities || "")
                 .split(/\r?\n/)
                 .map(item => item.trim())
@@ -282,7 +282,7 @@ export function PremiumPGHostels() {
           </motion.button>
         </motion.div>
 
-        {/* Content or Skeleton */}
+        {/* PG Cards - Horizontal Scroller */}
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <SkeletonCard />
@@ -291,15 +291,15 @@ export function PremiumPGHostels() {
             <SkeletonCard />
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex overflow-x-auto gap-8 pb-8 scrollbar-hide snap-x snap-mandatory">
             {hostels.map((hostel, index) => (
               <motion.div
                 key={hostel.id || index}
-                initial={{ opacity: 0, y: 60 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15, duration: 0.6 }}
-                className={`group ${hostel.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
+                className={`flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[24%] snap-start group ${hostel.isDummy ? 'cursor-not-allowed grayscale-[0.5] opacity-80' : ''}`}
               >
                 {/* Card with Parallax Effect */}
                 <motion.div
@@ -341,9 +341,9 @@ export function PremiumPGHostels() {
                     </h4>
 
                     {/* Description - 2 lines */}
-                    <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2 min-h-[2.5em]">
+                    {/* <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2 min-h-[2.5em]">
                       {hostel.description || "Experience premium living with the perfect blend of comfort, style, and community. Our state-of-the-art facilities ensure a hassle-free lifestyle."}
-                    </p>
+                    </p> */}
 
                     <div className="space-y-1 mb-4">
                       <div className="flex items-center justify-between text-sm">
@@ -380,9 +380,11 @@ export function PremiumPGHostels() {
                             whileHover={{ scale: 1.04 }}
                             whileTap={{ scale: 0.97 }}
                             disabled={hostel.isDummy}
-                            className="px-2 py-1.5 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full text-white font-semibold text-[10px] shadow-lg shadow-[#037166]/30 whitespace-nowrap"
+                            className="px-2 py-1.5 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full font-semibold text-[10px] shadow-lg shadow-[#037166]/30 whitespace-nowrap"
                           >
-                            Book Now
+                            <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+                              Book Now
+                            </span>
                           </motion.button>
                         </Link>
                       </div>
