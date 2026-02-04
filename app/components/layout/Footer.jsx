@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 const footerLinks = {
@@ -40,9 +41,12 @@ const socialLinks = [
 // Hardcoded additionalServices removed as it's now dynamic
 
 export function Footer() {
+  const router = useRouter();
   const [serviceGroups, setServiceGroups] = useState([]);
   const [professionalServices, setProfessionalServices] = useState([]);
+  const [globalSettings, setGlobalSettings] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hoveredSocial, setHoveredSocial] = useState(null);
 
   useEffect(() => {
     const fetchFooterData = async () => {
@@ -88,6 +92,16 @@ export function Footer() {
           setProfessionalServices(profData.data);
         }
 
+        // Step 3: Fetch Global Settings
+        const globalResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/get_global_settings', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const globalData = await globalResponse.json();
+        if (globalData.success && globalData.policy) {
+          setGlobalSettings(globalData.policy);
+        }
+
       } catch (error) {
         console.error('Error fetching footer data:', error);
       } finally {
@@ -97,6 +111,28 @@ export function Footer() {
 
     fetchFooterData();
   }, []);
+
+  const dynamicQuickLinks = [
+    ...footerLinks.Quicklinks.map(link => {
+      if (link.name === 'Download Android App' && globalSettings?.customerAndroidAppLink) {
+        return { ...link, href: globalSettings.customerAndroidAppLink };
+      }
+      if (link.name === 'Download Ios App' && globalSettings?.customerIosAppLink) {
+        return { ...link, href: globalSettings.customerIosAppLink };
+      }
+      return link;
+    })
+  ];
+
+  const dynamicSocialLinks = socialLinks.map(social => {
+    const socialLabel = (social.label || '').toLowerCase();
+    if (socialLabel === 'facebook' && globalSettings?.facebook) return { ...social, href: globalSettings.facebook };
+    if (socialLabel === 'twitter' && globalSettings?.twitter) return { ...social, href: globalSettings.twitter };
+    if (socialLabel === 'instagram' && globalSettings?.instagram) return { ...social, href: globalSettings.instagram };
+    if (socialLabel === 'linkedin' && globalSettings?.linkedin) return { ...social, href: globalSettings.linkedin };
+    if (socialLabel === 'youtube' && globalSettings?.youtube) return { ...social, href: globalSettings.youtube };
+    return social;
+  });
 
   const getProfessionalLink = (serviceName, sub, category) => {
     const encodedSubName = encodeURIComponent(sub.name);
@@ -129,7 +165,7 @@ export function Footer() {
               viewport={{ once: true }}
               className="space-y-8"
             >
-              <h3 className="text-xl font-bold text-white mb-6">Appliance Services</h3>
+              <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent w-fit">Appliance Services</h3>
               <div className="text-sm leading-8 text-gray-400">
                 {serviceGroups.map((group, groupIdx) => (
                   group.subcategories.length > 0 && (
@@ -178,14 +214,14 @@ export function Footer() {
               serviceName;
 
           return (
-            <div key={sIdx} className="mb-12">
+            <div key={sIdx} className="mb-16">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 className="space-y-6"
               >
-                <h3 className="text-xl font-bold text-white mb-4">{displayTitle}</h3>
+                <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent w-fit">{displayTitle}</h3>
                 <div className="text-sm leading-8 text-gray-400">
                   {section.categories.map((catGroup, groupIdx) => (
                     <span key={catGroup.category._id} className="inline mr-1">
@@ -233,37 +269,44 @@ export function Footer() {
             >
               <div className="relative w-48 h-14 overflow-hidden mb-6">
                 <Image
-                  src="/d-hub-logo.png"
-                  alt="Doorstep Hub Logo"
+                  src={globalSettings?.applicaionLogo ? `https://api.doorstephub.com/${globalSettings.applicaionLogo}` : "/d-hub-logo.png"}
+                  alt={globalSettings?.applicationName || "Doorstep Hub"}
                   fill
                   sizes="192px"
-                  className="object-contain object-left"
+                  className="object-contain object-left cursor-pointer"
+                  onClick={() => router.push('/')}
                 />
               </div>
               <p className="text-white/60 mb-6 leading-relaxed max-w-sm">
-                Your trusted partner for all home service needs. Connecting you with verified professionals for quick, reliable, and affordable solutions.
+                {globalSettings?.aboutus || "Your trusted partner for all home service needs. Connecting you with verified professionals for quick, reliable, and affordable solutions."}
               </p>
 
               {/* Contact Info */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
-                  {/* <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+              <div className="space-y-4">
+                <a
+                  href={`tel:${globalSettings?.phone || "8886688666"}`}
+                  className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#037166]/20 transition-colors">
                     <Phone className="w-4 h-4" />
-                  </div> */}
-                  {/* <span className="text-sm">8886688666</span> */}
-                </div>
-                <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+                  </div>
+                  <span className="text-sm">{globalSettings?.phone || "8886688666"}</span>
+                </a>
+                <a
+                  href={`mailto:${globalSettings?.email || "help@doorstephub.com"}`}
+                  className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#037166]/20 transition-colors">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <span className="text-sm">help@doorstephub.com</span>
-                </div>
-                {/* <div className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors cursor-pointer">
+                  <span className="text-sm">{globalSettings?.email || "help@doorstephub.com"}</span>
+                </a>
+                <div className="flex items-center gap-3 text-white/60">
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4" />
                   </div>
-                  <span className="text-sm">Hyderabad, Telangana</span>
-                </div> */}
+                  <span className="text-sm leading-tight">{globalSettings?.address || "Hyderabad, Telangana"}</span>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -299,10 +342,12 @@ export function Footer() {
           >
             <h4 className="text-white font-bold mb-4">Quick Links</h4>
             <ul className="space-y-3">
-              {footerLinks.Quicklinks.map((link) => (
+              {dynamicQuickLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
+                    target={link.href?.startsWith('http') ? "_blank" : undefined}
+                    rel={link.href?.startsWith('http') ? "noopener noreferrer" : undefined}
                     className="text-white/60 hover:text-[#04a99d] transition-colors text-sm block"
                   >
                     {link.name}
@@ -354,21 +399,40 @@ export function Footer() {
             viewport={{ once: true }}
             className="flex items-center gap-3"
           >
-            {socialLinks.map((social, index) => (
-              <motion.a
-                key={social.label}
-                href={social.href}
-                aria-label={social.label}
-                whileHover={{ scale: 1.1, y: -3 }}
-                whileTap={{ scale: 0.9 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="w-10 h-10 rounded-full bg-white/5 hover:bg-gradient-to-r hover:from-[#037166] hover:to-[#04a99d] border border-white/10 hover:border-[#037166]/50 flex items-center justify-center text-white/60 hover:text-white transition-all group"
-              >
-                <social.icon className="w-5 h-5" />
-              </motion.a>
+            {dynamicSocialLinks.map((social, index) => (
+              <div key={social.label} className="relative group">
+                <AnimatePresence>
+                  {hoveredSocial === social.label && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                      className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-[#1a1a1a] border border-[#037166]/50 rounded-lg text-white text-xs font-medium whitespace-nowrap shadow-xl flex flex-col items-center z-50 pointer-events-none"
+                    >
+                      {social.label}
+                      {/* Tooltip Arrow/Tail */}
+                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1a1a1a] border-r border-b border-[#037166]/50 rotate-45" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <motion.a
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  onMouseEnter={() => setHoveredSocial(social.label)}
+                  onMouseLeave={() => setHoveredSocial(null)}
+                  whileHover={{ scale: 1.1, y: -3 }}
+                  whileTap={{ scale: 0.9 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-gradient-to-r hover:from-[#037166] hover:to-[#04a99d] border border-white/10 hover:border-[#037166]/50 flex items-center justify-center text-white/60 hover:text-white transition-all group"
+                >
+                  <social.icon className="w-5 h-5" />
+                </motion.a>
+              </div>
             ))}
           </motion.div>
         </div>

@@ -74,13 +74,13 @@ export function KnowledgeSpace() {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4"
           >
             <BookOpen className="w-3 h-3 text-[#04a99d]" />
-            <h6 className="text-xs font-medium text-[#04a99d]">LEARN & EXPLORE</h6>
+            <h6 className="text-sm font-medium text-[#04a99d]">LEARN & EXPLORE</h6>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold mb-4"
+            className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent"
           >
             Knowledge Space
           </motion.h2>
@@ -89,7 +89,7 @@ export function KnowledgeSpace() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-white/60 text-lg"
+            className="text-gray-400 text-lg max-w-2xl"
           >
             Expert tips and guides to help you maintain your home
           </motion.p>

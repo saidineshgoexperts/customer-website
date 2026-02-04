@@ -1,14 +1,14 @@
 {
   "pages": {
-    "/(landing)/page": [
+    "/appliances/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/page.js"
+      "static/chunks/app/appliances/page.js"
     ],
-    "/(landing)/layout": [
+    "/appliances/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/layout.js"
+      "static/chunks/app/appliances/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -26,26 +26,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/(legal)/faqs/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(legal)/faqs/page.js"
-    ],
-    "/(legal)/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(legal)/layout.js"
-    ],
-    "/(legal)/terms-conditions/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(legal)/terms-conditions/page.js"
-    ],
-    "/(legal)/privacy-policy/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(legal)/privacy-policy/page.js"
-    ],
     "/services/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -56,35 +36,70 @@
       "static/chunks/main-app.js",
       "static/chunks/app/services/layout.js"
     ],
-    "/pghostels/listings/[type]/page": [
+    "/(landing)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/listings/[type]/page.js"
+      "static/chunks/app/(landing)/page.js"
     ],
-    "/pghostels/layout": [
+    "/(landing)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/layout.js"
+      "static/chunks/app/(landing)/layout.js"
     ],
-    "/spa-salon/subcategory/[id]/page": [
+    "/services/child/[childCategoryId]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/spa-salon/subcategory/[id]/page.js"
+      "static/chunks/app/services/child/[childCategoryId]/page.js"
+    ],
+    "/services/categories/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/categories/page.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
+    ],
+    "/partner/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/partner/page.js"
+    ],
+    "/spa-salon/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/page.js"
     ],
     "/spa-salon/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/spa-salon/layout.js"
     ],
-    "/religious-services/subcategory/[id]/page": [
+    "/spa-salon/results/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/subcategory/[id]/page.js"
+      "static/chunks/app/spa-salon/results/page.js"
     ],
-    "/religious-services/layout": [
+    "/spa-salon/detail/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/layout.js"
+      "static/chunks/app/spa-salon/detail/[id]/page.js"
+    ],
+    "/spa-salon/packages/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/packages/page.js"
+    ],
+    "/spa-salon/booking/address/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/booking/address/page.js"
+    ],
+    "/spa-salon/booking/confirm/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/booking/confirm/page.js"
     ]
   }
 }

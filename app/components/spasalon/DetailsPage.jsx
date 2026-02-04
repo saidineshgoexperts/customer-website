@@ -115,10 +115,10 @@ export function DetailsPage() {
                                 {service.name}
                             </h1>
                             <p className="text-xl text-gray-600">{service.provider}</p>
-                            <div className="flex items-center gap-2 mt-2 text-gray-600">
+                            {/* <div className="flex items-center gap-2 mt-2 text-gray-600">
                                 <MapPin className="w-4 h-4" />
                                 <span>{service.distance} away</span>
-                            </div>
+                            </div> */}
                         </div>
 
                         {/* Right - Quick Stats */}
@@ -129,17 +129,17 @@ export function DetailsPage() {
                                     <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B] mr-1" />
                                     <span className="text-2xl font-bold text-gray-900">{service.rating}</span>
                                 </div>
-                                <div className="text-xs text-gray-500 text-center">{service.reviewCount} Reviews</div>
+                                <div className="text-xs text-gray-500 text-center">Rating</div>
                             </div>
 
                             {/* Duration Card */}
-                            <div className="bg-gradient-to-br from-[#C06C84]/10 to-[#C06C84]/5 rounded-2xl p-4 border border-[#C06C84]/20 min-w-[120px]">
+                            {/* <div className="bg-gradient-to-br from-[#C06C84]/10 to-[#C06C84]/5 rounded-2xl p-4 border border-[#C06C84]/20 min-w-[120px]">
                                 <div className="flex items-center justify-center mb-1">
                                     <Clock className="w-5 h-5 text-[#C06C84] mr-1" />
                                     <span className="text-2xl font-bold text-gray-900">{service.duration}</span>
                                 </div>
                                 <div className="text-xs text-gray-500 text-center">Duration</div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 
@@ -184,15 +184,15 @@ export function DetailsPage() {
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Service Description</h3>
                                 <p className="text-gray-700 leading-relaxed text-lg mb-6">{service.description}</p>
 
-                                <h4 className="text-xl font-semibold text-gray-900 mb-4">What's Included</h4>
-                                <ul className="space-y-2">
+                                {/* <h4 className="text-xl font-semibold text-gray-900 mb-4">What's Included</h4> */}
+                                {/* <ul className="space-y-2">
                                     {service.includes.map((item, index) => (
                                         <li key={index} className="flex items-center text-gray-700">
                                             <span className="w-2 h-2 bg-[#C06C84] rounded-full mr-3"></span>
                                             {item}
                                         </li>
                                     ))}
-                                </ul>
+                                </ul> */}
                             </motion.div>
                         </TabsContent>
 
@@ -318,32 +318,21 @@ export function DetailsPage() {
                 animate={{ y: 0 }}
                 className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 shadow-2xl z-50"
             >
-                <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-                    <div>
-                        <div className="text-sm text-gray-500 mb-1">Service Price</div>
-                        <div className="flex items-baseline space-x-2">
-                            <span className="text-3xl font-bold text-gray-900">
-                                ₹{service.price}
-                            </span>
-                        </div>
-                    </div>
-
+                <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-center">
                     <button
                         onClick={() => {
                             if (!selectedPackage) {
                                 if (service.packages && service.packages.length > 0) {
-                                    // Fallback auto-select first
                                     setSelectedPackage(service.packages[0]);
                                     setShowAddonsModal(true);
                                 } else {
-                                    // If absolutely no packages, try service.id but known to fail
                                     console.warn("No packages found");
                                 }
                                 return;
                             }
                             setShowAddonsModal(true);
                         }}
-                        className="px-12 py-4 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-[#C06C84]/40 transition-all transform hover:scale-105 flex items-center gap-2"
+                        className="w-full md:w-auto md:px-24 py-4 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-[#C06C84]/40 transition-all transform hover:scale-105 flex items-center justify-center gap-2"
                     >
                         Book Now
                         <ChevronRight className="w-5 h-5" />

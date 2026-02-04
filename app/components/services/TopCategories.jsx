@@ -22,7 +22,28 @@ export function TopCategories({ onViewAll }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        if ('geolocation' in navigator) {
+        // 1. Check localStorage first
+        if (typeof window !== 'undefined') {
+          const savedLocation = localStorage.getItem('user_location_data');
+          if (savedLocation) {
+            try {
+              const parsed = JSON.parse(savedLocation);
+              // Use lat/lng and look for alternatives too
+              const lat = parsed.lat || parsed.lattitude;
+              const lng = parsed.lng || parsed.longitude;
+
+              if (lat && lng) {
+                await fetchCategoriesFromAPI(lat.toString(), lng.toString());
+                return;
+              }
+            } catch (e) {
+              console.error('Error parsing saved location:', e);
+            }
+          }
+        }
+
+        // 2. Fallback to GPS or Default
+        if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
               const { latitude, longitude } = position.coords;
@@ -30,7 +51,8 @@ export function TopCategories({ onViewAll }) {
             },
             () => {
               fetchWithDefaultLocation();
-            }
+            },
+            { timeout: 5000 } // Add a timeout for safety
           );
         } else {
           fetchWithDefaultLocation();
@@ -92,7 +114,7 @@ export function TopCategories({ onViewAll }) {
       whileHover={{ y: -12 }}
       className="group cursor-pointer"
     >
-      <div className="relative w-72 h-80 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
+      <div className="relative w-72 lg:w-[210px] h-64 lg:h-72 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
         {/* Skeleton Image */}
         <div className="absolute inset-0 animate-shimmer">
           <div className="w-full h-full bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 rounded-3xl" />
@@ -114,7 +136,7 @@ export function TopCategories({ onViewAll }) {
   );
 
   return (
-    <section ref={sectionRef} className="py-5 relative overflow-hidden">
+    <section ref={sectionRef} className="py-1 relative overflow-hidden">
       <motion.div style={{ opacity, y }} className="max-w-[1400px] mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-12">
@@ -126,13 +148,13 @@ export function TopCategories({ onViewAll }) {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4"
             >
               <div className="w-2 h-2 rounded-full bg-[#04a99d] animate-pulse" />
-              <h6 className="text-xs font-medium text-[#04a99d]">POPULAR</h6>
+              <h6 className="text-sm font-medium text-[#04a99d]">POPULAR</h6>
             </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent  md:text-5xl font-bold mb-3"
+              className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent"
             >
               Explore Top Categories
             </motion.h2>
@@ -141,7 +163,7 @@ export function TopCategories({ onViewAll }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-white/60"
+              className="text-gray-400 text-lg max-w-2xl"
             >
               Browse our most requested services
             </motion.p>
@@ -180,7 +202,7 @@ export function TopCategories({ onViewAll }) {
                     onClick={() => router.push(`/services/category/${category._id}?name=${encodeURIComponent(category.title)}`)}
                     className="group cursor-pointer"
                   >
-                    <div className="relative w-72 h-80 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
+                    <div className="relative w-72 lg:w-[210px] h-54 lg:h-72 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
                       {/* Image */}
                       <div className="absolute inset-0">
                         <img

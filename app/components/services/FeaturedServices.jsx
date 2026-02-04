@@ -112,7 +112,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
   }
 
   return (
-    <section id="featured-services" className="py-20 relative overflow-hidden">
+    <section id="featured-services" className="py-15 relative overflow-hidden">
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f1614]/30 to-transparent" />
 
@@ -126,13 +126,13 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#037166]/10 border border-[#037166]/20 mb-4"
           >
             <Sparkles className="w-3 h-3 text-[#04a99d]" />
-            <h6 className="text-xs font-medium text-[#04a99d]">FEATURED</h6>
+            <h6 className="text-sm font-medium text-[#04a99d]">FEATURED</h6>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl  bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent md:text-5xl font-bold mb-3"
+            className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent"
           >
             Explore Our Featured Service
           </motion.h2>
@@ -141,7 +141,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-white/60"
+            className="text-gray-400 text-lg max-w-2xl"
           >
             Top-rated services trusted by thousands of customers
           </motion.p>

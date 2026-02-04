@@ -17,9 +17,12 @@ export default function SpaConfirmPage() {
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [bookedDate, setBookedDate] = useState('');
     const [bookedTime, setBookedTime] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('COD');
+    const [paymentMethod, setPaymentMethod] = useState('ONLINE'); // Default to Online for prepayment
+    const [paymentOption, setPaymentOption] = useState('ADVANCE'); // 'ADVANCE' or 'FULL'
     const [loading, setLoading] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
+
+    const PLATFORM_FEE = 125;
 
     useEffect(() => {
         const savedAddress = sessionStorage.getItem('selected_address');
@@ -28,6 +31,12 @@ export default function SpaConfirmPage() {
         } else {
             toast.error("No address selected");
             router.push('/spa-salon/booking/address');
+        }
+
+        // Auto-select first available date
+        const initialDates = getAvailableDates();
+        if (initialDates.length > 0) {
+            setBookedDate(initialDates[0].value);
         }
     }, [router]);
 
@@ -48,25 +57,22 @@ export default function SpaConfirmPage() {
     const getAvailableDates = () => {
         const now = new Date();
         const dates = [];
-        let startDate = new Date(now);
 
-        const todayCutoff = new Date();
-        todayCutoff.setHours(SERVICE_END_HOUR - BUFFER_HOURS, 0, 0, 0);
+        // Start showing Today from 9 AM till 8 PM (1 hour before 9 PM close)
+        const todayLimit = new Date();
+        todayLimit.setHours(SERVICE_END_HOUR - 1, 0, 0, 0);
 
-        if (now > todayCutoff) {
-            startDate.setDate(startDate.getDate() + 1);
-        }
+        const startFromTomorrow = now > todayLimit;
 
-        for (let i = (now > todayCutoff ? 1 : 0); i < 7; i++) {
-            const date = new Date(startDate);
-            date.setDate(date.getDate() + i);
+        for (let i = (startFromTomorrow ? 1 : 0); i < 10 + (startFromTomorrow ? 1 : 0); i++) {
+            const date = new Date();
+            date.setDate(now.getDate() + i);
             dates.push({
                 value: date.toISOString().split('T')[0],
-                label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                }),
+                dayName: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', { weekday: 'short' }),
+                dayNumber: date.getDate().toString().padStart(2, '0'),
+                month: date.toLocaleDateString('en-US', { month: 'short' }),
+                fullLabel: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
             });
         }
         return dates;
@@ -119,7 +125,14 @@ export default function SpaConfirmPage() {
         const isMock = cartItems.some(item => item.providerId?.startsWith('mock_'));
         if (isMock) {
             toast.success('Mock Booking Confirmed!');
-            router.push(`/spa-salon/thank-you?date=${bookedDate}&time=${bookedTime}`);
+            const paid = paymentOption === 'ADVANCE'
+                ? ((cartData?.totalServiceCost || 0) * 0.25 + PLATFORM_FEE).toFixed(0)
+                : ((cartData?.totalServiceCost || 0) + PLATFORM_FEE).toFixed(0);
+            const remaining = paymentOption === 'ADVANCE'
+                ? ((cartData?.totalServiceCost || 0) * 0.75).toFixed(0)
+                : '0';
+
+            router.push(`/spa-salon/thank-you?date=${bookedDate}&time=${bookedTime}&paid=${paid}&remaining=${remaining}`);
             return;
         }
 
@@ -139,6 +152,7 @@ export default function SpaConfirmPage() {
                 bookedDate,
                 bookedTime,
                 paymentMethod,
+                paymentOption, // 'ADVANCE' or 'FULL'
                 sourceOfLead: 'website',
                 providerType: checkoutProviderType
             };
@@ -167,7 +181,14 @@ export default function SpaConfirmPage() {
                     window.location.href = easebuzzUrl;
                 } else {
                     toast.success('Booking confirmed! Relax and enjoy.');
-                    router.push(`/spa-salon/thank-you?date=${bookedDate}&time=${bookedTime}`);
+                    const paid = paymentOption === 'ADVANCE'
+                        ? ((cartData?.totalServiceCost || 0) * 0.25 + PLATFORM_FEE).toFixed(0)
+                        : ((cartData?.totalServiceCost || 0) + PLATFORM_FEE).toFixed(0);
+                    const remaining = paymentOption === 'ADVANCE'
+                        ? ((cartData?.totalServiceCost || 0) * 0.75).toFixed(0)
+                        : '0';
+
+                    router.push(`/spa-salon/thank-you?date=${bookedDate}&time=${bookedTime}&paid=${paid}&remaining=${remaining}`);
                 }
             } else {
                 toast.error(data.message || 'Checkout failed');
@@ -222,17 +243,30 @@ export default function SpaConfirmPage() {
                 {/* Progress Indicator */}
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 pb-6">
                     <div className="flex items-center gap-2">
-                        {['Selection', 'Address', 'Confirm & Pay'].map((step, index) => (
-                            <React.Fragment key={step}>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                                        <CheckCircle className="w-5 h-5 text-[#C06C84]" />
+                        {['Selection', 'Address', 'Confirm & Pay'].map((step, index) => {
+                            const isCompleted = index < 2;
+                            const isCurrent = index === 2;
+                            return (
+                                <React.Fragment key={step}>
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isCompleted ? 'bg-white shadow-md' : isCurrent ? 'bg-white ring-4 ring-white/30 scale-110 shadow-lg' : 'bg-white/30'
+                                            }`}>
+                                            {isCompleted ? (
+                                                <CheckCircle className="w-5 h-5 text-[#C06C84]" />
+                                            ) : (
+                                                <span className={`text-sm font-bold ${isCurrent ? 'text-[#C06C84]' : 'text-white/60'}`}>{index + 1}</span>
+                                            )}
+                                        </div>
+                                        <span className={`text-xs sm:text-sm font-medium transition-all ${isCurrent ? 'text-white font-bold' : 'text-white/70'
+                                            }`}>{step}</span>
                                     </div>
-                                    <span className="text-white/90 text-sm font-medium hidden sm:inline">{step}</span>
-                                </div>
-                                {index < 2 && <div className="h-0.5 flex-1 bg-white/30" />}
-                            </React.Fragment>
-                        ))}
+                                    {index < 2 && (
+                                        <div className={`h-0.5 flex-1 mx-2 transition-all ${isCompleted ? 'bg-white/80' : 'bg-white/20'
+                                            }`} />
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -259,12 +293,15 @@ export default function SpaConfirmPage() {
                                         <button
                                             key={date.value}
                                             onClick={() => setBookedDate(date.value)}
-                                            className={`p-4 rounded-xl font-medium transition-all ${bookedDate === date.value
-                                                ? 'bg-[#C06C84] text-white shadow-lg shadow-[#C06C84]/30'
-                                                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                            className={`p-4 rounded-2xl flex flex-col items-center gap-0.5 transition-all border-2 ${bookedDate === date.value
+                                                ? 'bg-[#C06C84] border-[#C06C84] text-white shadow-lg'
+                                                : 'bg-white border-gray-100 text-gray-700 hover:border-[#C06C84]/30'
                                                 }`}
                                         >
-                                            {date.label}
+                                            <span className={`text-[10px] uppercase font-bold tracking-widest ${bookedDate === date.value ? 'text-white/80' : 'text-gray-400'}`}>
+                                                {date.dayName}
+                                            </span>
+                                            <span className="text-lg font-black tracking-tight">{date.dayNumber} {date.month}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -307,6 +344,58 @@ export default function SpaConfirmPage() {
                             )}
                         </motion.div>
 
+                        {/* Payment Option - Advance vs Full */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="p-6 rounded-2xl bg-white border-2 border-[#C06C84]/20 shadow-sm"
+                        >
+                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                <CreditCard className="w-5 h-5 text-[#C06C84]" />
+                                Payment Choice
+                            </h3>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <button
+                                    onClick={() => setPaymentOption('ADVANCE')}
+                                    className={`p-6 rounded-2xl border-2 transition-all text-left relative overflow-hidden group ${paymentOption === 'ADVANCE'
+                                        ? 'border-[#C06C84] bg-[#C06C84]/5'
+                                        : 'border-gray-100 hover:border-[#C06C84]/30 bg-gray-50'
+                                        }`}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className={`font-bold ${paymentOption === 'ADVANCE' ? 'text-[#C06C84]' : 'text-gray-900'}`}>
+                                            Pay Advance
+                                        </h4>
+                                        {paymentOption === 'ADVANCE' && <CheckCircle className="w-5 h-5 text-[#C06C84]" />}
+                                    </div>
+                                    <p className="text-sm text-gray-600 mb-2">Pay platform fee + 25% deposit to confirm your slot.</p>
+                                    <p className="text-2xl font-bold text-gray-900">₹{((cartData?.totalServiceCost || 0) * 0.25 + PLATFORM_FEE).toFixed(0)}</p>
+                                    <div className="mt-2 text-[10px] text-gray-400 uppercase font-bold tracking-wider">Slot Confirmed</div>
+                                </button>
+
+                                <button
+                                    onClick={() => setPaymentOption('FULL')}
+                                    className={`p-6 rounded-2xl border-2 transition-all text-left relative overflow-hidden group ${paymentOption === 'FULL'
+                                        ? 'border-[#C06C84] bg-[#C06C84]/5'
+                                        : 'border-gray-100 hover:border-[#C06C84]/30 bg-gray-50'
+                                        }`}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className={`font-bold ${paymentOption === 'FULL' ? 'text-[#C06C84]' : 'text-gray-900'}`}>
+                                            Full Payment
+                                        </h4>
+                                        {paymentOption === 'FULL' && <CheckCircle className="w-5 h-5 text-[#C06C84]" />}
+                                    </div>
+                                    <p className="text-sm text-gray-600 mb-2">Pay total amount including service cost upfront.</p>
+                                    <p className="text-2xl font-bold text-gray-900">
+                                        ₹{((cartData?.totalServiceCost || 0) + PLATFORM_FEE).toFixed(0)}
+                                    </p>
+                                    <div className="mt-2 text-[10px] text-gray-400 uppercase font-bold tracking-wider">Hassle Free</div>
+                                </button>
+                            </div>
+                        </motion.div>
+
                         {/* Payment Method */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -315,14 +404,14 @@ export default function SpaConfirmPage() {
                             className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
                         >
                             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-[#C06C84]" />
+                                <Wallet className="w-5 h-5 text-[#C06C84]" />
                                 Select Payment Method
                             </h3>
                             <div className="grid md:grid-cols-3 gap-3">
                                 {[
-                                    { id: 'COD', label: 'Pay after Service', icon: Truck },
-                                    { id: 'WALLET', label: 'Wallet Pay', icon: Wallet },
                                     { id: 'ONLINE', label: 'Online Payment', icon: CreditCard },
+                                    { id: 'WALLET', label: 'Wallet Pay', icon: Wallet },
+                                    { id: 'COD', label: 'Pay at Store', icon: Truck },
                                 ].map((method) => (
                                     <button
                                         key={method.id}
@@ -370,61 +459,58 @@ export default function SpaConfirmPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="sticky top-48 p-6 rounded-2xl bg-white border border-gray-200 shadow-lg"
+                            className="sticky top-48 p-6 rounded-3xl bg-white border border-gray-200 shadow-xl"
                         >
-                            <h3 className="text-xl font-bold text-gray-900 mb-6">Booking Summary</h3>
+                            <h3 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h3>
 
-                            {/* Cart Items */}
-                            <div className="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2 scrollbar-thin">
-                                {cartItems.map((item) => (
-                                    <div key={item.itemId || item._id} className="flex justify-between text-sm">
-                                        <div className="flex-1">
-                                            <p className="text-gray-900 font-bold">{item.itemName}</p>
-                                            <p className="text-gray-400 text-[10px]">Qty: {item.quantity || 1}</p>
-                                        </div>
-                                        <span className="text-gray-900 font-medium">₹{item.subtotal?.toFixed(2)}</span>
+                            {/* Service Details */}
+                            <div className="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
+                                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
+                                    <div className="w-12 h-12 rounded-xl bg-[#C06C84]/10 flex items-center justify-center text-[#C06C84]">
+                                        <Scissors className="w-6 h-6" />
                                     </div>
-                                ))}
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Service Selected</p>
+                                        <p className="text-gray-900 font-bold line-clamp-1">{cartItems[0]?.itemName || 'Salon Service'}</p>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-500 text-sm">Service Cost</span>
+                                        <span className="text-gray-900 font-bold">₹{cartData?.totalServiceCost || 0}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-gray-500 text-sm">Platform Fee</span>
+                                            <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 cursor-help" title="Booking & Platform Service Fee">?</div>
+                                        </div>
+                                        <span className="text-gray-900 font-bold">₹{PLATFORM_FEE}</span>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="h-px bg-gray-100 mb-4" />
-
-                            {/* Pricing */}
-                            <div className="space-y-2 mb-4">
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Subtotal</span>
-                                    <span>₹{(cartData?.totalServiceCost || 0).toFixed(2)}</span>
+                            {/* Final Calculation */}
+                            <div className="p-4 rounded-2xl bg-[#C06C84]/5 border border-[#C06C84]/20 mb-6">
+                                <div className="flex justify-between mb-1">
+                                    <span className="text-gray-600 font-medium">Payable Now</span>
+                                    <span className="text-2xl font-black text-[#C06C84]">
+                                        ₹{paymentOption === 'ADVANCE'
+                                            ? ((cartData?.totalServiceCost || 0) * 0.25 + PLATFORM_FEE).toFixed(0)
+                                            : ((cartData?.totalServiceCost || 0) + PLATFORM_FEE).toFixed(0)}
+                                    </span>
                                 </div>
-                                <div className="flex justify-between text-gray-600">
-                                    <span>Platform Fee</span>
-                                    <span>₹{(cartData?.platformFee || 0).toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-gray-600">
-                                    <span>GST</span>
-                                    <span>₹{(cartData?.gstAmount || 0).toFixed(2)}</span>
-                                </div>
+                                <p className="text-[10px] text-[#C06C84] uppercase font-bold">
+                                    {paymentOption === 'ADVANCE' ? 'Advance + Platform Fee' : 'Total Service Paid'}
+                                </p>
                             </div>
 
-                            <div className="h-px bg-gray-100 mb-4" />
-
-                            <div className="flex justify-between text-xl font-bold text-[#C06C84] mb-2">
-                                <span>Total</span>
-                                <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
-                            </div>
-                            <p className="text-xs text-gray-500 mb-6 text-center bg-gray-50 p-2 rounded-lg border border-gray-100">
-                                <span className="font-semibold">Note:</span> This is only the booking cost. The total service amount is collected at the store.
-                            </p>
-
-                            {/* Selected Date/Time Preview */}
-                            {bookedDate && bookedTime && (
-                                <div className="p-4 rounded-lg bg-[#C06C84]/5 border border-[#C06C84]/10 mb-6">
-                                    <p className="text-gray-600 text-sm mb-2">Scheduled for:</p>
-                                    <p className="text-[#C06C84] font-bold">
-                                        {availableDates.find(d => d.value === bookedDate)?.label}
-                                    </p>
-                                    <p className="text-[#C06C84] font-bold">
-                                        {availableTimesForSelectedDate.find(t => t.value === bookedTime)?.label}
-                                    </p>
+                            {paymentOption === 'ADVANCE' && (
+                                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 mb-6">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-500 text-sm">Remaining to Pay</span>
+                                        <span className="text-gray-900 font-bold">₹{((cartData?.totalServiceCost || 0) * 0.75).toFixed(0)}</span>
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-1 uppercase">Pay at store after service</p>
                                 </div>
                             )}
 
@@ -434,20 +520,24 @@ export default function SpaConfirmPage() {
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleCheckout}
                                 disabled={loading || !bookedDate || !bookedTime}
-                                className={`w-full px-6 py-4 rounded-xl font-medium text-lg transition-all ${loading || !bookedDate || !bookedTime
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : 'bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white hover:shadow-lg'
+                                className={`w-full px-6 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg ${loading || !bookedDate || !bookedTime
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                                    : 'bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white hover:shadow-[#C06C84]/40'
                                     }`}
                             >
                                 {loading ? (
                                     <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        Processing...
+                                        Confirming...
                                     </div>
                                 ) : (
-                                    `Pay ₹${(cartData?.finalAmount || 0).toFixed(2)}`
+                                    paymentOption === 'ADVANCE' ? 'Pay Advance & Book' : 'Pay Full Amount'
                                 )}
                             </motion.button>
+
+                            <p className="mt-4 text-[10px] text-center text-gray-400">
+                                By booking, you agree to our Terms & Cancellation Policy.
+                            </p>
                         </motion.div>
                     </div>
                 </div>

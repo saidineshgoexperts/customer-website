@@ -87,11 +87,11 @@ export function Hero({ onViewServices, onBookService }) {
           {/* Trust Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-[#037166]/30 mb-8">
             <div className="w-2 h-2 rounded-full bg-[#04a99d]" />
-            <h6 className="text-sm text-white/80">Trusted by 50,000+ customers</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">Trusted by 50,000+ customers</h6>
           </div>
 
           {/* Main Headline */}
-          <h1 className="italic text-5xl md:text-6xl lg:text-7xl font-bold !font-poppins mb-6 leading-tight text-white">
+          <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold mb-6 italic text-white">
             Expert Home Services
             <br />
             <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
@@ -101,7 +101,7 @@ export function Hero({ onViewServices, onBookService }) {
 
 
           {/* Subheadline */}
-          <p className="text-xl md:text-2xl text-white/70 mb-12 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-xl text-gray-400 mb-12 leading-relaxed max-w-3xl mx-auto">
             Professional repair and maintenance services for all your home needs.
             Book verified experts in minutes.
           </p>
@@ -112,7 +112,7 @@ export function Hero({ onViewServices, onBookService }) {
               onClick={onBookService}
               className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold text-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-[#037166]/50 hover:scale-105"
             >
-              <span className="relative z-10 flex items-center gap-2 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+              <span className="relative z-10 flex items-center gap-2 text-white">
                 Book a Service Now
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-white" />
               </span>
@@ -123,7 +123,7 @@ export function Hero({ onViewServices, onBookService }) {
               onClick={onViewServices}
               className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold text-lg hover:bg-white/10 hover:border-[#037166]/50 transition-all hover:scale-105"
             >
-              <span className="bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+              <span className="text-white">
                 Find Services
               </span>
               <Search className="w-5 h-5 group-hover:translate-x-1 transition-transform text-white" />

@@ -1,8 +1,7 @@
 {
-  "/(legal)/privacy-policy/page": "app/(legal)/privacy-policy/page.js",
-  "/services/page": "app/services/page.js",
-  "/spa-salon/subcategory/[id]/page": "app/spa-salon/subcategory/[id]/page.js",
-  "/(landing)/page": "app/(landing)/page.js",
-  "/pghostels/listings/[type]/page": "app/pghostels/listings/[type]/page.js",
-  "/religious-services/subcategory/[id]/page": "app/religious-services/subcategory/[id]/page.js"
+  "/spa-salon/results/page": "app/spa-salon/results/page.js",
+  "/spa-salon/detail/[id]/page": "app/spa-salon/detail/[id]/page.js",
+  "/spa-salon/booking/address/page": "app/spa-salon/booking/address/page.js",
+  "/spa-salon/page": "app/spa-salon/page.js",
+  "/spa-salon/booking/confirm/page": "app/spa-salon/booking/confirm/page.js"
 }

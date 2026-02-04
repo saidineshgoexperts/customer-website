@@ -170,18 +170,13 @@ export function NearbyServiceCenters({ onViewAll }) {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-white/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6 mx-auto">
             <Navigation className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm text-[#037166] font-medium">Live Location Services</h6>
+            <h6 className="text-sm bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-medium">Live Location Services</h6>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => router.push('/services/child/683dbc04b62d2a241de0f7e8?category=Services&name=Service Centers')}
-          >
-            <span className="text-white">Nearest Appliance </span>
-            <span className="bg-gradient-to-r from-[#037166] via-[#04a99d] to-[#037166] bg-clip-text text-transparent">
-              Service Centers
-            </span>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">
+            Nearest Appliance Service Centers
           </h2>
 
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">

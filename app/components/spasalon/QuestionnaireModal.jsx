@@ -43,110 +43,153 @@ const staticQuestions = [
     },
 ];
 
-export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }) {
+export function QuestionnaireModal({ isOpen, onClose, categoryName: initialCategoryName, categoryId: initialCategoryId }) {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(0);
     const [answers, setAnswers] = useState({});
-    const [questions, setQuestions] = useState(staticQuestions);
+    const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [selectedCat, setSelectedCat] = useState({ id: initialCategoryId, name: initialCategoryName });
 
-    // Fetch Subcategories
+    // Fetch Categories and Subcategories
     useEffect(() => {
-        const fetchSubcategories = async () => {
-            // Need a valid categoryId to fetch. If mock/missing, maybe rely on static or just static questions?
-            // The user wants it to be like PG.
+        const fetchData = async () => {
             if (!isOpen) return;
-
             setLoading(true);
-            try {
-                // If using mock category ID or none, maybe skip? 
-                // Using fetch anyway.
-                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/subcategories', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ categoryId })
-                });
-                const data = await response.json();
 
-                if (data.success && data.data && data.data.length > 0) {
-                    const subcatQuestion = {
-                        id: 'subcategoryId',
-                        question: `Select a ${categoryName} Service`,
-                        options: data.data.map(sub => ({
-                            value: sub._id,
-                            label: sub.name,
-                            icon: '✨', // Default icon as API doesn't return emojis usually
-                            image: sub.image // Optional: render image if UI supports
-                        }))
-                    };
-                    setQuestions([subcatQuestion, ...staticQuestions]);
+            try {
+                const API_BASE_URL = 'https://api.doorstephub.com/v1/dhubApi/app';
+
+                // Case 1: No category selected yet - Fetch all categories
+                if (!selectedCat.id) {
+                    const catResponse = await fetch(`${API_BASE_URL}/professional-services-flow/public/categories`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ serviceId: '6790757755050f22d997d95d' })
+                    });
+                    const catData = await catResponse.json();
+
+                    if (catData.success) {
+                        const catQuestion = {
+                            id: 'categoryId',
+                            question: 'Which service category are you looking for?',
+                            options: catData.data.map(cat => ({
+                                value: cat._id,
+                                label: cat.name,
+                                icon: '🎯',
+                                image: cat.image
+                            }))
+                        };
+                        setQuestions([catQuestion]);
+                        setCurrentStep(0);
+                    }
                 } else {
-                    // Fallback or keep existing
-                    setQuestions(staticQuestions);
+                    // Case 2: Category is selected (from prop or previous step) - Fetch subcategories
+                    const subcatResponse = await fetch(`${API_BASE_URL}/professional-services-flow/public/subcategories`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ categoryId: selectedCat.id })
+                    });
+                    const subcatData = await subcatResponse.json();
+
+                    if (subcatData.success && subcatData.data.length > 0) {
+                        const subcatQuestion = {
+                            id: 'subcategoryId',
+                            question: `Select a ${selectedCat.name} Service`,
+                            options: subcatData.data.map(sub => ({
+                                value: sub._id,
+                                label: sub.name,
+                                icon: '✨',
+                                image: sub.image
+                            }))
+                        };
+                        setQuestions([subcatQuestion, ...staticQuestions]);
+                        setCurrentStep(0);
+                    } else {
+                        // If no subcategories, use category + static questions
+                        setQuestions(staticQuestions);
+                        setCurrentStep(0);
+                    }
                 }
             } catch (error) {
-                console.error("Error fetching subcategories", error);
+                console.error("Error fetching modal data", error);
+                // Fallback to static if API fails
                 setQuestions(staticQuestions);
+                setCurrentStep(0);
             } finally {
                 setLoading(false);
             }
         };
 
-        if (categoryId) {
-            fetchSubcategories();
-        } else {
-            setQuestions(staticQuestions);
-        }
-    }, [categoryId, isOpen, categoryName]);
+        fetchData();
+    }, [isOpen, selectedCat.id]);
 
-    // Reset on close
+    // Reset on close or when initialCategoryId changes (e.g. clicking different categories on home page)
     useEffect(() => {
         if (!isOpen) {
-            setCurrentStep(0);
+            setSelectedCat({ id: initialCategoryId, name: initialCategoryName });
             setAnswers({});
+            setCurrentStep(0);
+        } else {
+            // Update selectedCat if props change while open
+            setSelectedCat({ id: initialCategoryId, name: initialCategoryName });
         }
-    }, [isOpen]);
+    }, [isOpen, initialCategoryId, initialCategoryName]);
 
-    const currentQuestion = questions[currentStep];
-    const progress = ((currentStep + 1) / questions.length) * 100;
+    const handleAnswer = async (value) => {
+        const currentQuestion = questions[currentStep];
 
-    const handleAnswer = (value) => {
-        // If selecting subcategory (first step usually), store extra data if needed?
-        // Just storing value for now.
+        // Store answer
         const newAnswers = { ...answers, [currentQuestion.id]: value };
         setAnswers(newAnswers);
 
-        // Auto-advance
-        setTimeout(() => {
-            if (currentStep < questions.length - 1) {
-                setCurrentStep(currentStep + 1);
-            }
-        }, 300);
+        if (currentQuestion.id === 'categoryId') {
+            const selectedOption = currentQuestion.options.find(opt => opt.value === value);
+            setSelectedCat({ id: value, name: selectedOption.label || 'Category' });
+            return; // useEffect will handle fetching subcategories
+        }
+
+        // If it's the last step, navigate
+        if (currentStep === questions.length - 1) {
+            handleComplete(newAnswers, selectedCat.id);
+        } else {
+            // Otherwise move to next step with slight delay for animation
+            setTimeout(() => {
+                setCurrentStep(curr => curr + 1);
+            }, 300);
+        }
     };
 
-    const handleComplete = () => {
-        const queryParams = new URLSearchParams({
-            category: categoryId,
-            ...answers
+    const handleComplete = (allAnswers, catId) => {
+        const queryParams = new URLSearchParams();
+        if (catId) queryParams.set('categoryId', catId);
+
+        // Add all questionnaire answers to query params
+        Object.entries(allAnswers).forEach(([key, value]) => {
+            queryParams.set(key, value);
         });
-        // Navigate to results
+
         router.push(`/spa-salon/results?${queryParams.toString()}`);
         onClose();
-        setAnswers({});
-        setCurrentStep(0);
     };
 
     const handleBack = () => {
         if (currentStep > 0) {
             setCurrentStep(currentStep - 1);
+        } else if (selectedCat.id && !initialCategoryId) {
+            // If we are on first step of current questions but we have a category selected 
+            // that wasn't passed as a prop, go back to category selection
+            setSelectedCat({ id: null, name: '' });
         }
     };
 
+    const currentQuestion = questions[currentStep];
     const isLastStep = currentStep === questions.length - 1;
+    const progress = questions.length > 0 ? ((currentStep + 1) / questions.length) * 100 : 0;
     // Check if current question is answered
     const canProceed = answers[currentQuestion?.id];
 
-    if (!currentQuestion) return null;
+    if (!currentQuestion && !loading) return null;
 
     return (
         <AnimatePresence>
@@ -184,7 +227,12 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }
                                     Find your perfect spa service
                                 </h2>
                                 <p className="text-[#64748B]">
-                                    Answer a few quick questions about <span className="text-[#C06C84]">{categoryName}</span>
+                                    {selectedCat.id
+                                        ? `Selecting services for `
+                                        : "Answer a few quick questions to find "}
+                                    <span className="text-[#C06C84] font-medium">
+                                        {selectedCat.id ? selectedCat.name : "the best spa services"}
+                                    </span>
                                 </p>
 
                                 {/* Progress Bar */}
@@ -203,8 +251,11 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }
 
                             {/* Question Content */}
                             <div className="p-8 overflow-y-auto">
-                                {loading && questions.length === staticQuestions.length ? (
-                                    <div className="flex justify-center py-10"><span className="animate-spin text-2xl">⏳</span></div>
+                                {loading ? (
+                                    <div className="flex flex-col items-center justify-center py-20">
+                                        <div className="w-12 h-12 border-4 border-[#C06C84] border-t-transparent rounded-full animate-spin mb-4" />
+                                        <p className="text-[#64748B]">Finding perfect matches...</p>
+                                    </div>
                                 ) : (
                                     <AnimatePresence mode="wait">
                                         <motion.div
@@ -230,13 +281,20 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName, categoryId }
                                                             : 'border-[#E8ECF2] bg-[#F6F7FB] hover:border-[#C06C84]/50 hover:bg-[#FBEAF0]'
                                                             }`}
                                                     >
-                                                        <div className="flex items-center gap-3">
+                                                        <div className="flex items-center gap-4">
                                                             {option.image ? (
-                                                                <div className="w-12 h-12 rounded-lg bg-cover bg-center" style={{ backgroundImage: `url('https://api.doorstephub.com/${option.image}')` }} />
+                                                                <div
+                                                                    className="w-16 h-16 rounded-xl bg-cover bg-center shadow-inner flex-shrink-0"
+                                                                    style={{
+                                                                        backgroundImage: `url('${option.image.startsWith('http') ? option.image : `https://api.doorstephub.com/${option.image}`}')`
+                                                                    }}
+                                                                />
                                                             ) : (
-                                                                <span className="text-3xl">{option.icon}</span>
+                                                                <div className="w-16 h-16 rounded-xl bg-[#F6F7FB] flex items-center justify-center text-3xl flex-shrink-0">
+                                                                    {option.icon}
+                                                                </div>
                                                             )}
-                                                            <span className="text-[#0F172A] font-medium">{option.label}</span>
+                                                            <span className="text-[#0F172A] font-semibold text-lg">{option.label}</span>
                                                         </div>
                                                     </motion.button>
                                                 ))}

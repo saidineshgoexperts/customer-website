@@ -9,7 +9,13 @@ import { Button } from '@/components/ui/button';
 function SpaThankYouContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [bookingDetails, setBookingDetails] = useState({ date: '', time: '', address: '' });
+    const [bookingDetails, setBookingDetails] = useState({
+        date: '',
+        time: '',
+        address: '',
+        paid: '0',
+        remaining: '0'
+    });
 
     useEffect(() => {
         const savedAddress = sessionStorage.getItem('selected_address');
@@ -18,6 +24,8 @@ function SpaThankYouContent() {
         setBookingDetails({
             date: searchParams.get('date'),
             time: searchParams.get('time'),
+            paid: searchParams.get('paid') || '0',
+            remaining: searchParams.get('remaining') || '0',
             address: addressData ? `${addressData.flat}, ${addressData.area}` : 'Selected Address'
         });
     }, [searchParams]);
@@ -104,10 +112,29 @@ function SpaThankYouContent() {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500 font-medium">Service Location</p>
-                                <p className="text-gray-900 font-semibold leading-tight">
+                                <p className="text-gray-900 font-semibold leading-tight line-clamp-2">
                                     {bookingDetails.address || 'Loading address...'}
                                 </p>
                             </div>
+                        </motion.div>
+
+                        {/* Payment Summary */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.65 }}
+                            className="p-5 rounded-3xl bg-white border-2 border-[#C06C84]/10 shadow-sm"
+                        >
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-gray-500 text-sm">Paid Today</span>
+                                <span className="text-xl font-bold text-[#C06C84]">₹{bookingDetails.paid}</span>
+                            </div>
+                            {bookingDetails.remaining !== '0' && (
+                                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                                    <span className="text-gray-500 text-sm">Pay at Store</span>
+                                    <span className="text-lg font-bold text-gray-900">₹{bookingDetails.remaining}</span>
+                                </div>
+                            )}
                         </motion.div>
 
                         {/* Quote */}

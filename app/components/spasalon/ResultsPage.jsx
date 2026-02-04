@@ -46,42 +46,70 @@ export function ResultsPage() {
             setLoading(true);
             try {
                 const userLocationData = localStorage.getItem('user_location_data');
-                const locationData = userLocationData ? JSON.parse(userLocationData) : null;
-                const lat = locationData?.lat || 17.3850; // Default to Hyd if missing
-                const lng = locationData?.lng || 78.4867;
+                const storedLocation = userLocationData ? JSON.parse(userLocationData) : null;
 
-                // SubcategoryId from params or default to a Spa one if needed. 
-                // Using searchParams.get('subcategoryId') as per PG flow.
-                const subcategoryId = searchParams.get('subcategoryId');
+                const lat = (location?.coords?.latitude || storedLocation?.lat || 17.3850).toString();
+                const lng = (location?.coords?.longitude || storedLocation?.lng || 78.4867).toString();
+
+                const subcategoryId = searchParams.get('subcategoryId') || "6957be10cc45593206b6e6c8"; // Fallback for testing
+                const categoryId = searchParams.get('categoryId') || "";
+
+                const filterMap = {
+                    'All Services': '',
+                    'Highest Rated': 'rating',
+                    'Price: Low to High': 'price_low',
+                    'Price: High to Low': 'price_high',
+                    'Nearest First': 'nearest'
+                };
+
+                let currentSortBy = filterMap[selectedFilter] || '';
+                if (activeTab === 'nearby') {
+                    currentSortBy = 'nearest';
+                }
 
                 const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        lattitude: lat,
-                        longitude: lng,
                         subcategoryId: subcategoryId,
-                        // Add other filters if needed
+                        categoryId: categoryId,
+                        serviceId: "",
+                        searchQuery: searchQuery,
+                        minPrice: 100,
+                        maxPrice: 500000,
+                        minRating: 4,
+                        sortBy: currentSortBy,
+                        lattitude: lat,
+                        longitude: lng
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.success && data.professionalServices) {
-                    const mappedServices = data.professionalServices.map(service => ({
-                        id: service._id,
-                        name: service.business_name || `${service.firstName} ${service.lastName}`,
-                        provider: service.business_name || 'Professional Service',
-                        image: service.logo ? `https://api.doorstephub.com/${service.logo}` : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80',
-                        rating: service.rating || 4.5,
-                        reviews: service.totalOrders || 0,
-                        price: service.BasePrice || service.minFare || 0,
-                        duration: '60 min', // Default as API might not return this in listing
-                        distance: '2.5 km', // Placeholder or calc
-                        availability: 'Available Today',
-                        isNearby: true, // Logic to determine if nearby
-                        address: service.address
-                    }));
+                    const mappedServices = data.professionalServices.map(service => {
+                        let distanceStr = '0.0 km';
+                        if (service.location?.coordinates && lat && lng) {
+                            const [sLng, sLat] = service.location.coordinates;
+                            const dist = calculateDistance(parseFloat(lat), parseFloat(lng), sLat, sLng);
+                            distanceStr = `${dist.toFixed(1)} km`;
+                        }
+
+                        return {
+                            id: service._id,
+                            name: service.business_name || `${service.firstName} ${service.lastName}`,
+                            provider: service.business_name || 'Professional Service',
+                            image: service.logo ? `https://api.doorstephub.com/${service.logo}` : 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80',
+                            rating: parseFloat(service.rating) || 4.5,
+                            reviews: service.totalOrders || 0,
+                            price: service.startingAt || service.BasePrice || service.minFare || 0,
+                            duration: '60 min',
+                            distance: service.distance || distanceStr,
+                            availability: service.badges[0],
+                            isNearby: true,
+                            address: service.address
+                        };
+                    });
                     setServices(mappedServices);
                 } else {
                     setServices([]);
@@ -93,8 +121,24 @@ export function ResultsPage() {
             }
         };
 
-        fetchServices();
-    }, [searchParams, location]);
+        const timer = setTimeout(() => {
+            fetchServices();
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchParams, location, activeTab, selectedFilter, searchQuery]);
+
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
 
     const filteredServices = services.filter(service => {
         const matchesTab = activeTab === 'all' || (activeTab === 'nearby' && service.isNearby);
@@ -265,7 +309,7 @@ function ServiceCard({ service, index, router }) {
                 />
 
                 {/* Wishlist Button */}
-                <motion.button
+                {/* <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={(e) => {
@@ -277,7 +321,7 @@ function ServiceCard({ service, index, router }) {
                     <Heart
                         className={`w-5 h-5 ${isWishlisted ? 'fill-[#C06C84] text-[#C06C84]' : ''}`}
                     />
-                </motion.button>
+                </motion.button> */}
 
                 {/* Availability Badge */}
                 <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium ${service.availability === 'Available Today'
@@ -295,15 +339,15 @@ function ServiceCard({ service, index, router }) {
 
                 {/* Stats */}
                 <div className="flex items-center gap-4 mb-4">
-                    <div className="flex items-center gap-1 text-[#FBBF24]">
+                    <div className="flex items-center gap-1 text-[#C06C84]">
                         <Star className="w-4 h-4 fill-current" />
                         <span className="text-[#0F172A] font-medium">{service.rating}</span>
                         <span className="text-[#64748B] text-sm">({service.reviews})</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[#64748B]">
+                    {/* <div className="flex items-center gap-1 text-[#64748B]">
                         <Clock className="w-4 h-4" />
                         <span className="text-sm">{service.duration}</span>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Distance */}
@@ -317,6 +361,7 @@ function ServiceCard({ service, index, router }) {
                 {/* Price & CTA */}
                 <div className="flex items-center justify-between pt-4 border-t border-[#E8ECF2]">
                     <div>
+                        <p className="text-[10px] text-[#64748B] font-bold uppercase tracking-wider mb-0.5">Starting at</p>
                         <p className="text-2xl font-bold text-[#0F172A]">₹{service.price}</p>
                     </div>
                     <motion.button
