@@ -28,7 +28,6 @@ export function PremiumHomePage() {
     const [selectedCategory, setSelectedCategory] = useState({ id: '', name: '' });
     const [featuredHostels, setFeaturedHostels] = useState([]);
     const [apiCategories, setApiCategories] = useState([]);
-    const [serviceBanners, setServiceBanners] = useState([]);
     const [loading, setLoading] = useState(true);
     const { scrollY } = useScroll();
     const heroRef = useRef(null);
@@ -103,9 +102,6 @@ export function PremiumHomePage() {
                 const data = await response.json();
                 if (data.success && data.category) {
                     setApiCategories(data.category);
-                    if (data.serviceBanners) {
-                        setServiceBanners(data.serviceBanners);
-                    }
                 }
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -342,23 +338,23 @@ export function PremiumHomePage() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-gray-200 p-6 max-w-6xl"
+                        className="bg-white/80 backdrop-blur-2xl rounded-2xl shadow-xl border border-gray-200 p-3 max-w-4xl mx-auto"
                     >
-                        <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-3">
                             {/* Search Input */}
-                            <div className="flex-1 min-w-[300px] relative">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <div className="flex-1 min-w-[250px] relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <Input
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     placeholder="Search by area, college, landmark..."
-                                    className="pl-12 h-14 bg-white/50 border-gray-200 focus:border-[#037166] text-lg text-black placeholder:text-gray-500"
+                                    className="pl-10 h-12 bg-white/50 border-gray-200 focus:border-[#037166] text-sm text-black placeholder:text-gray-500 rounded-xl"
                                 />
                             </div>
 
                             {/* Filter Chips */}
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-1.5 hidden md:flex">
                                 {['Boys', 'Girls', 'Co-living', 'Dorm', 'With Food'].map((chip, i) => (
                                     <motion.button
                                         key={chip}
@@ -368,7 +364,7 @@ export function PremiumHomePage() {
                                         transition={{ delay: i * 0.05 }}
                                         whileHover={{ scale: 0.95 }}
                                         whileTap={{ scale: 0.9 }}
-                                        className="px-4 py-2 bg-gray-100 hover:bg-[#037166] hover:text-white text-gray-700 rounded-full text-sm font-medium transition-all"
+                                        className="px-3 py-1.5 bg-gray-100 hover:bg-[#037166] hover:text-white text-gray-700 rounded-lg text-xs font-medium transition-all"
                                     >
                                         {chip}
                                     </motion.button>
@@ -380,7 +376,7 @@ export function PremiumHomePage() {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={handleSearch}
-                                className="px-8 py-3.5 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-2xl font-semibold shadow-lg shadow-[#037166]/30"
+                                className="px-6 py-2.5 bg-gradient-to-r from-[#037166] to-[#025951] text-white rounded-xl font-semibold shadow-lg shadow-[#037166]/20 text-sm"
                             >
                                 Search
                             </motion.button>

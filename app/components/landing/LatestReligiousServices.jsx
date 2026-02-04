@@ -355,7 +355,7 @@ export function LatestReligiousServices() {
         </div>
 
         {/* Peaceful Message */}
-        {services.length > 0 && (
+        {/* {services.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -370,7 +370,7 @@ export function LatestReligiousServices() {
               "Find peace in every moment, strength in every prayer"
             </motion.p>
           </motion.div>
-        )}
+        )} */}
       </div>
     </section>
   );

@@ -189,7 +189,7 @@ export function RecommendedReligious() {
   }
 
   return (
-    <section className="relative py-22 overflow-hidden">
+    <section className="relative py-22  overflow-hidden">
       {/* Architectural World Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d12] to-[#0a0a0a]" />
@@ -225,7 +225,7 @@ export function RecommendedReligious() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#037166]/10 via-[#9b59b6]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 mt-10 bg-gradient-to-r from-[#037166]/10 via-[#9b59b6]/10 to-[#037166]/10 border border-[#037166]/30 rounded-full mb-6">
             <Compass className="w-4 h-4 text-[#9b59b6]" />
             <h6 className="text-sm bg-gradient-to-r from-[#037166] via-[#9b59b6] to-[#037166] bg-clip-text text-transparent font-medium">
               Guided Spiritual Journey
@@ -334,7 +334,7 @@ export function RecommendedReligious() {
         </div>
 
         {/* Inspirational Quote */}
-        {journeys.length > 0 && (
+        {/* {journeys.length > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -353,7 +353,7 @@ export function RecommendedReligious() {
             </p>
             <p className="text-sm text-[#037166]">- Ancient Wisdom</p>
           </motion.div>
-        )}
+        )} */}
       </div>
     </section>
   );

@@ -10,6 +10,24 @@ export function TopCategories({ onViewAll }) {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const sectionRef = useRef(null);
+  const scrollRef = useRef(null);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!isLoading && categories.length > 0) {
+      const interval = setInterval(() => {
+        if (scrollRef.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+          if (scrollLeft + clientWidth >= scrollWidth - 5) {
+            scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+          }
+        }
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading, categories]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -185,7 +203,7 @@ export function TopCategories({ onViewAll }) {
 
         {/* Horizontal Scrolling Cards */}
         <div className="relative">
-          <div className="overflow-x-auto scrollbar-hide pb-4">
+          <div ref={scrollRef} className="overflow-x-auto scrollbar-hide pb-4 scroll-smooth">
             <div className="flex gap-6 min-w-max">
               {isLoading
                 ? Array.from({ length: 8 }).map((_, index) => (

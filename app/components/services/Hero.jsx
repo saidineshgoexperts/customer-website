@@ -134,9 +134,9 @@ export function Hero({ onViewServices, onBookService }) {
           {/* Trust Indicators */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {[
-              { icon: Shield, label: 'Licensed Professionals', desc: 'All verified & insured' },
-              { icon: Clock, label: 'Same Day Service', desc: 'Book in 60 seconds' },
-              { icon: Sparkles, label: '30-90 Days Warranty', desc: 'On all services' },
+              { icon: Shield, label: 'Licensed Professionals', desc: 'All verified & Insured' },
+              { icon: Clock, label: 'Same Day Service', desc: 'Book In 60 Seconds' },
+              { icon: Sparkles, label: '30-90 Days Warranty', desc: 'On All Services' },
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-[#037166]/50 transition-all">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center">
@@ -152,29 +152,7 @@ export function Hero({ onViewServices, onBookService }) {
         </div>
 
         {/* Service Preview Cards */}
-        <div className="mt-20">
-          <div className="relative">
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {isLoading
-                ? Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="flex-shrink-0 w-48 h-64 rounded-2xl bg-white/5 animate-pulse" />
-                ))
-                : categories.map((category, i) => (
-                  <div
-                    key={category._id || i}
-                    className="flex-shrink-0"
-                    onClick={() => router.push(`/services/category/${category._id}?name=${encodeURIComponent(category.title)}`)}
-                  >
-                    <ServicePreviewCard service={category} index={i} />
-                  </div>
-                ))}
-            </div>
 
-            {/* Fade gradient on sides */}
-            <div className="absolute top-0 left-0 bottom-0 w-20 bg-gradient-to-r from-[#0a0a0a] to-transparent pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#0a0a0a] to-transparent pointer-events-none" />
-          </div>
-        </div>
       </div>
 
       <style jsx>{`

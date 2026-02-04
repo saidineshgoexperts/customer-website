@@ -492,7 +492,11 @@ export function HomePage() {
                         className="flex items-center justify-between mb-8"
                     >
                         <div>
-                            <h2 className="text-4xl font-bold text-[#0F172A] mb-2">Featured Packages</h2>
+                            <h2 className="text-4xl font-bold mb-2">
+                                <span className="bg-gradient-to-r from-[#026b60] via-[#9b435a] to-[#026b60] bg-clip-text text-transparent">
+                                    Featured Packages
+                                </span>
+                            </h2>
                             <p className="text-xl text-[#64748B]">Most booked this week</p>
                         </div>
                         <motion.button

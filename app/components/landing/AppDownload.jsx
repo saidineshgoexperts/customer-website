@@ -16,6 +16,16 @@ export function AppDownload() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const videoRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.log("Video autoplay failed:", error);
+      });
+    }
+  }, []);
+
   return (
     <section id="app-download" className="relative min-h-screen flex items-center overflow-hidden py-16">
       {/* Architectural World Background */}
@@ -179,11 +189,15 @@ export function AppDownload() {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-[#0a0a0a] rounded-b-3xl z-20" />
 
                 {/* Screen */}
-                <div className="relative w-full h-full bg-white flex items-center justify-center p-8">
-                  <ImageWithFallback
-                    src="/d-hub-logo.png"
-                    alt="Doorstep Hub App"
-                    className="w-full h-auto object-contain"
+                <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden rounded-[2.5rem]">
+                  <video
+                    ref={videoRef}
+                    src="/dhubvideo.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover scale-110"
                   />
                 </div>
 

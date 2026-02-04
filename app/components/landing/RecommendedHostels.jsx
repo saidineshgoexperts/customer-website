@@ -436,7 +436,7 @@ export function RecommendedHostels() {
         </div>
 
         {/* Trust Indicators */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -462,7 +462,7 @@ export function RecommendedHostels() {
               <h6 className="text-xs text-gray-400 uppercase tracking-wider">{indicator.label}</h6>
             </motion.div>
           ))}
-        </motion.div>
+        </motion.div> */}
 
         {hostels.length === 0 && !loading && (
           <div className="text-center py-20">

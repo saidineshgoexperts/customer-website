@@ -4,42 +4,41 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Check, Loader2, Sparkles, Scissors, Flower } from 'lucide-react';
 
-export function AddonsModal({ isOpen, onClose, providerId, selectedPackageId, onContinue }) {
+export function AddonsModal({ isOpen, onClose, providerId, selectedPackageIds, onContinue }) {
     const [addons, setAddons] = useState([]);
     const [selectedAddons, setSelectedAddons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        console.log("🛠️ AddonsModal State:", { isOpen, providerId, selectedPackageId });
+        console.log("🛠️ AddonsModal State:", { isOpen, providerId, selectedPackageIds });
 
         const isValidId = (id) => id && id !== 'undefined' && id !== 'null';
+        const hasValidPackages = Array.isArray(selectedPackageIds) && selectedPackageIds.length > 0;
 
-        if (isOpen && isValidId(providerId) && isValidId(selectedPackageId)) {
+        if (isOpen && isValidId(providerId) && hasValidPackages) {
             console.log("✅ Fetching addons...");
             fetchAddons();
         } else {
             if (isOpen) {
-                console.warn("⚠️ AddonsModal skipping fetch due to invalid params:", { isOpen, providerId, selectedPackageId });
+                console.warn("⚠️ AddonsModal skipping fetch due to invalid params:", { isOpen, providerId, selectedPackageIds });
             }
             // Reset state or handle empty
             setAddons([]);
             setSelectedAddons([]);
             setLoading(false); // Stop loading if parameters are missing
         }
-    }, [isOpen, providerId, selectedPackageId]);
+    }, [isOpen, providerId, selectedPackageIds]);
 
     const fetchAddons = async () => {
         setLoading(true);
         setError(null);
         try {
-
-
             const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-service-addons', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    serviceIds: [selectedPackageId],
+                    serviceIds: selectedPackageIds,
                     professionalProviderId: providerId
                 })
             });

@@ -82,8 +82,10 @@ export function FeaturedPackagesPage() {
 
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
-                            <h1 className="text-3xl font-bold text-[#0F172A] mb-2">
-                                Featured <span className="text-[#C06C84]">Packages</span>
+                            <h1 className="text-3xl font-bold mb-2">
+                                <span className="bg-gradient-to-r from-[#026b60] via-[#9b435a] to-[#026b60] bg-clip-text text-transparent">
+                                    Featured Packages
+                                </span>
                             </h1>
                             <p className="text-[#64748B]">
                                 {filteredStores.length} exclusive wellness centers available

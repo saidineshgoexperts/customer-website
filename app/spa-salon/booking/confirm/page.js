@@ -465,13 +465,23 @@ export default function SpaConfirmPage() {
 
                             {/* Service Details */}
                             <div className="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
-                                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
-                                    <div className="w-12 h-12 rounded-xl bg-[#C06C84]/10 flex items-center justify-center text-[#C06C84]">
-                                        <Scissors className="w-6 h-6" />
+                                <div className="flex flex-col gap-3 mb-4 pb-4 border-b border-gray-200">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-xl bg-[#C06C84]/10 flex items-center justify-center text-[#C06C84]">
+                                            <Scissors className="w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Services Selected</p>
+                                            <p className="text-gray-900 font-bold">{cartItems.length} {cartItems.length === 1 ? 'Item' : 'Items'}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Service Selected</p>
-                                        <p className="text-gray-900 font-bold line-clamp-1">{cartItems[0]?.itemName || 'Salon Service'}</p>
+                                    <div className="mt-2 space-y-1 pl-1">
+                                        {cartItems.map((item, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
+                                                <div className="w-1 h-1 rounded-full bg-[#C06C84]" />
+                                                <span className="line-clamp-1">{item.itemName}</span>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                                 <div className="space-y-2">

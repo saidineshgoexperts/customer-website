@@ -13,7 +13,7 @@ export function DetailsPage() {
     const params = useParams();
     const [activeTab, setActiveTab] = useState('details');
     const [service, setService] = useState(null);
-    const [selectedPackage, setSelectedPackage] = useState(null);
+    const [selectedPackages, setSelectedPackages] = useState([]);
     const [showAddonsModal, setShowAddonsModal] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -59,13 +59,10 @@ export function DetailsPage() {
                             avatar: '👤'
                         })) : []
                     };
-                    console.log("DetailsPage Loaded Service:", mappedService);
-                    console.log("Original Store Data:", store);
                     setService(mappedService);
 
-
                     if (data.provider_rate_cards && data.provider_rate_cards.length > 0) {
-                        setSelectedPackage(data.provider_rate_cards[0]);
+                        setSelectedPackages([data.provider_rate_cards[0]]);
                     }
                 }
             } catch (error) {
@@ -76,6 +73,17 @@ export function DetailsPage() {
         };
         fetchServiceDetails();
     }, [params?.id]);
+
+    const togglePackage = (pkg) => {
+        setSelectedPackages(prev => {
+            const isSelected = prev.some(p => p._id === pkg._id);
+            if (isSelected) {
+                return prev.filter(p => p._id !== pkg._id);
+            } else {
+                return [...prev, pkg];
+            }
+        });
+    };
 
     if (loading || !service) return <div className="min-h-screen pt-20 flex justify-center items-center">Loading...</div>;
 
@@ -115,10 +123,6 @@ export function DetailsPage() {
                                 {service.name}
                             </h1>
                             <p className="text-xl text-gray-600">{service.provider}</p>
-                            {/* <div className="flex items-center gap-2 mt-2 text-gray-600">
-                                <MapPin className="w-4 h-4" />
-                                <span>{service.distance} away</span>
-                            </div> */}
                         </div>
 
                         {/* Right - Quick Stats */}
@@ -131,15 +135,6 @@ export function DetailsPage() {
                                 </div>
                                 <div className="text-xs text-gray-500 text-center">Rating</div>
                             </div>
-
-                            {/* Duration Card */}
-                            {/* <div className="bg-gradient-to-br from-[#C06C84]/10 to-[#C06C84]/5 rounded-2xl p-4 border border-[#C06C84]/20 min-w-[120px]">
-                                <div className="flex items-center justify-center mb-1">
-                                    <Clock className="w-5 h-5 text-[#C06C84] mr-1" />
-                                    <span className="text-2xl font-bold text-gray-900">{service.duration}</span>
-                                </div>
-                                <div className="text-xs text-gray-500 text-center">Duration</div>
-                            </div> */}
                         </div>
                     </div>
 
@@ -183,16 +178,6 @@ export function DetailsPage() {
                             >
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Service Description</h3>
                                 <p className="text-gray-700 leading-relaxed text-lg mb-6">{service.description}</p>
-
-                                {/* <h4 className="text-xl font-semibold text-gray-900 mb-4">What's Included</h4> */}
-                                {/* <ul className="space-y-2">
-                                    {service.includes.map((item, index) => (
-                                        <li key={index} className="flex items-center text-gray-700">
-                                            <span className="w-2 h-2 bg-[#C06C84] rounded-full mr-3"></span>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul> */}
                             </motion.div>
                         </TabsContent>
 
@@ -203,47 +188,50 @@ export function DetailsPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="grid gap-4"
                             >
-                                {service.packages.map((pkg) => (
-                                    <div
-                                        key={pkg._id}
-                                        onClick={() => setSelectedPackage(pkg)}
-                                        className={`bg-white rounded-2xl p-4 shadow-sm border-2 cursor-pointer transition-all ${selectedPackage?._id === pkg._id
-                                            ? 'border-[#C06C84] bg-[#C06C84]/5'
-                                            : 'border-gray-100 hover:border-[#C06C84]/30'
-                                            }`}
-                                    >
-                                        <div className="flex gap-4">
-                                            {/* Package Image */}
-                                            <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                                                <img
-                                                    src={pkg.image ? `https://api.doorstephub.com/${pkg.image}` : service.image}
-                                                    alt={pkg.name}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-
-                                            {/* Package Details */}
-                                            <div className="flex-1">
-                                                <div className="flex justify-between items-start">
-                                                    <h3 className="font-bold text-gray-900 line-clamp-1">{pkg.name}</h3>
-                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPackage?._id === pkg._id
-                                                        ? 'border-[#C06C84] bg-[#C06C84]'
-                                                        : 'border-gray-300'
-                                                        }`}>
-                                                        {selectedPackage?._id === pkg._id && (
-                                                            <Check className="w-3 h-3 text-white" />
-                                                        )}
-                                                    </div>
+                                {service.packages.map((pkg) => {
+                                    const isSelected = selectedPackages.some(p => p._id === pkg._id);
+                                    return (
+                                        <div
+                                            key={pkg._id}
+                                            onClick={() => togglePackage(pkg)}
+                                            className={`bg-white rounded-2xl p-4 shadow-sm border-2 cursor-pointer transition-all ${isSelected
+                                                ? 'border-[#C06C84] bg-[#C06C84]/5'
+                                                : 'border-gray-100 hover:border-[#C06C84]/30'
+                                                }`}
+                                        >
+                                            <div className="flex gap-4">
+                                                {/* Package Image */}
+                                                <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                                                    <img
+                                                        src={pkg.image ? `https://api.doorstephub.com/${pkg.image}` : service.image}
+                                                        alt={pkg.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
                                                 </div>
-                                                <p className="text-sm text-gray-500 line-clamp-2 mt-1 mb-2">{pkg.description}</p>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-lg text-gray-900">₹{pkg.price}</span>
-                                                    <span className="text-xs text-gray-400 capitalize">{pkg.priceUnit}</span>
+
+                                                {/* Package Details */}
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-start">
+                                                        <h3 className="font-bold text-gray-900 line-clamp-1">{pkg.name}</h3>
+                                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected
+                                                            ? 'border-[#C06C84] bg-[#C06C84]'
+                                                            : 'border-gray-300'
+                                                            }`}>
+                                                            {isSelected && (
+                                                                <Check className="w-3 h-3 text-white" />
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-sm text-gray-500 line-clamp-2 mt-1 mb-2">{pkg.description}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-lg text-gray-900">₹{pkg.price}</span>
+                                                        <span className="text-xs text-gray-400 capitalize">{pkg.priceUnit}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </motion.div>
                         </TabsContent>
 
@@ -321,9 +309,9 @@ export function DetailsPage() {
                 <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-center">
                     <button
                         onClick={() => {
-                            if (!selectedPackage) {
+                            if (selectedPackages.length === 0) {
                                 if (service.packages && service.packages.length > 0) {
-                                    setSelectedPackage(service.packages[0]);
+                                    setSelectedPackages([service.packages[0]]);
                                     setShowAddonsModal(true);
                                 } else {
                                     console.warn("No packages found");
@@ -345,11 +333,12 @@ export function DetailsPage() {
                 isOpen={showAddonsModal}
                 onClose={() => setShowAddonsModal(false)}
                 providerId={params.id}
-                selectedPackageId={selectedPackage?._id}
+                selectedPackageIds={selectedPackages.map(p => p._id)}
                 onContinue={(selectedAddons) => {
                     setShowAddonsModal(false);
+                    const packageIds = selectedPackages.map(p => p._id).join(',');
                     const addonIds = selectedAddons.map(a => a._id).join(',');
-                    router.push(`/spa-salon/booking/address?providerId=${params.id}&packageId=${selectedPackage?._id}&addons=${addonIds}`);
+                    router.push(`/spa-salon/booking/address?providerId=${params.id}&packageId=${packageIds}&addons=${addonIds}`);
                 }}
             />
         </div>

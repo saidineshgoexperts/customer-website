@@ -147,10 +147,13 @@ function SpaAddressContent() {
 
         setLoading(true);
         try {
+            const packageIdList = packageId ? packageId.split(',') : [];
+            const firstPackageId = packageIdList[0];
+
             // Mock Skip
-            if (providerId?.startsWith('mock_') || packageId?.startsWith('mock_')) {
+            if (providerId?.startsWith('mock_') || (firstPackageId && firstPackageId.startsWith('mock_'))) {
                 sessionStorage.setItem('spa_booking_data', JSON.stringify({
-                    providerId, packageId, addons: addons ? addons.split(',') : [], address: selectedAddress
+                    providerId, packageId: packageIdList, addons: addons ? addons.split(',') : [], address: selectedAddress
                 }));
                 sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
                 router.push('/spa-salon/booking/confirm');
@@ -160,21 +163,23 @@ function SpaAddressContent() {
             // 1. Clear Cart
             await clearCart(true);
 
-            // 2. Add Main Package
-            const packageSuccess = await addToCart(
-                providerId,
-                packageId,
-                'professional_service',
-                1,
-                null,
-                'professional',
-                true // suppressToast
-            );
+            // 2. Add All Packages
+            for (const pId of packageIdList) {
+                const packageSuccess = await addToCart(
+                    providerId,
+                    pId,
+                    'professional_service',
+                    1,
+                    null,
+                    'professional',
+                    true // suppressToast
+                );
 
-            if (!packageSuccess) {
-                toast.error('Failed to add service to booking');
-                setLoading(false);
-                return;
+                if (!packageSuccess) {
+                    toast.error(`Failed to add service ${pId} to booking`);
+                    setLoading(false);
+                    return;
+                }
             }
 
             // 3. Add Addons
@@ -186,7 +191,7 @@ function SpaAddressContent() {
                         addonId,
                         'professional_addon',
                         1,
-                        packageId,
+                        firstPackageId, // Link addons to the first package
                         'professional',
                         true // suppressToast
                     );
@@ -196,7 +201,7 @@ function SpaAddressContent() {
             // Save booking context
             sessionStorage.setItem('spa_booking_data', JSON.stringify({
                 providerId,
-                packageId,
+                packageId: packageIdList,
                 addons: addons ? addons.split(',') : [],
                 address: selectedAddress
             }));

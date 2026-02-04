@@ -419,7 +419,7 @@ export function RecommendedSpaSalon() {
         </div>
 
         {/* Premium Stats - Original layout preserved */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -445,7 +445,7 @@ export function RecommendedSpaSalon() {
               <div className="text-xs text-gray-400 uppercase tracking-wider">{stat.label}</div>
             </motion.div>
           ))}
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );
