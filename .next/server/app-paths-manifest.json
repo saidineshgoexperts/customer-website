@@ -1,8 +1,8 @@
 {
-  "/services/category/[categoryId]/page": "app/services/category/[categoryId]/page.js",
-  "/(landing)/page": "app/(landing)/page.js",
-  "/appliances/page": "app/appliances/page.js",
+  "/(legal)/privacy-policy/page": "app/(legal)/privacy-policy/page.js",
   "/services/page": "app/services/page.js",
-  "/services/listing/[subCategoryId]/page": "app/services/listing/[subCategoryId]/page.js",
-  "/services/detail/[serviceId]/page": "app/services/detail/[serviceId]/page.js"
+  "/spa-salon/subcategory/[id]/page": "app/spa-salon/subcategory/[id]/page.js",
+  "/(landing)/page": "app/(landing)/page.js",
+  "/pghostels/listings/[type]/page": "app/pghostels/listings/[type]/page.js",
+  "/religious-services/subcategory/[id]/page": "app/religious-services/subcategory/[id]/page.js"
 }

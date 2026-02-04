@@ -21,9 +21,9 @@ const footerLinks = {
     { name: 'Download Ios App', href: 'https://apps.apple.com/in/app/doorstep-hub/id6448539336' },
   ],
   Moreinfo: [
-    { name: 'FAQs', href: '#' },
-    { name: 'Terms of Service', href: '#' },
-    { name: 'Privacy Policy', href: '#' },
+    { name: 'FAQs', href: '/faqs' },
+    { name: 'Terms of Service', href: '/terms-conditions' },
+    { name: 'Privacy Policy', href: '/privacy-policy' },
     { name: 'Help Center', href: '#' },
     { name: 'All Services', href: '#' },
   ],
@@ -37,90 +37,25 @@ const socialLinks = [
   { icon: Youtube, href: 'https://www.youtube.com/channel/UCTn8lV-nEbdWdwXolLAsMZA', label: 'YouTube' },
 ];
 
-const additionalServices = [
-  {
-    title: 'PG & Hostels',
-    basePath: '/pghostels',
-    groups: [
-      {
-        id: 'pg', name: 'PG Services', subcategories: [
-          { _id: 'men-pg', name: "Men's PG", query: 'type=men' },
-          { _id: 'women-pg', name: "Women's PG", query: 'type=women' },
-          { _id: 'coliving', name: "Co-living PG", query: 'type=coliving' },
-          { _id: 'luxury-pg', name: "Luxury PG", query: 'type=luxury' }
-        ]
-      },
-      {
-        id: 'hostels', name: 'Hostels', subcategories: [
-          { _id: 'student-hostel', name: 'Student Hostels', query: 'type=student' },
-          { _id: 'working-hostel', name: 'Working Professionals Hostels', query: 'type=working' },
-          { _id: 'backpackers', name: 'Backpacker Hostels', query: 'type=backpacker' }
-        ]
-      }
-    ]
-  },
-  {
-    title: 'Religious Services',
-    basePath: '/religious-services',
-    groups: [
-      {
-        id: 'pooja', name: 'Pooja Services', subcategories: [
-          { _id: 'ganesh-pooja', name: 'Ganesh Pooja', query: 'service=ganesh' },
-          { _id: 'satyanarayan', name: 'Satyanarayan Pooja', query: 'service=satyanarayan' },
-          { _id: 'griha-pravesh', name: 'Griha Pravesh', query: 'service=grihapravesh' },
-          { _id: 'office-pooja', name: 'Office Pooja', query: 'service=office' }
-        ]
-      },
-      {
-        id: 'pandit', name: 'Pandit Booking', subcategories: [
-          { _id: 'wedding-pandit', name: 'Wedding Pandit', query: 'service=wedding' },
-          { _id: 'funeral-priest', name: 'Funeral Services', query: 'service=funeral' },
-          { _id: 'astrology', name: 'Vedic Astrology', query: 'service=astrology' }
-        ]
-      }
-    ]
-  },
-  {
-    title: 'Spa & Salon',
-    basePath: '/spa-salon',
-    groups: [
-      {
-        id: 'spa', name: 'Spa Therapies', subcategories: [
-          { _id: 'thai-massage', name: 'Thai Massage', query: 'category=thai' },
-          { _id: 'swedish-massage', name: 'Swedish Massage', query: 'category=swedish' },
-          { _id: 'deep-tissue', name: 'Deep Tissue', query: 'category=deeptissue' },
-          { _id: 'ayurvedic', name: 'Ayurvedic Spa', query: 'category=ayurvedic' }
-        ]
-      },
-      {
-        id: 'salon', name: 'Salon Services', subcategories: [
-          { _id: 'haircut', name: 'Haircut & Styling', query: 'category=haircut' },
-          { _id: 'facial', name: 'Facial Treatments', query: 'category=facial' },
-          { _id: 'manicure', name: 'Manicure & Pedicure', query: 'category=manicure' },
-          { _id: 'makeup', name: 'Bridal Makeup', query: 'category=makeup' }
-        ]
-      }
-    ]
-  }
-];
+// Hardcoded additionalServices removed as it's now dynamic
 
 export function Footer() {
   const [serviceGroups, setServiceGroups] = useState([]);
+  const [professionalServices, setProfessionalServices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchFooterData = async () => {
       try {
-        // Step 1: Fetch Categories
+        // Step 1: Fetch Appliance Categories
         const catResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getallcategorys', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lattitude: '17.4391296', longitude: '78.4433152' })
+          body: JSON.stringify({ lattitude: '17.3850', longitude: '78.4866' })
         });
         const catData = await catResponse.json();
 
         if (catData.success && Array.isArray(catData.data)) {
-          // Step 2: Fetch subcategories for each category
           const groups = await Promise.all(catData.data.map(async (category) => {
             try {
               const subResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getsubcategorysbycategoryid', {
@@ -139,9 +74,20 @@ export function Footer() {
               return { id: category._id, name: category.name, subcategories: [] };
             }
           }));
-
           setServiceGroups(groups);
         }
+
+        // Step 2: Fetch Professional Services Catalog
+        const profResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/professional-services-catalog', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const profData = await profResponse.json();
+
+        if (profData.success && Array.isArray(profData.data)) {
+          setProfessionalServices(profData.data);
+        }
+
       } catch (error) {
         console.error('Error fetching footer data:', error);
       } finally {
@@ -151,6 +97,22 @@ export function Footer() {
 
     fetchFooterData();
   }, []);
+
+  const getProfessionalLink = (serviceName, sub, category) => {
+    const encodedSubName = encodeURIComponent(sub.name);
+    const encodedCatName = category ? encodeURIComponent(category.name) : '';
+
+    if (serviceName.toLowerCase().includes('spa')) {
+      return `/spa-salon/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
+    }
+    if (serviceName.toLowerCase().includes('pg') || serviceName.toLowerCase().includes('hostel')) {
+      return `/pghostels/listings/${sub._id}?name=${encodedSubName}`;
+    }
+    if (serviceName.toLowerCase().includes('religious')) {
+      return `/religious-services/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
+    }
+    return '#';
+  };
 
   return (
     <footer className="relative bg-gradient-to-b from-[#0a0a0a] to-black border-t border-white/5">
@@ -208,50 +170,57 @@ export function Footer() {
           </div>
         )}
 
-        {/* Additional Services Sections */}
-        {additionalServices.map((section, sIdx) => (
-          <div key={sIdx} className="mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <h3 className="text-xl font-bold text-white mb-4">{section.title}</h3>
-              <div className="text-sm leading-8 text-gray-400">
-                {section.groups.map((group, groupIdx) => (
-                  <span key={group.id} className="inline mr-1">
-                    {/* Group Name */}
-                    <span className="text-white font-bold whitespace-nowrap mr-2">
-                      {group.name}:
-                    </span>
+        {/* Dynamic Professional Services Sections */}
+        {!isLoading && professionalServices.map((section, sIdx) => {
+          const serviceName = section.service.name;
+          const displayTitle = serviceName.includes('Spa') ? 'Spa & Salon' :
+            serviceName.includes('PG') ? 'PG & Hostels' :
+              serviceName;
 
-                    {/* Subcategories */}
-                    {group.subcategories.map((sub, idx) => (
-                      <span key={sub._id} className="inline">
-                        <Link
-                          href={`${section.basePath}?${sub.query}`}
-                          className="text-white/70 hover:text-[#04a99d] transition-colors"
-                        >
-                          {sub.name}
-                        </Link>
-                        {/* Separator between subcategories */}
-                        {idx < group.subcategories.length - 1 && (
-                          <span className="mx-2 text-white/20">|</span>
-                        )}
+          return (
+            <div key={sIdx} className="mb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="space-y-6"
+              >
+                <h3 className="text-xl font-bold text-white mb-4">{displayTitle}</h3>
+                <div className="text-sm leading-8 text-gray-400">
+                  {section.categories.map((catGroup, groupIdx) => (
+                    <span key={catGroup.category._id} className="inline mr-1">
+                      {/* Category Name */}
+                      <span className="text-white font-bold whitespace-nowrap mr-2">
+                        {catGroup.category.name}:
                       </span>
-                    ))}
 
-                    {/* Separator between Groups - Render unless it's the last group */}
-                    {groupIdx < section.groups.length - 1 && (
-                      <span className="mx-4 text-[#037166] opacity-50">||</span>
-                    )}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        ))}
+                      {/* Subcategories */}
+                      {catGroup.subcategories.map((sub, idx) => (
+                        <span key={sub._id} className="inline">
+                          <Link
+                            href={getProfessionalLink(serviceName, sub, catGroup.category)}
+                            className="text-white/70 hover:text-[#04a99d] transition-colors"
+                          >
+                            {sub.name}
+                          </Link>
+                          {/* Separator between subcategories */}
+                          {idx < catGroup.subcategories.length - 1 && (
+                            <span className="mx-2 text-white/20">|</span>
+                          )}
+                        </span>
+                      ))}
+
+                      {/* Separator between Categories - Render unless it's the last category */}
+                      {groupIdx < section.categories.length - 1 && (
+                        <span className="mx-4 text-[#037166] opacity-50">||</span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          );
+        })}
 
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">

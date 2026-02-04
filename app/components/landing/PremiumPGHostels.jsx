@@ -323,7 +323,7 @@ export function PremiumPGHostels() {
               >
                 {/* Card with Parallax Effect */}
                 <motion.div
-                  whileHover={hostel.isDummy ? {} : { y: -15, rotateY: 5 }}
+                  whileHover={hostel.isDummy ? {} : {}}
                   transition={{ type: 'spring', stiffness: 300 }}
                   className={`relative h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] border border-[#037166]/30 rounded-3xl overflow-hidden shadow-2xl ${hostel.isDummy ? 'pointer-events-none' : ''}`}
                   style={{ transformStyle: 'preserve-3d' }}
@@ -339,7 +339,7 @@ export function PremiumPGHostels() {
                   {/* Image with Depth */}
                   <div className="relative h-48 overflow-hidden">
                     <motion.div
-                      whileHover={hostel.isDummy ? {} : { scale: 1.1 }}
+                      whileHover={hostel.isDummy ? {} : {}}
                       transition={{ duration: 0.6 }}
                     >
                       <ImageWithFallback
