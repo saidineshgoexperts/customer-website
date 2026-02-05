@@ -251,8 +251,8 @@ export function ServiceDetailsPage({
                       key={idx}
                       onClick={() => setCurrentImageIndex(idx)}
                       className={`relative w-20 h-20 rounded-lg overflow-hidden transition-all ${currentImageIndex === idx
-                          ? 'ring-2 ring-[#037166] scale-105'
-                          : 'opacity-60 hover:opacity-100'
+                        ? 'ring-2 ring-[#037166] scale-105'
+                        : 'opacity-60 hover:opacity-100'
                         }`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" />
@@ -289,7 +289,7 @@ export function ServiceDetailsPage({
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { icon: Shield, text: 'Licensed & Insured' },
-                  { icon: Award, text: 'Certified Technicians' },
+                  { icon: Award, text: 'Verified & Insured Professionals' },
                   { icon: Clock, text: 'Same-Day Service' },
                   { icon: ThumbsUp, text: 'Satisfaction Guaranteed' },
                 ].map((item, idx) => (
@@ -340,8 +340,8 @@ export function ServiceDetailsPage({
                 whileHover={{ y: -8 }}
                 onClick={() => handleSelectCard(card.id)}
                 className={`relative cursor-pointer rounded-2xl p-8 transition-all duration-300 ${selectedCards.includes(card.id)
-                    ? 'bg-gradient-to-br from-[#037166]/20 to-[#04a99d]/10 border-2 border-[#037166]'
-                    : 'bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-white/20'
+                  ? 'bg-gradient-to-br from-[#037166]/20 to-[#04a99d]/10 border-2 border-[#037166]'
+                  : 'bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-white/20'
                   }`}
               >
                 {/* Popular Badge */}

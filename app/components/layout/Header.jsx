@@ -148,16 +148,16 @@ export function Header({ theme = {}, navItems = [] }) {
             {/* Logo */}
             <Link href="/">
               <motion.div
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.02 }}
                 className="flex items-center relative group flex-shrink-0"
               >
-                <div className="relative w-48 h-14 overflow-hidden flex-shrink-0">
+                <div className="relative w-36 sm:w-48 h-10 sm:h-14 overflow-hidden flex-shrink-0">
                   <Image
                     src="/d-hub-logo.png"
                     alt="Doorstep Hub Logo"
                     fill
-                    sizes="192px"
-                    className="object-contain"
+                    sizes="(max-width: 640px) 144px, 192px"
+                    className="object-contain object-left"
                     priority
                   />
                 </div>
@@ -216,7 +216,7 @@ export function Header({ theme = {}, navItems = [] }) {
             </nav>
 
             {/* Right Actions */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-2">
               <div id="location-bar">
                 <LocationBar theme={currentTheme} />
               </div>
@@ -262,7 +262,7 @@ export function Header({ theme = {}, navItems = [] }) {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`lg:hidden p-2 rounded-xl ${currentTheme.buttonBg} border ${currentTheme.border} hover:bg-[#037166]/10 transition-all shadow-md hover:shadow-lg`}
+                className={`lg:hidden p-2 rounded-xl ${currentTheme.buttonBg} border ${currentTheme.border} hover:bg-[#037166]/10 transition-all shadow-md hover:shadow-lg mr-2`}
               >
                 {mobileMenuOpen ? (
                   <X className="w-6 h-6 text-[#037166]" />

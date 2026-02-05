@@ -451,8 +451,8 @@ export function ServiceDetailsPage({
               {/* Service Highlights */}
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: Shield, text: 'Licensed Professionals' },
-                  { icon: Award, text: 'Verified Partners' },
+                  { icon: Shield, text: 'Verified & Insured Professional' },
+                  { icon: Award, text: '30-90 Days Service Warranty On Repairs' },
                   { icon: Clock, text: 'Same-Day Service' },
                   { icon: ThumbsUp, text: 'Satisfaction Guaranteed' },
                 ].map((item, idx) => (

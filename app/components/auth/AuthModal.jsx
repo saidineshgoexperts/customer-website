@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Phone, ShieldCheck, Mail, User, LogOut, Camera, Chrome, Pencil, Check } from 'lucide-react';
+import { X, Phone, ShieldCheck, Mail, User, LogOut, Camera, Chrome, Pencil, Check, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
@@ -81,7 +81,9 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
         try {
             const data = await verifyOtp(mobile, otp);
             if (data.success || data.status === 'success') {
-                onClose();
+                // onClose(); // Don't close, show profile update instead
+                setIsEditing(true); // Auto-enable edit mode
+                setStep('profile');
             } else {
                 toast.error(data.message || 'Invalid OTP');
             }
@@ -285,7 +287,9 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                     <h3 className={`text-xl font-bold ${t.textMain}`}>{user?.name || `${user?.firstName} ${user?.lastName}`}</h3>
                                     <p className={`${t.textMain} opacity-60 text-sm`}>{user?.phone || user?.mobile || 'No phone'}</p>
                                 </div>
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
                                     onClick={async () => {
                                         if (isEditing) {
                                             // Handle Save
@@ -301,7 +305,10 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                                 await updateProfile(formData);
                                                 setIsEditing(false);
                                                 setSelectedFile(null);
-                                                // Preview image stays until next full refresh or update via context
+                                                toast.success('Profile updated successfully');
+                                            } catch (error) {
+                                                console.error(error);
+                                                toast.error('Failed to update profile');
                                             } finally {
                                                 setLoading(false);
                                             }
@@ -309,10 +316,13 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                             setIsEditing(true);
                                         }
                                     }}
-                                    className={`absolute top-0 right-0 p-2 rounded-xl bg-white/5 border border-white/10 ${t.textHover} hover:bg-white/10 transition-all`}
+                                    className={`absolute top-0 right-0 p-2.5 rounded-xl border transition-all ${isEditing
+                                        ? `bg-green-500/20 border-green-500 text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)] animate-pulse`
+                                        : `bg-white/5 border-white/10 ${t.textHover} hover:bg-white/10`
+                                        }`}
                                 >
-                                    {isEditing ? <Check className="w-5 h-5 text-green-500" /> : <Pencil className="w-5 h-5" />}
-                                </button>
+                                    {isEditing ? <Check className="w-5 h-5 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]" /> : <Pencil className="w-5 h-5" />}
+                                </motion.button>
                             </div>
 
                             <div className="space-y-4">
@@ -339,6 +349,18 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                     />
                                 </div>
                             </div>
+
+                            {!isEditing && (
+                                <motion.button
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    onClick={onClose}
+                                    className={`w-full py-4 border border-green-500/30 text-green-500 font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-green-500/10 transition-all`}
+                                >
+                                    Continue to Booking
+                                    <ChevronRight className="w-4 h-4" />
+                                </motion.button>
+                            )}
 
                             <button
                                 onClick={() => {

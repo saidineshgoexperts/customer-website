@@ -283,15 +283,7 @@ export function Footer() {
 
               {/* Contact Info */}
               <div className="space-y-4">
-                <a
-                  href={`tel:${globalSettings?.phone || "8886688666"}`}
-                  className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors group"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#037166]/20 transition-colors">
-                    <Phone className="w-4 h-4" />
-                  </div>
-                  <span className="text-sm">{globalSettings?.phone || "8886688666"}</span>
-                </a>
+
                 <a
                   href={`mailto:${globalSettings?.email || "help@doorstephub.com"}`}
                   className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors group"
@@ -301,12 +293,7 @@ export function Footer() {
                   </div>
                   <span className="text-sm">{globalSettings?.email || "help@doorstephub.com"}</span>
                 </a>
-                <div className="flex items-center gap-3 text-white/60">
-                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-4 h-4" />
-                  </div>
-                  <span className="text-sm leading-tight">{globalSettings?.address || "Hyderabad, Telangana"}</span>
-                </div>
+
               </div>
             </motion.div>
           </div>

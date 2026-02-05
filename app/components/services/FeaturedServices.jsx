@@ -168,7 +168,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                   viewport={{ once: true }}
                   className="absolute top-0 inset-x-0 mx-auto w-fit z-20 px-6 py-1 bg-gradient-to-r from-[#037166] to-[#04a99d] backdrop-blur-md rounded-full rounded-t-none border border-t-0 border-[#037166]/30 shadow-lg whitespace-nowrap flex items-center space-x-2"
                 >
-                  <h6 className="m-0 text-white text-xs font-bold w-full text-center">⭐ {service.serviceDelhiveryType || 'Featured'}</h6>
+                  <h6 className="m-0 text-white text-xs font-bold w-full text-center">{service.serviceDelhiveryType || 'Featured'}</h6>
                 </motion.div>
 
                 {/* Image */}
@@ -187,7 +187,6 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                     className="absolute inset-0 bg-gradient-to-t from-[#037166]/30 to-transparent"
                   />
 
-                  {/* Arrow Button - Bottom Right */}
                   <div className="absolute bottom-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <motion.button
                       whileHover={{ scale: 1.1 }}
@@ -197,18 +196,19 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                       <ArrowRight className="w-5 h-5 text-white" />
                     </motion.button>
                   </div>
+
+                  {/* Rating Badge - Bottom Left */}
+                  <div className="absolute bottom-2 left-2 z-20">
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#037166]/20 backdrop-blur-md border border-[#037166]/10">
+                      <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                      <span className="text-sm  text-white">4.8</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Content */}
                 <div className="p-6">
-                  {/* Rating Placeholder (not in API, using dummy) */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#037166]/20">
-                      <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
-                      <span className="text-sm font-medium text-white">4.8</span>
-                    </div>
-                    {/* <span className="text-sm text-white/50 font-normal">(New)</span> */}
-                  </div>
+
 
                   {/* Title */}
                   <h4 className="text-xl bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-bold mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-1">

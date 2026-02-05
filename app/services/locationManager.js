@@ -141,32 +141,65 @@ class LocationManager {
                     const result = results[0];
                     let city = '';
                     let area = '';
+                    let neighborhood = '';
+                    let houseNumber = '';
                     let postalCode = '';
                     let state = '';
 
+                    // Variables to store multi-part components
+                    let houseParts = [];
+                    let areaParts = [];
+
                     // Extract city, area, postal code, and state from address components
                     for (const component of result.address_components) {
-                        if (component.types.includes('locality')) {
-                            city = component.long_name;
+                        const types = component.types;
+                        const name = component.long_name;
+
+                        if (types.includes('locality')) {
+                            city = name;
                         }
-                        if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
-                            area = component.long_name;
+
+                        // Capture all levels of sublocality and neighborhood for area
+                        if (types.includes('sublocality') || types.includes('sublocality_level_1') ||
+                            types.includes('sublocality_level_2') || types.includes('sublocality_level_3') ||
+                            types.includes('neighborhood') || types.includes('route')) {
+                            if (!areaParts.includes(name)) {
+                                areaParts.push(name);
+                            }
                         }
-                        if (component.types.includes('postal_code')) {
-                            postalCode = component.long_name;
+
+                        // Capture specific building/plot details
+                        if (types.includes('premise') || types.includes('subpremise') ||
+                            types.includes('street_number') || types.includes('point_of_interest') ||
+                            types.includes('room') || types.includes('floor')) {
+                            // Avoid duplicates in house parts
+                            if (!houseParts.includes(name)) {
+                                houseParts.push(name);
+                            }
                         }
-                        if (component.types.includes('administrative_area_level_1')) {
-                            state = component.long_name;
+
+                        if (types.includes('postal_code')) {
+                            postalCode = name;
+                        }
+                        if (types.includes('administrative_area_level_1')) {
+                            state = name;
                         }
                     }
 
-                    const shortAddress = area ? `${area}, ${city}` : city || result.formatted_address.split(',')[0];
+                    // Process specialized components
+                    // In India, sometimes the order is reversed in components, so we might want to reverse houseParts
+                    // but usually, more specific is first.
+                    const finalHouse = houseParts.join(', ');
+                    const finalArea = Array.from(new Set(areaParts)).join(', '); // Remove duplicates
+
+                    const shortAddress = finalArea ? `${finalArea.split(',')[0]}, ${city}` : city || result.formatted_address.split(',')[0];
 
                     resolve({
                         lat,
                         lng,
                         city,
-                        area,
+                        area: finalArea,
+                        flat: finalHouse, // Auto-fill Plot/House details
                         postalCode,
                         state,
                         address: result.formatted_address,
@@ -239,40 +272,47 @@ class LocationManager {
      */
     async detectWithIP() {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
 
         try {
-            const response = await fetch(LOCATION_CONFIG.IP_API_URL, {
+            // ipwho.is is very CORS friendly and reliable
+            const response = await fetch('https://ipwho.is/', {
                 method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                },
                 signal: controller.signal
             });
+
             clearTimeout(timeoutId);
 
-            if (!response.ok) {
-                throw new Error('IP detection failed');
-            }
-
+            if (!response.ok) throw new Error('IP API failed');
             const data = await response.json();
 
-            // Extract location data from IP API response
+            // Mapping for ipwho.is
             const locationData = {
-                lat: data.latitude,
-                lng: data.longitude,
-                city: data.city || 'Unknown',
+                lat: Number(data.latitude) || 17.3850,
+                lng: Number(data.longitude) || 78.4867,
+                city: data.city || 'Hyderabad',
                 area: data.region || '',
-                address: `${data.city}, ${data.region}, ${data.country_name}`,
-                shortAddress: data.city || 'Unknown'
+                postalCode: data.postal || '',
+                state: data.region || 'Telangana',
+                address: `${data.city || 'Hyderabad'}, ${data.region || ''}`,
+                shortAddress: data.city || 'Hyderabad'
             };
 
-            const savedData = this.saveLocation(locationData, LOCATION_CONFIG.SOURCES.IP);
-            return savedData;
+            return this.saveLocation(locationData, LOCATION_CONFIG.SOURCES.IP);
         } catch (error) {
             clearTimeout(timeoutId);
-            console.error('IP detection error:', error);
-            throw new Error('Failed to detect location via IP');
+            console.error('IP detection failure:', error);
+            // Absolute fallback to avoid crashes
+            return {
+                lat: 17.3850,
+                lng: 78.4867,
+                city: "Hyderabad",
+                area: "Madhapur",
+                postalCode: "500081",
+                state: "Telangana",
+                address: "Hyderabad, Telangana",
+                shortAddress: "Hyderabad"
+            };
         }
     }
 

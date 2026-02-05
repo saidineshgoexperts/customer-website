@@ -18,8 +18,8 @@ export const LOCATION_CONFIG = {
     GPS_TIMEOUT: 10000,
 
     // IP geolocation service (free, no API key required)
-    // Using ipapi.co - 30k requests/month free tier
-    IP_API_URL: 'https://ipapi.co/json/',
+    // Using ipwho.is - generous limits and CORS support
+    IP_API_URL: 'https://ipwho.is/',
 
     // Default country for location searches
     DEFAULT_COUNTRY: 'IN',

@@ -17,7 +17,7 @@ export function AddressPage({
   onContinue,
 }) {
   const { user, token, isAuthenticated } = useAuth();
-  const { detectWithGPS, loading: locationLoading, isMapsLoaded } = useLocationContext();
+  const { location: contextLocation, detectWithGPS, loading: locationLoading, isMapsLoaded } = useLocationContext();
   const mapRef = React.useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,6 +28,22 @@ export function AddressPage({
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [locationPermission, setLocationPermission] = useState('unknown');
+  const [showPermissionBanner, setShowPermissionBanner] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && navigator.permissions) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        setLocationPermission(result.state);
+        if (result.state === 'denied') setShowPermissionBanner(true);
+        result.onchange = () => {
+          setLocationPermission(result.state);
+          if (result.state === 'denied') setShowPermissionBanner(true);
+        };
+      });
+    }
+  }, []);
+
   const [newAddress, setNewAddress] = useState({
     name: '',
     phone: '',
@@ -40,12 +56,60 @@ export function AddressPage({
     stateName: 'Telangana',
     cityName: 'Hyderabad',
     defaultAddress: false,
-    latitude: "17.450123",
-    longitude: "78.390456",
-    stateId: "680cbb3d2d42e474f451ace3", // Default IDs from user example
+    latitude: contextLocation?.lat || "17.450123",
+    longitude: contextLocation?.lng || "78.390456",
+    stateId: "680cbb3d2d42e474f451ace3",
     cityId: "684d704faa93650a05d5ff47"
   });
   const [detectionSuccess, setDetectionSuccess] = useState(false);
+  const [hasAutoDetected, setHasAutoDetected] = useState(false);
+  const [mapCenter, setMapCenter] = useState({
+    lat: Number(contextLocation?.lat) || 17.450123,
+    lng: Number(contextLocation?.lng) || 78.390456
+  });
+
+  // Sync initial state and map center if contextLocation arrives
+  useEffect(() => {
+    const initLocation = async () => {
+      if (contextLocation?.lat && !hasAutoDetected) {
+        const lat = Number(contextLocation.lat);
+        const lng = Number(contextLocation.lng);
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const coords = { lat, lng };
+          setMapCenter(coords);
+          setHasAutoDetected(true);
+        }
+
+        try {
+          // Even if we have contextLocation, it might be IP-based (vague)
+          // So we do a fresh reverseGeocode to get Plot/House details
+          const data = await locationManager.reverseGeocode(lat, lng);
+
+          setNewAddress(prev => ({
+            ...prev,
+            latitude: lat.toString(),
+            longitude: lng.toString(),
+            area: data.area || contextLocation.area || prev.area,
+            cityName: data.city || contextLocation.city || prev.cityName,
+            postalCode: data.postalCode || contextLocation.postalCode || prev.postalCode,
+            flat: data.flat || contextLocation.flat || prev.flat,
+            addressLineOne: data.address || contextLocation.address || prev.addressLineOne,
+            stateName: data.state || contextLocation.state || prev.stateName
+          }));
+
+          // If no addresses, show the add form automatically
+          if (addresses.length === 0 && !loading) {
+            setShowAddForm(true);
+          }
+        } catch (e) {
+          console.warn("Initial reverseGeocode failed", e);
+        }
+      }
+    };
+
+    initLocation();
+  }, [contextLocation, hasAutoDetected, addresses.length, loading]);
 
   const fetchAddresses = useCallback(async () => {
     if (!token) return;
@@ -87,24 +151,54 @@ export function AddressPage({
   // (prevents auto-restore when user clears the field manually)
 
   const handleAutoDetect = async () => {
+    setIsLocating(true);
     try {
       const locationData = await detectWithGPS();
+
+      if (!locationData || !locationData.lat) {
+        toast.error('Precise location unavailable. Please enable GPS or drag map.');
+        return;
+      }
+
       setNewAddress(prev => ({
         ...prev,
         area: locationData.area || '',
-        cityName: locationData.city || '',
+        cityName: locationData.city || locationData.cityName || '',
         postalCode: locationData.postalCode || '',
-        stateName: locationData.state || 'Telangana',
+        stateName: locationData.state || locationData.stateName || 'Telangana',
         addressLineOne: locationData.address || '',
-        latitude: locationData.lat || prev.latitude,
-        longitude: locationData.lng || prev.longitude
+        flat: locationData.flat || prev.flat,
+        latitude: locationData.lat.toString(),
+        longitude: locationData.lng.toString()
       }));
+
+      const lat = Number(locationData.lat);
+      const lng = Number(locationData.lng);
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        const coords = { lat, lng };
+        setMapCenter(coords);
+        if (mapRef.current) {
+          mapRef.current.panTo(coords);
+          mapRef.current.setZoom(17);
+        }
+      }
+
+      setShowAddForm(true);
       setDetectionSuccess(true);
-      toast.success('Location detected successfully!');
-      // Reset success check after 3 seconds
+
+      if (locationData.isEstimated) {
+        toast.info('Using estimated area (GPS denied)');
+      } else {
+        toast.success('Location detected successfully!');
+      }
+
       setTimeout(() => setDetectionSuccess(false), 3000);
     } catch (error) {
-      toast.error('Failed to detect location. Please fill manually.');
+      console.warn('GPS failed:', error);
+      toast.error('GPS access denied. Use map drag or manual entry.');
+    } finally {
+      setIsLocating(false);
     }
   };
 
@@ -226,7 +320,7 @@ export function AddressPage({
       className="min-h-screen pt-20 pb-32"
     >
       {/* Header */}
-      <section className="sticky top-20 z-40 bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] border-b border-white/10 shadow-lg opacity-50">
+      <section className="top-20 z-40 bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] border-b border-white/10 shadow-lg">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
           <motion.button
             initial={{ opacity: 0, x: -20 }}
@@ -263,161 +357,192 @@ export function AddressPage({
               <div className="relative w-full h-[400px] rounded-3xl overflow-hidden bg-[#f0f2f5] border border-gray-200/20 group">
                 {/* Real-time Google Map */}
                 {isMapsLoaded ? (
-                  <GoogleMap
-                    mapContainerStyle={{ width: '100%', height: '100%' }}
-                    center={{ lat: parseFloat(newAddress.latitude || "17.450123"), lng: parseFloat(newAddress.longitude || "78.390456") }}
-                    zoom={15}
-                    options={{
-                      disableDefaultUI: true,
-                      zoomControl: false,
-                      streetViewControl: false,
-                      mapTypeControl: false,
-                      fullscreenControl: false,
-                      clickableIcons: false, // We want drag map, not click POIs
-                      gestureHandling: 'greedy'
-                    }}
-                    onLoad={(map) => { mapRef.current = map; }}
-                    onDragStart={() => setIsDragging(true)}
-                    onDragEnd={async () => {
-                      if (!mapRef.current) return;
-                      // setIsDragging(true); // removed to avoid flicker on immediate stop
-                      const center = mapRef.current.getCenter();
-                      const lat = center.lat();
-                      const lng = center.lng();
+                  <>
+                    {/* GPS Guidance Banner */}
+                    {locationPermission === 'denied' && showPermissionBanner && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="absolute top-4 left-4 right-4 z-20 bg-black/60 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-2xl flex items-center justify-between gap-4"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="w-5 h-5 text-yellow-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-white">GPS matches disabled</p>
+                            <p className="text-[11px] text-white/60">Drag the pin to your exact location for service.</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setShowPermissionBanner(false)}
+                          className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                        >
+                          <X className="w-4 h-4 text-white/40" />
+                        </button>
+                      </motion.div>
+                    )}
+                    <GoogleMap
+                      mapContainerStyle={{ width: '100%', height: '100%' }}
+                      center={mapCenter}
+                      zoom={17}
+                      options={{
+                        disableDefaultUI: true,
+                        zoomControl: false,
+                        streetViewControl: false,
+                        mapTypeControl: false,
+                        fullscreenControl: false,
+                        clickableIcons: false,
+                        gestureHandling: 'greedy'
+                      }}
+                      onLoad={(map) => { mapRef.current = map; }}
+                      onDragStart={() => setIsDragging(true)}
+                      onDragEnd={async () => {
+                        if (!mapRef.current) return;
+                        const center = mapRef.current.getCenter();
+                        const lat = Number(center.lat());
+                        const lng = Number(center.lng());
 
-                      try {
-                        const data = await locationManager.reverseGeocode(lat, lng);
-                        setNewAddress(prev => ({
-                          ...prev,
-                          area: data.area || prev.area,
-                          cityName: data.city || prev.cityName,
-                          postalCode: data.postalCode || prev.postalCode,
-                          stateName: data.state || prev.stateName,
-                          addressLineOne: data.address,
-                          latitude: lat,
-                          longitude: lng
-                        }));
-                      } catch (error) {
-                        console.error("Geocoding failed", error);
-                      } finally {
-                        setIsDragging(false);
-                      }
-                    }}
-                  >
-                    {/* Search Bar Overlay */}
-                    <div className="absolute top-4 left-4 right-4 z-10">
-                      <div className="relative">
-                        <div className="w-full bg-white rounded-xl shadow-lg shadow-black/5 p-4 flex items-center gap-3">
-                          <Search className="w-5 h-5 text-gray-400" />
-                          <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => {
-                              const query = e.target.value;
-                              setSearchQuery(query);
-                              if (query.length > 2) {
-                                locationManager.searchLocation(query).then(setSearchResults);
-                              } else {
-                                setSearchResults([]);
-                              }
-                            }}
-                            placeholder="Search for your location"
-                            className="flex-1 outline-none text-gray-700 placeholder-gray-400 text-sm font-medium"
-                          />
-                          {searchQuery && (
-                            <button onClick={() => { setSearchQuery(''); setSearchResults([]); }} className="p-1 hover:bg-gray-100 rounded-full">
-                              <X className="w-4 h-4 text-gray-400" />
-                            </button>
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                          setMapCenter({ lat, lng });
+                        }
+
+                        try {
+                          const data = await locationManager.reverseGeocode(lat, lng);
+                          setNewAddress(prev => ({
+                            ...prev,
+                            area: data.area || prev.area,
+                            cityName: data.city || prev.cityName,
+                            postalCode: data.postalCode || prev.postalCode,
+                            stateName: data.state || prev.stateName,
+                            addressLineOne: data.address,
+                            flat: data.flat || prev.flat,
+                            latitude: lat.toString(),
+                            longitude: lng.toString()
+                          }));
+
+                          if (addresses.length === 0) {
+                            setShowAddForm(true);
+                          }
+                        } catch (error) {
+                          console.error("Geocoding failed", error);
+                        } finally {
+                          setIsDragging(false);
+                        }
+                      }}
+                    >
+                      {/* Search Bar Overlay */}
+                      <div className="absolute top-4 left-4 right-4 z-10">
+                        <div className="relative">
+                          <div className="w-full bg-white rounded-xl shadow-lg shadow-black/5 p-4 flex items-center gap-3">
+                            <Search className="w-5 h-5 text-gray-400" />
+                            <input
+                              type="text"
+                              value={searchQuery}
+                              onChange={(e) => {
+                                const query = e.target.value;
+                                setSearchQuery(query);
+                                if (query.length > 2) {
+                                  locationManager.searchLocation(query).then(setSearchResults);
+                                } else {
+                                  setSearchResults([]);
+                                }
+                              }}
+                              placeholder="Search for your location"
+                              className="flex-1 outline-none text-gray-700 placeholder-gray-400 text-sm font-medium"
+                            />
+                            {searchQuery && (
+                              <button onClick={() => { setSearchQuery(''); setSearchResults([]); }} className="p-1 hover:bg-gray-100 rounded-full">
+                                <X className="w-4 h-4 text-gray-400" />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Search Results Dropdown */}
+                          {searchResults.length > 0 && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto divide-y divide-gray-50 z-50">
+                              {searchResults.map((result) => (
+                                <button
+                                  key={result.place_id}
+                                  onClick={async () => {
+                                    setSearchQuery(result.description);
+                                    setSearchResults([]);
+                                    try {
+                                      const loc = await locationManager.setManualLocation(result.place_id);
+                                      const lat = Number(loc.lat);
+                                      const lng = Number(loc.lng);
+
+                                      if (!isNaN(lat) && !isNaN(lng)) {
+                                        const coords = { lat, lng };
+                                        setMapCenter(coords);
+                                        setNewAddress(prev => ({
+                                          ...prev,
+                                          ...loc,
+                                          latitude: lat.toString(),
+                                          longitude: lng.toString()
+                                        }));
+                                        if (mapRef.current) {
+                                          mapRef.current.panTo(coords);
+                                          mapRef.current.setZoom(17);
+                                          setShowAddForm(true);
+                                        }
+                                      }
+                                    } catch (e) {
+                                      toast.error("Failed to load location");
+                                    }
+                                  }}
+                                  className="w-full p-3 text-left hover:bg-gray-50 flex items-start gap-3 transition-colors"
+                                >
+                                  <MapPin className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-800 line-clamp-1">{result.main_text}</p>
+                                    <p className="text-xs text-gray-400 line-clamp-1">{result.secondary_text}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
                           )}
                         </div>
+                      </div>
 
-                        {/* Search Results Dropdown */}
-                        {searchResults.length > 0 && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto divide-y divide-gray-50 z-50">
-                            {searchResults.map((result) => (
-                              <button
-                                key={result.place_id}
-                                onClick={async () => {
-                                  setSearchQuery(result.description);
-                                  setSearchResults([]);
-                                  try {
-                                    const loc = await locationManager.setManualLocation(result.place_id);
-                                    setNewAddress(prev => ({ ...prev, ...loc, latitude: loc.lat, longitude: loc.lng }));
-                                    if (mapRef.current) {
-                                      mapRef.current.panTo({ lat: loc.lat, lng: loc.lng });
-                                      mapRef.current.setZoom(17);
-                                      setShowAddForm(true);
-                                    }
-                                  } catch (e) {
-                                    toast.error("Failed to load location");
-                                  }
-                                }}
-                                className="w-full p-3 text-left hover:bg-gray-50 flex items-start gap-3 transition-colors"
-                              >
-                                <MapPin className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
-                                <div>
-                                  <p className="text-sm font-medium text-gray-800 line-clamp-1">{result.main_text}</p>
-                                  <p className="text-xs text-gray-400 line-clamp-1">{result.secondary_text}</p>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                      {/* Locate Me Button status-aware */}
+                      <div className="absolute bottom-24 right-6 z-20">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleAutoDetect(); }}
+                          disabled={isLocating}
+                          className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95 ${locationPermission === 'denied'
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+                            : 'bg-white text-[#037166] hover:bg-gray-50'
+                            }`}
+                          title={locationPermission === 'denied' ? 'Enable GPS in browser settings' : 'Use Current Location'}
+                        >
+                          {isLocating ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : locationPermission === 'denied' ? (
+                            <X className="w-5 h-5" />
+                          ) : (
+                            <Crosshair className="w-6 h-6" />
+                          )}
+                        </button>
+                      </div>
+                    </GoogleMap>
+
+                    {/* Fixed Center Pin Target */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                      <div className="relative -mt-8 transition-transform duration-200" style={{ transform: isDragging ? 'scale(1.1) translateY(-10px)' : 'scale(1) translateY(0)' }}>
+                        <div className="w-4 h-4 rounded-full bg-black/20 animate-ping absolute -bottom-1 left-1/2 -translate-x-1/2" />
+                        <MapPin className="w-10 h-10 text-[#ea4335] drop-shadow-xl relative z-10" fill="#ea4335" />
+                        <div className="w-1 h-3 bg-black/80 mx-auto rounded-full mt-1" />
                       </div>
                     </div>
-
-                    {/* Locate Me Button */}
-                    <div className="absolute bottom-24 right-6 z-20">
-                      <button
-                        onClick={async () => {
-                          setIsLocating(true);
-                          try {
-                            const loc = await detectWithGPS();
-                            if (loc && mapRef.current) {
-                              setNewAddress(prev => ({ ...prev, ...loc, latitude: loc.lat, longitude: loc.lng }));
-                              mapRef.current.panTo({ lat: loc.lat, lng: loc.lng });
-                              mapRef.current.setZoom(17);
-                              setShowAddForm(true);
-                            }
-                          } catch (e) {
-                            toast.error("Location detection failed");
-                          } finally {
-                            setIsLocating(false);
-                          }
-                        }}
-                        className="w-12 h-12 rounded-full bg-white text-gray-600 shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all"
-                        title="Use Current Location"
-                      >
-                        {isLocating ? <Loader2 className="w-5 h-5 animate-spin text-[#037166]" /> : <Crosshair className="w-6 h-6" />}
-                      </button>
-                    </div>
-
-                    {/* Confirm Button */}
-                    {/* <div className="absolute bottom-6 right-6 left-6 z-20">
-                      <button
-                        onClick={() => setShowAddForm(true)}
-                        disabled={isDragging}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#037166] text-white font-bold text-lg shadow-lg hover:shadow-xl hover:bg-[#025a51] transition-all active:scale-95 disabled:opacity-70"
-                      >
-                        <span>{isDragging ? 'Locating...' : 'Confirm Location'}</span>
-                      </button>
-                    </div> */}
-                  </GoogleMap>
+                  </>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400 bg-gray-100">
                     <Loader2 className="w-8 h-8 animate-spin mb-2 text-[#037166]" />
                     <span className="text-sm">Loading Google Maps...</span>
                   </div>
                 )}
-
-                {/* Fixed Center Pin Target */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                  <div className="relative -mt-8 transition-transform duration-200" style={{ transform: isDragging ? 'scale(1.1) translateY(-10px)' : 'scale(1) translateY(0)' }}>
-                    <div className="w-4 h-4 rounded-full bg-black/20 animate-ping absolute -bottom-1 left-1/2 -translate-x-1/2" />
-                    <MapPin className="w-10 h-10 text-[#ea4335] drop-shadow-xl relative z-10" fill="#ea4335" />
-                    <div className="w-1 h-3 bg-black/80 mx-auto rounded-full mt-1" />
-                  </div>
-                </div>
               </div>
             ) : (
               addresses.map((address, index) => {
@@ -508,10 +633,14 @@ export function AddressPage({
                   addressLineOne: '',
                   addressLineTwo: '',
                   stateName: 'Telangana',
-                  cityName: 'Hyderabad',
+                  cityName: contextLocation?.city || 'Hyderabad',
                   defaultAddress: false,
-                  latitude: "17.450123",
-                  longitude: "78.390456"
+                  latitude: contextLocation?.lat || "17.450123",
+                  longitude: contextLocation?.lng || "78.390456",
+                  area: contextLocation?.area || '',
+                  postalCode: contextLocation?.postalCode || '',
+                  flat: contextLocation?.flat || '',
+                  addressLineOne: contextLocation?.address || ''
                 });
                 setShowAddForm(true);
               }}

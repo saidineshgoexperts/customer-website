@@ -120,7 +120,7 @@ export function AppDownload() {
                   <Apple className="w-6 h-6" />
                   <div className="text-left">
                     <div className="text-xs text-white/90">Download on the</div>
-                    <h5 className="text-base font-bold bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">App Store</h5>
+                    <h5 className="text-base ">App Store</h5>
                   </div>
                 </motion.button>
               </a>
@@ -138,7 +138,7 @@ export function AppDownload() {
                   <Smartphone className="w-6 h-6" />
                   <div className="text-left">
                     <div className="text-xs text-white/90">Get it on</div>
-                    <h5 className="text-base font-bold bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent">Google Play</h5>
+                    <h5 className="text-white font-bold text-transparent">Google Play</h5>
                   </div>
                 </motion.button>
               </a>

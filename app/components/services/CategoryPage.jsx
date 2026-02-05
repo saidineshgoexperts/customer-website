@@ -306,9 +306,9 @@ export function CategoryPage({ category, categoryId }) {
                         onHoverStart={() => setHoveredIndex(index)}
                         onHoverEnd={() => setHoveredIndex(null)}
                         onClick={() => handleSubCategoryClick(subCategory)}
-                        className="group cursor-pointer relative"
+                        className="group cursor-pointer relative h-full"
                       >
-                        <div className="relative h-full p-8 rounded-3xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border-2 border-white/10 hover:border-[#037166]/50 backdrop-blur-sm transition-all duration-300 overflow-hidden">
+                        <div className="relative h-full rounded-xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border-2 border-white/10 hover:border-[#037166]/50 backdrop-blur-sm transition-all duration-300 overflow-hidden flex items-stretch">
                           {/* Popular Badge */}
 
 
@@ -330,26 +330,26 @@ export function CategoryPage({ category, categoryId }) {
                               <img
                                 src={`https://api.doorstephub.com/${subCategory.image}`}
                                 alt={subCategory.name}
-                                className="w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+                                className="w-fit h-fit object-cover opacity-10 group-hover:opacity-20 transition-opacity duration-500"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/80 to-transparent" />
                             </div>
                           )}
 
                           {/* Icon/Image */}
-                          <div className="relative z-10 mb-6">
+                          <div className="relative z-10 flex-shrink-0 w-28 md:w-40 bg-white/5">
                             {subCategory.image ? (
-                              <div className="w-20 h-20 rounded-2xl overflow-hidden group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-[#037166]/30 border-2 border-[#037166]/30">
+                              <div className="w-full h-full overflow-hidden">
                                 <img
                                   src={`https://api.doorstephub.com/${subCategory.image}`}
                                   alt={subCategory.name}
-                                  className="w-full h-full object-cover"
+                                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                               </div>
                             ) : (
-                              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#037166] to-[#04a99d] flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-[#037166]/30">
+                              <div className="w-full h-full bg-gradient-to-br from-[#037166] to-[#04a99d] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                 <svg
-                                  className="w-10 h-10 text-white"
+                                  className="w-10 h-10 md:w-12 md:h-12 text-white"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -366,11 +366,11 @@ export function CategoryPage({ category, categoryId }) {
                           </div>
 
                           {/* Content */}
-                          <div className="relative z-10">
-                            <h4 className="text-2xl font-bold text-white mb-3 group-hover:text-[#04a99d] transition-colors">
+                          <div className="relative z-10 flex-1 min-w-0 p-4 md:p-6 flex flex-col justify-center">
+                            <h4 className="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3 group-hover:text-[#04a99d] transition-colors truncate">
                               {subCategory.name}
                             </h4>
-                            <p className="text-white/60 text-sm mb-4 leading-relaxed">
+                            <p className="text-white/60 text-sm mb-3 md:mb-4 leading-relaxed line-clamp-2">
                               Professional service by verified and experienced technicians
                             </p>
 
@@ -391,8 +391,8 @@ export function CategoryPage({ category, categoryId }) {
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: hoveredIndex === index ? 1 : 0 }}
-                            className="absolute inset-0 rounded-3xl border-2 border-[#037166] pointer-events-none"
-                            style={{ boxShadow: '0 0 30px rgba(3, 113, 102, 0.5)' }}
+                            className="absolute inset-0 rounded-xl border-2 border-[#037166] pointer-events-none"
+                            style={{ boxShadow: '0 0 15px rgba(3, 113, 102, 0.5)' }}
                           />
                         </div>
                       </motion.div>
@@ -402,108 +402,7 @@ export function CategoryPage({ category, categoryId }) {
               )}
 
               {/* All Other Subcategories - Compact Grid (Remaining) */}
-              {subCategories.length > featuredCount && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                >
-                  <h3 className="text-lg font-semibold text-white mb-4">All Services</h3>
 
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {subCategories.slice(featuredCount).map((subCategory, index) => {
-                      const absoluteIndex = index + featuredCount;
-                      return (
-                        <motion.div
-                          key={subCategory._id || `regular-${index}`}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: 0.4 + index * 0.05 }}
-                          whileHover={{ y: -4 }}
-                          onHoverStart={() => setHoveredIndex(absoluteIndex)}
-                          onHoverEnd={() => setHoveredIndex(null)}
-                          onClick={() => handleSubCategoryClick(subCategory)}
-                          className="group cursor-pointer"
-                        >
-                          <div className="relative h-full p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-[#037166]/50 backdrop-blur-sm transition-all duration-300 overflow-hidden">
-                            {/* Background glow on hover */}
-                            <AnimatePresence>
-                              {hoveredIndex === absoluteIndex && (
-                                <motion.div
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  exit={{ opacity: 0 }}
-                                  className="absolute inset-0 bg-gradient-to-br from-[#037166]/15 to-[#04a99d]/5"
-                                />
-                              )}
-                            </AnimatePresence>
-
-                            {/* Image Background if available (low opacity) */}
-                            {subCategory.image && (
-                              <div className="absolute inset-0 z-0">
-                                <img
-                                  src={`https://api.doorstephub.com/${subCategory.image}`}
-                                  alt={subCategory.name}
-                                  className="w-full h-full object-cover opacity-10 group-hover:opacity-15 transition-opacity duration-500"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/90 to-transparent" />
-                              </div>
-                            )}
-
-                            <div className="relative z-10 flex items-start justify-between gap-4">
-                              {/* Left: Icon & Content */}
-                              <div className="flex-1">
-                                <div className="flex items-start gap-4 mb-3">
-                                  {subCategory.image ? (
-                                    <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-110 transition-transform border-2 border-[#037166]/30">
-                                      <img
-                                        src={`https://api.doorstephub.com/${subCategory.image}`}
-                                        alt={subCategory.name}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#037166] to-[#04a99d] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                                      <CheckCircle className="w-6 h-6 text-white" />
-                                    </div>
-                                  )}
-                                  <div className="flex-1">
-                                    <h4 className="font-bold text-white mb-1 group-hover:text-[#04a99d] transition-colors">
-                                      {subCategory.name}
-                                    </h4>
-                                    <p className="text-xs text-white/50">Verified professionals</p>
-                                  </div>
-                                </div>
-
-                                {/* Price & Rating */}
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-baseline gap-1">
-                                    <span className="text-xs text-white/40">from</span>
-                                    <span className="text-xl font-bold text-[#037166]">
-                                      $49
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Star className="w-3 h-3 fill-[#037166] text-[#037166]" />
-                                    <span className="text-xs text-white/60">4.8</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Right: Arrow */}
-                              <div className="flex-shrink-0">
-                                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#037166]/20 transition-colors">
-                                  <ChevronRight className="w-4 h-4 text-[#037166] group-hover:translate-x-0.5 transition-transform" />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              )}
 
               {/* Bottom CTA Strip */}
               <motion.div
@@ -524,7 +423,7 @@ export function CategoryPage({ category, categoryId }) {
                     </div>
                     <div className="flex gap-4">
                       <button className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-[#037166]/50 transition-all whitespace-nowrap">
-                        Contact Support
+                        Raise A Ticket
                       </button>
                       {/* <button className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold hover:shadow-xl hover:shadow-[#037166]/30 transition-all whitespace-nowrap">
                         View All Services

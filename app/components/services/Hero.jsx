@@ -134,7 +134,7 @@ export function Hero({ onViewServices, onBookService }) {
           {/* Trust Indicators */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {[
-              { icon: Shield, label: 'Licensed Professionals', desc: 'All verified & Insured' },
+              { icon: Shield, label: 'Verified & Insured Professionals', desc: 'All verified & Insured' },
               { icon: Clock, label: 'Same Day Service', desc: 'Book In 60 Seconds' },
               { icon: Sparkles, label: '30-90 Days Warranty', desc: 'On All Services' },
             ].map((item, i) => (

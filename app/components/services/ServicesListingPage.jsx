@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { ArrowLeft, Star, MapPin, Clock, DollarSign, Filter, X, Zap, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Star, MapPin, Clock, DollarSign, Filter, X, Zap, RotateCcw, ChevronDown, ChevronRight, Folder } from 'lucide-react';
 import { useLocationContext } from '@/context/LocationContext';
 
 export function ServicesListingPage({ category, subCategory, subCategoryId, childCategoryId }) {
@@ -18,6 +18,13 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const { location } = useLocationContext();
+
+  // Categories & Subcategories State
+  const [allCategories, setAllCategories] = useState([]);
+  const [expandedCategory, setExpandedCategory] = useState(null);
+  const [categorySubcats, setCategorySubcats] = useState({}); // Cache for subcategories
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingSubcats, setLoadingSubcats] = useState({});
 
   const handleRatingChange = (rating) => {
     const newRating = rating === minRating ? 0 : rating;
@@ -105,6 +112,92 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
     fetchServices();
   }, [subCategoryId, childCategoryId, location?.lat, location?.lng, minRating]);
 
+  // Fetch Categories for Sidebar
+  useEffect(() => {
+    const fetchAllCategories = async () => {
+      if (!location?.lat || !location?.lng) return;
+
+      setLoadingCategories(true);
+      try {
+        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getallcategorys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lattitude: location.lat,
+            longitude: location.lng,
+          })
+        });
+
+        const data = await response.json();
+        if (data.success && data.data) {
+          setAllCategories(data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchAllCategories();
+  }, [location?.lat, location?.lng]);
+
+  // Helper to fetch subcategories
+  const fetchSubcategories = async (catId) => {
+    // If already fetched or fetching, skip
+    if (categorySubcats[catId] || loadingSubcats[catId]) return;
+
+    setLoadingSubcats(prev => ({ ...prev, [catId]: true }));
+    try {
+      const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getsubcategorysbycategoryid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId: catId })
+      });
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        setCategorySubcats(prev => ({ ...prev, [catId]: data.data }));
+      }
+    } catch (error) {
+      console.error("Error fetching subcategories:", error);
+    } finally {
+      setLoadingSubcats(prev => ({ ...prev, [catId]: false }));
+    }
+  };
+
+  // Auto-expand active category and fetch subcategories
+  useEffect(() => {
+    if (allCategories.length > 0 && category) {
+      const activeCat = allCategories.find(c => c.name === category);
+      if (activeCat) {
+        // Only if not already manually interacted (simple check: if expanded is null or different? 
+        // Actually best to just enforce it matches current context on load/change)
+        if (expandedCategory !== activeCat._id) {
+          setExpandedCategory(activeCat._id);
+        }
+        fetchSubcategories(activeCat._id);
+      }
+    }
+  }, [allCategories, category]);
+
+  const handleCategoryExpand = (catId) => {
+    if (expandedCategory === catId) {
+      setExpandedCategory(null);
+      return;
+    }
+    setExpandedCategory(catId);
+    fetchSubcategories(catId);
+  };
+
+  const handleSubCategorySelect = (subCat, catName) => {
+    // Navigate to the selected subcategory
+    router.push(`/services/listing/${subCat._id}?category=${encodeURIComponent(catName)}&name=${encodeURIComponent(subCat.name)}`);
+    // Close mobile filter if open
+    setFilterOpen(false);
+  };
+
+
   // Local filtering as fallback/additional layer
   const filteredServices = services.filter(s => (s.rating || 0) >= minRating);
   const filteredCenters = centers.filter(c => (c.rating || 0) >= minRating);
@@ -123,7 +216,14 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
           <motion.button
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            onClick={() => router.back()}
+            onClick={() => {
+              const activeCat = allCategories.find(c => c.name === category);
+              if (activeCat?._id) {
+                router.push(`/services/category/${activeCat._id}?name=${encodeURIComponent(category)}`);
+              } else {
+                router.back();
+              }
+            }}
             className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -135,7 +235,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-white/50 mb-2">
               {subCategory}
             </h1>
             <p className="text-white/80">{category} • Professional Services</p>
@@ -193,6 +293,76 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                 Filters
               </h4>
 
+              {/* Categories Filter */}
+              <div className="mb-8 border-b border-white/10 pb-6">
+                <h6 className="block text-white/80 mb-3 text-sm font-medium">Categories</h6>
+                <div className="space-y-2">
+                  {loadingCategories ? (
+                    <div className="space-y-2 animate-pulse">
+                      <div className="h-8 bg-white/5 rounded-lg" />
+                      <div className="h-8 bg-white/5 rounded-lg" />
+                    </div>
+                  ) : (
+                    allCategories.map((cat) => (
+                      <div key={cat._id} className="overflow-hidden">
+                        <button
+                          onClick={() => handleCategoryExpand(cat._id)}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all ${cat.name === category
+                            ? 'bg-[#037166]/10 text-[#04a99d] font-bold border border-[#037166]/20'
+                            : expandedCategory === cat._id
+                              ? 'bg-white/10 text-white'
+                              : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            }`}
+                        >
+                          <span className="flex items-center gap-2 truncate">
+                            {/* <Folder className="w-4 h-4 text-[#04a99d]" /> */}
+                            {cat.name}
+                          </span>
+                          {expandedCategory === cat._id ? (
+                            <ChevronDown className={`w-4 h-4 ${cat.name === category ? 'text-[#04a99d]' : 'text-[#04a99d]'}`} />
+                          ) : (
+                            <ChevronRight className="w-4 h-4 text-white/40" />
+                          )}
+                        </button>
+
+                        {/* Subcategories Expansion */}
+                        <AnimatePresence>
+                          {expandedCategory === cat._id && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pl-4 pr-1 py-1 space-y-1 mt-1 border-l border-white/10 ml-3">
+                                {loadingSubcats[cat._id] ? (
+                                  <div className="px-3 py-2 text-xs text-white/40">Loading...</div>
+                                ) : categorySubcats[cat._id]?.length > 0 ? (
+                                  categorySubcats[cat._id].map(sub => (
+                                    <button
+                                      key={sub._id}
+                                      onClick={() => handleSubCategorySelect(sub, cat.name)}
+                                      className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-colors truncate ${sub._id === subCategoryId
+                                        ? 'bg-[#037166]/20 text-[#04a99d] font-medium'
+                                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                                        }`}
+                                    >
+                                      {sub.name}
+                                    </button>
+                                  ))
+                                ) : (
+                                  <div className="px-3 py-2 text-xs text-white/40">No services found</div>
+                                )}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
               {/* Price Range */}
               {/* <div className="mb-6">
                 <h6 className="block text-white/80 mb-3 text-sm font-medium">Price Range</h6>
@@ -236,7 +406,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
               </div>
 
               {/* Availability */}
-              <div>
+              {/* <div>
                 <h6 className="block text-white/80 mb-3 text-sm font-medium">Availability</h6>
                 <div className="space-y-2">
                   <button className="w-full flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-white/70 hover:bg-white/10 transition-all text-sm">
@@ -248,7 +418,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                     Same Day Service
                   </button>
                 </div>
-              </div>
+              </div> */}
 
               {/* Reset Button */}
               <button
@@ -280,7 +450,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
                 >
                   {loading ? (
                     // Service Skeleton
@@ -295,44 +465,47 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
                         whileHover={{ y: -8, scale: 1.02 }}
-                        className="group cursor-pointer"
+                        className="group cursor-pointer h-full"
                       >
-                        <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-[#037166]/50 transition-all duration-300">
+                        <div className="flex flex-col relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-[#037166]/50 transition-all duration-300">
                           {/* Image */}
                           <div className="relative h-48 overflow-hidden">
                             <img
                               src={service.mainImage ? `https://api.doorstephub.com/${service.mainImage}` : 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=400'} // Fallback image
                               alt={service.name}
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                              className="w-full h-full object-cover transition-transform duration-700"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] to-transparent" />
 
-                            {/* Availability Badge - Assuming available for now */}
-                            <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-bold flex items-center gap-1">
-                              <Zap className="w-3 h-3" />
-                              Available Now
-                            </div>
+
 
                             {/* Price Badge */}
                             {/* <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white font-bold">
                               ₹{service.minFare}
                             </div> */}
+
+                            {/* Rating Badge */}
+                            <div className="absolute bottom-3 left-3 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center gap-1.5">
+                              <Star className="w-3.5 h-3.5 fill-[#04a99d] text-[#04a99d]" />
+                              <span className="text-white text-xs font-bold">{service.rating}</span>
+                              {/* <span className="text-white/60 text-[10px]">({service.totalOrders})</span> */}
+                            </div>
                           </div>
 
                           {/* Content */}
-                          <div className="p-6">
-                            <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-2">
+                          <div className="flex flex-col flex-1 p-6">
+                            <h4 className="text-[14px] font-bold text-white mb-2 group-hover:text-[#04a99d] transition-colors line-clamp-2">
                               {service.name}
                             </h4>
-                            <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
+                            <p className="text-white/60 text-[11px] mb-4 line-clamp-2">{service.description}</p>
 
                             {/* Meta Info */}
                             <div className="flex flex-wrap items-center gap-4 mb-4 text-sm">
-                              <div className="flex items-center gap-1">
+                              {/* <div className="flex items-center gap-1">
                                 <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
                                 <span className="text-white font-medium">{service.rating}</span>
                                 <span className="text-white/40">({service.totalOrders})</span>
-                              </div>
+                              </div> */}
                               {/* <div className="flex items-center gap-1 text-white/60">
                                 <Clock className="w-4 h-4" />
                                 <span>60 mins</span>
@@ -347,7 +520,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                             {/* CTA Button */}
                             <button
                               onClick={() => router.push(`/services/detail/${service._id}?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}`)}
-                              className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all"
+                              className="w-full mt-auto px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all"
                             >
                               Book Now
                             </button>

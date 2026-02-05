@@ -11,23 +11,31 @@ export function TopCategories({ onViewAll }) {
   const [isLoading, setIsLoading] = useState(true);
   const sectionRef = useRef(null);
   const scrollRef = useRef(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Auto-scroll effect
+  // Continuous "Marquee" Auto-scroll effect
   useEffect(() => {
-    if (!isLoading && categories.length > 0) {
-      const interval = setInterval(() => {
-        if (scrollRef.current) {
-          const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-          if (scrollLeft + clientWidth >= scrollWidth - 5) {
-            scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+    const container = scrollRef.current;
+    if (!isLoading && categories.length > 0 && container) {
+      // Disable CSS smooth scrolling for manual control if needed, quite abrupt otherwise?
+      // Actually simply setting scrollLeft works well for marquee.
+
+      let animationId;
+      const scroll = () => {
+        if (!isPaused && container) {
+          if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+            container.scrollLeft = 0;
           } else {
-            scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+            container.scrollLeft += 1;
           }
         }
-      }, 3000);
-      return () => clearInterval(interval);
+        animationId = requestAnimationFrame(scroll);
+      };
+
+      animationId = requestAnimationFrame(scroll);
+      return () => cancelAnimationFrame(animationId);
     }
-  }, [isLoading, categories]);
+  }, [isLoading, categories, isPaused]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -202,8 +210,12 @@ export function TopCategories({ onViewAll }) {
         </div>
 
         {/* Horizontal Scrolling Cards */}
-        <div className="relative">
-          <div ref={scrollRef} className="overflow-x-auto scrollbar-hide pb-4 scroll-smooth">
+        <div
+          className="relative"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <div ref={scrollRef} className="overflow-x-auto scrollbar-hide pb-4">
             <div className="flex gap-6 min-w-max">
               {isLoading
                 ? Array.from({ length: 8 }).map((_, index) => (
@@ -242,7 +254,7 @@ export function TopCategories({ onViewAll }) {
                       {/* Glass Card Overlay */}
                       <div className="absolute inset-0 flex flex-col justify-end p-6">
                         <div className="relative z-10">
-                          <h4 className="text-2xl  bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-bold mb-2 group-hover:text-[#04a99d] transition-colors">
+                          <h4 className="text-xl  bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent font-bold mb-2 group-hover:text-[#04a99d] transition-colors">
                             {category.title}
                           </h4>
                           <motion.div

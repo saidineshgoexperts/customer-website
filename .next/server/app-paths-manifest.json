@@ -1,7 +1,8 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/services/page": "app/services/page.js",
-  "/(landing)/page": "app/(landing)/page.js",
-  "/services/detail/[serviceId]/page": "app/services/detail/[serviceId]/page.js",
   "/services/category/[categoryId]/page": "app/services/category/[categoryId]/page.js",
+  "/services/listing/[subCategoryId]/page": "app/services/listing/[subCategoryId]/page.js",
+  "/services/detail/[serviceId]/page": "app/services/detail/[serviceId]/page.js",
   "/services/address/page": "app/services/address/page.js"
 }

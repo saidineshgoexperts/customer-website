@@ -23,8 +23,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${ubuntu.variable} font-ubuntu bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden`}>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning className={`${ubuntu.variable} font-ubuntu bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden`}>
         <LocationProvider>
           <AuthProvider>
             <AuthModalProvider>
@@ -33,7 +33,7 @@ export default function RootLayout({ children }) {
                   <ClientProviders>
                     <Script
                       id="google-maps-script"
-                      src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+                      src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&loading=async&v=weekly`}
                       strategy="beforeInteractive"
                     />
                     {children}
