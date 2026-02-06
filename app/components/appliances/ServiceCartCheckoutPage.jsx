@@ -117,7 +117,7 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
         try {
             const endpoint = paymentMethod === 'ONLINE'
                 ? 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/initiate-payment'
-                : 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
+                : 'something went wrong';
 
             const response = await fetch(endpoint, {
                 method: 'POST',

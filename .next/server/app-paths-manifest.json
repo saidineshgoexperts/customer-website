@@ -1,8 +1,7 @@
 {
-  "/partner/page": "app/partner/page.js",
+  "/appliances/listing/[subCategoryId]/page": "app/appliances/listing/[subCategoryId]/page.js",
+  "/appliances/booking/page": "app/appliances/booking/page.js",
   "/(landing)/page": "app/(landing)/page.js",
   "/appliances/page": "app/appliances/page.js",
-  "/pghostels/page": "app/pghostels/page.js",
-  "/religious-services/page": "app/religious-services/page.js",
-  "/spa-salon/page": "app/spa-salon/page.js"
+  "/careers/page": "app/careers/page.js"
 }

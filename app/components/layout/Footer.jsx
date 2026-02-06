@@ -12,10 +12,10 @@ const footerLinks = {
 
   Quicklinks: [
     { name: 'About Us', href: '#' },
-    { name: 'Careers', href: '#' },
+    { name: 'Careers', href: '/careers' },
     // { name: 'Press Kit', href: '#' },
     // { name: 'Contact', href: '#' },
-    { name: 'Become a ServicePartner', href: '/partner' },
+    { name: 'Become a Service Partner', href: '/partner' },
 
     { name: 'Download Android App', href: 'https://play.google.com/store/apps/details?id=com.doorstephub.partner' },
 
@@ -285,13 +285,27 @@ export function Footer() {
               <div className="space-y-4">
 
                 <a
-                  href={`mailto:${globalSettings?.email || "help@doorstephub.com"}`}
+                  href={`mailto:${globalSettings?.email}`}
                   className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors group"
                 >
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#037166]/20 transition-colors">
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="text-sm">{globalSettings?.email || "help@doorstephub.com"}</span>
+                </a>
+
+              </div>
+
+              <div className="space-y-4">
+
+                <a
+                  href={`mailto:${globalSettings?.email2}`}
+                  className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#037166]/20 transition-colors">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm">{globalSettings?.email2 || "help@doorstephub.com"}</span>
                 </a>
 
               </div>
