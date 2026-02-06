@@ -83,12 +83,14 @@ export default function NewHostelDetailPage() {
                         monthlyPrice: store.BasePrice * 30 || 5000, // Roughly estimating if not provided directly
                         logo: store.logo ? `https://api.doorstephub.com/${store.logo}` : 'https://images.unsplash.com/photo-1730096081994-73f1fa5f189a?fit=max&fm=jpg&w=200',
                         images: data.serviceImages && data.serviceImages.length > 0
-                            ? data.serviceImages.map(img => `https://api.doorstephub.com${img}`)
+                            ? data.serviceImages.map(img => img.startsWith('/')
+                                ? `https://api.doorstephub.com${img}`
+                                : `https://api.doorstephub.com/${img}`)
                             : ['https://images.unsplash.com/photo-1617430690223-3e165b390e25?fit=max&fm=jpg&w=1080'],
 
                         amenities: [
                             ...(Array.isArray(data.amenities) ? data.amenities : []),
-                            ...(data.otherAmenities ? data.otherAmenities.split(',').map(a => a.trim()) : [])
+                            ...(data.otherAmenities ? data.otherAmenities.split(/[\n,]/).map(a => a.trim()).filter(a => a.length > 0) : [])
                         ].map(amenity => ({
                             icon: amenityIcons[amenity] || Sparkles,
                             label: amenity,
@@ -289,7 +291,7 @@ export default function NewHostelDetailPage() {
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     {/* Sticky Tab Navigation */}
                     <div className="sticky top-20 z-40 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-2">
-                        <TabsList className="bg-transparent w-full grid grid-cols-4 gap-2">
+                        <TabsList className="bg-transparent w-full grid grid-cols-5 gap-2">
                             <TabsTrigger
                                 value="portfolio"
                                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
@@ -303,6 +305,13 @@ export default function NewHostelDetailPage() {
                             >
                                 <MessageSquare className="w-4 h-4 mr-2" />
                                 Reviews
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="gallery"
+                                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#037166] data-[state=active]:to-[#025951] data-[state=active]:text-white text-gray-600 hover:text-gray-900 rounded-xl transition-colors"
+                            >
+                                <Camera className="w-4 h-4 mr-2" />
+                                Gallery
                             </TabsTrigger>
                             <TabsTrigger
                                 value="amenities"
@@ -414,6 +423,32 @@ export default function NewHostelDetailPage() {
                             <div className="text-center py-10 text-gray-500">No reviews yet.</div>
                         )}
 
+                    </TabsContent>
+
+                    {/* Gallery Tab */}
+                    <TabsContent value="gallery" className="space-y-4">
+                        {hostelData.images.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {hostelData.images.map((img, index) => (
+                                    <motion.div
+                                        key={index}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: index * 0.1 }}
+                                        className="relative aspect-video rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group"
+                                    >
+                                        <img
+                                            src={img}
+                                            alt={`Gallery Image ${index + 1}`}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                                    </motion.div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-10 text-gray-500">No images available.</div>
+                        )}
                     </TabsContent>
 
                     {/* Amenities Tab */}
