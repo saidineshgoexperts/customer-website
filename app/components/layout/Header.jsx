@@ -38,8 +38,9 @@ export function Header({ theme = {}, navItems = [] }) {
 
   // Default Navigation (Landing Page)
   const defaultNavItems = [
-    { name: 'Appliance Services', href: '/services' },
+    { name: 'Appliance Services', href: '/appliances' },
     { name: 'Religious Services', href: '/religious-services' },
+    { name: 'Spa Saloon', href: '/spa-salon' },
     { name: 'PG Hostels', href: '/pghostels' },
     {
       name: 'More',
@@ -64,17 +65,25 @@ export function Header({ theme = {}, navItems = [] }) {
             let href = '#';
             const name = service.name.trim();
 
-            if (name.toUpperCase() === 'APPLIANCE SERVICE') href = '/services';
-            else if (name.toUpperCase() === 'RELIGIOUS SERVICES') href = '/religious-services';
-            else if (name.toUpperCase() === 'PG HOSTELS') href = '/pghostels';
-            else if (name.toUpperCase() === 'SPA SALONS') href = '/spa-salon';
+            if (name.toUpperCase().includes('APPLIANCE')) href = '/appliances';
+            else if (name.toUpperCase().includes('RELIGIOUS')) href = '/religious-services';
+            else if (name.toUpperCase().includes('PG')) href = '/pghostels';
+            else if (name.toUpperCase().includes('SPA')) href = '/spa-salon';
 
-            // Format Name: Title Case
-            const formattedName = name
-              .toLowerCase()
-              .split(' ')
-              .map(word => word.toUpperCase() === 'PG' ? 'PG' : (word.charAt(0).toUpperCase() + word.slice(1)))
-              .join(' ');
+            // Special Formatting for specific categories
+            let formattedName = name;
+            const upperName = name.toUpperCase();
+
+            if (upperName === 'SPA SALONS') {
+              formattedName = 'Spa Saloon';
+            } else {
+              // Format Name: Title Case
+              formattedName = name
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.toUpperCase() === 'PG' ? 'PG' : (word.charAt(0).toUpperCase() + word.slice(1)))
+                .join(' ');
+            }
 
             return { name: formattedName, href, originalService: service };
           });
@@ -101,13 +110,30 @@ export function Header({ theme = {}, navItems = [] }) {
   }, []);
 
   const handleServiceClick = (item) => {
+    let serviceData = null;
+
     if (item.originalService) {
-      const serviceData = {
+      serviceData = {
         id: item.originalService._id,
         name: item.originalService.name,
         servicetypeName: item.originalService.servicetypeName || item.originalService.name,
         image: item.originalService.image
       };
+    } else {
+      // Fallback for default items
+      const href = item.href;
+      if (href === '/appliances') {
+        serviceData = { id: '683daaa8f261c1548bdf7442', name: 'Appliance Service', servicetypeName: 'SERVICES' };
+      } else if (href === '/religious-services') {
+        serviceData = { id: '695250aa57bb211ca094e5fd', name: 'Religious Services', servicetypeName: 'Religious Services' };
+      } else if (href === '/spa-salon') {
+        serviceData = { id: '69524f4a57bb211ca094e5e6', name: 'Spa Saloons', servicetypeName: 'Spa Saloons' };
+      } else if (href === '/pghostels') {
+        serviceData = { id: '69524fb157bb211ca094e5ee', name: 'PG Hostels', servicetypeName: 'PG Hostels' };
+      }
+    }
+
+    if (serviceData) {
       localStorage.setItem('selectedService', JSON.stringify(serviceData));
     }
   };
@@ -138,7 +164,7 @@ export function Header({ theme = {}, navItems = [] }) {
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || pathname?.includes('/services') || pathname?.includes('/listings')
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || pathname?.includes('/services') || pathname?.includes('/listings') || pathname?.includes('/spa-salon')
           ? `${currentTheme.bgScrolled} backdrop-blur-xl border-b ${currentTheme.border} shadow-lg shadow-[#037166]/5`
           : 'bg-transparent'
           }`}

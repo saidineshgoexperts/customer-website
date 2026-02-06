@@ -17,8 +17,8 @@ const ubuntu = Ubuntu({
 });
 
 export const metadata = {
-  title: 'Next-Gen Dark Mode Super App',
-  description: 'SuperHub - Your All-in-One Service Platform',
+  title: 'DoorstepHub',
+  description: 'DoorstepHub - Your All-in-One Service Platform',
 };
 
 export default function RootLayout({ children }) {

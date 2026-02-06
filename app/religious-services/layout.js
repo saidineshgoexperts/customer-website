@@ -1,7 +1,7 @@
 import { Header } from '@/components/layout/Header';
 
 export const metadata = {
-    title: 'Religious & Spiritual Services | SuperHub',
+    title: 'Religious & Spiritual Services | DoorstepHub',
     description: 'Book improved pandits, pujas, and spiritual services. Experience divine connection at your doorstep.',
 };
 

@@ -82,7 +82,7 @@ export function BookingServices() {
   const handleServiceClick = (service) => {
     const categoryParam = encodeURIComponent(service.category);
     const subCategoryParam = encodeURIComponent(service.title);
-    router.push(`/services/detail/${service.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
+    router.push(`/appliances/detail/${service.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
   };
 
   return (

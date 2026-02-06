@@ -68,7 +68,7 @@ export function SpaLandingPage() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        serviceId: serviceId || 'SPA_SERVICE_ID_NEEDED' // TODO: Replace with real ID
+                        serviceId: serviceId || '69524f4a57bb211ca094e5e6'
                     })
                 });
                 const data = await response.json();
@@ -172,7 +172,11 @@ export function SpaLandingPage() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {categories.map((cat, index) => (
+                            {categoriesLoading ? (
+                                [1, 2, 3, 4].map((i) => (
+                                    <div key={i} className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
+                                ))
+                            ) : categories.map((cat, index) => (
                                 <motion.div
                                     key={cat._id || index}
                                     whileHover={{ y: -10 }}

@@ -14,7 +14,7 @@ const footerLinks = {
     { name: 'About Us', href: '#' },
     { name: 'Careers', href: '#' },
     // { name: 'Press Kit', href: '#' },
-    { name: 'Contact', href: '#' },
+    // { name: 'Contact', href: '#' },
     { name: 'Become a ServicePartner', href: '/partner' },
 
     { name: 'Download Android App', href: 'https://play.google.com/store/apps/details?id=com.doorstephub.partner' },
@@ -172,7 +172,7 @@ export function Footer() {
                     <span key={group.id} className="inline mr-1">
                       {/* Group Name */}
                       <Link
-                        href={`/services/category/${group.id}?name=${encodeURIComponent(group.name)}`}
+                        href={`/appliances/category/${group.id}?name=${encodeURIComponent(group.name)}`}
                         className="text-white font-bold hover:text-[#04a99d] transition-colors whitespace-nowrap mr-2"
                       >
                         {group.name}:
@@ -182,7 +182,7 @@ export function Footer() {
                       {group.subcategories.map((sub, idx) => (
                         <span key={sub._id} className="inline">
                           <Link
-                            href={`/services/listing/${sub._id}?category=${encodeURIComponent(group.name)}&name=${encodeURIComponent(sub.name)}`}
+                            href={`/appliances/listing/${sub._id}?category=${encodeURIComponent(group.name)}&name=${encodeURIComponent(sub.name)}`}
                             className="text-white/70 hover:text-[#04a99d] transition-colors"
                           >
                             {sub.name}

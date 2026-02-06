@@ -1,10 +1,10 @@
-import { GlobalNav } from '@/components/layout/GlobalNav';
+import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 export default function AppliancesLayout({ children }) {
     return (
         <>
-            <GlobalNav />
+            <Header />
             {children}
             <Footer />
         </>

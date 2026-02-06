@@ -71,7 +71,7 @@ export function CategoryPage({ category, categoryId }) {
   const theme = defaultTheme;
 
   const handleSubCategoryClick = (subCategory) => {
-    router.push(`/services/listing/${subCategory._id}?category=${encodeURIComponent(category)}&name=${encodeURIComponent(subCategory.name)}`);
+    router.push(`/appliances/listing/${subCategory._id}?category=${encodeURIComponent(category)}&name=${encodeURIComponent(subCategory.name)}`);
   };
 
   const handleBack = () => {

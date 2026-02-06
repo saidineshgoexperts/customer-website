@@ -192,7 +192,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
 
   const handleSubCategorySelect = (subCat, catName) => {
     // Navigate to the selected subcategory
-    router.push(`/services/listing/${subCat._id}?category=${encodeURIComponent(catName)}&name=${encodeURIComponent(subCat.name)}`);
+    router.push(`/appliances/listing/${subCat._id}?category=${encodeURIComponent(catName)}&name=${encodeURIComponent(subCat.name)}`);
     // Close mobile filter if open
     setFilterOpen(false);
   };
@@ -219,7 +219,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
             onClick={() => {
               const activeCat = allCategories.find(c => c.name === category);
               if (activeCat?._id) {
-                router.push(`/services/category/${activeCat._id}?name=${encodeURIComponent(category)}`);
+                router.push(`/appliances/category/${activeCat._id}?name=${encodeURIComponent(category)}`);
               } else {
                 router.back();
               }
@@ -519,7 +519,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
 
                             {/* CTA Button */}
                             <button
-                              onClick={() => router.push(`/services/detail/${service._id}?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}`)}
+                              onClick={() => router.push(`/appliances/detail/${service._id}?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}`)}
                               className="w-full mt-auto px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all"
                             >
                               Book Now
@@ -614,7 +614,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                               </div>
 
                               <button
-                                onClick={() => router.push(`/services/store/${center._id}?serviceId=${subCategoryId}`)}
+                                onClick={() => router.push(`/appliances/store/${center._id}?serviceId=${subCategoryId}`)}
                                 className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all"
                               >
                                 View Center

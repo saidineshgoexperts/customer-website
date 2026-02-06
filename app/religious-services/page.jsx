@@ -409,7 +409,9 @@ export default function ReligiousServicesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {categoriesLoading ? (
                 // Skeleton or Loading
-                <div className="col-span-4 text-center py-10">Loading categories...</div>
+                <div className="col-span-4 flex items-center justify-center py-20">
+                  <div className="w-10 h-10 border-4 border-[var(--saffron)]/20 border-t-[var(--saffron)] rounded-full animate-spin" />
+                </div>
               ) : categories.length > 0 ? (
                 categories.map((category, index) => (
                   <motion.div
@@ -573,9 +575,13 @@ export default function ReligiousServicesPage() {
                         </CardContent>
                       </Card>
                     ))
+                  ) : loading ? (
+                    <div className="col-span-full flex items-center justify-center py-20">
+                      <div className="w-10 h-10 border-4 border-[var(--saffron)]/20 border-t-[var(--saffron)] rounded-full animate-spin" />
+                    </div>
                   ) : (
-                    <div className="col-span-full text-center py-10 text-gray-500">
-                      {loading ? 'Loading services...' : 'No services found nearby.'}
+                    <div className="col-span-full text-center py-20 text-gray-500">
+                      No services found nearby.
                     </div>
                   )}
                 </div>

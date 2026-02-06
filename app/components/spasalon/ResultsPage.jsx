@@ -242,7 +242,11 @@ export function ResultsPage() {
             {/* Services Grid */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredServices.map((service, index) => (
+                    {loading ? (
+                        [1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className="h-[400px] bg-white rounded-2xl border border-[#E8ECF2] animate-pulse" />
+                        ))
+                    ) : filteredServices.map((service, index) => (
                         <ServiceCard
                             key={service.id}
                             service={service}
@@ -252,7 +256,7 @@ export function ResultsPage() {
                     ))}
                 </div>
 
-                {filteredServices.length === 0 && (
+                {!loading && filteredServices.length === 0 && (
                     <div className="text-center py-20">
                         <div className="text-6xl mb-4">🔍</div>
                         <h3 className="text-2xl font-bold text-[#0F172A] mb-2">No services found</h3>

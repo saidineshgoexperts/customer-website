@@ -3,7 +3,7 @@ import { NetworkStatus } from '@/components/ui/NetworkStatus';
 import { SessionManager } from '@/components/auth/SessionManager';
 
 export const metadata = {
-    title: 'PG & Hostels Booking | SuperHub',
+    title: 'PG & Hostels Booking | DoorstepHub',
     description: 'Find verified PGs, co-living spaces, and hostels near your college or office. Book instantly with zero brokerage.',
 };
 

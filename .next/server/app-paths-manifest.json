@@ -1,8 +1,8 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/services/page": "app/services/page.js",
-  "/services/category/[categoryId]/page": "app/services/category/[categoryId]/page.js",
-  "/services/listing/[subCategoryId]/page": "app/services/listing/[subCategoryId]/page.js",
-  "/services/detail/[serviceId]/page": "app/services/detail/[serviceId]/page.js",
-  "/services/address/page": "app/services/address/page.js"
+  "/partner/page": "app/partner/page.js",
+  "/(landing)/page": "app/(landing)/page.js",
+  "/appliances/page": "app/appliances/page.js",
+  "/pghostels/page": "app/pghostels/page.js",
+  "/religious-services/page": "app/religious-services/page.js",
+  "/spa-salon/page": "app/spa-salon/page.js"
 }
