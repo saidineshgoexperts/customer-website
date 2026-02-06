@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     CheckCircle,
@@ -75,6 +75,33 @@ const PartnerStats = [
 ];
 
 export default function BecomePartnerPage() {
+    const [appLinks, setAppLinks] = useState({
+        android: 'https://play.google.com/store/apps/details?id=com.doorstephub.partner',
+        ios: 'https://apps.apple.com/in/app/doorstep-hub/id6475340236'
+    });
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/get_global_settings', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                if (data.success && data.policy) {
+                    setAppLinks({
+                        android: data.policy.customerAndroidAppLink || 'https://play.google.com/store/apps/details?id=com.doorstephub.partner',
+                        ios: data.policy.customerIosAppLink || 'https://apps.apple.com/in/app/doorstep-hub/id6475340236'
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching dynamic app links:', error);
+            }
+        };
+
+        fetchSettings();
+    }, []);
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#0f1614] to-[#0a0a0a] text-white overflow-hidden">
             <Header />
@@ -125,7 +152,7 @@ export default function BecomePartnerPage() {
 
                                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                                     <a
-                                        href="https://play.google.com/store/apps/details?id=com.doorstephub.partner"
+                                        href={appLinks.android}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="group relative flex-1 flex items-center gap-4 px-8 py-5 rounded-2xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold shadow-2xl hover:shadow-[#037166]/40 hover:-translate-y-2 transition-all duration-300 overflow-hidden"
@@ -139,7 +166,7 @@ export default function BecomePartnerPage() {
                                     </a>
 
                                     <a
-                                        href="https://apps.apple.com/in/app/doorstep-hub/id6475340236"
+                                        href={appLinks.ios}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="group flex-1 flex items-center gap-4 px-8 py-5 rounded-2xl bg-white/8 border-2 border-white/20 backdrop-blur-xl text-white font-bold hover:bg-white/20 hover:border-[#04a99d] hover:shadow-2xl hover:shadow-[#04a99d]/30 transition-all duration-300 hover:-translate-y-2"
@@ -331,7 +358,7 @@ export default function BecomePartnerPage() {
                                         ))}
                                     </div>
                                     <a
-                                        href="https://play.google.com/store/apps/details?id=com.doorstephub.partner"
+                                        href={appLinks.android}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="px-8 py-4 mt-4 rounded-xl bg-white text-[#037166] font-bold hover:shadow-xl transition-all inline-flex items-center justify-center"

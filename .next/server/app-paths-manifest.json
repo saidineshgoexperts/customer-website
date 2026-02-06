@@ -1,7 +1,3 @@
 {
-  "/appliances/category/[categoryId]/page": "app/appliances/category/[categoryId]/page.js",
-  "/appliances/listing/[subCategoryId]/page": "app/appliances/listing/[subCategoryId]/page.js",
-  "/appliances/page": "app/appliances/page.js",
-  "/appliances/address/page": "app/appliances/address/page.js",
-  "/appliances/detail/[serviceId]/page": "app/appliances/detail/[serviceId]/page.js"
+  "/(landing)/page": "app/(landing)/page.js"
 }
