@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, MapPin, Calendar, Clock, CreditCard, Wallet, Truck, Sparkles, CheckCircle, User, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Clock, Info, CreditCard, Wallet, Truck, Sparkles, CheckCircle, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -11,6 +11,9 @@ import { AuthModal } from '@/components/auth/AuthModal';
 export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) {
     const { cartData, cartItems } = useServiceCart();
     const { token, isAuthenticated } = useAuth();
+
+    const bookingCost = cartData?.finalAmount || 0;
+    const inspectionCost = cartItems.reduce((acc, item) => acc + (item.inspectionCost || 0), 0);
 
     const [bookedDate, setBookedDate] = useState('');
     const [bookedTime, setBookedTime] = useState('');
@@ -194,15 +197,24 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                 {/* Progress Indicator */}
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 pb-6">
                     <div className="flex items-center gap-2">
-                        {['Service', 'Cart', 'Address', 'Confirm'].map((step, index) => (
-                            <React.Fragment key={step}>
+                        {[
+                            { label: 'Service', color: 'bg-[#037166]' },
+                            { label: 'Address', color: 'bg-[#037166]' },
+                            { label: 'Date & Time', color: 'bg-[#037166]' },
+                            { label: 'Payment', color: 'bg-white/20' }
+                        ].map((step, index) => (
+                            <React.Fragment key={step.label}>
                                 <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center">
-                                        <CheckCircle className="w-5 h-5 text-white" />
+                                    <div className={`w-8 h-8 rounded-full ${step.color} flex items-center justify-center`}>
+                                        {index < 3 ? (
+                                            <CheckCircle className="w-5 h-5 text-white" />
+                                        ) : (
+                                            <span className="text-white text-xs font-bold">{index + 1}</span>
+                                        )}
                                     </div>
-                                    <span className="text-white/90 text-sm font-medium hidden sm:inline">{step}</span>
+                                    <span className="text-white/90 text-sm font-medium hidden sm:inline">{step.label}</span>
                                 </div>
-                                {index < 3 && <div className="h-0.5 flex-1 bg-white/30" />}
+                                {index < 3 && <div className={`h-0.5 flex-1 ${index < 2 ? 'bg-[#037166]' : 'bg-white/30'}`} />}
                             </React.Fragment>
                         ))}
                     </div>
@@ -372,14 +384,16 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             <h4 className="text-xl font-bold text-white mb-6">Booking Summary</h4>
 
                             {/* Cart Items */}
-                            <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
+                            <div className="space-y-3 mb-6">
                                 {cartItems.map((item) => (
                                     <div key={item.itemId} className="flex justify-between text-sm">
                                         <div className="flex-1">
                                             <h6 className="text-white/90 font-bold">{item.itemName}</h6>
+                                            <p className="text-[#04a99d] text-[10px] font-semibold uppercase tracking-wider mb-1">
+                                                {item.packageName || 'Standard Package'}
+                                            </p>
                                             <p className="text-white/40 text-[10px]">Qty: {item.quantity || 1}</p>
                                         </div>
-                                        <span className="text-white/90 font-medium">₹{item.subtotal.toFixed(2)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -387,30 +401,45 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             <div className="h-px bg-white/10 mb-4" />
 
                             {/* Pricing */}
-                            <div className="space-y-2 mb-4">
-                                <div className="flex justify-between text-white/80">
-                                    <span>Service Cost</span>
-                                    <span>₹{(cartData?.totalServiceCost || 0).toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-white/80">
-                                    <span>Platform Fee</span>
-                                    <span>₹{(cartData?.platformFee || 0).toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-white/80">
-                                    <span>Consultation Fee</span>
-                                    <span>₹{(cartData?.consultationFee || 0).toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-white/80">
-                                    <span>GST</span>
-                                    <span>₹{(cartData?.gstAmount || 0).toFixed(2)}</span>
-                                </div>
+                            <div className="space-y-2 mb-2">
+                                {bookingCost > 0 && (
+                                    <div className="flex justify-between items-start text-white/80">
+                                        <div className="flex flex-col">
+                                            <span>Online Consultation Fee</span>
+                                            <div className="flex items-center gap-1 text-[#04a99d] text-xs font-normal">
+                                                <Info className="w-3 h-3" />
+                                                <span>pay online</span>
+                                            </div>
+                                        </div>
+                                        <span>₹{bookingCost.toFixed(2)}</span>
+                                    </div>
+                                )}
+
+                                {inspectionCost > 0 && (
+                                    <div className="flex flex-col gap-1 mt-4">
+                                        <div className="flex justify-between items-start text-white/80">
+                                            <div className="flex flex-col">
+                                                <span>Doorstep Inspection Fee</span>
+                                                <div className="flex items-center gap-1 text-[#04a99d] text-xs font-normal">
+                                                    <Info className="w-3 h-3" />
+                                                    <span>pay at Doorstep</span>
+                                                </div>
+                                            </div>
+                                            <span>₹{inspectionCost.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex items-start gap-2 text-[10px] text-white/50 bg-white/5 p-2 rounded">
+                                            <Info className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#04a99d]" />
+                                            <p>Note: This is the online consultation fee only. The Doorstep Inspection Fee will be collected at Doorstep.</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="h-px bg-white/10 mb-4" />
 
                             <div className="flex justify-between text-xl font-bold text-white mb-6">
                                 <span>Total</span>
-                                <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
+                                <span>₹{bookingCost.toFixed(2)}</span>
                             </div>
 
                             {/* Selected Date/Time Preview */}
@@ -443,7 +472,7 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                                         Processing...
                                     </div>
                                 ) : (
-                                    `Pay ₹${(cartData?.finalAmount || 0).toFixed(2)}`
+                                    `Confirm Booking - ₹${bookingCost.toFixed(2)}`
                                 )}
                             </motion.button>
 

@@ -198,6 +198,9 @@ export function BookingConfirmationPage({
         totalAmount: total.toString()
       };
 
+      // Save address to sessionStorage for Thank You page redirect/persistence
+      sessionStorage.setItem('selected_address', JSON.stringify(address));
+
       if (paymentMethod === 'COD' || paymentMethod === 'wallet') {
         // Use provider-flow/BookService for both COD and wallet
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/provider-flow/BookService', {
@@ -216,7 +219,13 @@ export function BookingConfirmationPage({
         if (data.success) {
           toast.success('Booking confirmed successfully!');
           cleanup();
-          onConfirmBooking();
+          const selectedDateLabel = availableDates.find(d => d.value === selectedDate)?.label || selectedDate;
+          const selectedTimeLabel = availableTimesForSelectedDate.find(t => t.value === selectedTime)?.label || selectedTime;
+          onConfirmBooking({
+            bookingId: data.bookingId,
+            bookedDate: selectedDateLabel,
+            bookedTime: selectedTimeLabel
+          });
         } else {
           throw new Error(data.message || 'Booking failed');
         }

@@ -90,7 +90,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
           }
 
           // Set about bio
-          setAboutBio(data.about?.bio || 'Professional service center providing quality services');
+          setAboutBio(data.about?.bio || '');
 
           // Set location data
           setLocationData(data.location || null);
@@ -109,6 +109,15 @@ export function StoreDetailPage({ storeId, serviceId }) {
       fetchCenterDetails();
     }
   }, [storeId]);
+
+  // Pre-select serviceId if provided
+  useEffect(() => {
+    if (serviceId && services.length > 0) {
+      if (!selectedPackages.includes(serviceId)) {
+        setSelectedPackages([serviceId]);
+      }
+    }
+  }, [serviceId, services]);
 
   // Get center data or use fallback
   const center = centerData || {
@@ -228,9 +237,10 @@ export function StoreDetailPage({ storeId, serviceId }) {
         { description: 'Continue shopping or proceed to checkout' }
       );
 
-      // Close popup and navigate to cart
+      // Close popup and navigate to address
       setShowAddonsPopup(false);
-      router.push('/appliances/cart');
+      localStorage.setItem('service_cart_flow', 'true');
+      router.push('/appliances/address');
     } catch (error) {
       console.error('Error adding to cart:', error);
       toast.error('Failed to add items to cart');
@@ -310,11 +320,17 @@ export function StoreDetailPage({ storeId, serviceId }) {
           animate={{ opacity: 1, y: 0 }}
           className="relative h-[500px] rounded-3xl overflow-hidden mb-8 shadow-2xl"
         >
-          <img
-            src={bannerImage || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200'}
-            alt="Service Center"
-            className="w-full h-full object-cover"
-          />
+          {bannerImage ? (
+            <img
+              src={bannerImage}
+              alt="Service Center Banner"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] flex items-center justify-center">
+              <Sparkles className="w-20 h-20 text-[#037166]/20" />
+            </div>
+          )}
 
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -350,12 +366,8 @@ export function StoreDetailPage({ storeId, serviceId }) {
                 </div>
                 <div className="flex gap-2">
                   <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-[#037166]" />
-                    <span className="text-white/80 text-sm">90-Day Warranty</span>
-                  </div>
-                  <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2">
                     <Clock className="w-4 h-4 text-[#037166]" />
-                    <span className="text-white/80 text-sm">Same-Day</span>
+                    <span className="text-white/80 text-sm">Express Service</span>
                   </div>
                 </div>
               </div>
@@ -509,7 +521,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                           }}
                           className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold hover:shadow-xl hover:shadow-[#037166]/30 transition-all"
                         >
-                          Add to Cart
+                          Book Now
                         </button>
                       </div>
                     </motion.div>
@@ -526,10 +538,13 @@ export function StoreDetailPage({ storeId, serviceId }) {
               {services && services.length > 0 && (
                 <div className="flex gap-4">
                   <button
-                    onClick={() => router.push('/appliances/cart')}
+                    onClick={() => {
+                      localStorage.setItem('service_cart_flow', 'true');
+                      router.push('/appliances/address');
+                    }}
                     className="px-8 py-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-[#037166]/50 transition-all"
                   >
-                    View Cart ({selectedPackages.length})
+                    Proceed to Address ({selectedPackages.length})
                   </button>
                 </div>
               )}
@@ -732,7 +747,7 @@ export function StoreDetailPage({ storeId, serviceId }) {
                     <div>
                       <h4 className="font-semibold text-white mb-2 text-lg">Get Directions</h4>
                       <p className="text-white/60 leading-relaxed mb-3">
-                        Located in Hyderabad, easily accessible.
+                        Professional service available in {locationData?.cityName || centerData?.cityName || 'your area'}.
                       </p>
                       <a
                         href={`https://www.google.com/maps?q=${locationData?.latitude},${locationData?.longitude}`}

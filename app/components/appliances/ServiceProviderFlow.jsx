@@ -298,10 +298,14 @@ export default function ServiceProviderFlow({ serviceType = null }) {
           onSuccess={(data) => {
             // Save booking details for thank you page
             setBookingDetails({
+              orderId: data.bookingId || data.orderId || '',
               date: data.bookedDate || 'Confirmed',
               time: data.bookedTime || '',
               address: `${selectedAddress?.flat}, ${selectedAddress?.area}, ${selectedAddress?.cityName}`
             });
+            // Save to sessionStorage for persistence (fallback if state is lost)
+            sessionStorage.setItem('last_booking_date', data.bookedDate || 'Confirmed');
+            sessionStorage.setItem('last_booking_time', data.bookedTime || '');
             setCurrentPage('thankYou');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
@@ -347,10 +351,14 @@ export default function ServiceProviderFlow({ serviceType = null }) {
           onConfirmBooking={(data) => {
             // Save booking details for thank you page
             setBookingDetails({
+              orderId: data?.bookingId || data?.orderId || '',
               date: data?.bookedDate || 'Confirmed',
               time: data?.bookedTime || '',
               address: `${selectedAddress?.flat}, ${selectedAddress?.area}, ${selectedAddress?.cityName}`
             });
+            // Save to sessionStorage for persistence (fallback if state is lost)
+            sessionStorage.setItem('last_booking_date', data?.bookedDate || 'Confirmed');
+            sessionStorage.setItem('last_booking_time', data?.bookedTime || '');
             setCurrentPage('thankYou');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}

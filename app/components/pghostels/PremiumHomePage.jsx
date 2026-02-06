@@ -333,7 +333,7 @@ export function PremiumHomePage() {
 
             {/* Quick Search Strip */}
             <section className="relative -mt-20 z-20">
-                <div className="max-w-7xl mx-auto px-4">
+                <div className="max-w-4xl mr-10 px-4">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}

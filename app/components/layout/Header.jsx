@@ -165,7 +165,7 @@ export function Header({ theme = {}, navItems = [] }) {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || pathname?.includes('/services') || pathname?.includes('/listings') || pathname?.includes('/spa-salon')
-          ? `${currentTheme.bgScrolled} backdrop-blur-xl border-b ${currentTheme.border} shadow-lg shadow-[#037166]/5`
+          ? `${currentTheme.bgScrolled} backdrop-blur-xl border-b ${currentTheme.border} shadow-lg ${currentTheme.isLight ? 'shadow-[#C06C84]/5' : 'shadow-[#037166]/5'}`
           : 'bg-transparent'
           }`}
       >
@@ -179,12 +179,16 @@ export function Header({ theme = {}, navItems = [] }) {
               >
                 <div className="relative w-36 sm:w-48 h-10 sm:h-14 overflow-hidden flex-shrink-0">
                   <Image
-                    src="/d-hub-logo.png"
+                    src={currentTheme.isLight ? "/d-hub-logo-light.png" : "/d-hub-logo.png"}
                     alt="Doorstep Hub Logo"
                     fill
                     sizes="(max-width: 640px) 144px, 192px"
                     className="object-contain object-left"
                     priority
+                    onError={(e) => {
+                      // Fallback if logo-light doesn't exist
+                      if (currentTheme.isLight) e.target.src = "/d-hub-logo.png";
+                    }}
                   />
                 </div>
               </motion.div>
@@ -199,7 +203,7 @@ export function Header({ theme = {}, navItems = [] }) {
                       <motion.button
                         onClick={() => setActiveDropdown(activeDropdown === index ? null : index)}
                         whileHover={{ y: -2 }}
-                        className={`${currentTheme.textMain} hover:text-[#037166] transition-colors relative font-medium whitespace-nowrap flex items-center gap-1`}
+                        className={`${currentTheme.textMain} hover:text-[${currentTheme.textHover}] transition-colors relative font-medium whitespace-nowrap flex items-center gap-1`}
                       >
                         {item.name}
                         <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${activeDropdown === index ? 'rotate-90' : ''}`} />
@@ -217,7 +221,7 @@ export function Header({ theme = {}, navItems = [] }) {
                           >
                             {item.dropdown.map((subItem, idx) => (
                               <Link key={idx} href={subItem.href} onClick={() => setActiveDropdown(null)}>
-                                <span className={`block px-4 py-3 text-sm ${currentTheme.textMain} hover:text-[#037166] hover:bg-[#037166]/10 transition-all cursor-pointer`}>
+                                <span className={`block px-4 py-3 text-sm ${currentTheme.textMain} hover:text-[${currentTheme.textHover}] hover:bg-[${currentTheme.textHover}]/5 transition-all cursor-pointer`}>
                                   {subItem.name}
                                 </span>
                               </Link>
@@ -229,7 +233,7 @@ export function Header({ theme = {}, navItems = [] }) {
                   ) : (
                     <Link href={item.href} onClick={() => handleServiceClick(item)}>
                       <motion.span
-                        className={`${currentTheme.textMain} hover:text-[#037166] transition-colors relative group font-medium whitespace-nowrap cursor-pointer`}
+                        className={`${currentTheme.textMain} hover:text-[${currentTheme.textHover}] transition-colors relative group font-medium whitespace-nowrap cursor-pointer`}
                         whileHover={{ y: -2 }}
                       >
                         {item.name}
@@ -251,14 +255,14 @@ export function Header({ theme = {}, navItems = [] }) {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className={`hidden sm:flex items-center justify-center w-11 h-11 rounded-full ${currentTheme.buttonBg} hover:bg-[#037166]/20 border ${currentTheme.border} transition-all relative shadow-md hover:shadow-lg`}
+                className={`hidden sm:flex items-center justify-center w-11 h-11 rounded-full ${currentTheme.buttonBg} hover:bg-[#C06C84]/10 border ${currentTheme.border} transition-all relative shadow-md hover:shadow-lg`}
               >
-                <ShoppingCart className="w-5 h-5 text-[#037166]" />
+                <ShoppingCart className={`w-5 h-5 ${currentTheme.isLight ? 'text-[#C06C84]' : 'text-[#037166]'}`} />
                 {cartItems.length > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-1 -right-1 w-5 h-5 bg-[#037166] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg"
+                    className={`absolute -top-1 -right-1 w-5 h-5 ${currentTheme.isLight ? 'bg-[#C06C84]' : 'bg-[#037166]'} text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg`}
                   >
                     {cartItems.length}
                   </motion.span>
@@ -270,7 +274,7 @@ export function Header({ theme = {}, navItems = [] }) {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setAuthModalOpen(true)}
-                className={`flex items-center justify-center w-11 h-11 rounded-full ${currentTheme.buttonBg} hover:bg-[#037166]/20 border ${currentTheme.border} transition-all overflow-hidden shadow-md hover:shadow-lg`}
+                className={`flex items-center justify-center w-11 h-11 rounded-full ${currentTheme.buttonBg} hover:bg-[#C06C84]/10 border ${currentTheme.border} transition-all overflow-hidden shadow-md hover:shadow-lg`}
               >
                 {isAuthenticated && user?.image ? (
                   <img
@@ -279,7 +283,7 @@ export function Header({ theme = {}, navItems = [] }) {
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
-                  <User className="w-5 h-5 text-[#037166]" />
+                  <User className={`w-5 h-5 ${currentTheme.isLight ? 'text-[#C06C84]' : 'text-[#037166]'}`} />
                 )}
               </motion.button>
 
@@ -288,12 +292,12 @@ export function Header({ theme = {}, navItems = [] }) {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`lg:hidden p-2 rounded-xl ${currentTheme.buttonBg} border ${currentTheme.border} hover:bg-[#037166]/10 transition-all shadow-md hover:shadow-lg mr-2`}
+                className={`lg:hidden p-2 rounded-xl ${currentTheme.buttonBg} border ${currentTheme.border} hover:bg-[#C06C84]/10 transition-all shadow-md hover:shadow-lg mr-2`}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-6 h-6 text-[#037166]" />
+                  <X className={`w-6 h-6 ${currentTheme.isLight ? 'text-[#C06C84]' : 'text-[#037166]'}`} />
                 ) : (
-                  <Menu className="w-6 h-6 text-[#037166]" />
+                  <Menu className={`w-6 h-6 ${currentTheme.isLight ? 'text-[#C06C84]' : 'text-[#037166]'}`} />
                 )}
               </button>
             </div>

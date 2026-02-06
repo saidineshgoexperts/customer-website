@@ -298,6 +298,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
           onSuccess={(data) => {
             // Save booking details for thank you page
             setBookingDetails({
+              orderId: data.bookingId || data.orderId || '',
               date: data.bookedDate || 'Confirmed',
               time: data.bookedTime || '',
               address: `${selectedAddress?.flat}, ${selectedAddress?.area}, ${selectedAddress?.cityName}`
@@ -347,6 +348,7 @@ export default function ServiceProviderFlow({ serviceType = null }) {
           onConfirmBooking={(data) => {
             // Save booking details for thank you page
             setBookingDetails({
+              orderId: data?.bookingId || data?.orderId || '',
               date: data?.bookedDate || 'Confirmed',
               time: data?.bookedTime || '',
               address: `${selectedAddress?.flat}, ${selectedAddress?.area}, ${selectedAddress?.cityName}`

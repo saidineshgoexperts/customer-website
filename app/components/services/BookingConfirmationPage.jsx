@@ -216,7 +216,7 @@ export function BookingConfirmationPage({
         if (data.success) {
           toast.success('Booking confirmed successfully!');
           cleanup();
-          onConfirmBooking();
+          onConfirmBooking(data);
         } else {
           throw new Error(data.message || 'Booking failed');
         }

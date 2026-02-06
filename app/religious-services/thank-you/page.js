@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 function ThankYouContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [bookingDetails, setBookingDetails] = useState({ date: '', time: '', address: '' });
+    const [bookingDetails, setBookingDetails] = useState({ orderId: '', date: '', time: '', address: '' });
 
     useEffect(() => {
         // Retrieve address from session storage (used in booking flow)
@@ -17,6 +17,7 @@ function ThankYouContent() {
         const addressData = savedAddress ? JSON.parse(savedAddress) : null;
 
         setBookingDetails({
+            orderId: searchParams.get('orderId') || '',
             date: searchParams.get('date'),
             time: searchParams.get('time'),
             address: addressData ? `${addressData.flat}, ${addressData.area}` : 'Selected Address'
@@ -73,10 +74,15 @@ function ThankYouContent() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-white/90"
+                        className="text-white/90 mb-4"
                     >
                         Your spiritual service has been scheduled.
                     </motion.p>
+                    {bookingDetails.orderId && (
+                        <div className="inline-block px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-mono">
+                            Booking ID: {bookingDetails.orderId}
+                        </div>
+                    )}
                 </div>
 
                 {/* Details Section */}

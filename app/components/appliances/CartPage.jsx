@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Trash2, ShoppingCart, Loader2, Tag } from 'lucide-react';
+import { ArrowLeft, Trash2, ShoppingCart, Loader2, Tag, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 
@@ -21,6 +21,9 @@ export function CartPage({
       await clearCart();
     }
   };
+
+  const inspectionCost = cartItems.reduce((acc, item) => acc + (item.inspectionCost || 0), 0);
+  const platformFee = cartData?.platformFee || 0;
 
   if (loading && cartItems.length === 0) {
     return (
@@ -184,28 +187,42 @@ export function CartPage({
               >
                 <h4 className="text-xl font-bold text-white mb-6">Order Summary</h4>
 
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-white/80">
-                    <span>Service Cost</span>
-                    <span>₹{(cartData?.totalServiceCost || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-white/80">
-                    <span>Platform Fee</span>
-                    <span>₹{(cartData?.platformFee || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-white/80">
-                    <span>Consultation Fee</span>
-                    <span>₹{(cartData?.consultationFee || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-white/80">
-                    <span>GST</span>
-                    <span>₹{(cartData?.gstAmount || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="h-px bg-white/10" />
-                  <div className="flex justify-between text-xl font-bold text-white">
-                    <span>Total</span>
+                <div className="space-y-2 mb-2">
+                  <div className="flex justify-between items-start text-white/80">
+                    <div className="flex flex-col">
+                      <span>Online Consultation Fee</span>
+                      <div className="flex items-center gap-1 text-[#04a99d] text-xs font-normal">
+                        <Info className="w-3 h-3" />
+                        <span>pay online</span>
+                      </div>
+                    </div>
                     <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
                   </div>
+
+                  {inspectionCost > 0 && (
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between items-start text-white/80">
+                        <div className="flex flex-col">
+                          <span>Doorstep Inspection Fee</span>
+                          <div className="flex items-center gap-1 text-[#04a99d] text-xs font-normal">
+                            <Info className="w-3 h-3" />
+                            <span>pay at Doorstep</span>
+                          </div>
+                        </div>
+                        <span>₹{inspectionCost.toFixed(2)}</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-[10px] text-white/50 bg-white/5 p-2 rounded">
+                        <Info className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#04a99d]" />
+                        <p>Note: This is the online consultation fee only. The Doorstep Inspection Fee will be collected at Doorstep.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="h-px bg-white/10 my-4" />
+                <div className="flex justify-between text-xl font-bold text-white mb-6">
+                  <span>Total</span>
+                  <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
                 </div>
 
                 <motion.button

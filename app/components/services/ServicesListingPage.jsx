@@ -601,7 +601,6 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                                 </div>
                                 <div className="flex items-center gap-1 text-white/60 text-sm">
                                   <MapPin className="w-4 h-4" />
-                                  2.3 km away
                                 </div>
                                 {/* <div className="text-white/60 text-sm">
                                   Min Fare: ₹{center.minFare}

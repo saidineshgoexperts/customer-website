@@ -93,6 +93,11 @@ export function ThankYouPage({ bookingDetails }) {
                         Thank You!
                     </h1>
                     <p className="text-xl text-white/80 mb-2">Your Booking Has Been Received</p>
+                    {bookingDetails?.orderId && (
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[#04a99d] font-mono text-sm mb-4">
+                            Booking ID: {bookingDetails.orderId}
+                        </div>
+                    )}
                     <p className="text-white/60">We've sent a Confirmation to your Registered Email </p>
                 </motion.div>
 
@@ -104,7 +109,7 @@ export function ThankYouPage({ bookingDetails }) {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 rounded-2xl p-12 flex flex-col h-full"
+                            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 rounded-2xl p-8 flex flex-col h-full"
                         >
                             <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-[#04a99d]" />

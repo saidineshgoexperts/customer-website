@@ -20,7 +20,7 @@ export default function CheckoutRoute() {
             selectedAddress={selectedAddress}
             onBack={() => router.push('/appliances/address')}
             onSuccess={(data) => {
-                router.push(`/appliances/thank-you?date=${data?.bookedDate || ''}&time=${data?.bookedTime || ''}`);
+                router.push(`/appliances/thank-you?orderId=${data?.bookingId || data?.orderId || ''}&date=${data?.bookedDate || ''}&time=${data?.bookedTime || ''}`);
             }}
         />
     );
