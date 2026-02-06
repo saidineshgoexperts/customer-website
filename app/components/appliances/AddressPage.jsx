@@ -16,7 +16,7 @@ export function AddressPage({
   onBack,
   onContinue,
 }) {
-  const { user, token, isAuthenticated } = useAuth();
+  const { user, token, isAuthenticated, loading: authLoading } = useAuth();
   const { location: contextLocation, detectWithGPS, loading: locationLoading, isMapsLoaded } = useLocationContext();
   const mapRef = React.useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -98,10 +98,7 @@ export function AddressPage({
             stateName: data.state || contextLocation.state || prev.stateName
           }));
 
-          // If no addresses, show the add form automatically
-          if (addresses.length === 0 && !loading) {
-            setShowAddForm(true);
-          }
+
         } catch (e) {
           console.warn("Initial reverseGeocode failed", e);
         }
@@ -125,10 +122,16 @@ export function AddressPage({
       const data = await response.json();
       if (data.success) {
         setAddresses(data.data || []);
-        // Auto-select default address if none selected
-        if (!selectedAddress && data.data?.length > 0) {
-          const def = data.data.find(a => a.defaultAddress) || data.data[0];
-          onSelectAddress(def);
+
+        if (data.data?.length > 0) {
+          setShowAddForm(false);
+          // Auto-select default address if none selected
+          if (!selectedAddress) {
+            const def = data.data.find(a => a.defaultAddress) || data.data[0];
+            onSelectAddress(def);
+          }
+        } else {
+          setShowAddForm(true);
         }
       }
     } catch (error) {
@@ -140,12 +143,14 @@ export function AddressPage({
   }, [token, selectedAddress, onSelectAddress]);
 
   useEffect(() => {
+    if (authLoading) return;
+
     if (isAuthenticated) {
       fetchAddresses();
     } else {
       setShowAuthModal(true);
     }
-  }, [isAuthenticated, fetchAddresses]);
+  }, [isAuthenticated, fetchAddresses, authLoading]);
 
   // No longer needed: Pre-fill logic moved to trigger button for better UX
   // (prevents auto-restore when user clears the field manually)
@@ -288,6 +293,10 @@ export function AddressPage({
       stateId: address.stateId || "680cbb3d2d42e474f451ace3",
       cityId: address.cityId || "684d704faa93650a05d5ff47"
     });
+    setMapCenter({
+      lat: Number(address.latitude) || 17.450123,
+      lng: Number(address.longitude) || 78.390456
+    });
     setShowAddForm(true);
   };
 
@@ -319,6 +328,11 @@ export function AddressPage({
       exit={{ opacity: 0 }}
       className="min-h-screen pt-20 pb-32"
     >
+      {authLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <Loader2 className="w-8 h-8 animate-spin text-[#037166]" />
+        </div>
+      )}
       {/* Header */}
       <section className="top-20 z-40 bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] border-b border-white/10 shadow-lg">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
@@ -352,7 +366,7 @@ export function AddressPage({
               <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-12 h-12 border-4 border-[#037166]/20 border-t-[#037166] rounded-full animate-spin mb-4" />
               </div>
-            ) : addresses.length === 0 ? (
+            ) : (addresses.length === 0 || showAddForm) ? (
               <div className="relative w-full h-[400px] rounded-3xl overflow-hidden bg-[#f0f2f5] border border-gray-200/20 group">
                 {/* Real-time Google Map */}
                 {isMapsLoaded ? (
@@ -641,6 +655,10 @@ export function AddressPage({
                   flat: contextLocation?.flat || '',
                   addressLineOne: contextLocation?.address || ''
                 });
+                setMapCenter({
+                  lat: Number(contextLocation?.lat) || 17.450123,
+                  lng: Number(contextLocation?.lng) || 78.390456
+                });
                 setShowAddForm(true);
               }}
               className="flex items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-white/20 hover:border-[#037166]/50 bg-white/5 hover:bg-white/10 transition-all group"
@@ -665,7 +683,11 @@ export function AddressPage({
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h4 className="text-xl font-bold text-white">
-                        {editingAddress ? 'Edit Address' : 'Add New Address'}
+                        {editingAddress
+                          ? 'Edit Address'
+                          : (!newAddress.name || !newAddress.phone)
+                            ? 'Please complete your profile'
+                            : 'Add New Address'}
                       </h4>
                       {!editingAddress && (
                         <p className="text-white/40 text-xs mt-1">Information pre-filled from your profile</p>

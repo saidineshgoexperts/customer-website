@@ -6,12 +6,16 @@ import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
+import { Menu, X, ShoppingCart, User, AlertTriangle, AlertCircle } from 'lucide-react';
 import { LocationBar } from '@/components/location/LocationBar';
 
 export function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
   const { cartItems } = useCart();
+  const { user } = useAuth();
+  const isProfileIncomplete = user && (!user.name || !user.mobile);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState('Home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -146,6 +150,34 @@ export function Navigation() {
               />
               Download
             </motion.button>
+
+            {/* Profile Icon */}
+            <button
+              onClick={() => router.push('/profile')}
+              className="relative p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors group"
+              title={isProfileIncomplete ? "Complete Profile" : "Profile"}
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#037166] to-[#04a99d] flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
+              </div>
+
+              {isProfileIncomplete && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-black"
+                >
+                  <span className="text-black text-xs font-bold">!</span>
+                </motion.div>
+              )}
+
+              {/* Hover Tooltip */}
+              {isProfileIncomplete && (
+                <div className="absolute top-full right-0 mt-2 px-3 py-1 bg-yellow-500 text-black text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  Complete Profile
+                </div>
+              )}
+            </button>
           </div>
 
           {/* Mobile Menu Button & Cart */}
@@ -159,6 +191,17 @@ export function Navigation() {
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-[#037166] to-[#04a99d] rounded-full flex items-center justify-center text-xs font-bold text-white">
                   {cartItems.length}
                 </span>
+              )}
+            </button>
+            <button
+              onClick={() => router.push('/profile')}
+              className="relative p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+            >
+              <User className="w-5 h-5 text-white" />
+              {isProfileIncomplete && (
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border border-black">
+                  <span className="text-black text-[10px] font-bold">!</span>
+                </div>
               )}
             </button>
             <button

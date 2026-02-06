@@ -1,4 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/pghostels/hostel-detail/[id]/page": "app/pghostels/hostel-detail/[id]/page.js"
+  "/appliances/category/[categoryId]/page": "app/appliances/category/[categoryId]/page.js",
+  "/appliances/listing/[subCategoryId]/page": "app/appliances/listing/[subCategoryId]/page.js",
+  "/appliances/page": "app/appliances/page.js",
+  "/appliances/address/page": "app/appliances/address/page.js",
+  "/appliances/detail/[serviceId]/page": "app/appliances/detail/[serviceId]/page.js"
 }
