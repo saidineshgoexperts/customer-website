@@ -183,15 +183,15 @@ export function NearbyServiceCenters({ onViewAll }) {
             Find expert repair centers near you for all your home appliances.
           </p>
 
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onViewAll}
             className="mt-8 px-8 py-3 bg-gradient-to-r from-[#037166] to-[#04a99d] text-white rounded-full font-medium shadow-lg hover:shadow-[#037166]/30 transition-all flex items-center gap-2 mx-auto"
           >
-            Explore Stores
+            Explore Service Centers
             <ArrowRight className="w-4 h-4" />
-          </motion.button>
+          </motion.button> */}
 
           {!location && (
             <div className="mt-8 flex flex-col items-center">
@@ -317,7 +317,7 @@ export function NearbyServiceCenters({ onViewAll }) {
             className="px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 text-white font-medium transition-all duration-300 flex items-center gap-2 group"
             onClick={onViewAll}
           >
-            Explore Stores
+            Explore Service Centers
             <Navigation className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
           </motion.button>
         </motion.div>

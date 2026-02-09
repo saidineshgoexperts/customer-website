@@ -22,7 +22,8 @@ export function ApplianceHomePage() {
         home: 'appliance-repair-services',
         category: 'service-list/category/appliance-repair-service',
         recentlyBooked: 'all-service-categories',
-        featuredServices: 'all-service-categories'
+        featuredServices: 'all-service-categories',
+        serviceCenter: 'nearby-service-centers'
     });
 
     // Fetch Slugs for this service
@@ -59,7 +60,12 @@ export function ApplianceHomePage() {
 
         const id = typeToId[type];
         if (id) {
-            router.push(`/${serviceSlugs.home}/child/${id}?category=Services&name=${type === 'partner' ? 'Verified Partners' : 'Service Centers'}`);
+            const baseUrl = `/${serviceSlugs.home}`;
+            if (type === 'partner') {
+                router.push(`${baseUrl}/verified-partners?category=Services&name=Verified Partners`);
+            } else {
+                router.push(`${baseUrl}/child/${id}?category=Services&name=${type === 'partner' ? 'Verified Partners' : 'Service Centers'}`);
+            }
         }
         setShowExploreModal(false);
     };
@@ -89,7 +95,7 @@ export function ApplianceHomePage() {
                 onViewAll={() => router.push(`/${serviceSlugs.recentlyBooked}`)}
             />
             <DownloadApp />
-            <NearbyStores onViewAll={() => router.push(`/${serviceSlugs.home}/centers`)} />
+            <NearbyStores onViewAll={() => router.push(`/${serviceSlugs.serviceCenter}`)} />
             <PopularCenters onStoreClick={(store) => {
                 const categoryParam = encodeURIComponent('General');
                 const subCategoryParam = encodeURIComponent(store.speciality || 'Service');

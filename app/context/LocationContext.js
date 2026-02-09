@@ -22,7 +22,7 @@ export function LocationProvider({ children }) {
     useEffect(() => {
         // 1. Wait for Google Maps (already loading in layout.js)
         const checkGoogleMaps = setInterval(() => {
-            if (window.google && window.google.maps) {
+            if (window.google && window.google.maps && window.google.maps.Map) {
                 setIsMapsLoaded(true);
                 locationManager.initializeGoogleServices();
                 clearInterval(checkGoogleMaps);

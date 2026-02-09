@@ -14,6 +14,25 @@ export function ServiceCentersListingPage() {
     const [selectedRating, setSelectedRating] = useState(null);
     const [filterOpen, setFilterOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [serviceSlugs, setServiceSlugs] = useState({
+        home: 'appliance-repair-services',
+        serviceCenter: 'nearby-service-centers'
+    });
+
+    useEffect(() => {
+        const fetchSlugs = async () => {
+            try {
+                const res = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_slugs_by_serviceId/683daaa8f261c1548bdf7442');
+                const data = await res.json();
+                if (data.success && data.data) {
+                    setServiceSlugs(prev => ({ ...prev, ...data.data }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch slugs:", error);
+            }
+        };
+        fetchSlugs();
+    }, []);
 
     useEffect(() => {
         const fetchStores = async () => {
@@ -67,7 +86,7 @@ export function ServiceCentersListingPage() {
     };
 
     const handleStoreClick = (storeId) => {
-        router.push(`/appliances/store/${storeId}`);
+        router.push(`/${serviceSlugs.home}/store/${storeId}`);
     };
 
     const ShimmerGrid = () => {
@@ -94,7 +113,7 @@ export function ServiceCentersListingPage() {
             <section className="bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] text-white py-12">
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
                     <button
-                        onClick={() => router.back()}
+                        onClick={() => router.push(`/${serviceSlugs.home}`)}
                         className="inline-flex items-center gap-2 mb-6 px-4 py-2 mt-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all"
                     >
                         <ArrowLeft className="w-4 h-4" />

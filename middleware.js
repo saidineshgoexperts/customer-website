@@ -43,6 +43,13 @@ async function getDynamicSlugs() {
                         if (category) mapping[category] = `${service.internalPrefix}/categories`;
                         if (recentlyBooked) mapping[recentlyBooked] = `${service.internalPrefix}/recent`;
                         if (featuredServices) mapping[featuredServices] = `${service.internalPrefix}/featured`;
+                        if (data.data.serviceCenter) mapping[data.data.serviceCenter] = `${service.internalPrefix}/centers`;
+
+                        // Manual mapping for Verified Partners (Appliances)
+                        if (service.id === '683daaa8f261c1548bdf7442') {
+                            mapping['verified-partners'] = `${service.internalPrefix}/child/683dbbfbb62d2a241de0f7e3`;
+                        }
+
                         return mapping;
                     }
                 } catch (e) {
