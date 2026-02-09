@@ -78,9 +78,6 @@ export const ServiceCartProvider = ({ children }) => {
 
             if (data.success) {
                 await fetchCart();
-                if (!suppressToast) {
-                    toast.success('Added to cart');
-                }
                 return true;
             } else {
                 toast.error(data.message || 'Failed to add to cart');
@@ -109,7 +106,6 @@ export const ServiceCartProvider = ({ children }) => {
             });
             const data = await response.json();
             if (data.success) {
-                toast.success('Removed from cart');
                 await fetchCart();
             }
         } catch (error) {
@@ -132,9 +128,6 @@ export const ServiceCartProvider = ({ children }) => {
             if (data.success) {
                 setCartItems([]);
                 setCartData(null);
-                if (!suppressToast) {
-                    toast.success('Cart cleared');
-                }
             }
         } catch (error) {
             console.error('Error clearing service cart:', error);

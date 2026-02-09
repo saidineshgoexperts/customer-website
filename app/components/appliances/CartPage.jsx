@@ -221,7 +221,7 @@ export function CartPage({
 
                 <div className="h-px bg-white/10 my-4" />
                 <div className="flex justify-between text-xl font-bold text-white mb-6">
-                  <span>Total</span>
+                  <span>Payable</span>
                   <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
                 </div>
 

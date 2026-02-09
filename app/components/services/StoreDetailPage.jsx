@@ -222,12 +222,6 @@ export function StoreDetailPage({ storeId, serviceId }) {
         }
       }
 
-      // Success message
-      toast.success(
-        `${service.name}${addons.length > 0 ? ` + ${addons.length} addon(s)` : ''} added to cart!`,
-        { description: 'Continue shopping or proceed to checkout' }
-      );
-
       // Close popup and navigate to cart
       setShowAddonsPopup(false);
       router.push('/appliances/cart');

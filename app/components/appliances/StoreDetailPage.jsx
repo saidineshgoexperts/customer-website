@@ -231,12 +231,6 @@ export function StoreDetailPage({ storeId, serviceId }) {
         }
       }
 
-      // Success message
-      toast.success(
-        `${service.name}${addons.length > 0 ? ` + ${addons.length} addon(s)` : ''} added to cart!`,
-        { description: 'Continue shopping or proceed to checkout' }
-      );
-
       // Close popup and navigate to address
       setShowAddonsPopup(false);
       localStorage.setItem('service_cart_flow', 'true');
@@ -361,9 +355,9 @@ export function StoreDetailPage({ storeId, serviceId }) {
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="px-4 py-2 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold">
+                {/* <div className="px-4 py-2 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold">
                   Starting from ₹{center.BasePrice || center.serviceBookingCost || 0}
-                </div>
+                </div> */}
                 <div className="flex gap-2">
                   <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center gap-2">
                     <Clock className="w-4 h-4 text-[#037166]" />

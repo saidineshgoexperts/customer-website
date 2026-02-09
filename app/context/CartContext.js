@@ -58,7 +58,6 @@ export const CartProvider = ({ children }) => {
             });
             const data = await response.json();
             if (data.success) {
-                toast.success('Added to cart');
                 await fetchCart();
                 return true;
             }
@@ -82,7 +81,6 @@ export const CartProvider = ({ children }) => {
             });
             const data = await response.json();
             if (data.success) {
-                toast.success('Removed from cart');
                 await fetchCart();
             }
         } catch (error) {
@@ -103,7 +101,6 @@ export const CartProvider = ({ children }) => {
             if (data.success) {
                 setCartItems([]);
                 setCartTotal(0);
-                toast.success('Cart cleared');
             }
         } catch (error) {
             toast.error('Failed to clear cart');
