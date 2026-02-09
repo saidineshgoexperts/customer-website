@@ -14,7 +14,6 @@ function ThankYouContent() {
 
         // Prioritize URL params for social/redirect cases, fallback to sessionStorage
         const urlAddress = searchParams.get('address');
-        const displayAddress = urlAddress || (sessionAddress ? `${sessionAddress.flat}, ${sessionAddress.area}, ${sessionAddress.cityName}` : '');
 
         // Format Date if it exists
         const rawDate = searchParams.get('date') || sessionStorage.getItem('last_booking_date');
@@ -25,6 +24,23 @@ function ThankYouContent() {
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             formattedDate = `${day} ${months[parseInt(month) - 1]} ${year}`;
         }
+
+        // Clean up duplicated address parts from URL
+        let cleanAddress = urlAddress;
+        if (urlAddress) {
+            // Split by newline to preserve name/structure
+            const lines = urlAddress.split('\n');
+            const cleanedLines = lines.map(line => {
+                // Split by comma to find duplicated segments within the line (e.g. area repeated)
+                const segments = line.split(',').map(s => s.trim());
+                // Remove duplicates while preserving order
+                const uniqueSegments = segments.filter((item, index) => segments.indexOf(item) === index);
+                return uniqueSegments.join(', ');
+            });
+            cleanAddress = cleanedLines.join('\n');
+        }
+
+        const displayAddress = cleanAddress || (sessionAddress ? `${sessionAddress.flat}, ${sessionAddress.area}, ${sessionAddress.cityName}` : '');
 
         setBookingDetails({
             orderId: searchParams.get('orderId') || '',

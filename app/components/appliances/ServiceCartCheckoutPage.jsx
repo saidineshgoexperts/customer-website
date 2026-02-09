@@ -9,8 +9,8 @@ import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) {
-    const { cartData, cartItems } = useServiceCart();
-    const { token, isAuthenticated } = useAuth();
+    const { cartData, cartItems, clearCart } = useServiceCart();
+    const { token, isAuthenticated, loading: authLoading } = useAuth();
 
     const bookingCost = cartData?.finalAmount || 0;
     const inspectionCost = cartItems.reduce((acc, item) => acc + (item.inspectionCost || 0), 0);
@@ -21,13 +21,42 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
     const [loading, setLoading] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [technicianPreference, setTechnicianPreference] = useState('any');
+    const [walletBalance, setWalletBalance] = useState(0);
+    const [walletLoading, setWalletLoading] = useState(false);
+
+    // Fetch Wallet Balance
+    useEffect(() => {
+        const fetchWalletBalance = async () => {
+            if (!token) return;
+            setWalletLoading(true);
+            try {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/wallet/balance', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success && data.wallet) {
+                    setWalletBalance(data.wallet.currentBalance || 0);
+                }
+            } catch (error) {
+                console.error('Error fetching wallet balance:', error);
+            } finally {
+                setWalletLoading(false);
+            }
+        };
+
+        if (isAuthenticated) {
+            fetchWalletBalance();
+        }
+    }, [token, isAuthenticated]);
 
     // Check authentication on mount
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (!authLoading && !isAuthenticated) {
             setShowAuthModal(true);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, authLoading]);
 
     // Service window: 9 AM to 9 PM (9:00 to 21:00)
     const SERVICE_START_HOUR = 9;
@@ -117,10 +146,19 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
         }
 
         setLoading(true);
+
         try {
-            const endpoint = paymentMethod === 'ONLINE'
-                ? 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/initiate-payment'
-                : 'something went wrong';
+            // Only 'online' is currently enabled in UI, so we focus on that.
+            // If we ever enable COD/Wallet for Cart, we'd need to check if 'service-cart' API supports them.
+            // For now, we use the existing endpoint for everything but ensure we send the right method string.
+
+            const methodToSend = paymentMethod === 'online' ? 'ONLINE' : paymentMethod;
+            // The API might expect 'ONLINE' uppercase? The original code had 'ONLINE'. 
+            // Check original: `paymentMethod === 'ONLINE'`. It sent `paymentMethod` in body.
+            // If I send 'online', backend might reject.
+            // Let's send 'ONLINE' if it is 'online'.
+
+            const endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/initiate-payment';
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -132,8 +170,10 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                     serviceAddressId: selectedAddress._id,
                     bookedDate,
                     bookedTime,
-                    paymentMethod,
-                    sourceOfLead: 'website'
+                    paymentMethod: methodToSend, // Send 'ONLINE'
+                    sourceOfLead: 'website',
+                    surl: `${window.location.protocol}//${window.location.host}${window.location.pathname}?status=success`,
+                    furl: `${window.location.protocol}//${window.location.host}${window.location.pathname}?status=failure`
                 })
             });
 
@@ -141,7 +181,15 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
             console.log('💳 Checkout Response:', data);
 
             if (data.success) {
-                if (paymentMethod === 'ONLINE' && data.access_key) {
+                if (methodToSend === 'ONLINE' && data.access_key) {
+                    // Save pending details for post-payment retrieval
+                    sessionStorage.setItem('pending_booking', JSON.stringify({
+                        bookedDate,
+                        bookedTime,
+                        address: selectedAddress,
+                        orderId: data.bookingId || data.orderId // Assuming API returns this
+                    }));
+
                     // Redirect to Easebuzz payment gateway with access_key
                     const easebuzzUrl = `https://testpay.easebuzz.in/pay/${data.access_key}`;
                     console.log('🔗 Redirecting to Easebuzz:', easebuzzUrl);
@@ -150,6 +198,7 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                 } else {
                     // COD or Wallet payment successful
                     toast.success('Booking created successfully!');
+                    clearCart(); // Clear cart only on successful booking
                     onSuccess && onSuccess(data);
                 }
             } else {
@@ -335,21 +384,64 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
                             </h4>
                             <div className="grid md:grid-cols-3 gap-3">
                                 {[
-                                    { id: 'COD', label: 'Cash on ServiceDelivery', icon: Truck },
-                                    { id: 'WALLET', label: 'Wallet Pay', icon: Wallet },
-                                    { id: 'ONLINE', label: 'Online Payment', icon: CreditCard },
+                                    {
+                                        id: 'COD',
+                                        label: 'Cash on Service Delivery',
+                                        icon: Truck,
+                                        disabled: true,
+                                        tooltip: 'For Premium Subscribers Only'
+                                    },
+                                    {
+                                        id: 'wallet',
+                                        label: 'Wallet Pay',
+                                        icon: Wallet,
+                                        disabled: true,
+                                        tooltip: 'Redeemable after service completion only',
+                                        showBalance: true
+                                    },
+                                    {
+                                        id: 'online',
+                                        label: 'Online Payment',
+                                        icon: CreditCard,
+                                        disabled: false
+                                    },
                                 ].map((method) => (
-                                    <button
-                                        key={method.id}
-                                        onClick={() => setPaymentMethod(method.id)}
-                                        className={`p-5 rounded-xl flex flex-col items-center gap-2 transition-all ${paymentMethod === method.id
-                                            ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg'
-                                            : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-                                            }`}
-                                    >
-                                        <method.icon className={`w-6 h-6 ${paymentMethod === method.id ? 'text-white' : 'text-[#04a99d]'}`} />
-                                        <h6 className="text-sm font-medium">{method.label}</h6>
-                                    </button>
+                                    <div key={method.id} className="relative group h-full">
+                                        <button
+                                            onClick={() => !method.disabled && setPaymentMethod(method.id)}
+                                            disabled={method.disabled}
+                                            className={`w-full h-full p-5 rounded-xl flex flex-col items-center justify-center gap-2 transition-all min-h-[140px] ${paymentMethod === method.id
+                                                ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg'
+                                                : method.disabled
+                                                    ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
+                                                    : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                                                }`}
+                                        >
+                                            <div className={`w-6 h-6 flex items-center justify-center ${paymentMethod === method.id ? 'text-white' : method.disabled ? 'text-white/10' : 'text-[#04a99d]'}`}>
+                                                {method.id === 'wallet' && !walletLoading && walletBalance > 0 ? (
+                                                    <span className="text-sm font-bold">₹{walletBalance}</span>
+                                                ) : (
+                                                    <method.icon className="w-6 h-6" />
+                                                )}
+                                            </div>
+
+                                            <h6 className="text-sm font-medium">{method.label}</h6>
+
+                                            {method.id === 'wallet' && (
+                                                <i className="text-[9px] text-white/40 block mt-0.5 leading-tight">
+                                                    Wallet Usable After Service Completion Only
+                                                </i>
+                                            )}
+                                        </button>
+
+                                        {/* Simple Tooltip on Top */}
+                                        {method.disabled && method.tooltip && (
+                                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-48 px-2 py-1 bg-black/90 text-white text-[12px] rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center">
+                                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-black/90 rotate-45 border-r border-b border-white/10" />
+                                                {method.tooltip}
+                                            </div>
+                                        )}
+                                    </div>
                                 ))}
                             </div>
                         </motion.div>

@@ -6,13 +6,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Search, User, Home, Briefcase, Calendar, MapPin, Tag, ChevronRight, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
+import { useServiceCart } from '@/context/ServiceCartContext';
 import { LocationBar } from '@/components/location/LocationBar';
 
 export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
-  const { cartItems } = useCart();
+  const { cartItems: productCartItems } = useCart();
+  const { cartItems: serviceCartItems } = useServiceCart();
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const cartItemsCount = (productCartItems?.length || 0) + (serviceCartItems?.length || 0);
 
   const handleNavigation = (href) => {
     router.push(href);
@@ -140,13 +144,13 @@ export function GlobalNav({ currentPage = 'home', breadcrumbs, onCartClick }) {
                 className="relative flex items-center justify-center w-10 h-10 rounded-full bg-[#1a1a1a] hover:bg-[#037166]/20 border border-[#037166]/30 transition-all"
               >
                 <ShoppingCart className="w-5 h-5 text-[#037166]" />
-                {cartItems.length > 0 && (
+                {cartItemsCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="absolute -top-1 -right-1 w-5 h-5 bg-[#037166] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg"
                   >
-                    {cartItems.length}
+                    {cartItemsCount}
                   </motion.span>
                 )}
               </motion.button>

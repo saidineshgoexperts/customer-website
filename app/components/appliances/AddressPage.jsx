@@ -147,7 +147,8 @@ export function AddressPage({
 
     if (isAuthenticated) {
       fetchAddresses();
-    } else {
+    } else if (!authLoading && !isAuthenticated) {
+      // Only show modal if NOT loading and NOT authenticated
       setShowAuthModal(true);
     }
   }, [isAuthenticated, fetchAddresses, authLoading]);

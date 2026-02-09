@@ -6,7 +6,7 @@ import { ArrowLeft, Calendar, Clock, MapPin, User, CheckCircle, Sparkles, Credit
 import { toast } from 'sonner';
 
 import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/CartContext';
+import { useServiceCart } from '@/context/ServiceCartContext';
 
 export function BookingConfirmationPage({
   address,
@@ -14,7 +14,8 @@ export function BookingConfirmationPage({
   onConfirmBooking,
 }) {
   const { user, token, isAuthenticated } = useAuth();
-  const { cartItems: contextCartItems, cartTotal: contextCartTotal, clearCart } = useCart();
+  const { cartItems: contextCartItems, cartData, clearCart } = useServiceCart();
+  const contextCartTotal = cartData?.finalAmount || 0;
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [technicianPreference, setTechnicianPreference] = useState('any');
@@ -247,6 +248,7 @@ export function BookingConfirmationPage({
             duration: 2000
           });
 
+          // No changes needed if not enforcing auth via modal on mount.st easebuzzUrl = `https://testpay.easebuzz.in/pay/${data.access_key}`;
           // Fixed Easebuzz URL format
           const easebuzzUrl = `https://testpay.easebuzz.in/pay/${data.access_key}`;
           cleanup();

@@ -1,1 +1,8 @@
-{}
+{
+  "/(landing)/page": "app/(landing)/page.js",
+  "/appliances/address/page": "app/appliances/address/page.js",
+  "/appliances/store/[storeId]/page": "app/appliances/store/[storeId]/page.js",
+  "/appliances/checkout/page": "app/appliances/checkout/page.js",
+  "/appliances/page": "app/appliances/page.js",
+  "/appliances/cart/page": "app/appliances/cart/page.js"
+}

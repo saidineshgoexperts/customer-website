@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useServiceCart } from '@/context/ServiceCartContext';
 import { useAuth } from '@/context/AuthContext';
 import { Menu, X, ShoppingCart, User, AlertTriangle, AlertCircle } from 'lucide-react';
 import { LocationBar } from '@/components/location/LocationBar';
@@ -13,8 +14,11 @@ import { LocationBar } from '@/components/location/LocationBar';
 export function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
-  const { cartItems } = useCart();
+  const { cartItems: productCartItems } = useCart();
+  const { cartItems: serviceCartItems } = useServiceCart();
   const { user } = useAuth();
+
+  const cartItemsCount = (productCartItems?.length || 0) + (serviceCartItems?.length || 0);
   const isProfileIncomplete = user && (!user.name || !user.mobile);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState('Home');
@@ -109,13 +113,13 @@ export function Navigation() {
             >
               <div className="flex items-center gap-2">
                 <ShoppingCart className="w-5 h-5" />
-                {cartItems.length > 0 && (
+                {cartItemsCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-[#037166] to-[#04a99d] rounded-full flex items-center justify-center text-xs font-bold"
                   >
-                    {cartItems.length}
+                    {cartItemsCount}
                   </motion.span>
                 )}
               </div>
@@ -187,9 +191,9 @@ export function Navigation() {
               className="relative p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
             >
               <ShoppingCart className="w-5 h-5 text-white" />
-              {cartItems.length > 0 && (
+              {cartItemsCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-[#037166] to-[#04a99d] rounded-full flex items-center justify-center text-xs font-bold text-white">
-                  {cartItems.length}
+                  {cartItemsCount}
                 </span>
               )}
             </button>

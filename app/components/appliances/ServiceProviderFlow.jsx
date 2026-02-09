@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { Hero } from '@/components/appliances/Hero';
 import { TopCategories } from '@/components/appliances/TopCategories';
@@ -28,10 +29,11 @@ import { ThankYouPage } from '@/components/appliances/ThankYouPage';
 import { GlobalNav } from '@/components/layout/GlobalNav';
 import { Toaster } from 'sonner';
 
-import { useCart } from '@/context/CartContext';
+import { useServiceCart } from '@/context/ServiceCartContext';
 
 export default function ServiceProviderFlow({ serviceType = null }) {
-  const { cartItems, addToCart, removeFromCart } = useCart();
+  const router = useRouter();
+  const { cartItems, addToCart, removeFromCart } = useServiceCart();
   const [scrollY, setScrollY] = useState(0);
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -96,9 +98,9 @@ export default function ServiceProviderFlow({ serviceType = null }) {
   };
 
   const handleAddToCart = async (item) => {
-    // item.id here might be productId. The API expects productId and storeId.
-    // In StoreDetailPage, we pass full item object.
-    const success = await addToCart(item.id, item.serviceId, item.quantity || 1);
+    // ServiceCart's addToCart: (providerId, itemId, itemType, quantity, parentServiceId)
+    // Here item seems to be from AllServicesPage or similar
+    const success = await addToCart(item.serviceId || item.id, item.id, 'service', item.quantity || 1);
     if (success) {
       // toast is already handled in Context
     }
@@ -168,8 +170,8 @@ export default function ServiceProviderFlow({ serviceType = null }) {
   };
 
   const handleViewAllStores = () => {
-    setCurrentPage('viewAllStores');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Navigate to the dedicated centers page
+    router.push('/appliances/centers');
   };
 
   const handleViewAllCategories = () => {

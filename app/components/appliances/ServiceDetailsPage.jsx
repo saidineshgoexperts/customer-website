@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Star, Clock, Shield, CheckCircle, Award, ThumbsUp, ChevronLeft, ChevronRight, ArrowRight, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useServiceCart } from '@/context/ServiceCartContext';
 
 // Service-specific accent colors
 const serviceAccents = {
@@ -45,6 +46,7 @@ export function ServiceDetailsPage({
   subCategory
 }) {
   const router = useRouter();
+  const { addToCart } = useServiceCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [serviceDetails, setServiceDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -487,48 +489,81 @@ export function ServiceDetailsPage({
                 ))}
               </div>
 
-              {/* Booking Button in Hero */}
-              <motion.button
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                onClick={() => {
-                  const finalServiceId = storeData.id || storeData._id || serviceId;
-                  if (!finalServiceId) {
-                    toast.error("Service information missing");
-                    return;
-                  }
+              <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  onClick={() => {
+                    const finalServiceId = storeData.id || storeData._id || serviceId;
+                    if (!finalServiceId) {
+                      toast.error("Service information missing");
+                      return;
+                    }
 
-                  localStorage.setItem('last_service_id', finalServiceId);
-                  const firstPackage = provider_rate_cards[0];
+                    localStorage.setItem('last_service_id', finalServiceId);
+                    const firstPackage = provider_rate_cards[0];
 
-                  // Clean the price string (remove + and non-numeric chars)
-                  const rawPrice = firstPackage?.price || 0;
-                  const cleanPrice = typeof rawPrice === 'string'
-                    ? parseInt(rawPrice.replace(/[^0-9]/g, '')) || 0
-                    : rawPrice;
+                    const rawPrice = firstPackage?.price || 0;
+                    const cleanPrice = typeof rawPrice === 'string'
+                      ? parseInt(rawPrice.replace(/[^0-9]/g, '')) || 0
+                      : rawPrice;
 
-                  // Enrich the item with service details for the confirmation page
-                  const itemsToBook = [{
-                    ...(firstPackage || {}),
-                    id: firstPackage?.id || `direct-${finalServiceId}`,
-                    serviceId: finalServiceId,
-                    serviceName: storeData.name || 'Professional Service',
-                    packageName: firstPackage?.title || 'Standard Package',
-                    price: cleanPrice,
-                    bookingCost: storeData.serviceBookingCost || 0,
-                    inspectionCost: storeData.inspectionCost || 0,
-                    quantity: 1
-                  }];
+                    const itemsToBook = [{
+                      ...(firstPackage || {}),
+                      id: firstPackage?.id || `direct-${finalServiceId}`,
+                      serviceId: finalServiceId,
+                      serviceName: storeData.name || 'Professional Service',
+                      packageName: firstPackage?.title || 'Standard Package',
+                      price: cleanPrice,
+                      bookingCost: storeData.serviceBookingCost || 0,
+                      inspectionCost: storeData.inspectionCost || 0,
+                      quantity: 1
+                    }];
 
-                  localStorage.setItem('booking_package_details', JSON.stringify(itemsToBook));
-                  router.push('/appliances/address');
-                }}
-                className="w-full mt-6 px-10 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg hover:shadow-2xl hover:shadow-[#037166]/40 transition-all flex items-center justify-center gap-3 group"
-              >
-                Book This Service Now
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </motion.button>
+                    localStorage.setItem('booking_package_details', JSON.stringify(itemsToBook));
+                    router.push('/appliances/address');
+                  }}
+                  className="flex-1 px-8 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg hover:shadow-2xl hover:shadow-[#037166]/40 transition-all flex items-center justify-center gap-3 group"
+                >
+                  Book Now
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </motion.button>
+
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  onClick={async () => {
+                    const finalServiceId = storeData.id || storeData._id || serviceId;
+                    if (!finalServiceId) {
+                      toast.error("Service information missing");
+                      return;
+                    }
+
+                    const firstPackage = provider_rate_cards[0];
+                    if (!firstPackage) {
+                      toast.error("No service package available");
+                      return;
+                    }
+
+                    const success = await addToCart(
+                      finalServiceId,
+                      firstPackage.id,
+                      'service',
+                      1
+                    );
+
+                    if (success) {
+                      toast.success("Added to cart");
+                    }
+                  }}
+                  className="flex-1 px-8 py-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-bold text-lg hover:bg-white/10 hover:border-[#037166]/50 transition-all flex items-center justify-center gap-3 group"
+                >
+                  Add to Cart
+                  <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </motion.button>
+              </div>
             </motion.div>
           </div>
         </div>

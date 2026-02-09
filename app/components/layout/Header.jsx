@@ -10,15 +10,21 @@ import { LocationBar } from '../location/LocationBar';
 import { AuthModal } from '../auth/AuthModal';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { useServiceCart } from '@/context/ServiceCartContext';
+import { useRouter } from 'next/navigation';
 
 export function Header({ theme = {}, navItems = [] }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
-  const { cartItems } = useCart();
+  const { cartItems: productCartItems } = useCart();
+  const { cartItems: serviceCartItems } = useServiceCart();
   const [activeDropdown, setActiveDropdown] = useState(null);
+
+  const cartItemsCount = (productCartItems?.length || 0) + (serviceCartItems?.length || 0);
 
   // Default Theme (Landing Page / Dark)
   const defaultTheme = {
@@ -255,16 +261,17 @@ export function Header({ theme = {}, navItems = [] }) {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => router.push('/appliances/cart')}
                 className={`hidden sm:flex items-center justify-center w-11 h-11 rounded-full ${currentTheme.buttonBg} hover:bg-[#C06C84]/10 border ${currentTheme.border} transition-all relative shadow-md hover:shadow-lg`}
               >
                 <ShoppingCart className={`w-5 h-5 ${currentTheme.isLight ? 'text-[#C06C84]' : 'text-[#037166]'}`} />
-                {cartItems.length > 0 && (
+                {cartItemsCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className={`absolute -top-1 -right-1 w-5 h-5 ${currentTheme.isLight ? 'bg-[#C06C84]' : 'bg-[#037166]'} text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg`}
                   >
-                    {cartItems.length}
+                    {cartItemsCount}
                   </motion.span>
                 )}
               </motion.button>

@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Navigation, Star, Phone, Clock, Loader2 } from 'lucide-react';
+import { MapPin, Navigation, Star, Phone, Clock, Loader2, ArrowRight } from 'lucide-react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
+import { useRouter } from 'next/navigation';
 import { useLocation } from '@/hooks/useLocation';
 
 const mapContainerStyle = {
@@ -78,6 +79,7 @@ const mapOptions = {
 };
 
 export function NearbyServiceCenters() {
+  const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const { location, detectWithGPS, loading: contextLoading, isMapsLoaded } = useLocation();
   const [selectedService, setSelectedService] = useState(0);
@@ -332,6 +334,16 @@ export function NearbyServiceCenters() {
             Real-time availability of service centers near {location ? (location.shortAddress || 'you') : 'you'}
           </p>
 
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.push('/appliances/centers')}
+            className="mt-8 px-8 py-3 bg-gradient-to-r from-[#037166] to-[#04a99d] text-white rounded-full font-medium shadow-lg hover:shadow-[#037166]/30 transition-all flex items-center gap-2 mx-auto"
+          >
+            Explore Stores
+            <ArrowRight className="w-4 h-4" />
+          </motion.button>
+
           {!location && (
             <div className="mt-4">
               <button
@@ -404,7 +416,25 @@ export function NearbyServiceCenters() {
             )}
           </motion.div>
         </div>
+
+        {/* Explore Stores Button - Bottom */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex justify-center mt-16"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 text-white font-medium transition-all duration-300 flex items-center gap-2 group"
+            onClick={() => router.push('/appliances/centers')}
+          >
+            Explore Stores
+            <Navigation className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+          </motion.button>
+        </motion.div>
       </div>
-    </section>
+    </section >
   );
 }
