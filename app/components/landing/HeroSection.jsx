@@ -292,21 +292,8 @@ const imageLoader = ({ src }) => {
   return `https://api.doorstephub.com/${src}`;
 };
 
-/* ---------- SERVICE NAME TO SLUG MAPPING ---------- */
-const serviceSlugMap = {
-  'APPLIANCE SERVICE': 'appliances',
-  'Appliance Service': 'appliances',
-  'PG Hostels': 'pg-hostel',
-  'Religious Services': 'religious',
-  'Spa Salons': 'spa-salon',
-  'Spa Saloons': 'spa-salon',
-  'Daily Needs': 'daily-needs',
-  'MEDICINE': 'medicine',
-  'PARCEL': 'parcel',
-};
-
 /* ---------- COMPACT SERVICES SECTION ---------- */
-function ServiceCardsSection({ services, loading, activeIndex }) {
+function ServiceCardsSection({ services, loading, activeIndex, serviceSlugs }) {
   const router = useRouter();
 
   const containerVariants = {
@@ -337,7 +324,15 @@ function ServiceCardsSection({ services, loading, activeIndex }) {
     }));
 
     // Generate slug from service.name
-    const slug = serviceSlugMap[service.name] || service.name.toLowerCase().replace(/\s+/g, '-');
+    let slug = service.name.toLowerCase().replace(/\s+/g, '-');
+
+    // Use dynamic slugs for specific services
+    const upperName = service.name.toUpperCase();
+    if (upperName.includes('APPLIANCE')) slug = serviceSlugs.appliances;
+    else if (upperName.includes('RELIGIOUS')) slug = serviceSlugs.religious;
+    else if (upperName.includes('PG')) slug = serviceSlugs.pg;
+    else if (upperName.includes('SPA')) slug = serviceSlugs.spa;
+
     router.push(`/${slug}`);
   };
 
@@ -420,6 +415,47 @@ function HeroContent({ services = [], loading = false, error = null }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [serviceSlugs, setServiceSlugs] = useState({
+    appliances: 'appliances',
+    religious: 'religious-services',
+    spa: 'spa-salon',
+    pg: 'pghostels'
+  });
+
+  // Fetch Service Slugs
+  useEffect(() => {
+    const fetchSlugs = async () => {
+      const services = [
+        { id: '683daaa8f261c1548bdf7442', key: 'appliances' },
+        { id: '695250aa57bb211ca094e5fd', key: 'religious' },
+        { id: '69524f4a57bb211ca094e5e6', key: 'spa' },
+        { id: '69524fb157bb211ca094e5ee', key: 'pg' }
+      ];
+
+      try {
+        const results = await Promise.all(
+          services.map(s =>
+            fetch(`https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_slugs_by_serviceId/${s.id}`)
+              .then(res => res.json())
+              .then(data => data.success && data.data?.home ? { [s.key]: data.data.home } : null)
+              .catch(() => null)
+          )
+        );
+
+        const newSlugs = {};
+        results.forEach(res => {
+          if (res) Object.assign(newSlugs, res);
+        });
+
+        if (Object.keys(newSlugs).length > 0) {
+          setServiceSlugs(prev => ({ ...prev, ...newSlugs }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch service slugs:", error);
+      }
+    };
+    fetchSlugs();
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -540,7 +576,7 @@ function HeroContent({ services = [], loading = false, error = null }) {
                 </button>
               </div>
             ) : (
-              <ServiceCardsSection services={services} loading={loading} activeIndex={activeIndex} />
+              <ServiceCardsSection services={services} loading={loading} activeIndex={activeIndex} serviceSlugs={serviceSlugs} />
             )}
           </motion.div>
         </motion.div>

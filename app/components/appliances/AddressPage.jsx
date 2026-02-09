@@ -108,7 +108,7 @@ export function AddressPage({
     initLocation();
   }, [contextLocation, hasAutoDetected, addresses.length, loading]);
 
-  const fetchAddresses = useCallback(async () => {
+  const fetchAddresses = useCallback(async (selectId = null) => {
     if (!token) return;
     setLoading(true);
     try {
@@ -125,8 +125,11 @@ export function AddressPage({
 
         if (data.data?.length > 0) {
           setShowAddForm(false);
-          // Auto-select default address if none selected
-          if (!selectedAddress) {
+          // Auto-select based on priority
+          if (selectId) {
+            const target = data.data.find(a => a._id === selectId);
+            if (target) onSelectAddress(target);
+          } else if (!selectedAddress) {
             const def = data.data.find(a => a.defaultAddress) || data.data[0];
             onSelectAddress(def);
           }
@@ -240,8 +243,9 @@ export function AddressPage({
       if (data.success) {
         toast.success(editingAddress ? 'Address updated!' : 'Address added!');
         setShowAddForm(false);
+        const targetId = editingAddress?._id || data.data?._id || data._id;
         setEditingAddress(null);
-        fetchAddresses();
+        fetchAddresses(targetId);
       } else {
         toast.error(data.message || 'Action failed');
       }
@@ -559,73 +563,83 @@ export function AddressPage({
                 )}
               </div>
             ) : (
-              addresses.map((address, index) => {
-                const Icon = getIcon(address.type);
-                const isSelected = selectedAddress?._id === address._id;
+              // Sort addresses: Selected first, then Default
+              [...addresses]
+                .sort((a, b) => {
+                  if (selectedAddress?._id === a._id) return -1;
+                  if (selectedAddress?._id === b._id) return 1;
+                  // If neither is selected, keep default address at top
+                  if (a.defaultAddress && !selectedAddress) return -1;
+                  if (b.defaultAddress && !selectedAddress) return 1;
+                  return 0;
+                })
+                .map((address, index) => {
+                  const Icon = getIcon(address.type);
+                  const isSelected = selectedAddress?._id === address._id;
 
-                return (
-                  <motion.div
-                    key={address._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
-                    transition={{ delay: index * 0.1 }}
-                    layout
-                    onClick={() => onSelectAddress(address)}
-                    className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${isSelected
-                      ? 'bg-gradient-to-br from-[#037166]/20 to-[#04a99d]/10 border-2 border-[#037166]'
-                      : 'bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-white/20'
-                      }`}
-                  >
-                    <div className="flex gap-6">
-                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${isSelected
-                        ? 'bg-gradient-to-br from-[#037166] to-[#04a99d]'
-                        : 'bg-white/5'
-                        }`}>
-                        <Icon className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-[#04a99d]'}`} />
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h4 className="text-xl font-bold text-white capitalize">{address.type}</h4>
-                          {address.defaultAddress && (
-                            <h6 className="px-2 py-0.5 rounded-full bg-[#037166]/20 text-[#04a99d] text-xs font-medium">
-                              DEFAULT
-                            </h6>
-                          )}
+                  return (
+                    <motion.div
+                      key={address._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{ delay: index * 0.1 }}
+                      layout
+                      onClick={() => onSelectAddress(address)}
+                      className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${isSelected
+                        ? 'bg-gradient-to-br from-[#037166]/20 to-[#04a99d]/10 border-2 border-[#037166]'
+                        : 'bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-white/20'
+                        }`}
+                    >
+                      <div className="flex gap-6">
+                        <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${isSelected
+                          ? 'bg-gradient-to-br from-[#037166] to-[#04a99d]'
+                          : 'bg-white/5'
+                          }`}>
+                          <Icon className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-[#04a99d]'}`} />
                         </div>
-                        <p className="font-medium text-white mb-1">{address.name}</p>
-                        <p className="text-white/80 text-sm mb-1">{address.flat}, {address.area}</p>
-                        <p className="text-white/60 text-xs">{address.cityName}, {address.postalCode}</p>
-                      </div>
 
-                      <div className="flex flex-col gap-2">
-                        {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-8 h-8 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center"
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="text-xl font-bold text-white capitalize">{address.type}</h4>
+                            {address.defaultAddress && (
+                              <h6 className="px-2 py-0.5 rounded-full bg-[#037166]/20 text-[#04a99d] text-xs font-medium">
+                                DEFAULT
+                              </h6>
+                            )}
+                          </div>
+                          <p className="font-medium text-white mb-1">{address.name}</p>
+                          <p className="text-white/80 text-sm mb-1">{address.flat}, {address.area}</p>
+                          <p className="text-white/60 text-xs">{address.cityName}, {address.postalCode}</p>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          {isSelected && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-8 h-8 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center"
+                            >
+                              <Check className="w-5 h-5 text-white" />
+                            </motion.div>
+                          )}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleEditClick(address); }}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all"
                           >
-                            <Check className="w-5 h-5 text-white" />
-                          </motion.div>
-                        )}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleEditClick(address); }}
-                          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDeleteAddress(address._id); }}
-                          className="p-2 rounded-lg bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-500 transition-all"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteAddress(address._id); }}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-500 transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })
+                    </motion.div>
+                  );
+                })
             )}
           </AnimatePresence>
 

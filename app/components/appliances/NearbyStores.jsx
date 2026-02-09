@@ -117,8 +117,8 @@ export function NearbyServiceCenters({ onViewAll }) {
             position={{ lat: location.lat, lng: location.lng }}
             icon={{
               url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
-              scaledSize: new window.google.maps.Size(40, 40),
-              anchor: new window.google.maps.Point(20, 40)
+              scaledSize: { width: 40, height: 40 },
+              anchor: { x: 20, y: 40 }
             }}
             title="You are here"
           />
@@ -132,8 +132,8 @@ export function NearbyServiceCenters({ onViewAll }) {
                 url: selectedService === index
                   ? 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
                   : 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                scaledSize: new window.google.maps.Size(36, 36),
-                anchor: new window.google.maps.Point(18, 36)
+                scaledSize: { width: 36, height: 36 },
+                anchor: { x: 18, y: 36 }
               }}
               onClick={() => setSelectedService(index)}
             />

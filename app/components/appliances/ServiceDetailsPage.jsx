@@ -489,7 +489,7 @@ export function ServiceDetailsPage({
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 mt-6">
+              <div className="flex gap-4 mt-6">
                 <motion.button
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -524,44 +524,10 @@ export function ServiceDetailsPage({
                     localStorage.setItem('booking_package_details', JSON.stringify(itemsToBook));
                     router.push('/appliances/address');
                   }}
-                  className="flex-1 px-8 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg hover:shadow-2xl hover:shadow-[#037166]/40 transition-all flex items-center justify-center gap-3 group"
+                  className="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg hover:shadow-2xl hover:shadow-[#037166]/40 transition-all flex items-center justify-center gap-3 group"
                 >
                   Book Now
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </motion.button>
-
-                <motion.button
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  onClick={async () => {
-                    const finalServiceId = storeData.id || storeData._id || serviceId;
-                    if (!finalServiceId) {
-                      toast.error("Service information missing");
-                      return;
-                    }
-
-                    const firstPackage = provider_rate_cards[0];
-                    if (!firstPackage) {
-                      toast.error("No service package available");
-                      return;
-                    }
-
-                    const success = await addToCart(
-                      finalServiceId,
-                      firstPackage.id,
-                      'service',
-                      1
-                    );
-
-                    if (success) {
-                      toast.success("Added to cart");
-                    }
-                  }}
-                  className="flex-1 px-8 py-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-bold text-lg hover:bg-white/10 hover:border-[#037166]/50 transition-all flex items-center justify-center gap-3 group"
-                >
-                  Add to Cart
-                  <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 </motion.button>
               </div>
             </motion.div>

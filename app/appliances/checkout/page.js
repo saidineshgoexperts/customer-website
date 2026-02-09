@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { PaymentFailureModal } from '@/components/ui/PaymentFailureModal';
 import { useServiceCart } from '@/context/ServiceCartContext';
 
-export default function CheckoutRoute() {
+function CheckoutContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [selectedAddress, setSelectedAddress] = useState(null);
@@ -84,5 +84,14 @@ export default function CheckoutRoute() {
             />
         </>
     );
+}
 
+import { Suspense } from 'react';
+
+export default function CheckoutRoute() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>}>
+            <CheckoutContent />
+        </Suspense>
+    );
 }

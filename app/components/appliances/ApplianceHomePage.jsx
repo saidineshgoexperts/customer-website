@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Hero } from '@/components/appliances/Hero';
 import { ServiceBookingModal } from '@/components/appliances/ServiceBookingModal';
@@ -18,12 +18,34 @@ export function ApplianceHomePage() {
     const router = useRouter();
     const [showModal, setShowModal] = useState(false);
     const [showExploreModal, setShowExploreModal] = useState(false);
+    const [serviceSlugs, setServiceSlugs] = useState({
+        home: 'appliance-repair-services',
+        category: 'service-list/category/appliance-repair-service',
+        recentlyBooked: 'all-service-categories',
+        featuredServices: 'all-service-categories'
+    });
+
+    // Fetch Slugs for this service
+    useEffect(() => {
+        const fetchSlugs = async () => {
+            try {
+                const res = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_slugs_by_serviceId/683daaa8f261c1548bdf7442');
+                const data = await res.json();
+                if (data.success && data.data) {
+                    setServiceSlugs(prev => ({ ...prev, ...data.data }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch appliance sub-page slugs:", error);
+            }
+        };
+        fetchSlugs();
+    }, []);
 
     const handleServiceClick = (serviceId, categoryName, subcategoryName) => {
         const categoryParam = encodeURIComponent(categoryName || 'General');
         const subCategoryParam = encodeURIComponent(subcategoryName || 'Service');
-        // We use /appliances here for the new neat navigation
-        router.push(`/appliances/detail/${serviceId}?category=${categoryParam}&subCategory=${subCategoryParam}`);
+        // Use dynamic home slug if available
+        router.push(`/${serviceSlugs.home}/detail/${serviceId}?category=${categoryParam}&subCategory=${subCategoryParam}`);
     };
 
     const openModal = () => setShowModal(true);
@@ -37,7 +59,7 @@ export function ApplianceHomePage() {
 
         const id = typeToId[type];
         if (id) {
-            router.push(`/appliances/child/${id}?category=Services&name=${type === 'partner' ? 'Verified Partners' : 'Service Centers'}`);
+            router.push(`/${serviceSlugs.home}/child/${id}?category=Services&name=${type === 'partner' ? 'Verified Partners' : 'Service Centers'}`);
         }
         setShowExploreModal(false);
     };
@@ -57,21 +79,21 @@ export function ApplianceHomePage() {
                 onClose={() => setShowExploreModal(false)}
                 onSelect={handleExploreSelect}
             />
-            <TopCategories onViewAll={() => router.push('/appliances/categories')} />
+            <TopCategories onViewAll={() => router.push(`/${serviceSlugs.category}`)} />
             <FeaturedServices
                 onServiceClick={handleServiceClick}
-                onViewAll={() => router.push('/appliances/featured')}
+                onViewAll={() => router.push(`/${serviceSlugs.featuredServices}`)}
             />
             <RecentlyBooked
                 onServiceClick={handleServiceClick}
-                onViewAll={() => router.push('/appliances/recent')}
+                onViewAll={() => router.push(`/${serviceSlugs.recentlyBooked}`)}
             />
             <DownloadApp />
-            <NearbyStores onViewAll={() => router.push('/appliances/centers')} />
+            <NearbyStores onViewAll={() => router.push(`/${serviceSlugs.home}/centers`)} />
             <PopularCenters onStoreClick={(store) => {
                 const categoryParam = encodeURIComponent('General');
                 const subCategoryParam = encodeURIComponent(store.speciality || 'Service');
-                router.push(`/appliances/detail/${store.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
+                router.push(`/${serviceSlugs.home}/detail/${store.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
             }} />
             <KnowledgeSpace />
             <Newsletter />

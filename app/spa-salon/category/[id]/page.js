@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import { ArrowLeft, ChevronRight, Sparkles, Flower, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocationContext } from '@/context/LocationContext';
 
-export default function SpaCategoryPage() {
+function SpaCategoryContent() {
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
@@ -175,5 +175,13 @@ export default function SpaCategoryPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SpaCategoryPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>}>
+            <SpaCategoryContent />
+        </Suspense>
     );
 }

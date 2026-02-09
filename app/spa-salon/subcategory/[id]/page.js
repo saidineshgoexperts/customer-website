@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import { ArrowLeft, Star, Clock, ChevronRight, ShieldCheck, Heart } from 'lucide-react';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLocationContext } from '@/context/LocationContext';
 
-export default function SpaSubCategoryPage() {
+function SpaSubCategoryContent() {
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
@@ -156,5 +156,13 @@ export default function SpaSubCategoryPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function SpaSubCategoryPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+            <SpaSubCategoryContent />
+        </Suspense>
     );
 }

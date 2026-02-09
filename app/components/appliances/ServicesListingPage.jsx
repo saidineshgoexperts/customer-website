@@ -87,17 +87,28 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
         const servicesData = await servicesResponse.json();
 
         if (servicesData.success) {
-          // Set services from dhubServices array
           setServices(servicesData.dhubServices || []);
-
-          // Set centers from nearByServiceCenters array (same API response)
-          setCenters(servicesData.nearByServiceCenters || []);
-
-          console.log('Fetched services:', servicesData.dhubServices?.length || 0);
-          console.log('Fetched nearby centers:', servicesData.nearByServiceCenters?.length || 0);
         } else {
           setServices([]);
-          setCenters([]);
+        }
+
+        // Fetch centers separately from the new API
+        const centersResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_service_center', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lattitude: location.lat,
+            longitude: location.lng,
+            page: 1,
+            limit: 10
+          })
+        });
+
+        if (centersResponse.ok) {
+          const centersData = await centersResponse.json();
+          if (centersData.success) {
+            setCenters(centersData.nearByServiceCenters || []);
+          }
         }
 
       } catch (error) {

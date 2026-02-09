@@ -20,7 +20,7 @@ export function BookingConfirmationPage({
   const [selectedTime, setSelectedTime] = useState('');
   const [technicianPreference, setTechnicianPreference] = useState('any');
   const [isConfirming, setIsConfirming] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('COD');
+  const [paymentMethod, setPaymentMethod] = useState('online');
   const [directBookingItems, setDirectBookingItems] = useState(null);
   const [walletBalance, setWalletBalance] = useState(0);
   const [walletLoading, setWalletLoading] = useState(false);
@@ -613,7 +613,7 @@ export function BookingConfirmationPage({
               <div className="h-px bg-white/10 mb-4" />
 
               <div className="flex justify-between text-xl font-bold text-white mb-6">
-                <span>Total</span>
+                <span>Payable</span>
                 <span>₹{total}</span>
               </div>
 

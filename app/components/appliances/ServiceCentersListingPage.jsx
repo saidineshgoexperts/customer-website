@@ -26,7 +26,7 @@ export function ServiceCentersListingPage() {
                     currentLoc = { lat: 17.3850, lng: 78.4867 };
                 }
 
-                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/nearest_service_centers', {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_service_center', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -34,14 +34,16 @@ export function ServiceCentersListingPage() {
                     body: JSON.stringify({
                         lattitude: currentLoc.lat,
                         longitude: currentLoc.lng,
+                        page: 1,
+                        limit: 50
                     }),
                 });
 
                 if (!response.ok) throw new Error('Failed to fetch stores');
                 const result = await response.json();
 
-                if (result.success && result.nearestServiceCenters) {
-                    setStores(result.nearestServiceCenters.map(item => ({
+                if (result.success && result.nearByServiceCenters) {
+                    setStores(result.nearByServiceCenters.map(item => ({
                         id: item._id,
                         name: item.name || `${item.firstName} ${item.lastName}`,
                         address: item.address || item.cityName || 'Location not specified',

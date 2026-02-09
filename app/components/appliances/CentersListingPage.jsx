@@ -48,14 +48,11 @@ export function CentersListingPage({ category, subCategory, childCategoryId }) {
                 const body = {
                     lattitude: location.lat,
                     longitude: location.lng,
-                    childcategoryId: childCategoryId
+                    page: 1,
+                    limit: 20
                 };
 
-                if (minRating > 0) {
-                    body.minRating = minRating;
-                }
-
-                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/services_by_childcategory', {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_service_center', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)

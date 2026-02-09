@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import { ArrowLeft, Star, MapPin, Sparkles, Filter, CheckCircle, Clock } from 'lucide-react';
@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLocationContext } from '@/context/LocationContext';
 
-export default function SubCategoryServicesPage() {
+function SubCategoryServicesContent() {
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
@@ -159,5 +159,13 @@ export default function SubCategoryServicesPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SubCategoryServicesPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-[var(--off-white)] flex items-center justify-center">Loading...</div>}>
+            <SubCategoryServicesContent />
+        </Suspense>
     );
 }

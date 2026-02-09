@@ -42,27 +42,43 @@ export function Header({ theme = {}, navItems = [] }) {
 
   const currentTheme = { ...defaultTheme, ...theme };
 
-  // Default Navigation (Landing Page)
-  const defaultNavItems = [
-    { name: 'Appliance Services', href: '/appliances' },
-    { name: 'Religious Services', href: '/religious-services' },
-    { name: 'Spa Saloon', href: '/spa-salon' },
-    { name: 'PG Hostels', href: '/pghostels' },
-    {
-      name: 'More',
-      dropdown: [
-        { name: 'Become a Partner', href: '/partner' },
-        { name: 'Share Ride', href: '#share-ride' }
-      ]
-    }
-  ];
 
   const [apiNavItems, setApiNavItems] = useState([]);
+  const [serviceSlugs, setServiceSlugs] = useState({
+    appliances: 'appliances',
+    religious: 'religious-services',
+    spa: 'spa-salon',
+    pg: 'pghostels'
+  });
 
-  // Fetch Services for Navigation
+  // Fetch Slugs and Services for Navigation
   useEffect(() => {
-    const fetchServices = async () => {
+    const fetchData = async () => {
       try {
+        // 1. Fetch Slugs
+        const servicesToFetchSlugs = [
+          { id: '683daaa8f261c1548bdf7442', key: 'appliances' },
+          { id: '695250aa57bb211ca094e5fd', key: 'religious' },
+          { id: '69524f4a57bb211ca094e5e6', key: 'spa' },
+          { id: '69524fb157bb211ca094e5ee', key: 'pg' }
+        ];
+
+        const slugResults = await Promise.all(
+          servicesToFetchSlugs.map(s =>
+            fetch(`https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_slugs_by_serviceId/${s.id}`)
+              .then(res => res.json())
+              .then(data => data.success && data.data?.home ? { [s.key]: data.data.home } : null)
+              .catch(() => null)
+          )
+        );
+
+        const newSlugs = { ...serviceSlugs };
+        slugResults.forEach(res => {
+          if (res) Object.assign(newSlugs, res);
+        });
+        setServiceSlugs(newSlugs);
+
+        // 2. Fetch all services and map them using the new slugs
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
         const data = await response.json();
 
@@ -71,10 +87,10 @@ export function Header({ theme = {}, navItems = [] }) {
             let href = '#';
             const name = service.name.trim();
 
-            if (name.toUpperCase().includes('APPLIANCE')) href = '/appliances';
-            else if (name.toUpperCase().includes('RELIGIOUS')) href = '/religious-services';
-            else if (name.toUpperCase().includes('PG')) href = '/pghostels';
-            else if (name.toUpperCase().includes('SPA')) href = '/spa-salon';
+            if (name.toUpperCase().includes('APPLIANCE')) href = `/${newSlugs.appliances}`;
+            else if (name.toUpperCase().includes('RELIGIOUS')) href = `/${newSlugs.religious}`;
+            else if (name.toUpperCase().includes('PG')) href = `/${newSlugs.pg}`;
+            else if (name.toUpperCase().includes('SPA')) href = `/${newSlugs.spa}`;
 
             // Special Formatting for specific categories
             let formattedName = name;
@@ -83,7 +99,6 @@ export function Header({ theme = {}, navItems = [] }) {
             if (upperName === 'SPA SALONS') {
               formattedName = 'Spa Saloon';
             } else {
-              // Format Name: Title Case
               formattedName = name
                 .toLowerCase()
                 .split(' ')
@@ -94,7 +109,7 @@ export function Header({ theme = {}, navItems = [] }) {
             return { name: formattedName, href, originalService: service };
           });
 
-          // Add 'More' dropdown for extra static items
+          // Add 'More' dropdown
           mappedItems.push({
             name: 'More',
             dropdown: [
@@ -106,12 +121,12 @@ export function Header({ theme = {}, navItems = [] }) {
           setApiNavItems(mappedItems);
         }
       } catch (error) {
-        console.error("Failed to fetch nav services:", error);
+        console.error("Failed to fetch nav data:", error);
       }
     };
 
     if (navItems.length === 0) {
-      fetchServices();
+      fetchData();
     }
   }, []);
 
@@ -128,13 +143,13 @@ export function Header({ theme = {}, navItems = [] }) {
     } else {
       // Fallback for default items
       const href = item.href;
-      if (href === '/appliances') {
+      if (href === '/appliances' || href === `/${serviceSlugs.appliances}`) {
         serviceData = { id: '683daaa8f261c1548bdf7442', name: 'Appliance Service', servicetypeName: 'SERVICES' };
-      } else if (href === '/religious-services') {
+      } else if (href === '/religious-services' || href === `/${serviceSlugs.religious}`) {
         serviceData = { id: '695250aa57bb211ca094e5fd', name: 'Religious Services', servicetypeName: 'Religious Services' };
-      } else if (href === '/spa-salon') {
+      } else if (href === '/spa-salon' || href === `/${serviceSlugs.spa}`) {
         serviceData = { id: '69524f4a57bb211ca094e5e6', name: 'Spa Saloons', servicetypeName: 'Spa Saloons' };
-      } else if (href === '/pghostels') {
+      } else if (href === '/pghostels' || href === `/${serviceSlugs.pg}`) {
         serviceData = { id: '69524fb157bb211ca094e5ee', name: 'PG Hostels', servicetypeName: 'PG Hostels' };
       }
     }
@@ -143,6 +158,21 @@ export function Header({ theme = {}, navItems = [] }) {
       localStorage.setItem('selectedService', JSON.stringify(serviceData));
     }
   };
+
+  // Default Navigation (Landing Page) - Moved inside to be dynamic
+  const defaultNavItems = [
+    { name: 'Appliance Services', href: `/${serviceSlugs.appliances}` },
+    { name: 'Religious Services', href: `/${serviceSlugs.religious}` },
+    { name: 'Spa Saloon', href: `/${serviceSlugs.spa}` },
+    { name: 'PG Hostels', href: `/${serviceSlugs.pg}` },
+    {
+      name: 'More',
+      dropdown: [
+        { name: 'Become a Partner', href: '/partner' },
+        { name: 'Share Ride', href: '#share-ride' }
+      ]
+    }
+  ];
 
   const menuItems = navItems.length > 0 ? navItems : (apiNavItems.length > 0 ? apiNavItems : defaultNavItems);
 
@@ -165,12 +195,16 @@ export function Header({ theme = {}, navItems = [] }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const isServicePage = pathname?.includes('/services') ||
+    pathname?.includes('/listings') ||
+    Object.values(serviceSlugs).some(slug => pathname?.includes(slug));
+
   return (
     <>
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || pathname?.includes('/services') || pathname?.includes('/listings') || pathname?.includes('/spa-salon')
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || isServicePage
           ? `${currentTheme.bgScrolled} backdrop-blur-xl border-b ${currentTheme.border} shadow-lg ${currentTheme.isLight ? 'shadow-[#C06C84]/5' : 'shadow-[#037166]/5'}`
           : 'bg-transparent'
           }`}
@@ -261,7 +295,7 @@ export function Header({ theme = {}, navItems = [] }) {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => router.push('/appliances/cart')}
+                onClick={() => router.push(`/${serviceSlugs.appliances}/cart`)}
                 className={`hidden sm:flex items-center justify-center w-11 h-11 rounded-full ${currentTheme.buttonBg} hover:bg-[#C06C84]/10 border ${currentTheme.border} transition-all relative shadow-md hover:shadow-lg`}
               >
                 <ShoppingCart className={`w-5 h-5 ${currentTheme.isLight ? 'text-[#C06C84]' : 'text-[#037166]'}`} />

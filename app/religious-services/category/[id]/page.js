@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import { ArrowLeft, ChevronRight, Sparkles, Flower2, Star, CheckCircle } from 'lucide-react';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLocationContext } from '@/context/LocationContext';
 
-export default function ReligiousCategoryPage() {
+function ReligiousCategoryContent() {
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
@@ -256,5 +256,13 @@ export default function ReligiousCategoryPage() {
             <p className="text-gray-500 mt-2">We couldn't find any services for this category.</p>
             <Button variant="outline" className="mt-6" onClick={() => router.back()}>Go Back</Button>
         </div>
+    );
+}
+
+export default function ReligiousCategoryPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-[var(--off-white)] flex items-center justify-center">Loading...</div>}>
+            <ReligiousCategoryContent />
+        </Suspense>
     );
 }

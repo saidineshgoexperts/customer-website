@@ -47,8 +47,7 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
             try {
                 const body = {
                     lattitude: location.lat,
-                    longitude: location.lng,
-                    childcategoryId: childCategoryId
+                    longitude: location.lng
                 };
 
                 if (minRating > 0) {

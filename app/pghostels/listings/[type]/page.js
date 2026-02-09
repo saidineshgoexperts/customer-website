@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { useRouter, useSearchParams, useParams, usePathname } from 'next/navigation';
 import {
@@ -115,7 +115,7 @@ const amenityIcons = {
     Gym: TrendingUp,
 };
 
-export default function PGResultsPage() {
+function PGListingsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const params = useParams();
@@ -712,5 +712,13 @@ export default function PGResultsPage() {
                 </Tabs >
             </div >
         </div >
+    );
+}
+
+export default function PGResultsPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>}>
+            <PGListingsContent />
+        </Suspense>
     );
 }

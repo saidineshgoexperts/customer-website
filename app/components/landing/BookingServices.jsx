@@ -23,18 +23,41 @@ export function BookingServices() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [serviceSlugs, setServiceSlugs] = useState({
+    appliances: 'appliances',
+    religious: 'religious-services',
+    spa: 'spa-salon',
+    pg: 'pghostels'
+  });
 
+  // Fetch Service Slugs and Services
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  useEffect(() => {
-    const fetchServices = async () => {
+    const fetchData = async () => {
       try {
+        // 1. Fetch Slugs
+        const servicesToFetchSlugs = [
+          { id: '683daaa8f261c1548bdf7442', key: 'appliances' },
+          { id: '695250aa57bb211ca094e5fd', key: 'religious' },
+          { id: '69524f4a57bb211ca094e5e6', key: 'spa' },
+          { id: '69524fb157bb211ca094e5ee', key: 'pg' }
+        ];
+
+        const slugResults = await Promise.all(
+          servicesToFetchSlugs.map(s =>
+            fetch(`https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_slugs_by_serviceId/${s.id}`)
+              .then(res => res.json())
+              .then(data => data.success && data.data?.home ? { [s.key]: data.data.home } : null)
+              .catch(() => null)
+          )
+        );
+
+        const newSlugs = { ...serviceSlugs };
+        slugResults.forEach(res => {
+          if (res) Object.assign(newSlugs, res);
+        });
+        setServiceSlugs(newSlugs);
+
+        // 2. Fetch Latest Booking Services
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/products/latest_bookings_services');
         const data = await response.json();
 
@@ -53,13 +76,21 @@ export function BookingServices() {
           setServices(transformedServices);
         }
       } catch (err) {
-        console.error('Error:', err);
+        console.error('Error fetching booking services:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchServices();
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   // Auto-scroller for the horizontal container
@@ -82,7 +113,18 @@ export function BookingServices() {
   const handleServiceClick = (service) => {
     const categoryParam = encodeURIComponent(service.category);
     const subCategoryParam = encodeURIComponent(service.title);
-    router.push(`/appliances/detail/${service.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
+
+    // Determine base slug dynamically
+    let baseSlug = 'appliances';
+    const upperCategory = service.category.toUpperCase();
+    const upperTitle = service.title.toUpperCase();
+
+    if (upperCategory.includes('APPLIANCE') || upperTitle.includes('APPLIANCE')) baseSlug = serviceSlugs.appliances;
+    else if (upperCategory.includes('RELIGIOUS') || upperTitle.includes('RELIGIOUS')) baseSlug = serviceSlugs.religious;
+    else if (upperCategory.includes('PG') || upperTitle.includes('PG')) baseSlug = serviceSlugs.pg;
+    else if (upperCategory.includes('SPA') || upperTitle.includes('SPA')) baseSlug = serviceSlugs.spa;
+
+    router.push(`/${baseSlug}/detail/${service.id}?category=${categoryParam}&subCategory=${subCategoryParam}`);
   };
 
   return (
