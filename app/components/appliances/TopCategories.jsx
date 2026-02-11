@@ -115,6 +115,7 @@ export function TopCategories({ onViewAll }) {
             image: `https://api.doorstephub.com/${item.image}`,
             _id: item._id,
             status: item.status,
+            slug: item.slug,
           }));
           setCategories(mappedCategories);
         }
@@ -229,7 +230,7 @@ export function TopCategories({ onViewAll }) {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -12 }}
-                    onClick={() => router.push(`/appliances/category/${category._id}?name=${encodeURIComponent(category.title)}`)}
+                    onClick={() => router.push(`/${category.slug}`)}
                     className="group cursor-pointer"
                   >
                     <div className="relative w-72 lg:w-[210px] h-54 lg:h-72 rounded-3xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">

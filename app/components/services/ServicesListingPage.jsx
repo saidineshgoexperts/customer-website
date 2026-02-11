@@ -143,7 +143,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
   }, [location?.lat, location?.lng]);
 
   // Helper to fetch subcategories
-  const fetchSubcategories = async (catId) => {
+  const fetchSubcategories = async (catId, slug) => {
     // If already fetched or fetching, skip
     if (categorySubcats[catId] || loadingSubcats[catId]) return;
 
@@ -152,7 +152,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
       const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getsubcategorysbycategoryid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoryId: catId })
+        body: JSON.stringify({ slug: slug })
       });
 
       const data = await response.json();
@@ -176,7 +176,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
         if (expandedCategory !== activeCat._id) {
           setExpandedCategory(activeCat._id);
         }
-        fetchSubcategories(activeCat._id);
+        fetchSubcategories(activeCat._id, activeCat.slug);
       }
     }
   }, [allCategories, category]);
@@ -186,8 +186,11 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
       setExpandedCategory(null);
       return;
     }
+    const cat = allCategories.find(c => c._id === catId);
     setExpandedCategory(catId);
-    fetchSubcategories(catId);
+    if (cat) {
+      fetchSubcategories(catId, cat.slug);
+    }
   };
 
   const handleSubCategorySelect = (subCat, catName) => {
@@ -219,7 +222,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
             onClick={() => {
               const activeCat = allCategories.find(c => c.name === category);
               if (activeCat?._id) {
-                router.push(`/appliances/category/${activeCat._id}?name=${encodeURIComponent(category)}`);
+                router.push(`/${activeCat.slug}`);
               } else {
                 router.back();
               }

@@ -55,14 +55,14 @@ function CategorySkeleton() {
   );
 }
 
-export function CategoryPage({ category, categoryId }) {
+export function CategoryPage({ slug, initialData }) {
   const router = useRouter();
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categoryImage, setCategoryImage] = useState(null);
   const [categoryMetadata, setCategoryMetadata] = useState({
-    categoryName: category,
+    categoryName: '',
     totalCount: 0,
     detectedCity: null
   });
@@ -71,7 +71,9 @@ export function CategoryPage({ category, categoryId }) {
   const theme = defaultTheme;
 
   const handleSubCategoryClick = (subCategory) => {
-    router.push(`/appliances/listing/${subCategory._id}?category=${encodeURIComponent(category)}&name=${encodeURIComponent(subCategory.name)}`);
+    // Prefer slug from API metadata if available, otherwise use initial slug
+    const targetSlug = categoryMetadata?.slug || slug;
+    router.push(`/${targetSlug}/${subCategory.slug}`);
   };
 
   const handleBack = () => {
@@ -80,7 +82,21 @@ export function CategoryPage({ category, categoryId }) {
 
   useEffect(() => {
     const fetchSubCategories = async () => {
-      if (!categoryId) {
+      // Use initialData if provided and valid
+      if (initialData && initialData.success && Array.isArray(initialData.data)) {
+        setSubCategories(initialData.data);
+        if (initialData.image) setCategoryImage(initialData.image);
+        setCategoryMetadata({
+          categoryName: initialData.categoryName || '',
+          slug: initialData.slug || initialData.categorySlug || slug, // Use API slug if available, else prop
+          totalCount: initialData.totalCount || initialData.data.length,
+          detectedCity: initialData.detectedCity
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (!slug) {
         setLoading(false);
         return;
       }
@@ -93,7 +109,7 @@ export function CategoryPage({ category, categoryId }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            categoryId: categoryId
+            slug: slug
           })
         });
 
@@ -112,7 +128,8 @@ export function CategoryPage({ category, categoryId }) {
           }
 
           setCategoryMetadata({
-            categoryName: data.categoryName || category,
+            categoryName: data.categoryName || '',
+            slug: data.slug || data.categorySlug || slug, // Use API slug if available, else prop
             totalCount: data.totalCount || data.data.length,
             detectedCity: data.detectedCity
           });
@@ -125,7 +142,14 @@ export function CategoryPage({ category, categoryId }) {
     };
 
     fetchSubCategories();
-  }, [categoryId, category]);
+  }, [slug, initialData]);
+
+  // Auto-correct URL if slug doesn't match canonical slug (e.g. "AC Repair" vs "ac-repair")
+  useEffect(() => {
+    if (categoryMetadata.slug && slug && categoryMetadata.slug !== slug) {
+      router.replace(`/${categoryMetadata.slug}`);
+    }
+  }, [categoryMetadata.slug, slug, router]);
 
   return (
     <motion.div
@@ -187,7 +211,7 @@ export function CategoryPage({ category, categoryId }) {
               <ChevronRight className="w-4 h-4" />
               <span className="text-white/80">Services</span>
               <ChevronRight className="w-4 h-4" />
-              <span className="text-[#037166]">{categoryMetadata.categoryName || category}</span>
+              <span className="text-[#037166]">{categoryMetadata.categoryName}</span>
             </div>
           </motion.div>
 
@@ -200,7 +224,7 @@ export function CategoryPage({ category, categoryId }) {
               transition={{ duration: 0.6, delay: 0.1 }}
             >
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                {categoryMetadata.categoryName || category}
+                {categoryMetadata.categoryName}
               </h1>
               <p className="text-lg text-white/70 leading-relaxed mb-6">
                 {theme.description}

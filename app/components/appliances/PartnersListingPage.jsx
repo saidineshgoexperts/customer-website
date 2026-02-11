@@ -66,9 +66,7 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
                 if (data.success && data.dhubServices && data.dhubServices.length > 0) {
                     setServices(data.dhubServices);
                 } else {
-                    // Redirect if no services found
                     setServices([]);
-                    router.replace('/appliances/book-appointment');
                 }
             } catch (error) {
                 console.error("Error fetching services:", error);

@@ -57,7 +57,7 @@ export function ServiceBookingModal({ isOpen, onClose }) {
         setLoading(true);
         try {
             const body = {
-                categoryId: category._id,
+                slug: category.slug,
                 ...(location?.lat && location?.lng ? { lattitude: location.lat, longitude: location.lng } : {})
             };
 
@@ -74,13 +74,13 @@ export function ServiceBookingModal({ isOpen, onClose }) {
                 setStep(2); // Move to next step
             } else {
                 // Direct redirect if no subcategories found (fallback)
-                router.push(`/appliances/category/${category._id}?name=${encodeURIComponent(category.name)}`);
+                router.push(`/${category.slug}`);
                 onClose();
             }
         } catch (error) {
             console.error('Failed to fetch subcategories:', error);
             // Fallback redirect
-            router.push(`/appliances/category/${category._id}?name=${encodeURIComponent(category.name)}`);
+            router.push(`/${category.slug}`);
             onClose();
         } finally {
             setLoading(false);
@@ -97,7 +97,7 @@ export function ServiceBookingModal({ isOpen, onClose }) {
         }));
 
         // Redirect to listing page
-        router.push(`/appliances/listing/${subCategory._id}?category=${encodeURIComponent(selectedCategory.name)}&name=${encodeURIComponent(subCategory.name)}`);
+        router.push(`/appliances/listing/${subCategory.slug}?category=${encodeURIComponent(selectedCategory.name)}&name=${encodeURIComponent(subCategory.name)}`);
         onClose();
     };
 

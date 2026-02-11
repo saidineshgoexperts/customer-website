@@ -1,5 +1,7 @@
 {
-  "/appliances/page": "app/appliances/page.js",
-  "/appliances/category/[categoryId]/page": "app/appliances/category/[categoryId]/page.js",
-  "/(landing)/page": "app/(landing)/page.js"
+  "/[slug]/[subCategorySlug]/page": "app/[slug]/[subCategorySlug]/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(landing)/page": "app/(landing)/page.js",
+  "/appliances/detail/[serviceId]/page": "app/appliances/detail/[serviceId]/page.js",
+  "/appliances/page": "app/appliances/page.js"
 }

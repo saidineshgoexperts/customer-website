@@ -7,7 +7,7 @@ export default function AllCategoriesPage() {
     const router = useRouter();
 
     const handleCategoryClick = (category) => {
-        router.push(`/appliances/category/${category._id}?name=${encodeURIComponent(category.title)}`);
+        router.push(`/${category.slug}`);
     };
 
     return (

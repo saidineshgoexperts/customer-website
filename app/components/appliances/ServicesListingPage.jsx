@@ -6,7 +6,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { ArrowLeft, Star, MapPin, Clock, DollarSign, Filter, X, Zap, RotateCcw, ChevronDown, ChevronRight, Folder } from 'lucide-react';
 import { useLocationContext } from '@/context/LocationContext';
 
-export function ServicesListingPage({ category, subCategory, subCategoryId, childCategoryId }) {
+export function ServicesListingPage({ category, subCategory, subCategoryId, childCategoryId, slug }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -25,6 +25,15 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
   const [categorySubcats, setCategorySubcats] = useState({}); // Cache for subcategories
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [loadingSubcats, setLoadingSubcats] = useState({});
+
+  // Metadata State (derived from props or API)
+  const [pageTitle, setPageTitle] = useState(subCategory || '');
+  const [categoryName, setCategoryName] = useState(category || '');
+
+  useEffect(() => {
+    if (subCategory) setPageTitle(subCategory);
+    if (category) setCategoryName(category);
+  }, [category, subCategory]);
 
   const handleRatingChange = (rating) => {
     const newRating = rating === minRating ? 0 : rating;
@@ -48,7 +57,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
 
   useEffect(() => {
     const fetchServices = async () => {
-      if ((!subCategoryId && !childCategoryId) || !location?.lat || !location?.lng) {
+      if ((!subCategoryId && !childCategoryId && !slug) || !location?.lat || !location?.lng) {
         setLoading(false);
         return;
       }
@@ -61,7 +70,9 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
           longitude: location.lng,
         };
 
-        if (childCategoryId) {
+        if (slug) {
+          body.slug = slug;
+        } else if (childCategoryId) {
           apiUrl = 'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/services_by_childcategory';
           body.childcategoryId = childCategoryId;
         } else {
@@ -87,7 +98,15 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
         const servicesData = await servicesResponse.json();
 
         if (servicesData.success) {
+          // Set the services
           setServices(servicesData.dhubServices || []);
+
+          // Update metadata if missing
+          if ((!subCategory || !category) && servicesData.dhubServices?.length > 0) {
+            const firstService = servicesData.dhubServices[0];
+            if (!subCategory && firstService.subcategoryName) setPageTitle(firstService.subcategoryName);
+            if (!category && firstService.categoryName) setCategoryName(firstService.categoryName);
+          }
         } else {
           setServices([]);
         }
@@ -121,7 +140,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
     };
 
     fetchServices();
-  }, [subCategoryId, childCategoryId, location?.lat, location?.lng, minRating]);
+  }, [subCategoryId, childCategoryId, slug, location?.lat, location?.lng, minRating]);
 
   // Fetch Categories for Sidebar
   useEffect(() => {
@@ -154,7 +173,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
   }, [location?.lat, location?.lng]);
 
   // Helper to fetch subcategories
-  const fetchSubcategories = async (catId) => {
+  const fetchSubcategories = async (catId, slug) => {
     // If already fetched or fetching, skip
     if (categorySubcats[catId] || loadingSubcats[catId]) return;
 
@@ -163,7 +182,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
       const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getsubcategorysbycategoryid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoryId: catId })
+        body: JSON.stringify({ slug: slug })
       });
 
       const data = await response.json();
@@ -179,39 +198,68 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
 
   // Auto-expand active category and fetch subcategories
   useEffect(() => {
-    if (allCategories.length > 0 && category) {
-      const activeCat = allCategories.find(c => c.name === category);
+    if (allCategories.length > 0 && categoryName) {
+      const activeCat = allCategories.find(c => c.name === categoryName || c.slug === categoryName);
       if (activeCat) {
+        // If we found it by slug, update the display name to be the real name
+        if (activeCat.slug === categoryName) {
+          setCategoryName(activeCat.name);
+        }
+
+        // Auto-correct URL if slug doesn't match canonical slug (e.g. "AC Repair" vs "ac-repair")
+        // Check if we are on a nested route (where category prop is present)
+        if (category && activeCat.slug !== category) {
+          // We need to keep the subcategory part. 
+          // subCategory prop might be name too? No, it's usually slug from URL.
+          // But actually `slug` prop is the subcategory slug.
+          if (slug) {
+            router.replace(`/${activeCat.slug}/${slug}`);
+          }
+        }
+
         // Only if not already manually interacted (simple check: if expanded is null or different? 
         // Actually best to just enforce it matches current context on load/change)
         if (expandedCategory !== activeCat._id) {
           setExpandedCategory(activeCat._id);
         }
-        fetchSubcategories(activeCat._id);
+        fetchSubcategories(activeCat._id, activeCat.slug);
       }
     }
-  }, [allCategories, category]);
+  }, [allCategories, categoryName]);
 
   const handleCategoryExpand = (catId) => {
     if (expandedCategory === catId) {
       setExpandedCategory(null);
       return;
     }
+    const cat = allCategories.find(c => c._id === catId);
     setExpandedCategory(catId);
-    fetchSubcategories(catId);
+    if (cat) {
+      fetchSubcategories(catId, cat.slug);
+    }
   };
 
-  const handleSubCategorySelect = (subCat, catName) => {
+  const handleSubCategorySelect = (subCat, catSlug) => {
     // Navigate to the selected subcategory
-    router.push(`/appliances/listing/${subCat._id}?category=${encodeURIComponent(catName)}&name=${encodeURIComponent(subCat.name)}`);
+    router.push(`/${catSlug}/${subCat.slug}`);
     // Close mobile filter if open
     setFilterOpen(false);
   };
 
 
   // Local filtering as fallback/additional layer
-  const filteredServices = services.filter(s => (s.rating || 0) >= minRating);
-  const filteredCenters = centers.filter(c => (c.rating || 0) >= minRating);
+  const filteredServices = services.filter(s => {
+    // If no minRating, show all
+    if (minRating === 0) return true;
+    const rating = parseFloat(s.rating || 0);
+    return rating >= minRating;
+  });
+
+  const filteredCenters = centers.filter(c => {
+    if (minRating === 0) return true;
+    const rating = parseFloat(c.rating || 0);
+    return rating >= minRating;
+  });
 
 
   return (
@@ -228,9 +276,14 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={() => {
-              const activeCat = allCategories.find(c => c.name === category);
-              if (activeCat?._id) {
-                router.push(`/appliances/category/${activeCat._id}?name=${encodeURIComponent(category)}`);
+              if (categoryName) {
+                const activeCat = allCategories.find(c => c.name === categoryName);
+                if (activeCat?.slug) {
+                  // Navigate to Category Page
+                  router.push(`/${activeCat.slug}`);
+                } else {
+                  router.back();
+                }
               } else {
                 router.back();
               }
@@ -238,7 +291,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
             className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to {category}
+            {categoryName ? `Back to ${categoryName}` : 'Back'}
           </motion.button>
 
           <motion.div
@@ -247,9 +300,11 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
             transition={{ delay: 0.2 }}
           >
             <h1 className="text-3xl md:text-4xl font-bold text-white/50 mb-2">
-              {subCategory}
+              {pageTitle}
             </h1>
-            <p className="text-white/80">{category} • Professional Services</p>
+            <p className="text-white/80">
+              {categoryName ? `${categoryName} • ` : ''}Professional Services
+            </p>
           </motion.div>
         </div>
 
@@ -354,8 +409,8 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                                   categorySubcats[cat._id].map(sub => (
                                     <button
                                       key={sub._id}
-                                      onClick={() => handleSubCategorySelect(sub, cat.name)}
-                                      className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-colors truncate ${sub._id === subCategoryId
+                                      onClick={() => handleSubCategorySelect(sub, cat.slug)}
+                                      className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-colors truncate ${sub.slug === slug || sub._id === subCategoryId
                                         ? 'bg-[#037166]/20 text-[#04a99d] font-medium'
                                         : 'text-white/60 hover:text-white hover:bg-white/5'
                                         }`}

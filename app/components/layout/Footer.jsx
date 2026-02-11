@@ -65,17 +65,18 @@ export function Footer() {
               const subResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getsubcategorysbycategoryid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ categoryId: category._id })
+                body: JSON.stringify({ slug: category.slug })
               });
               const subData = await subResponse.json();
               return {
                 id: category._id,
                 name: category.name,
+                slug: category.slug, // Added slug
                 subcategories: subData.success && Array.isArray(subData.data) ? subData.data : []
               };
             } catch (err) {
               console.error(`Error fetching subcategories for ${category.name}:`, err);
-              return { id: category._id, name: category.name, subcategories: [] };
+              return { id: category._id, name: category.name, slug: category.slug, subcategories: [] };
             }
           }));
           setServiceGroups(groups);
@@ -172,7 +173,7 @@ export function Footer() {
                     <span key={group.id} className="inline mr-1">
                       {/* Group Name */}
                       <Link
-                        href={`/appliances/category/${group.id}?name=${encodeURIComponent(group.name)}`}
+                        href={`/${group.slug}`}
                         className="text-white font-bold hover:text-[#04a99d] transition-colors whitespace-nowrap mr-2"
                       >
                         {group.name}:
@@ -182,7 +183,7 @@ export function Footer() {
                       {group.subcategories.map((sub, idx) => (
                         <span key={sub._id} className="inline">
                           <Link
-                            href={`/appliances/listing/${sub._id}?category=${encodeURIComponent(group.name)}&name=${encodeURIComponent(sub.name)}`}
+                            href={`/appliances/listing/${sub.slug}?category=${encodeURIComponent(group.name)}&name=${encodeURIComponent(sub.name)}`}
                             className="text-white/70 hover:text-[#04a99d] transition-colors"
                           >
                             {sub.name}
