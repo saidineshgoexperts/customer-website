@@ -606,8 +606,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                     ))
                   ) : (
                     <div className="col-span-full text-center py-20 text-white/60">
-                      No services found for this category.
-                    </div>
+                                          </div>
                   )}
                 </motion.div>
               ) : (

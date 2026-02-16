@@ -1,7 +1,7 @@
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
-export default function AppliancesLayout({ children }) {
+export default function BookAppointmentLayout({ children }) {
     const appliancesTheme = {
         bgScrolled: 'bg-[#0a0a0a]/80',
         bgMobile: 'bg-[#0a0a0a]/95',

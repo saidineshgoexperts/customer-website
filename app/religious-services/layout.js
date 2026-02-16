@@ -16,6 +16,7 @@ export default function ReligiousServicesLayout({ children }) {
         accentGradientFrom: 'from-[#800000]', // Maroon
         accentGradientTo: 'to-[#ff9933]', // Saffron
         buttonBg: 'bg-white',
+        isLight: true
     };
 
     return (

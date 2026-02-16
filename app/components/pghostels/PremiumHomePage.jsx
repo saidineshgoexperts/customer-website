@@ -263,19 +263,19 @@ export function PremiumHomePage() {
                         initial={{ opacity: 0, x: 50 }}
                         animate={isHeroInView ? { opacity: 1, x: 0 } : {}}
                         transition={{ duration: 0.8, ease: [0.6, 0.05, 0.01, 0.9] }}
-                        className="relative h-[600px]"
+                        className="relative h-[550px] md:h-[650px] flex items-center justify-center p-6"
                         style={{
-                            transform: typeof window !== 'undefined' ? `perspective(1000px) rotateY(${(mousePosition.x - window.innerWidth / 2) / 50}deg) rotateX(${-(mousePosition.y - window.innerHeight / 2) / 50}deg)` : 'none'
+                            transform: typeof window !== 'undefined' ? `perspective(1000px) rotateY(${(mousePosition.x - window.innerWidth / 2) / 60}deg) rotateX(${-(mousePosition.y - window.innerHeight / 2) / 60}deg)` : 'none'
                         }}
                     >
                         {/* Main Card */}
                         <motion.div
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-96 rounded-3xl overflow-hidden shadow-2xl"
+                            className="relative w-80 md:w-96 h-[450px] md:h-[550px] rounded-3xl overflow-hidden shadow-2xl z-10"
                             animate={{
-                                y: [0, -20, 0],
+                                y: [0, -15, 0],
                             }}
                             transition={{
-                                duration: 4,
+                                duration: 5,
                                 repeat: Infinity,
                                 ease: "easeInOut"
                             }}
@@ -284,49 +284,54 @@ export function PremiumHomePage() {
                                 className="absolute inset-0 bg-cover bg-center"
                                 style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1617430690223-3e165b390e25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3N0ZWwlMjBpbnRlcmlvcnxlbnwxfHx8fDE3Njg2NDU4OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080)' }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         </motion.div>
 
                         {/* Floating Price Card */}
                         <motion.div
-                            className="absolute top-20 -left-10 bg-white/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-gray-100"
+                            className="absolute top-12 left-0 md:-left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border border-white/50 z-20"
                             animate={{
-                                y: [0, 15, 0],
+                                y: [0, 10, 0],
                             }}
                             transition={{
-                                duration: 3,
+                                duration: 4,
                                 repeat: Infinity,
                                 ease: "easeInOut",
                                 delay: 0.5
                             }}
                         >
-                            <div className="text-sm text-gray-500">Starting from</div>
+                            <div className="text-sm text-gray-500 font-medium">Starting from</div>
                             <div className="text-3xl font-bold text-[#037166]">₹8,500</div>
                             <div className="text-xs text-gray-400">/month</div>
                         </motion.div>
 
                         {/* Floating Rating Card */}
                         <motion.div
-                            className="absolute bottom-32 -right-10 bg-white/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-gray-100"
+                            className="absolute bottom-12 right-0 md:-right-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border border-white/50 z-20"
                             animate={{
-                                y: [0, -15, 0],
+                                y: [0, -10, 0],
                             }}
                             transition={{
-                                duration: 3.5,
+                                duration: 4.5,
                                 repeat: Infinity,
                                 ease: "easeInOut",
                                 delay: 1
                             }}
                         >
                             <div className="flex items-center space-x-2">
-                                <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
-                                <span className="text-2xl font-bold text-black">4.8</span>
+                                <div className="p-1 bg-amber-100 rounded-lg">
+                                    <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
+                                </div>
+                                <span className="text-2xl font-bold text-gray-900">4.8</span>
                             </div>
-                            <div className="text-xs text-black mt-1">0.8 km away</div>
+                            <div className="text-xs text-gray-500 mt-2 font-medium flex items-center">
+                                <MapPin className="w-3 h-3 mr-1 text-[#037166]" />
+                                0.8 km away
+                            </div>
                         </motion.div>
 
                         {/* Glow Effect */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#037166]/20 blur-[100px] rounded-full" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[#037166]/10 blur-[120px] rounded-full pointer-events-none" />
                     </motion.div>
                 </div>
             </section>
@@ -851,7 +856,7 @@ function FeaturedHostelsSection({ listings, loading, router }) {
                             const hostelId = listing._id;
                             const hostelName = listing.hostelName;
                             const hostelArea = listing.address || listing.cityName;
-                            const hostelPrice = parseInt(listing.defaultPrice);
+                            const hostelPrice = listing.startingAt || 250;
                             // Handle image URL: use directly if absolute (fallback), else prepend API URL
                             const hostelImage = listing.image?.startsWith('http')
                                 ? listing.image
@@ -912,13 +917,13 @@ function FeaturedHostelsSection({ listings, loading, router }) {
                                                     <p className="text-white/60 text-sm font-medium uppercase tracking-wider mb-1">Starting from</p>
                                                     <div className="flex items-baseline gap-1">
                                                         <span className="text-3xl font-bold text-white">₹{hostelPrice.toLocaleString()}</span>
-                                                        <span className="text-white/60">/mo</span>
+                                                        <span className="text-white/60">/month</span>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl">
+                                                {/* <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl">
                                                     <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                                                     <span className="text-white font-bold text-lg">{hostelRating}</span>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         </div>
                                     </div>

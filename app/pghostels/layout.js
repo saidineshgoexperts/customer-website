@@ -18,6 +18,7 @@ export default function PGHostelsLayout({ children }) {
         accentGradientFrom: 'from-[#037166]',
         accentGradientTo: 'to-[#025951]',
         buttonBg: 'bg-gray-50',
+        isLight: true
     };
 
     return (
