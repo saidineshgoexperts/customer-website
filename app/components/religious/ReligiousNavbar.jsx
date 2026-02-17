@@ -130,7 +130,7 @@ export function ReligiousNavbar() {
                     >
                         {isAuthenticated && user?.image ? (
                             <img
-                                src={user.image}
+                                src={user.image?.startsWith('http') ? user.image : `https://api.doorstephub.com/${user.image}`}
                                 alt={user.name}
                                 className="w-full h-full object-cover rounded-full"
                             />

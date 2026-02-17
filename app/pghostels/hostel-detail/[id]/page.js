@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import {
     ArrowLeft, Star, TrendingUp, DollarSign, Wifi, Utensils, Shirt, Zap,
     Car, Shield, Camera, MessageSquare, Sparkles, MapPin, Clock, Check, X
@@ -13,6 +13,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { AddonsModal } from '@/components/pghostels/AddonsModal';
 import { useServiceCart } from '@/context/ServiceCartContext';
+import { toast } from 'sonner';
 
 const amenityIcons = {
     Wifi: Wifi,
@@ -31,6 +32,8 @@ export default function NewHostelDetailPage() {
     const params = useParams();
     const router = useRouter();
     const id = params.id;
+    const searchParams = useSearchParams();
+    const fromListing = searchParams.get('fromListing') || 'all';
     const [activeTab, setActiveTab] = useState('portfolio');
     const { scrollY } = useScroll();
     const headerOpacity = useTransform(scrollY, [0, 300], [1, 0.8]);
@@ -41,6 +44,7 @@ export default function NewHostelDetailPage() {
     const [showAddonsModal, setShowAddonsModal] = useState(false);
     const [addonsData, setAddonsData] = useState(null);
     const [isCheckingAddons, setIsCheckingAddons] = useState(false);
+    const { addToCart, clearCart } = useServiceCart();
 
     const sliderSettings = {
         dots: true,
@@ -180,11 +184,59 @@ export default function NewHostelDetailPage() {
         }
     };
 
-    const handleAddonsContinue = (selectedAddons) => {
-        setShowAddonsModal(false);
-        const addonIds = selectedAddons.map(a => a._id).join(',');
-        // Navigate to address page with package details and selected addons
-        router.push(`/pghostels/booking/address?providerId=${id}&packageId=${selectedPackage._id}&addons=${addonIds}`);
+    const handleAddonsContinue = async (selectedAddons) => {
+        setIsCheckingAddons(true);
+        try {
+            setShowAddonsModal(false);
+
+            // 1. Clear existing cart to start fresh
+            await clearCart(true);
+
+            // 2. Add Main Package
+            const packageSuccess = await addToCart(
+                id,
+                selectedPackage._id,
+                'professional_service',
+                1,
+                null,
+                'professional',
+                true
+            );
+
+            if (!packageSuccess) {
+                toast.error('Failed to add package to booking');
+                return;
+            }
+
+            // 3. Add Add-ons
+            for (const addon of selectedAddons) {
+                await addToCart(
+                    id,
+                    addon._id,
+                    'professional_addon',
+                    1,
+                    selectedPackage._id,
+                    'professional',
+                    true
+                );
+            }
+
+            // Save booking context for restoration if needed
+            sessionStorage.setItem('pg_booking_data', JSON.stringify({
+                providerId: id,
+                packageId: selectedPackage._id,
+                addons: selectedAddons.map(a => a._id)
+            }));
+
+            // Navigate to address page (params are still useful for context, but items are already in cart)
+            const addonIds = selectedAddons.map(a => a._id).join(',');
+            router.push(`/pghostels/booking/address?providerId=${id}&packageId=${selectedPackage._id}&addons=${addonIds}`);
+        } catch (error) {
+            console.error('Error during booking initiation:', error);
+            toast.error('Failed to initiate booking. Please try again.');
+        } finally {
+            setIsCheckingAddons(false);
+        }
     };
 
     if (!hostelData) {
@@ -201,7 +253,7 @@ export default function NewHostelDetailPage() {
             <motion.button
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                onClick={() => router.back()}
+                onClick={() => router.push(`/pghostels/listings/${fromListing}`)}
                 className="fixed top-24 left-4 z-50 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors border border-gray-200"
             >
                 <ArrowLeft className="w-5 h-5 text-gray-900" />

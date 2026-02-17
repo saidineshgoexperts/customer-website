@@ -17,6 +17,9 @@ function ThankYouContent() {
             time: searchParams.get('time') || '',
             address: address ? `${address.flat}, ${address.area}, ${address.cityName}` : ''
         });
+
+        // Clear booking session data after successful creation
+        sessionStorage.removeItem('pg_booking_data');
     }, [searchParams]);
 
     return <ThankYouPage bookingDetails={bookingDetails} />;

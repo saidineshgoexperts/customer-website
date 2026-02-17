@@ -151,7 +151,7 @@ export function CartPage({
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <h6 className="px-3 py-1 rounded-full bg-[#037166]/20 border border-[#037166]/30 text-[#04a99d] text-xs font-semibold">
-                              {item.itemType === 'service' ? 'Service' : 'Add-on'}
+                              {item.itemType === 'service' || item.itemType === 'professional_service' ? 'Service' : 'Add-on'}
                             </h6>
                             <span className="text-white/60 text-sm">
                               Qty: {item.quantity}

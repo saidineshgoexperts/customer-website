@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import {
     ArrowLeft, Star, DollarSign, Sparkles, MapPin, Check,
     Loader2, Flower, Scissors, ShieldCheck, Heart, Clock
@@ -27,6 +27,10 @@ export default function SpaServiceDetailPage() {
     const params = useParams();
     const router = useRouter();
     const id = params.id;
+    const searchParams = useSearchParams();
+    const subcategoryId = searchParams.get('subcategoryId');
+    const subCategoryName = searchParams.get('subCategoryName');
+    const categoryName = searchParams.get('categoryName');
     const [activeTab, setActiveTab] = useState('portfolio');
     const { scrollY } = useScroll();
     const headerOpacity = useTransform(scrollY, [0, 300], [1, 0.8]);
@@ -177,7 +181,13 @@ export default function SpaServiceDetailPage() {
             <motion.button
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                onClick={() => router.back()}
+                onClick={() => {
+                    if (subcategoryId) {
+                        router.push(`/spa-salon/subcategory/${subcategoryId}?category=${encodeURIComponent(categoryName)}&name=${encodeURIComponent(subCategoryName)}`);
+                    } else {
+                        router.back();
+                    }
+                }}
                 className="fixed top-24 left-4 z-50 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors border border-gray-200"
             >
                 <ArrowLeft className="w-5 h-5 text-gray-700" />

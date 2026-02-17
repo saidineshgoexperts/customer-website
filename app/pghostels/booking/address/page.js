@@ -185,51 +185,10 @@ function PGAddressContent() {
 
         setLoading(true);
         try {
-            // 1. Clear existing cart to start fresh
-            await clearCart(true);
+            // No need to clear cart or add items here anymore, 
+            // as they are added in the Hostel Detail page before arriving here.
 
-            // 2. Add Main Package (Professional Service)
-            const packageSuccess = await addToCart(
-                providerId,
-                packageId,
-                'professional_service', // itemType
-                1, // quantity
-                null, // parentServiceId
-                'professional', // providerType
-                true // suppressToast
-            );
-
-            if (!packageSuccess) {
-                toast.error('Failed to add package to booking');
-                setLoading(false);
-                return;
-            }
-
-            // 3. Add Add-ons (Professional Addons)
-            if (addons) {
-                const addonList = addons.split(',');
-                for (const addonId of addonList) {
-                    await addToCart(
-                        providerId,
-                        addonId,
-                        'professional_addon',
-                        1,
-                        packageId, // Link addon to the package
-                        'professional',
-                        true // suppressToast
-                    );
-                }
-            }
-
-            // Save booking context (backup/legacy)
-            sessionStorage.setItem('pg_booking_data', JSON.stringify({
-                providerId,
-                packageId,
-                addons: addons ? addons.split(',') : [],
-                address: selectedAddress
-            }));
-
-            // Save address for Confirm Page
+            // Only update session storage with current selection for next steps
             sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
 
             router.push('/pghostels/booking/confirm');
@@ -255,7 +214,7 @@ function PGAddressContent() {
                     <motion.button
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        onClick={() => router.back()}
+                        onClick={() => router.push('/services/cart')}
                         className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
                     >
                         <ArrowLeft className="w-4 h-4" />

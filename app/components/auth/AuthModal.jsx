@@ -81,8 +81,6 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
         try {
             const data = await verifyOtp(mobile, otp);
             if (data.success || data.status === 'success') {
-                // onClose(); // Don't close, show profile update instead
-                setIsEditing(true); // Auto-enable edit mode
                 setStep('profile');
             } else {
                 toast.error(data.message || 'Invalid OTP');
@@ -94,12 +92,22 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
         }
     };
 
+    // Auto-enable edit mode for first-time users (no name)
+    React.useEffect(() => {
+        if (isAuthenticated && user && step === 'profile') {
+            const hasProfile = user.name || user.firstName || user.lastName;
+            if (!hasProfile) {
+                setIsEditing(true);
+            }
+        }
+    }, [user, isAuthenticated, step]);
+
     const handleGoogleLogin = async () => {
         setLoading(true);
         try {
             const data = await loginWithGoogle();
             if (data.success || data.status === 'success') {
-                onClose();
+                setStep('profile');
             }
         } catch (error) {
             console.error('Google login error:', error);
@@ -110,6 +118,8 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
     };
 
     if (!isOpen) return null;
+
+    const isFirstTimeUser = isAuthenticated && user && !(user.name || user.firstName || user.lastName);
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -130,7 +140,13 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                 {/* Header */}
                 <div className={`p-6 border-b border-opacity-10 ${borderColor} flex items-center justify-between`}>
                     <h2 className={`text-xl font-bold ${t.textMain}`}>
-                        {isAuthenticated ? 'Your Profile' : 'Sign In'}
+                        {!isAuthenticated
+                            ? 'Sign In'
+                            : isFirstTimeUser
+                                ? 'Complete Profile'
+                                : isEditing
+                                    ? 'Edit Profile'
+                                    : 'Your Profile'}
                     </h2>
                     <button onClick={onClose} className={`p-2 rounded-xl transition-colors hover:bg-white/10 ${t.textMain} opacity-70 hover:opacity-100`}>
                         <X className="w-5 h-5" />
@@ -254,7 +270,11 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                 <div className="relative group">
                                     <div className={`w-24 h-24 rounded-full border-2 border-opacity-50 ${borderColor} overflow-hidden ${inputBg}`}>
                                         {previewImage || user?.image ? (
-                                            <img src={previewImage || user.image} alt={user.name} className="w-full h-full object-cover" />
+                                            <img
+                                                src={previewImage || (user.image?.startsWith('http') ? user.image : `https://api.doorstephub.com/${user.image}`)}
+                                                alt={user.name}
+                                                className="w-full h-full object-cover"
+                                            />
                                         ) : (
                                             <div className={`w-full h-full flex items-center justify-center text-3xl font-bold ${accentText}`}>
                                                 {user?.firstName?.[0] || user?.name?.[0] || 'U'}
@@ -284,7 +304,7 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                     </button>
                                 </div>
                                 <div className="mt-4 text-center">
-                                    <h3 className={`text-xl font-bold ${t.textMain}`}>{user?.name || `${user?.firstName} ${user?.lastName}`}</h3>
+                                    <h3 className={`text-xl font-bold ${t.textMain}`}>{user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User'}</h3>
                                     <p className={`${t.textMain} opacity-60 text-sm`}>{user?.phone || user?.mobile || 'No phone'}</p>
                                 </div>
                                 <motion.button
@@ -293,6 +313,10 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                     onClick={async () => {
                                         if (isEditing) {
                                             // Handle Save
+                                            if (!profileData.name || !profileData.email) {
+                                                toast.error('Please fill in your name and email');
+                                                return;
+                                            }
                                             setLoading(true);
                                             try {
                                                 const formData = new FormData();
@@ -305,10 +329,8 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                                 await updateProfile(formData);
                                                 setIsEditing(false);
                                                 setSelectedFile(null);
-                                                toast.success('Profile updated successfully');
                                             } catch (error) {
                                                 console.error(error);
-                                                toast.error('Failed to update profile');
                                             } finally {
                                                 setLoading(false);
                                             }

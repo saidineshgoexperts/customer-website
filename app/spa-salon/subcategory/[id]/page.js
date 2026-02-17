@@ -94,7 +94,7 @@ function SpaSubCategoryContent() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    onClick={() => router.push(`/spa-salon/service/${service._id}`)}
+                                    onClick={() => router.push(`/spa-salon/service/${service._id}?subcategoryId=${params.id}&subCategoryName=${encodeURIComponent(subCategoryName)}&categoryName=${encodeURIComponent(categoryName)}`)}
                                     className="group cursor-pointer"
                                 >
                                     <div className="bg-white rounded-3xl p-4 shadow-sm hover:shadow-xl hover:shadow-[#C06C84]/10 transition-all border border-gray-100 h-full flex flex-col">

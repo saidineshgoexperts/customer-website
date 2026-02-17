@@ -120,6 +120,42 @@ export default function PGConfirmPage() {
         setBookedTime('');
     }, [bookedDate]);
 
+    // Cart Restoration Logic: If cart is empty but we have saved data (e.g. returned from payment)
+    useEffect(() => {
+        const restoreCart = async () => {
+            if (!isAuthenticated || cartLoading) return;
+
+            if (cartItems.length === 0) {
+                const savedData = sessionStorage.getItem('pg_booking_data');
+                if (savedData) {
+                    try {
+                        const { providerId, packageId, addons } = JSON.parse(savedData);
+                        console.log('🔄 Restoring Cart Items:', { providerId, packageId, addons });
+
+                        setLoading(true);
+                        // Add package
+                        await addToCart(providerId, packageId, 'professional_service', 1, null, 'professional', true);
+
+                        // Add addons
+                        if (Array.isArray(addons)) {
+                            for (const addonId of addons) {
+                                await addToCart(providerId, addonId, 'professional_addon', 1, packageId, 'professional', true);
+                            }
+                        }
+
+                        toast.success('Booking details restored');
+                    } catch (error) {
+                        console.error('Cart restoration failed:', error);
+                    } finally {
+                        setLoading(false);
+                    }
+                }
+            }
+        };
+
+        restoreCart();
+    }, [isAuthenticated, cartLoading, cartItems.length, addToCart]);
+
     const handleCheckout = async () => {
         if (!isAuthenticated) {
             toast.error('Please login to proceed');
@@ -163,10 +199,8 @@ export default function PGConfirmPage() {
             if (paymentMethod === 'ONLINE') {
                 endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/initiate-payment';
             } else if (paymentMethod === 'WALLET') {
-                // Wallet Payment API
                 endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
             } else {
-                // COD / Default
                 endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
             }
 
@@ -193,6 +227,8 @@ export default function PGConfirmPage() {
                 } else {
                     // COD or Wallet payment successful
                     toast.success('Booking created successfully!');
+                    // Clear booking data on success
+                    sessionStorage.removeItem('pg_booking_data');
                     router.push(`/services/thank-you?date=${bookedDate}&time=${bookedTime}`);
                 }
             } else {
@@ -227,11 +263,11 @@ export default function PGConfirmPage() {
                     <motion.button
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        onClick={() => router.back()}
+                        onClick={() => router.push('/services/cart')}
                         className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Address
+                        Back to Cart
                     </motion.button>
 
                     <motion.h1

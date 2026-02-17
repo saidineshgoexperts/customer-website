@@ -410,7 +410,7 @@ function PGListingsContent() {
                     </div>
 
                     {/* Content Section */}
-                    <div className="p-6" onClick={() => isClickable && router.push(`/pghostels/hostel-detail/${listing.id}`)}>
+                    <div className="p-6" onClick={() => isClickable && router.push(`/pghostels/hostel-detail/${listing.id}?fromListing=${params.type}`)}>
                         {/* PG Name & Location */}
                         <div className="mb-4">
                             <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-[#037166] transition-colors">

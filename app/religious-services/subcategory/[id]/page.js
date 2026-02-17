@@ -105,7 +105,7 @@ function SubCategoryServicesContent() {
                             >
                                 <Card
                                     className="overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 hover:border-[var(--saffron)]/30 h-full"
-                                    onClick={() => router.push(`/religious-services/service/${service._id}`)}
+                                    onClick={() => router.push(`/religious-services/service/${service._id}?subcategoryId=${params.id}&subCategoryName=${encodeURIComponent(subCategoryName)}&categoryName=${encodeURIComponent(categoryName)}`)}
                                 >
                                     <div className="relative h-52 overflow-hidden bg-gradient-to-br from-[var(--warm-beige)] to-[var(--soft-cream)]">
                                         <img
