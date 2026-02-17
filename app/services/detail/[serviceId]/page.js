@@ -6,6 +6,7 @@ export default function ServiceDetailRoute({ params, searchParams }) {
             serviceId={params.serviceId}
             category={searchParams.category || ''}
             subCategory={searchParams.subCategory || ''}
+            subCategoryId={searchParams.subCategoryId || ''}
         />
     );
 }

@@ -1,15 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { AlertCircle, RefreshCw, Home, XCircle, ShieldAlert, HeadphonesIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export function PaymentFailurePage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const [hasBookingData, setHasBookingData] = useState(false);
+
+    useEffect(() => {
+        // Check if we have booking data to retry
+        const savedAddress = sessionStorage.getItem('selected_address');
+        const bookingDetails = sessionStorage.getItem('booking_package_details');
+        setHasBookingData(!!(savedAddress || bookingDetails));
+    }, []);
 
     const handleRetry = () => {
-        router.push('/appliances/booking');
+        // Check for saved booking data
+        const savedAddress = sessionStorage.getItem('selected_address');
+        const bookingDetails = sessionStorage.getItem('booking_package_details');
+
+        if (savedAddress) {
+            // If we have address, redirect back to confirmation page
+            router.push('/appliances/booking');
+        } else if (bookingDetails) {
+            // If we have booking details, redirect to address selection
+            router.push('/appliances/address');
+        } else {
+            // Fallback to home if no data
+            router.push('/appliances');
+        }
     };
 
     const handleGoHome = () => {

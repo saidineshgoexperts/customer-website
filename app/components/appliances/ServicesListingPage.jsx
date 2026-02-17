@@ -587,7 +587,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
 
                             {/* CTA Button */}
                             <button
-                              onClick={() => router.push(`/appliances/detail/${service._id}?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}`)}
+                              onClick={() => router.push(`/appliances/detail/${service._id}?category=${encodeURIComponent(categoryName)}&subCategory=${encodeURIComponent(pageTitle)}`)}
                               className="w-full mt-auto px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all"
                             >
                               Book Now
@@ -606,7 +606,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                     ))
                   ) : (
                     <div className="col-span-full text-center py-20 text-white/60">
-                                          </div>
+                    </div>
                   )}
                 </motion.div>
               ) : (

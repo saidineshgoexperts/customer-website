@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { BookingSteps, FLOW_TYPES } from '@/components/shared/BookingSteps';
 
 export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) {
     const { cartData, cartItems, clearCart } = useServiceCart();
@@ -245,28 +246,11 @@ export function ServiceCartCheckoutPage({ selectedAddress, onBack, onSuccess }) 
 
                 {/* Progress Indicator */}
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 pb-6">
-                    <div className="flex items-center gap-2">
-                        {[
-                            { label: 'Service', color: 'bg-[#037166]' },
-                            { label: 'Address', color: 'bg-[#037166]' },
-                            { label: 'Date & Time', color: 'bg-[#037166]' },
-                            { label: 'Payment', color: 'bg-white/20' }
-                        ].map((step, index) => (
-                            <React.Fragment key={step.label}>
-                                <div className="flex items-center gap-2">
-                                    <div className={`w-8 h-8 rounded-full ${step.color} flex items-center justify-center`}>
-                                        {index < 3 ? (
-                                            <CheckCircle className="w-5 h-5 text-white" />
-                                        ) : (
-                                            <span className="text-white text-xs font-bold">{index + 1}</span>
-                                        )}
-                                    </div>
-                                    <span className="text-white/90 text-sm font-medium hidden sm:inline">{step.label}</span>
-                                </div>
-                                {index < 3 && <div className={`h-0.5 flex-1 ${index < 2 ? 'bg-[#037166]' : 'bg-white/30'}`} />}
-                            </React.Fragment>
-                        ))}
-                    </div>
+                    <BookingSteps
+                        flowType={FLOW_TYPES.SERVICE_CENTER}
+                        currentStep="address"
+                        serviceSlug="appliances"
+                    />
                 </div>
             </section>
 

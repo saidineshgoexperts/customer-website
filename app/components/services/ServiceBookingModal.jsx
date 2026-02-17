@@ -216,8 +216,16 @@ export function ServiceBookingModal({ isOpen, onClose }) {
                                             whileTap={{ scale: 0.98 }}
                                             className="group flex items-center gap-4 p-4 rounded-xl bg-[#1a1a1a] border border-[#333] hover:border-[#037166] hover:bg-[#037166]/10 transition-all text-left"
                                         >
-                                            <div className="w-10 h-10 rounded-full bg-[#222] flex items-center justify-center flex-shrink-0 group-hover:bg-[#037166] transition-colors">
-                                                <CheckCircle className="w-5 h-5 text-gray-500 group-hover:text-white" />
+                                            <div className="w-12 h-12 rounded-lg bg-[#222] overflow-hidden flex-shrink-0 border border-[#333] group-hover:border-[#037166]/30">
+                                                <img
+                                                    src={sub.image?.startsWith('http') ? sub.image : `https://api.doorstephub.com/${sub.image}`}
+                                                    alt={sub.name}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg></div>';
+                                                    }}
+                                                />
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-semibold text-white group-hover:text-[#04a99d] transition-colors">{sub.name}</h4>

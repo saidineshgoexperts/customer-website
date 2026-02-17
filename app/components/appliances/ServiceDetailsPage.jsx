@@ -43,7 +43,8 @@ const relatedServices = [
 export function ServiceDetailsPage({
   serviceId,
   category,
-  subCategory
+  subCategory,
+  subCategoryId
 }) {
   const router = useRouter();
   const { addToCart } = useServiceCart();
@@ -75,6 +76,42 @@ export function ServiceDetailsPage({
         const data = await response.json();
         if (data.success) {
           setServiceDetails(data);
+
+          // Auto-enrich URL if metadata is missing
+          if (!category || !subCategory || !subCategoryId) {
+            try {
+              const res = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
+              const allServicesData = await res.json();
+              if (allServicesData.success && Array.isArray(allServicesData.data)) {
+                let foundCat = '';
+                let foundSub = '';
+                let foundSubId = '';
+
+                for (const cat of allServicesData.data) {
+                  const subContent = cat.subcategories || [];
+                  for (const sub of subContent) {
+                    if (sub._id === data.storeData?.subCategoryId) {
+                      foundCat = cat.name;
+                      foundSub = sub.name;
+                      foundSubId = sub._id;
+                      break;
+                    }
+                  }
+                  if (foundCat) break;
+                }
+
+                if (foundCat && foundSub && foundSubId) {
+                  const params = new URLSearchParams(window.location.search);
+                  params.set('category', foundCat);
+                  params.set('subCategory', foundSub);
+                  params.set('subCategoryId', foundSubId);
+                  router.replace(`${window.location.pathname}?${params.toString()}`);
+                }
+              }
+            } catch (enrichError) {
+              console.error("Error auto-enriching URL:", enrichError);
+            }
+          }
         }
       } catch (error) {
         console.error("Error fetching service details:", error);
@@ -85,7 +122,7 @@ export function ServiceDetailsPage({
     };
 
     fetchServiceDetails();
-  }, [serviceId]);
+  }, [serviceId, category, subCategory, subCategoryId, router]);
 
   if (loading) {
     return (
@@ -187,13 +224,7 @@ export function ServiceDetailsPage({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={() => {
-              // Get subCategoryId from serviceDetails or use a fallback
-              const subCatId = serviceDetails?.storeData?.subCategoryId;
-              if (subCatId && category && subCategory) {
-                router.push(`/appliances/listing/${subCatId}?category=${encodeURIComponent(category)}&name=${encodeURIComponent(subCategory)}`);
-              } else {
-                window.history.back();
-              }
+              router.push('/appliances');
             }}
             className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all"
           >

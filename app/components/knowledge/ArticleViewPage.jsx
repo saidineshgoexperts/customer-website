@@ -6,6 +6,7 @@ import { ArrowLeft, Clock, Calendar, User, Share2, Facebook, Twitter, Linkedin, 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
+import { NewsletterWidget } from '@/components/shared/NewsletterWidget';
 
 export function ArticleViewPage({ slug }) {
     const router = useRouter();
@@ -225,18 +226,7 @@ export function ArticleViewPage({ slug }) {
                 {/* Sidebar */}
                 <aside className="lg:col-span-4 space-y-8">
                     {/* Newsletter Widget */}
-                    <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded-2xl sticky top-24">
-                        <h3 className="text-xl font-bold mb-2">Subscribe to our Newsletter</h3>
-                        <p className="text-gray-400 text-sm mb-6">Get the latest tips and updates delivered directly to your inbox.</p>
-                        <input
-                            type="email"
-                            placeholder="Your email address"
-                            className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg text-white mb-4 focus:outline-none focus:border-[#037166] transition-colors"
-                        />
-                        <button className="w-full px-4 py-3 bg-[#037166] hover:bg-[#025951] text-white font-medium rounded-lg transition-colors">
-                            Subscribe
-                        </button>
-                    </div>
+                    <NewsletterWidget compact />
 
                     {/* Related Articles */}
                     {relatedArticles.length > 0 && (

@@ -218,7 +218,7 @@ export default function BecomePartnerPage() {
                                                     <TrendingUp className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-xs text-white/50">₹24,560</div>
+                                                    <div className="text-xs text-white/50">₹74000</div>
                                                     <div className="text-sm font-bold text-[#04a99d]">This Month</div>
                                                 </div>
                                             </div>
@@ -231,7 +231,7 @@ export default function BecomePartnerPage() {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="text-xs text-white/60 truncate">Today's Earnings</div>
-                                                        <div className="text-2xl font-black text-white">₹2,450</div>
+                                                        <div className="text-2xl font-black text-white">₹3350</div>
                                                     </div>
                                                 </div>
 

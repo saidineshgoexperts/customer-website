@@ -156,7 +156,7 @@ export function NearbyServiceCenters() {
             };
           });
 
-          setServices(transformedServices.slice(0, 4));
+          setServices(transformedServices.slice(0, 6));
         } else {
           setServices([]);
         }
@@ -382,7 +382,7 @@ export function NearbyServiceCenters() {
             )}
           </motion.div>
 
-          {/* YOUR EXACT ORIGINAL LIST */}
+          {/* Service List - First 4 */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -392,7 +392,7 @@ export function NearbyServiceCenters() {
             {loading ? (
               Array(3).fill(0).map((_, i) => <SkeletonService key={i} />)
             ) : services.length > 0 ? (
-              services.map((service, index) => (
+              services.slice(0, 4).map((service, index) => (
                 <motion.div
                   key={service.id}
                   onClick={() => setSelectedService(index)}
@@ -416,6 +416,35 @@ export function NearbyServiceCenters() {
             )}
           </motion.div>
         </div>
+
+        {/* Last 2 Service Centers - Side by Side Below Map */}
+        {!loading && services.length >= 6 && (
+          <div className="grid lg:grid-cols-2 gap-8 mt-8">
+            {services.slice(4, 6).map((service, index) => {
+              const actualIndex = index + 4;
+              return (
+                <motion.div
+                  key={service.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  onClick={() => setSelectedService(actualIndex)}
+                  className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${selectedService === actualIndex
+                    ? 'bg-gradient-to-r from-[#037166]/20 to-[#025951]/20 border-2 border-[#037166]'
+                    : 'bg-[#1a1a1a]/50 border border-[#037166]/20'
+                    }`}
+                >
+                  <h4 className="text-xl font-bold bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent transition-colors">{service.name}</h4>
+                  <p className="text-gray-400 text-sm">{service.address}</p>
+                  <div className="flex gap-4 mt-2">
+                    <span className="flex items-center text-[#037166] text-sm"><Star className="w-4 h-4 mr-1" /> {service.rating}</span>
+                    <h6 className="text-sm text-gray-400 font-normal">{service.status}</h6>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Explore Stores Button - Bottom */}
         <motion.div

@@ -18,7 +18,19 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
     const [profileData, setProfileData] = useState({ name: '', email: '' });
     const [previewImage, setPreviewImage] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [resendTimer, setResendTimer] = useState(0);
     const fileInputRef = React.useRef(null);
+
+    // Timer logic for Resend OTP
+    React.useEffect(() => {
+        let interval;
+        if (resendTimer > 0) {
+            interval = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [resendTimer]);
 
     // Initial load of profile data
     React.useEffect(() => {
@@ -50,7 +62,7 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
     const accentText = t.textHover;
 
     const handleSendOtp = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         if (mobile.length !== 10) {
             toast.error('Please enter a valid 10-digit mobile number');
             return;
@@ -59,7 +71,8 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
         try {
             const data = await loginWithWhatsApp(mobile);
             if (data.success || data.status === 'success') {
-                setStep('otp');
+                if (step !== 'otp') setStep('otp');
+                setResendTimer(30);
                 toast.success('OTP sent to WhatsApp');
             } else {
                 toast.error(data.message || 'Failed to send OTP');
@@ -68,6 +81,12 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
             console.error(error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleResendOtp = () => {
+        if (resendTimer === 0) {
+            handleSendOtp();
         }
     };
 
@@ -250,6 +269,23 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                     >
                                         {loading ? 'Verifying...' : 'Verify OTP'}
                                     </button>
+
+                                    <div className="text-center">
+                                        {resendTimer > 0 ? (
+                                            <p className={`${t.textMain} opacity-40 text-sm`}>
+                                                Resend code in <span className="font-bold">{resendTimer}s</span>
+                                            </p>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={handleResendOtp}
+                                                disabled={loading}
+                                                className={`text-sm font-bold ${accentText} hover:underline disabled:opacity-50 transition-all`}
+                                            >
+                                                Resend OTP
+                                            </button>
+                                        )}
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={() => {

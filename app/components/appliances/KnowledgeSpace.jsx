@@ -97,7 +97,7 @@ export function KnowledgeSpace() {
 
   // Skeleton Card
   const SkeletonCard = () => (
-    <div className="h-full rounded-3xl overflow-hidden bg-[#1a1a1a] border border-white/5">
+    <div className="h-full rounded-3xl overflow-hidden bg-[#1a1a1a] border mb-3 border-white/5">
       <div className="h-48 bg-white/5 animate-pulse" />
       <div className="p-6 space-y-4">
         <div className="h-6 w-3/4 bg-white/5 rounded animate-pulse" />
@@ -253,7 +253,7 @@ export function KnowledgeSpace() {
         </motion.div>
 
         {/* Newsletter Signup */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -278,7 +278,7 @@ export function KnowledgeSpace() {
               Subscribe Now
             </motion.button>
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

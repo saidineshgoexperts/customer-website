@@ -306,21 +306,33 @@ export function Header({ theme = {}, navItems = [] }) {
                 )}
               </motion.button>
 
-              {/* Auth Button */}
+              {/* Auth Button with Profile Indicator */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setAuthModalOpen(true)}
-                className={`flex items-center justify-center w-11 h-11 rounded-full ${currentTheme.buttonBg} ${currentTheme.textHover ? `hover:bg-[${currentTheme.textHover.replace('text-', '').replace('[', '').replace(']', '')}]/10` : 'hover:bg-[#037166]/10'} border ${currentTheme.border} transition-all overflow-hidden shadow-md hover:shadow-lg`}
+                className={`relative flex items-center justify-center w-11 h-11 rounded-full ${currentTheme.buttonBg} ${currentTheme.textHover ? `hover:bg-[${currentTheme.textHover.replace('text-', '').replace('[', '').replace(']', '')}]/10` : 'hover:bg-[#037166]/10'} border ${currentTheme.border} transition-all overflow-hidden shadow-md hover:shadow-lg`}
               >
                 {isAuthenticated && user?.image ? (
                   <img
                     src={user.image?.startsWith('http') ? user.image : `https://api.doorstephub.com/${user.image}`}
-                    alt={user.name}
+                    alt={user.name || 'User'}
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
                   <User className={`w-5 h-5 ${currentTheme.textHover ? currentTheme.textHover : 'text-[#037166]'}`} />
+                )}
+
+                {/* Profile Incomplete Warning Badge */}
+                {isAuthenticated && (!user?.name || !user?.email) && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-[#0a0a0a] shadow-lg"
+                    title="Complete your profile"
+                  >
+                    <span className="text-white text-xs font-bold">!</span>
+                  </motion.div>
                 )}
               </motion.button>
 

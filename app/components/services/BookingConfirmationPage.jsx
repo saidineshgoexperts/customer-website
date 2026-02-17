@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { BookingSteps, FLOW_TYPES } from '@/components/shared/BookingSteps';
 
 export function BookingConfirmationPage({
   address,
@@ -295,37 +296,11 @@ export function BookingConfirmationPage({
 
         {/* Progress Indicator */}
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8 pb-6">
-          <div className="flex items-center gap-2">
-            {[
-              { label: 'Service', status: 'completed' },
-              { label: directBookingItems ? 'Direct' : 'Cart', status: 'completed' },
-              { label: 'Address', status: 'completed' },
-              { label: 'Confirm', status: 'active' }
-            ].map((step, index, arr) => (
-              <React.Fragment key={step.label}>
-                <div className="flex items-center gap-2">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step.status === 'completed' || step.status === 'active'
-                    ? 'bg-gradient-to-r from-[#037166] to-[#04a99d]'
-                    : 'bg-white/10'
-                    }`}>
-                    {step.status === 'completed' ? (
-                      <CheckCircle className="w-5 h-5 text-white" />
-                    ) : (
-                      <div className={`w-3 h-3 rounded-full ${step.status === 'active' ? 'bg-white' : 'bg-white/30'}`} />
-                    )}
-                  </div>
-                  <span className={`text-sm font-medium hidden sm:inline ${step.status === 'active' ? 'text-white' : 'text-white/70'
-                    }`}>{step.label}</span>
-                </div>
-                {index < arr.length - 1 && (
-                  <div className={`h-0.5 flex-1 ${arr[index + 1].status === 'active' || step.status === 'completed'
-                    ? 'bg-[#037166]'
-                    : 'bg-white/10'
-                    }`} />
-                )}
-              </React.Fragment>
-            ))}
-          </div>
+          <BookingSteps
+            flowType={directBookingItems ? FLOW_TYPES.NORMAL : FLOW_TYPES.SERVICE_CENTER}
+            currentStep="confirm"
+            serviceSlug="services"
+          />
         </div>
       </section>
 

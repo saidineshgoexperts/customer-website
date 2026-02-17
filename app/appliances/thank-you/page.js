@@ -28,16 +28,44 @@ function ThankYouContent() {
         // Clean up duplicated address parts from URL
         let cleanAddress = urlAddress;
         if (urlAddress) {
-            // Split by newline to preserve name/structure
-            const lines = urlAddress.split('\n');
-            const cleanedLines = lines.map(line => {
-                // Split by comma to find duplicated segments within the line (e.g. area repeated)
-                const segments = line.split(',').map(s => s.trim());
-                // Remove duplicates while preserving order
-                const uniqueSegments = segments.filter((item, index) => segments.indexOf(item) === index);
-                return uniqueSegments.join(', ');
-            });
-            cleanAddress = cleanedLines.join('\n');
+            // Split by comma to get all segments
+            const segments = urlAddress.split(',').map(s => s.trim()).filter(s => s);
+
+            // Remove consecutive duplicate segments
+            const uniqueSegments = [];
+            for (let i = 0; i < segments.length; i++) {
+                // Check if this segment is the same as the previous one
+                if (i === 0 || segments[i] !== segments[i - 1]) {
+                    uniqueSegments.push(segments[i]);
+                }
+            }
+
+            // Also check for repeated patterns (e.g., "A, B, C, A, B, C")
+            // Find the longest repeating pattern from the middle
+            let finalSegments = uniqueSegments;
+            for (let patternLength = 1; patternLength <= Math.floor(uniqueSegments.length / 2); patternLength++) {
+                const midPoint = Math.floor(uniqueSegments.length / 2);
+                let isRepeating = true;
+
+                // Check if segments repeat around the middle
+                for (let i = 0; i < patternLength && (midPoint - patternLength + i) >= 0 && (midPoint + i) < uniqueSegments.length; i++) {
+                    if (uniqueSegments[midPoint - patternLength + i] !== uniqueSegments[midPoint + i]) {
+                        isRepeating = false;
+                        break;
+                    }
+                }
+
+                if (isRepeating && midPoint >= patternLength) {
+                    // Remove the repeated pattern
+                    finalSegments = [
+                        ...uniqueSegments.slice(0, midPoint),
+                        ...uniqueSegments.slice(midPoint + patternLength)
+                    ];
+                    break;
+                }
+            }
+
+            cleanAddress = finalSegments.join(', ');
         }
 
         const displayAddress = cleanAddress || (sessionAddress ? `${sessionAddress.flat}, ${sessionAddress.area}, ${sessionAddress.cityName}` : '');

@@ -65,7 +65,7 @@ export function NearbyServiceCenters({ onViewAll }) {
         const data = await response.json();
 
         if (data.success && data.nearestServiceCenters) {
-          const transformedServices = data.nearestServiceCenters.slice(0, 8).map((service, index) => {
+          const transformedServices = data.nearestServiceCenters.slice(0, 6).map((service, index) => {
             const angle = (index / 5) * 2 * Math.PI;
             const dist = 0.3 + index * 0.4;
             const latOffset = (dist / 111) * Math.cos(angle);
@@ -227,7 +227,7 @@ export function NearbyServiceCenters({ onViewAll }) {
             )}
           </motion.div>
 
-          {/* Service List */}
+          {/* Service List - First 4 */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -239,7 +239,7 @@ export function NearbyServiceCenters({ onViewAll }) {
                 <div key={i} className="h-32 rounded-2xl bg-white/5 animate-pulse border border-white/10" />
               ))
             ) : services.length > 0 ? (
-              services.map((service, index) => (
+              services.slice(0, 4).map((service, index) => (
                 <motion.div
                   key={service.id}
                   onClick={() => setSelectedService(index)}
@@ -303,6 +303,74 @@ export function NearbyServiceCenters({ onViewAll }) {
             )}
           </motion.div>
         </div>
+
+        {/* Last 2 Service Centers - Side by Side Below Map */}
+        {!loading && services.length >= 6 && (
+          <div className="grid lg:grid-cols-2 gap-8 mt-8">
+            {services.slice(4, 6).map((service, index) => {
+              const actualIndex = index + 4;
+              return (
+                <motion.div
+                  key={service.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  onClick={() => setSelectedService(actualIndex)}
+                  whileHover={{ x: 5 }}
+                  className={`p-5 rounded-2xl cursor-pointer transition-all duration-300 border backdrop-blur-sm ${selectedService === actualIndex
+                    ? 'bg-gradient-to-r from-[#037166]/20 to-[#025951]/20 border-[#037166] shadow-lg shadow-[#037166]/10'
+                    : 'bg-[#1a1a1a]/50 border-white/10 hover:border-[#037166]/30'
+                    }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#037166]/20 text-[#04a99d]">
+                          {service.distance} AWAY
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 fill-[#04a99d] text-[#04a99d]" />
+                          <span className="text-xs font-bold text-white">{service.rating}</span>
+                        </div>
+                      </div>
+                      <h4 className="text-xl font-bold text-white mb-1 group-hover:text-[#04a99d] transition-colors">
+                        {service.name}
+                      </h4>
+                      <p className="text-white/40 text-sm line-clamp-1">{service.address}</p>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = `tel:${service.phone}`;
+                      }}
+                      className="p-3 rounded-xl bg-[#037166]/10 hover:bg-[#037166] text-[#037166] hover:text-white transition-all border border-[#037166]/20"
+                    >
+                      <Phone className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-xs text-gray-400 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-green-400" />
+                      {service.status}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/appliances/store/${service.id}`);
+                      }}
+                      className="text-xs font-bold text-[#04a99d] hover:text-white flex items-center gap-1"
+                    >
+                      View Details
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
 
         {/* View All Button */}
         <motion.div

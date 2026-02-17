@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { BookOpen, TrendingUp, Clock, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
+import { NewsletterWidget } from '@/components/shared/NewsletterWidget';
 
 const dummyArticles = [
   {
@@ -253,32 +254,7 @@ export function KnowledgeSection() {
         </motion.div>
 
         {/* Newsletter Signup */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-20 max-w-3xl mx-auto p-8 bg-gradient-to-r from-[#1a1a1a]/80 via-[#1a1a1a]/90 to-[#1a1a1a]/80 backdrop-blur-xl border-2 border-[#037166]/30 rounded-3xl"
-        >
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-white mb-2">Stay Updated</h3>
-            <p className="text-gray-400">Get the latest articles and exclusive insights delivered to your inbox</p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-6 py-4 bg-[#0a0a0a]/80 border border-[#037166]/30 rounded-full text-white placeholder-gray-500 focus:outline-none focus:border-[#037166] transition-colors"
-            />
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 bg-gradient-to-r from-[#037166] to-[#025951] rounded-full text-white font-semibold shadow-lg shadow-[#037166]/40 hover:shadow-xl hover:shadow-[#037166]/50 transition-all whitespace-nowrap"
-            >
-              Subscribe Now
-            </motion.button>
-          </div>
-        </motion.div>
+        <NewsletterWidget />
       </div>
     </section>
   );
