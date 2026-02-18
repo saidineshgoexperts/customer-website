@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { ArrowLeft, Star, Clock, Shield, CheckCircle, Award, ThumbsUp, ChevronLeft, ChevronRight, ArrowRight, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
@@ -47,6 +47,7 @@ export function ServiceDetailsPage({
   subCategoryId
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { addToCart } = useServiceCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [serviceDetails, setServiceDetails] = useState(null);
@@ -224,7 +225,10 @@ export function ServiceDetailsPage({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={() => {
-              router.push('/appliances');
+              // Extract base path (everything before /detail)
+              const pathSegments = pathname.split('/detail/');
+              const basePath = pathSegments[0] || '/appliances';
+              router.push(basePath);
             }}
             className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all"
           >
@@ -553,7 +557,11 @@ export function ServiceDetailsPage({
                     }];
 
                     localStorage.setItem('booking_package_details', JSON.stringify(itemsToBook));
-                    router.push('/appliances/address');
+
+                    // Navigate to address page preserving current base path
+                    const pathSegments = pathname.split('/detail/');
+                    const basePath = pathSegments[0] || '/appliances';
+                    router.push(`${basePath}/address`);
                   }}
                   className="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg hover:shadow-2xl hover:shadow-[#037166]/40 transition-all flex items-center justify-center gap-3 group"
                 >

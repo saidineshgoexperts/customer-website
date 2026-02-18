@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Calendar, Clock, MapPin, User, CheckCircle, Sparkles, CreditCard, Wallet, Truck, Info } from 'lucide-react';
 import { toast } from 'sonner';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { BookingSteps, FLOW_TYPES } from '@/components/shared/BookingSteps';
+import { generateIdempotencyKey, formatDateTimeWithTimezone, validatePrice } from '@/utils/security';
 
 export function BookingConfirmationPage({
   address,
@@ -24,6 +25,11 @@ export function BookingConfirmationPage({
   const [directBookingItems, setDirectBookingItems] = useState(null);
   const [walletBalance, setWalletBalance] = useState(0);
   const [walletLoading, setWalletLoading] = useState(false);
+
+  // Race condition protection
+  const [isProcessing, setIsProcessing] = useState(false);
+  const processingRef = useRef(false);
+  const idempotencyKeyRef = useRef(null);
 
   // Fetch Wallet Balance
   useEffect(() => {
@@ -170,6 +176,12 @@ export function BookingConfirmationPage({
   }, [selectedDate]);
 
   const handleConfirm = async () => {
+    // Prevent duplicate clicks (race condition protection)
+    if (isProcessing || processingRef.current) {
+      console.log('Booking already in progress, ignoring duplicate click');
+      return;
+    }
+
     if (!isAuthenticated) {
       toast.error('Please login to book a service');
       return;
@@ -179,7 +191,22 @@ export function BookingConfirmationPage({
       return;
     }
 
+    // Validate price integrity
+    const priceValidation = validatePrice(total);
+    if (!priceValidation.valid) {
+      toast.error('Invalid booking amount. Please refresh and try again.');
+      return;
+    }
+
+    // Set processing flags
+    setIsProcessing(true);
+    processingRef.current = true;
     setIsConfirming(true);
+
+    // Generate idempotency key for this booking
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current = generateIdempotencyKey('booking');
+    }
 
     try {
       const storedServiceId = localStorage.getItem('last_service_id');
@@ -189,6 +216,9 @@ export function BookingConfirmationPage({
         throw new Error('Service identifier missing. Please return to service details and try again.');
       }
 
+      // Format date/time with timezone
+      const dateTimeInfo = formatDateTimeWithTimezone(selectedDate, selectedTime);
+
       const bookingData = {
         serviceId: serviceId,
         serviceAddressId: address._id || address.id,
@@ -196,7 +226,9 @@ export function BookingConfirmationPage({
         addMoreInfo: `Technician Preference: ${technicianPreference}. Payment: ${paymentMethod}. Packages: ${cartItems.map(i => i.packageName || i.serviceName).join(', ')}`,
         bookedDate: selectedDate,
         bookedTime: selectedTime,
-        totalAmount: total.toString()
+        bookedDateTime: dateTimeInfo.iso, // ISO 8601 format with timezone
+        timezone: dateTimeInfo.timezone,
+        totalAmount: priceValidation.value.toString() // Use validated price
       };
 
       if (paymentMethod === 'COD' || paymentMethod === 'wallet') {
@@ -205,7 +237,8 @@ export function BookingConfirmationPage({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'X-Idempotency-Key': idempotencyKeyRef.current // Prevent duplicate bookings
           },
           body: JSON.stringify({
             ...bookingData,
@@ -227,7 +260,8 @@ export function BookingConfirmationPage({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'X-Idempotency-Key': idempotencyKeyRef.current // Prevent duplicate payments
           },
           body: JSON.stringify(bookingData)
         });
@@ -250,8 +284,13 @@ export function BookingConfirmationPage({
     } catch (error) {
       console.error('Booking Error:', error);
       toast.error(error.message || 'Failed to confirm booking. Please try again.');
+
+      // Reset idempotency key on error to allow retry
+      idempotencyKeyRef.current = null;
     } finally {
       setIsConfirming(false);
+      setIsProcessing(false);
+      processingRef.current = false;
     }
   };
 

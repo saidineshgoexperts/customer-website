@@ -23,7 +23,8 @@ export function ApplianceHomePage() {
         category: 'service-list/category/appliance-repair-service',
         recentlyBooked: 'all-service-categories',
         featuredServices: 'all-service-categories',
-        serviceCenter: 'nearby-service-centers'
+        serviceCenter: 'nearby-service-centers',
+        verifiedPartner: 'verified-appliance-repair-partners'
     });
 
     // Fetch Slugs for this service
@@ -62,9 +63,10 @@ export function ApplianceHomePage() {
         if (id) {
             const baseUrl = `/${serviceSlugs.home}`;
             if (type === 'partner') {
-                router.push(`${baseUrl}/verified-partners?category=Services&name=Verified Partners`);
+                router.push(`/${serviceSlugs.verifiedPartner}`);
             } else {
-                router.push(`${baseUrl}/child/${id}?category=Services&name=${type === 'partner' ? 'Verified Partners' : 'Service Centers'}`);
+                // Align with the slug used in the "Nearest Appliance Service Centers" section
+                router.push(`/${serviceSlugs.serviceCenter}`);
             }
         }
         setShowExploreModal(false);

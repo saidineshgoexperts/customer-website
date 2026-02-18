@@ -1,9 +1,7 @@
 {
-  "/appliances/address/page": "app/appliances/address/page.js",
-  "/appliances/booking/page": "app/appliances/booking/page.js",
-  "/appliances/detail/[serviceId]/page": "app/appliances/detail/[serviceId]/page.js",
-  "/(landing)/page": "app/(landing)/page.js",
-  "/appliances/payment-failed/page": "app/appliances/payment-failed/page.js",
+  "/appliances/page": "app/appliances/page.js",
   "/[slug]/page": "app/[slug]/page.js",
-  "/services/payment-failed/page": "app/services/payment-failed/page.js"
+  "/[slug]/[subCategorySlug]/page": "app/[slug]/[subCategorySlug]/page.js",
+  "/appliances/recent/page": "app/appliances/recent/page.js",
+  "/appliances/detail/[serviceId]/page": "app/appliances/detail/[serviceId]/page.js"
 }

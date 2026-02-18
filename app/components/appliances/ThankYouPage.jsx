@@ -94,8 +94,13 @@ export function ThankYouPage({ bookingDetails }) {
                     </h1>
                     <p className="text-xl text-white/80 mb-2">Your Booking Has Been Received</p>
                     {bookingDetails?.orderId && (
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[#04a99d] font-mono text-sm mb-4">
-                            Booking ID: {bookingDetails.orderId}
+                        <div className="inline-flex flex-col items-center gap-2 mb-4">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[#04a99d] font-mono text-sm">
+                                Booking ID: {bookingDetails.orderId}
+                            </div>
+                            <p className="text-[11px] text-[#04a99d]/60 font-medium animate-pulse">
+                                Payment verification in progress. This usually takes 2-5 minutes.
+                            </p>
                         </div>
                     )}
                     <p className="text-white/60">We've sent a Confirmation to your Registered Email </p>
@@ -171,6 +176,9 @@ export function ThankYouPage({ bookingDetails }) {
                         <h5 className="text-2xl font-bold text-white mb-3">Doorstep Hub App</h5>
                         <p className="text-white/60 text-sm mb-8 max-w-[280px] leading-relaxed">
                             Track your service, manage bookings, and get app-exclusive offers in real-time.
+                            <span className="block mt-2 text-[#04a99d]/80 font-medium italic">
+                                *If payment status is pending, it will update here within minutes.
+                            </span>
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">

@@ -1,14 +1,14 @@
 {
   "pages": {
-    "/appliances/page": [
+    "/(landing)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/appliances/page.js"
+      "static/chunks/app/(landing)/page.js"
     ],
-    "/appliances/layout": [
+    "/(landing)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/appliances/layout.js"
+      "static/chunks/app/(landing)/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -36,10 +36,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/[slug]/layout.js"
     ],
-    "/appliances/child/[childCategoryId]/page": [
+    "/appliances/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/appliances/child/[childCategoryId]/page.js"
+      "static/chunks/app/appliances/page.js"
+    ],
+    "/appliances/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/appliances/layout.js"
     ],
     "/[slug]/[subCategorySlug]/page": [
       "static/chunks/webpack.js",
@@ -51,21 +56,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/appliances/detail/[serviceId]/page.js"
     ],
-    "/_not-found/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
-    ],
-    "/(landing)/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/page.js"
-    ],
-    "/(landing)/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/layout.js"
-    ],
     "/appliances/address/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -76,15 +66,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/appliances/booking/page.js"
     ],
-    "/appliances/featured/page": [
+    "/appliances/[...slug]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/appliances/featured/page.js"
+      "static/chunks/app/appliances/[...slug]/page.js"
     ],
-    "/appliances/recent/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/appliances/recent/page.js"
+      "static/chunks/app/_not-found/page.js"
+    ],
+    "/appliances/child/[childCategoryId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/appliances/child/[childCategoryId]/page.js"
     ],
     "/appliances/centers/page": [
       "static/chunks/webpack.js",
@@ -96,40 +91,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/knowledge/[slug]/page.js"
     ],
-    "/knowledge/page": [
+    "/knowledge/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/knowledge/page.js"
+      "static/chunks/app/knowledge/layout.js"
     ],
-    "/partner/page": [
+    "/appliances/recent/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/partner/page.js"
-    ],
-    "/appliances/[...slug]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/appliances/[...slug]/page.js"
-    ],
-    "/appliances/cart/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/appliances/cart/page.js"
-    ],
-    "/appliances/payment-failed/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/appliances/payment-failed/page.js"
-    ],
-    "/services/payment-failed/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/services/payment-failed/page.js"
-    ],
-    "/services/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/services/layout.js"
+      "static/chunks/app/appliances/recent/page.js"
     ]
   }
 }

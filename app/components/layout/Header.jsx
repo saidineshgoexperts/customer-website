@@ -205,7 +205,7 @@ export function Header({ theme = {}, navItems = [] }) {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || isServicePage
-          ? `${currentTheme.bgScrolled} backdrop-blur-xl border-b ${currentTheme.border} shadow-lg ${currentTheme.isLight ? 'shadow-[#C06C84]/5' : 'shadow-[#037166]/5'}`
+          ? `${currentTheme.bgScrolled} glass-premium border-b ${currentTheme.border} shadow-lg ${currentTheme.isLight ? 'shadow-[#C06C84]/5' : 'shadow-[#037166]/5'}`
           : 'bg-transparent'
           }`}
       >

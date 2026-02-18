@@ -14,19 +14,45 @@ export function PaymentFailurePage() {
         // Check if we have booking data to retry
         const savedAddress = sessionStorage.getItem('selected_address');
         const bookingDetails = sessionStorage.getItem('booking_package_details');
-        setHasBookingData(!!(savedAddress || bookingDetails));
-    }, []);
+
+        // Also check URL parameters for booking reference
+        const orderId = searchParams.get('orderId');
+        const serviceId = searchParams.get('serviceId');
+        const date = searchParams.get('date');
+        const time = searchParams.get('time');
+        const addressParam = searchParams.get('address');
+
+        // If we have URL params, restore to sessionStorage
+        if (orderId || serviceId) {
+            if (date) sessionStorage.setItem('last_booking_date', date);
+            if (time) sessionStorage.setItem('last_booking_time', time);
+            if (addressParam) {
+                try {
+                    // Try to parse if it's JSON, otherwise use as string
+                    const addressData = addressParam.startsWith('{')
+                        ? JSON.parse(addressParam)
+                        : { fullAddress: addressParam };
+                    sessionStorage.setItem('selected_address', JSON.stringify(addressData));
+                } catch (e) {
+                    console.error('Failed to parse address:', e);
+                }
+            }
+        }
+
+        setHasBookingData(!!(savedAddress || bookingDetails || orderId || serviceId));
+    }, [searchParams]);
 
     const handleRetry = () => {
         // Check for saved booking data
         const savedAddress = sessionStorage.getItem('selected_address');
         const bookingDetails = sessionStorage.getItem('booking_package_details');
+        const serviceId = searchParams.get('serviceId');
 
-        if (savedAddress) {
+        if (savedAddress || searchParams.get('address')) {
             // If we have address, redirect back to confirmation page
             router.push('/appliances/booking');
-        } else if (bookingDetails) {
-            // If we have booking details, redirect to address selection
+        } else if (bookingDetails || serviceId) {
+            // If we have booking details or serviceId, redirect to address selection
             router.push('/appliances/address');
         } else {
             // Fallback to home if no data

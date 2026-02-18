@@ -47,7 +47,7 @@ async function getDynamicSlugs() {
 
                         // Manual mapping for Verified Partners (Appliances)
                         if (service.id === '683daaa8f261c1548bdf7442') {
-                            mapping['verified-partners'] = `${service.internalPrefix}/child/683dbbfbb62d2a241de0f7e3`;
+                            mapping['verified-appliance-repair-partners'] = `${service.internalPrefix}/child/683dbbfbb62d2a241de0f7e3`;
                         }
 
                         return mapping;

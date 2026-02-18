@@ -174,7 +174,10 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
                                         transition={{ delay: index * 0.1 }}
                                         whileHover={{ y: -8, scale: 1.02 }}
                                         className="group"
-                                        onClick={() => router.push(`/appliances/detail/${service._id}?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}`)}
+                                        onClick={() => {
+                                            const detailPath = `${pathname}/detail/${service._id}`;
+                                            router.push(`${detailPath}?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}`);
+                                        }}
                                     >
                                         <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-[#037166]/50 transition-all duration-300">
                                             <div className="relative h-48 overflow-hidden">

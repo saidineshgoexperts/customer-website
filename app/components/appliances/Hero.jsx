@@ -121,7 +121,7 @@ export function Hero({ onViewServices, onBookService }) {
 
             <button
               onClick={onViewServices}
-              className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold text-lg hover:bg-white/10 hover:border-[#037166]/50 transition-all hover:scale-105"
+              className="group inline-flex items-center gap-2 px-8 py-4 rounded-full glass-button-premium border border-white/10 text-white font-semibold text-lg hover:bg-white/10 hover:border-[#037166]/50 transition-all hover:scale-105"
             >
               <span className="text-white">
                 Find Services
