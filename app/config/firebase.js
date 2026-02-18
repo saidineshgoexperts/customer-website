@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBXChtYr4A25f-7GukWB-vukPkmtvKUwNA",
@@ -20,8 +20,8 @@ const googleProvider = new GoogleAuthProvider();
 
 // Add custom parameters to show logged-in accounts
 googleProvider.setCustomParameters({
-    prompt: 'select_account', // Force account selection screen
-    login_hint: '', // Empty to show all accounts
+    prompt: 'select_account',
+    login_hint: '',
     access_type: 'online',
 });
 
@@ -29,30 +29,37 @@ googleProvider.setCustomParameters({
 googleProvider.addScope('email');
 googleProvider.addScope('profile');
 
+// Apple Provider Configuration
+const appleProvider = new OAuthProvider('apple.com');
+appleProvider.addScope('email');
+appleProvider.addScope('name');
+
 // Sign in with Google Popup
 export const signInWithGoogle = async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
-
-        // Get the ID Token
         const idToken = await user.getIdToken();
 
         console.log('✅ Google Sign-In Success');
-        console.log('👤 User Details:', {
-            email: user.email,
-            name: user.displayName,
-            photoURL: user.photoURL,
-            uid: user.uid,
-            emailVerified: user.emailVerified
-        });
-        console.log('🔑 ID Token:', idToken.substring(0, 50) + '...');
-
         return { user, idToken };
     } catch (error) {
         console.error('❌ Google Sign-In Error:', error);
-        console.error('Error Code:', error.code);
-        console.error('Error Message:', error.message);
+        throw error;
+    }
+};
+
+// Sign in with Apple Popup
+export const signInWithApple = async () => {
+    try {
+        const result = await signInWithPopup(auth, appleProvider);
+        const user = result.user;
+        const idToken = await user.getIdToken();
+
+        console.log('✅ Apple Sign-In Success');
+        return { user, idToken };
+    } catch (error) {
+        console.error('❌ Apple Sign-In Error:', error);
         throw error;
     }
 };

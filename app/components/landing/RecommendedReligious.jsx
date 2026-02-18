@@ -279,11 +279,13 @@ export function RecommendedReligious() {
                     </div>
                   </div>
 
-                  {/* Rating Badge */}
-                  {/* <div className="absolute top-6 right-6 px-4 py-2 bg-[#037166]/90 backdrop-blur-md rounded-full flex items-center space-x-2">
-                    <Star className="w-4 h-4 text-white fill-white" />
-                    <h6 className="text-sm font-bold text-white">{journey.rating}</h6>
-                  </div> */}
+                  {/* Rating Badge - Bottom Left Flush */}
+                  <div className="absolute bottom-0 left-0 z-20">
+                    <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border border-white/10">
+                      <Star className="w-4 h-4 text-[#04a99d] fill-[#04a99d]" />
+                      <h6 className="text-sm font-bold text-white">{journey.rating}</h6>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Content */}

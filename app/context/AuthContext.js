@@ -269,6 +269,38 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const loginWithApple = async () => {
+        try {
+            const { signInWithApple } = await import('@/config/firebase');
+            const { user, idToken } = await signInWithApple();
+
+            console.log('🍎 Firebase Apple Sign-In successful, calling backend API...');
+
+            const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/auth/loginWithApple', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken, fcmtoken: '1234' })
+            });
+
+            const data = await response.json();
+            console.log('📡 Backend API response:', data);
+
+            if (data.success && data.token) {
+                saveToken(data.token);
+                await fetchProfile(data.token);
+                toast.success('Login successful!');
+                return data;
+            } else {
+                toast.error(data.message || 'Apple Sign-in failed');
+                return data;
+            }
+        } catch (error) {
+            console.error('❌ Apple Sign-in error:', error);
+            toast.error('Apple Sign-in failed');
+            throw error;
+        }
+    };
+
     const updateProfile = async (formData) => {
         try {
             // Check token expiry before making request
@@ -335,6 +367,7 @@ export const AuthProvider = ({ children }) => {
             loginWithWhatsApp,
             verifyOtp,
             loginWithGoogle,
+            loginWithApple,
             updateProfile,
             logout,
             handleApiError, // Expose for use in other contexts

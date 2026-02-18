@@ -64,7 +64,17 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
 
                 const data = await response.json();
                 if (data.success && data.dhubServices && data.dhubServices.length > 0) {
-                    setServices(data.dhubServices);
+                    // Fetch all services for slug enrichment
+                    const allRes = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
+                    const allData = await allRes.json();
+                    const allServices = allData.success && Array.isArray(allData.data) ? allData.data : [];
+
+                    const enriched = data.dhubServices.map(service => {
+                        // Standardized slug generation to handle missing API slugs
+                        const slug = service.slug || allServices.find(as => as._id === service._id)?.slug || service.serviceName?.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || 'service';
+                        return { ...service, slug };
+                    });
+                    setServices(enriched);
                 } else {
                     setServices([]);
                 }
@@ -172,11 +182,8 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.1 }}
                                         whileHover={{ y: -8, scale: 1.02 }}
-                                        className="group"
-                                        onClick={() => {
-                                            const detailPath = `${pathname}/detail/${service._id}`;
-                                            router.push(`${detailPath}?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}`);
-                                        }}
+                                        className="group cursor-pointer"
+                                        onClick={() => router.push(`/${service.slug}`)}
                                     >
                                         <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-[#037166]/50 transition-all duration-300">
                                             <div className="relative h-48 overflow-hidden">
@@ -190,6 +197,15 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
                                                     <Zap className="w-3 h-3" />
                                                     Verified
                                                 </div>
+
+                                                {/* Rating Badge - Bottom Left Flush */}
+                                                <div className="absolute bottom-0 left-0 z-20">
+                                                    <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
+                                                        <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                                                        <span className="text-sm font-bold text-white">{service.rating || '4.8'}</span>
+                                                        {service.totalOrders > 0 && <span className="text-white/40 text-xs">({service.totalOrders})</span>}
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div className="p-6">
@@ -197,13 +213,7 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
                                                     {service.name}
                                                 </h4>
                                                 <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
-                                                <div className="flex items-center gap-4 text-sm mb-4">
-                                                    <div className="flex items-center gap-1">
-                                                        <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
-                                                        <span className="text-white font-medium">{service.rating || '4.5'}</span>
-                                                        <span className="text-white/40">({service.totalOrders || 0})</span>
-                                                    </div>
-                                                </div>
+
                                                 <button className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg transition-all">
                                                     Book Now
                                                 </button>

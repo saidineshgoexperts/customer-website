@@ -198,14 +198,13 @@ export function PopularCenters({ onStoreClick }) {
                           e.target.src = 'https://images.unsplash.com/photo-1667503779301-3120a323859a?auto=format&fit=crop&q=80';
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-
-                      {/* Hover Glow */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        whileHover={{ opacity: 1 }}
-                        className="absolute inset-0 bg-gradient-to-t from-[#037166]/30 to-transparent"
-                      />
+                      {/* Rating Badge - Bottom Left Flush */}
+                      <div className="absolute bottom-0 left-0 z-20">
+                        <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10 text-white">
+                          <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                          <span className="text-sm font-bold">{center.rating}</span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Content */}
@@ -225,13 +224,7 @@ export function PopularCenters({ onStoreClick }) {
 
                       {/* Rating & CTA */}
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#037166]/20">
-                            <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
-                            <span className="text-sm font-medium text-white">{center.rating}</span>
-                          </div>
-                          {center.reviews > 0 && <span className="text-sm text-white/50">({center.reviews})</span>}
-                        </div>
+
 
                         <motion.button
                           whileHover={{ scale: 1.1, rotate: 5 }}

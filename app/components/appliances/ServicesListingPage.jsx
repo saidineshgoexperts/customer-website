@@ -98,12 +98,25 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
         const servicesData = await servicesResponse.json();
 
         if (servicesData.success) {
-          // Set the services
-          setServices(servicesData.dhubServices || []);
+          // Fetch all services to get slugs for enrichment
+          const allRes = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
+          const allData = await allRes.json();
+          const allServices = allData.success && Array.isArray(allData.data) ? allData.data : [];
+
+          // Set the services with slugs enriched if missing
+          const enrichedServices = (servicesData.dhubServices || []).map(service => {
+            if (service.slug) return service;
+            const matched = allServices.find(as => as._id === service._id);
+            // Ensure we have a valid slug string
+            const slug = (matched?.slug || service.name || service.itemName || 'service').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+            return { ...service, slug };
+          });
+
+          setServices(enrichedServices);
 
           // Update metadata if missing
-          if ((!subCategory || !category) && servicesData.dhubServices?.length > 0) {
-            const firstService = servicesData.dhubServices[0];
+          if ((!subCategory || !category) && enrichedServices.length > 0) {
+            const firstService = enrichedServices[0];
             if (!subCategory && firstService.subcategoryName) setPageTitle(firstService.subcategoryName);
             if (!category && firstService.categoryName) setCategoryName(firstService.categoryName);
           }
@@ -534,6 +547,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                         transition={{ delay: index * 0.1 }}
                         whileHover={{ y: -8, scale: 1.02 }}
                         className="group cursor-pointer h-full"
+                        onClick={() => router.push(`/${service.slug}`)}
                       >
                         <div className="flex flex-col relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 hover:border-[#037166]/50 transition-all duration-300">
                           {/* Image */}
@@ -552,11 +566,12 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                               ₹{service.minFare}
                             </div> */}
 
-                            {/* Rating Badge */}
-                            <div className="absolute bottom-3 left-3 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center gap-1.5">
-                              <Star className="w-3.5 h-3.5 fill-[#04a99d] text-[#04a99d]" />
-                              <span className="text-white text-xs font-bold">{service.rating}</span>
-                              {/* <span className="text-white/60 text-[10px]">({service.totalOrders})</span> */}
+                            {/* Rating Badge - Bottom Left Flush */}
+                            <div className="absolute bottom-0 left-0 z-20">
+                              <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
+                                <Star className="w-3.5 h-3.5 fill-[#04a99d] text-[#04a99d]" />
+                                <span className="text-white text-xs font-bold">{service.rating}</span>
+                              </div>
                             </div>
                           </div>
 
@@ -587,7 +602,7 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
 
                             {/* CTA Button */}
                             <button
-                              onClick={() => router.push(`/appliances/detail/${service._id}?category=${encodeURIComponent(categoryName)}&subCategory=${encodeURIComponent(pageTitle)}`)}
+                              onClick={() => router.push(`/${service.slug}`)}
                               className="w-full mt-auto px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all"
                             >
                               Book Now

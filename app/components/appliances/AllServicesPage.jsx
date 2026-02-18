@@ -124,6 +124,15 @@ export function AllServicesPage({
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] to-transparent" />
+
+                      {/* Rating Badge - Bottom Left Flush */}
+                      <div className="absolute bottom-0 left-0 z-20">
+                        <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
+                          <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                          <span className="text-sm font-bold text-white">4.9</span>
+                        </div>
+                      </div>
+
                       <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] text-white text-xs font-bold flex items-center gap-1">
                         <Zap className="w-3 h-3" />
                         Available Now
@@ -135,11 +144,6 @@ export function AllServicesPage({
                         Expert Service {id}
                       </h4>
                       <p className="text-white/60 text-sm mb-4">Professional service provider</p>
-                      <div className="flex items-center gap-1 mb-4">
-                        <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
-                        <span className="text-white font-medium">4.9</span>
-                        <span className="text-white/40">(245)</span>
-                      </div>
                       <button className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg hover:shadow-[#037166]/30 transition-all">
                         Book Now
                       </button>

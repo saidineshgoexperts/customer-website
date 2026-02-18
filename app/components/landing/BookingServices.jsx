@@ -62,17 +62,26 @@ export function BookingServices() {
         const data = await response.json();
 
         if (data.success && data.services) {
-          const transformedServices = data.services.slice(0, 6).map(service => ({
-            id: service._id,
-            title: service.serviceName,
-            category: service.categoryName,
-            rating: 4.8,
-            bookings: '2.3K',
-            image: service.mainImage
-              ? `https://api.doorstephub.com/${service.mainImage}`
-              : 'https://images.unsplash.com/photo-1594873604892-b599f847e859?w=400',
-            status: service.status === 'active' ? 'Save 10% On Services' : 'Unavailable',
-          }));
+          // Fetch all services for slug enrichment
+          const allRes = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
+          const allData = await allRes.json();
+          const allServices = allData.success && Array.isArray(allData.data) ? allData.data : [];
+
+          const transformedServices = data.services.slice(0, 6).map(service => {
+            const matched = allServices.find(as => as._id === service._id || as.serviceName === service.serviceName);
+            return {
+              id: service._id,
+              title: service.serviceName,
+              category: service.categoryName,
+              slug: service.slug || matched?.slug,
+              rating: 4.8,
+              bookings: '2.3K',
+              image: service.mainImage
+                ? `https://api.doorstephub.com/${service.mainImage}`
+                : 'https://images.unsplash.com/photo-1594873604892-b599f847e859?w=400',
+              status: service.status === 'active' ? 'Save 10% On Services' : 'Unavailable',
+            };
+          });
           setServices(transformedServices);
         }
       } catch (err) {
@@ -111,6 +120,10 @@ export function BookingServices() {
   }, [loading, services]);
 
   const handleServiceClick = (service) => {
+    if (service.slug) {
+      router.push(`/${service.slug}`);
+      return;
+    }
     const categoryParam = encodeURIComponent(service.category);
     const subCategoryParam = encodeURIComponent(service.title);
 
@@ -217,6 +230,14 @@ export function BookingServices() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
 
+                    {/* Rating Badge - Bottom Left Flush */}
+                    <div className="absolute bottom-0 left-0 z-20">
+                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
+                        <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                        <span className="text-sm font-bold text-white">{service.rating}</span>
+                      </div>
+                    </div>
+
                     {/* Book Now Button Badge - Bottom Center */}
                     <div
                       className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-[#025951]"
@@ -240,15 +261,6 @@ export function BookingServices() {
                         <h6 className="text-[10px] text-[#037166] font-medium  tracking-wider">
                           {service.category}
                         </h6>
-
-                        {/* Rating */}
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-[#037166] fill-[#037166]" />
-                          <span className="text-xs text-gray-300 font-medium">
-                            {service.rating}
-                          </span>
-                        </div>
-
                       </div>
 
                       {/* Title */}

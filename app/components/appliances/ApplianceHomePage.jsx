@@ -43,10 +43,14 @@ export function ApplianceHomePage() {
         fetchSlugs();
     }, []);
 
-    const handleServiceClick = (serviceId, categoryName, subcategoryName) => {
+    const handleServiceClick = (serviceId, categoryName, subcategoryName, serviceSlug) => {
+        if (serviceSlug) {
+            router.push(`/${serviceSlug}`);
+            return;
+        }
         const categoryParam = encodeURIComponent(categoryName || 'General');
         const subCategoryParam = encodeURIComponent(subcategoryName || 'Service');
-        // Use dynamic home slug if available
+        // Fallback to ID-based if no slug
         router.push(`/${serviceSlugs.home}/detail/${serviceId}?category=${categoryParam}&subCategory=${subCategoryParam}`);
     };
 

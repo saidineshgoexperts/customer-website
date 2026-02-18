@@ -158,7 +158,7 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8 }}
               className="flex-shrink-0 w-[85%] sm:w-[50%] md:w-[33%] lg:w-[22%] xl:w-[15.5%] snap-start group cursor-pointer"
-              onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName)}
+              onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName, service.slug)}
             >
               <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
                 {/* Featured Badge */}
@@ -198,10 +198,10 @@ export function FeaturedServices({ onViewAll, onServiceClick }) {
                   </div>
 
                   {/* Rating Badge - Bottom Left */}
-                  <div className="absolute bottom-2 left-2 z-20">
-                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#037166]/20 backdrop-blur-md border border-[#037166]/10">
+                  <div className="absolute bottom-0 left-0 z-20">
+                    <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
                       <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
-                      <span className="text-sm  text-white">4.8</span>
+                      <span className="text-sm font-bold text-white">{service.rating || '4.8'}</span>
                     </div>
                   </div>
                 </div>

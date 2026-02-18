@@ -13,8 +13,24 @@ export function ThankYouPage({ bookingDetails }) {
     const { user } = useAuth();
     const [copied, setCopied] = useState(false);
     const [showSocials, setShowSocials] = useState(false);
+    const [referAndEarnAmount, setReferAndEarnAmount] = useState('49');
 
-    const inviteLink = `https://doorstephub.com?ref=${user?.phone || 'DH49'}`;
+    React.useEffect(() => {
+        const fetchGlobalSettings = async () => {
+            try {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/get_global_settings');
+                const data = await response.json();
+                if (data.success && data.policy?.customerReferedAmount) {
+                    setReferAndEarnAmount(data.policy.customerReferedAmount);
+                }
+            } catch (error) {
+                console.error("Error fetching global settings:", error);
+            }
+        };
+        fetchGlobalSettings();
+    }, []);
+
+    const inviteLink = `https://doorstephub.com?ref=${user?.phone || `DH${referAndEarnAmount}`}`;
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(inviteLink);
@@ -246,7 +262,7 @@ export function ThankYouPage({ bookingDetails }) {
                                 <Gift className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h4 className="text-xl font-bold text-white">Refer & Earn ₹49</h4>
+                                <h4 className="text-xl font-bold text-white">Refer & Earn ₹{referAndEarnAmount}</h4>
                                 <p className="text-[#04a99d] text-sm font-medium">Earn rewards after your friend's first successful booking</p>
                             </div>
                         </div>

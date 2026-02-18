@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { Church, Calendar, MapPin, Users, Bell, Flame, User, Scroll, Flower2, Utensils, Home, Clock, BookOpen, Building2 } from 'lucide-react';
+import { Church, Calendar, MapPin, Users, Bell, Flame, User, Scroll, Flower2, Utensils, Home, Clock, BookOpen, Building2, Star } from 'lucide-react';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 export function LatestReligiousServices() {
@@ -286,6 +286,14 @@ export function LatestReligiousServices() {
 
                   {/* Divine Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
+
+                  {/* Rating Badge - Bottom Left Flush */}
+                  <div className="absolute bottom-0 left-0 z-20">
+                    <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
+                      <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                      <span className="text-sm font-bold text-white">{service.rating || '4.8'}</span>
+                    </div>
+                  </div>
 
                   {/* Join Service Button Badge - Bottom Center */}
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

@@ -13,9 +13,12 @@ export default function AddressRoute() {
             selectedAddress={selectedAddress}
             onSelectAddress={setSelectedAddress}
             onBack={() => {
-                const isDirect = localStorage.getItem('last_service_id');
-                if (isDirect) {
-                    const serviceId = localStorage.getItem('last_service_id');
+                const serviceSlug = localStorage.getItem('last_service_slug');
+                const serviceId = localStorage.getItem('last_service_id');
+
+                if (serviceSlug) {
+                    router.push(`/${serviceSlug}`);
+                } else if (serviceId) {
                     router.push(`/appliances/detail/${serviceId}`);
                 } else {
                     router.push('/appliances/cart');

@@ -38,6 +38,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
             bookings: Math.floor(Math.random() * 200) + 50, // Random bookings for demo
             categoryName: service.categoryName,
             subcategoryName: service.subcategoryName,
+            slug: service.slug,
           }));
           setServices(transformedServices);
         } else {
@@ -202,7 +203,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -8, scale: 1.02 }}
                   className="group cursor-pointer flex-shrink-0 w-80"
-                  onClick={() => onServiceClick?.(service.id, service.categoryName, service.subcategoryName)}
+                  onClick={() => onServiceClick?.(service.id, service.categoryName, service.subcategoryName, service.slug)}
                 >
                   <div className="relative w-full h-[320px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 backdrop-blur-sm">
                     {/* Booking Badge */}
@@ -232,7 +233,7 @@ export function RecentlyBooked({ onServiceClick, onViewAll }) {
                         className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 px-6 py-1 bg-[#037166] backdrop-blur-md rounded-t-lg rounded-b-none text-white shadow-lg border border-b-0 border-[#037166]/20 whitespace-nowrap cursor-pointer transition-all duration-300 opacity-0 group-hover:opacity-100 hover:bg-[#025951]"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onServiceClick?.(service.id, service.categoryName, service.subcategoryName);
+                          onServiceClick?.(service.id, service.categoryName, service.subcategoryName, service.slug);
                         }}
                       >
                         <h6 className="text-[12px] font-ubuntu tracking-wider text-white">Book Now</h6>

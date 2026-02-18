@@ -329,6 +329,14 @@ export function RecommendedSpaSalon() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
 
 
+                  {/* Rating Badge - Bottom Left Flush */}
+                  {/* <div className="absolute bottom-0 left-0 z-20">
+                    <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border border-white/10">
+                      <Sparkles className="w-4 h-4 text-[#d4af37] fill-[#d4af37]" />
+                      <span className="text-sm font-bold text-white">{place.rating}</span>
+                    </div>
+                  </div> */}
+
                   {/* Shimmer Effect */}
                   <motion.div
                     initial={{ x: '-100%' }}
@@ -355,10 +363,7 @@ export function RecommendedSpaSalon() {
                     </div>
 
                     {/* Rating Space */}
-                    <div className="flex items-center space-x-1 mb-4">
-                      <Sparkles className="w-5 h-5 text-[#d4af37] fill-[#d4af37]" />
-                      <span className="text-lg font-bold text-white">{place.rating}</span>
-                    </div>
+
 
                     {/* Price & Action Card - Matches PG Styling */}
                     <div className="mb-4 p-2 border border-[#037166]/20 rounded-xl flex items-center justify-between gap-2 bg-[#037166]/5">

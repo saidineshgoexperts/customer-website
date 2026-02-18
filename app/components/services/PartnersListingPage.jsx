@@ -191,6 +191,15 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
                                                     <Zap className="w-3 h-3" />
                                                     Verified
                                                 </div>
+
+                                                {/* Rating Badge - Bottom Left Flush */}
+                                                <div className="absolute bottom-0 left-0 z-20">
+                                                    <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
+                                                        <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                                                        <span className="text-sm font-bold text-white">{service.rating || '4.8'}</span>
+                                                        {service.totalOrders > 0 && <span className="text-white/40 text-xs">({service.totalOrders})</span>}
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div className="p-6">
@@ -198,13 +207,7 @@ export function PartnersListingPage({ category, subCategory, childCategoryId }) 
                                                     {service.name}
                                                 </h4>
                                                 <p className="text-white/60 text-sm mb-4 line-clamp-2">{service.description}</p>
-                                                <div className="flex items-center gap-4 text-sm mb-4">
-                                                    <div className="flex items-center gap-1">
-                                                        <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
-                                                        <span className="text-white font-medium">{service.rating || '4.5'}</span>
-                                                        <span className="text-white/40">({service.totalOrders || 0})</span>
-                                                    </div>
-                                                </div>
+
                                                 <button className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-medium hover:shadow-lg transition-all">
                                                     Book Now
                                                 </button>

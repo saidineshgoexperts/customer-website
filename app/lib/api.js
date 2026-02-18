@@ -46,7 +46,19 @@ export async function fetchFeaturedServices() {
     const data = await response.json();
 
     if (data.success && Array.isArray(data.updatedServices)) {
-        return data.updatedServices;
+        try {
+            // Fetch all services to get correct slugs for enrichment
+            const allServices = await fetchAllServices();
+            return data.updatedServices.map(service => {
+                if (service.slug) return service;
+                // Match by ID or name
+                const matched = allServices.find(as => as._id === service._id || as.serviceName === service.serviceName);
+                return matched ? { ...service, slug: matched.slug } : service;
+            });
+        } catch (error) {
+            console.error("Error enriching featured services with slugs:", error);
+            return data.updatedServices;
+        }
     }
 
     throw new Error(data.message || 'Failed to fetch featured services');

@@ -191,6 +191,14 @@ export function LatestSpaServices() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
 
+                    {/* Rating Badge - Bottom Left Flush */}
+                    <div className="absolute bottom-0 left-0 z-20">
+                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
+                        <Star className="w-4 h-4 fill-[#04a99d] text-[#04a99d]" />
+                        <span className="text-sm font-bold text-white">{store.rating || '4.8'}</span>
+                      </div>
+                    </div>
+
                     {/* View Details Button Badge - Bottom Center */}
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <Link href={`/spa-salon/detail/${store._id}`}>

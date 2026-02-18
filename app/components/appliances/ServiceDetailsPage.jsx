@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Star, Clock, Shield, CheckCircle, Award, ThumbsUp, ChevronLeft, ChevronRight, ArrowRight, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
@@ -42,35 +42,74 @@ const relatedServices = [
 
 export function ServiceDetailsPage({
   serviceId,
+  serviceSlug, // Added Slug support
   category,
   subCategory,
   subCategoryId
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { addToCart } = useServiceCart();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [serviceDetails, setServiceDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('About Service');
-  const [visibleReviews, setVisibleReviews] = useState(4);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [serviceDetails, setServiceDetails] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [visibleReviews, setVisibleReviews] = useState(4);
   const accentColor = serviceAccents[category] || '#5a8b9d';
 
   useEffect(() => {
     const fetchServiceDetails = async () => {
-      if (!serviceId) return;
+      if (!serviceId && !serviceSlug) return;
       setLoading(true);
       try {
-        const response = await fetch(`https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/dhub_service_details/${serviceId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({}),
-        });
+        let response;
+        if (serviceSlug) {
+          // Priority: Call API directly with slug
+          response = await fetch(`https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/dhub_service_details/${serviceSlug}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+          });
+
+          // If direct slug call fails, try resolution fallback
+          if (!response.ok) {
+            const allRes = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
+            const allData = await allRes.json();
+
+            if (allData.success && Array.isArray(allData.data)) {
+              const generateSlug = (n) => n?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || '';
+              let matchedId = null;
+
+              for (const cat of allData.data) {
+                for (const sub of (cat.subcategories || [])) {
+                  if (sub.slug === serviceSlug || generateSlug(sub.name) === serviceSlug) {
+                    matchedId = sub._id;
+                    break;
+                  }
+                }
+                if (matchedId) break;
+              }
+
+              if (matchedId) {
+                response = await fetch(`https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/dhub_service_details/${matchedId}`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({}),
+                });
+              }
+            }
+          }
+        } else if (serviceId) {
+          response = await fetch(`https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/dhub_service_details/${serviceId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+          });
+        }
 
         if (!response.ok) throw new Error('Failed to fetch details');
 
@@ -123,7 +162,7 @@ export function ServiceDetailsPage({
     };
 
     fetchServiceDetails();
-  }, [serviceId, category, subCategory, subCategoryId, router]);
+  }, [serviceId, serviceSlug, category, subCategory, subCategoryId, router]);
 
   if (loading) {
     return (
@@ -225,10 +264,12 @@ export function ServiceDetailsPage({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={() => {
-              // Extract base path (everything before /detail)
-              const pathSegments = pathname.split('/detail/');
-              const basePath = pathSegments[0] || '/appliances';
-              router.push(basePath);
+              // Priority: Go back. Fallback: Appliances home
+              if (window.history.length > 1) {
+                router.back();
+              } else {
+                router.push('/appliances');
+              }
             }}
             className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all"
           >
@@ -537,6 +578,7 @@ export function ServiceDetailsPage({
                     }
 
                     localStorage.setItem('last_service_id', finalServiceId);
+                    if (serviceSlug) localStorage.setItem('last_service_slug', serviceSlug);
                     const firstPackage = provider_rate_cards[0];
 
                     const rawPrice = firstPackage?.price || 0;
@@ -558,10 +600,9 @@ export function ServiceDetailsPage({
 
                     localStorage.setItem('booking_package_details', JSON.stringify(itemsToBook));
 
-                    // Navigate to address page preserving current base path
-                    const pathSegments = pathname.split('/detail/');
-                    const basePath = pathSegments[0] || '/appliances';
-                    router.push(`${basePath}/address`);
+                    // Navigate to address page
+                    // Since dynamic slugs are root-level, we use the standard appliances/address route
+                    router.push('/appliances/address');
                   }}
                   className="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-bold text-lg hover:shadow-2xl hover:shadow-[#037166]/40 transition-all flex items-center justify-center gap-3 group"
                 >

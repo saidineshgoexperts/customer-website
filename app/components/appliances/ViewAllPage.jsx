@@ -161,6 +161,7 @@ export function ViewAllPage({
               bookings: Math.floor(Math.random() * 200) + 50,
               categoryName: service.categoryName,
               subcategoryName: service.subcategoryName,
+              slug: service.slug,
             })));
           }
         } catch (error) {
@@ -339,7 +340,7 @@ export function ViewAllPage({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                       whileHover={{ x: 10 }} // Slight horizontal shift on hover instead of lift
-                      onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName)}
+                      onClick={() => onServiceClick?.(service._id, service.categoryName, service.subcategoryName, service.slug)}
                       className="group cursor-pointer"
                     >
                       <div className="flex flex-col md:flex-row gap-6 p-4 rounded-3xl bg-[#1a1a1a] border border-white/10 hover:border-[#037166]/50 transition-all duration-300 h-full overflow-hidden">
@@ -435,7 +436,7 @@ export function ViewAllPage({
                       transition={{ delay: index * 0.05 }}
                       whileHover={{ y: -8, scale: 1.02 }}
                       className="group cursor-pointer h-full"
-                      onClick={() => onServiceClick?.(service.id, service.categoryName, service.subcategoryName)}
+                      onClick={() => onServiceClick?.(service.id, service.categoryName, service.subcategoryName, service.slug)}
                     >
                       <div className="relative h-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 shadow-lg">
                         <div className="relative h-48 overflow-hidden">

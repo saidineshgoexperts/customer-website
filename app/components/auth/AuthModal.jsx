@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
 export function AuthModal({ isOpen, onClose, theme = {} }) {
-    const { user, loginWithWhatsApp, verifyOtp, loginWithGoogle, updateProfile, logout, isAuthenticated } = useAuth();
+    const { user, loginWithWhatsApp, verifyOtp, loginWithGoogle, loginWithApple, updateProfile, logout, isAuthenticated } = useAuth();
     const [step, setStep] = useState('login'); // login, otp, profile
     const [mobile, setMobile] = useState('');
     const [otp, setOtp] = useState('');
@@ -220,6 +220,28 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                 >
                                     <Chrome className="w-5 h-5" />
                                     Sign in with Google
+                                </button>
+
+                                <button
+                                    onClick={async () => {
+                                        setLoading(true);
+                                        try {
+                                            const data = await loginWithApple();
+                                            if (data.success || data.status === 'success') {
+                                                setStep('profile');
+                                            }
+                                        } catch (error) {
+                                            console.error('Apple login error:', error);
+                                        } finally {
+                                            setLoading(false);
+                                        }
+                                    }}
+                                    className={`w-full py-4 ${inputBg} glass-button-premium border border-opacity-20 ${borderColor} ${t.textMain} hover:bg-opacity-80 font-bold rounded-xl flex items-center justify-center gap-3 transition-all`}
+                                >
+                                    <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+                                        <path d="M17.05 20.28c-.98.95-2.05 1.78-3.19 1.76-1.14-.02-1.5-.72-2.82-.72-1.32 0-1.74.7-2.82.74-1.14.04-2.26-.88-3.26-1.87-2.02-1.99-3.57-5.59-1.55-9.1C4.4 9.1 6.5 7.85 8.42 7.82c1.44-.03 2.8.96 3.68.96.88 0 2.54-1.2 4.26-1.03.72.03 2.73.29 4.02 2.18-.1.06-2.4 1.4-2.38 4.19.03 3.32 2.92 4.51 2.95 4.52-.02.05-.46 1.58-1.6 3.2v-.01zM12.03 7.25c-.02-2.3 2.12-4.26 4.38-4.25-.01 2.37-2.22 4.36-4.38 4.25z" />
+                                    </svg>
+                                    Sign in with Apple
                                 </button>
                             </div>
                         ) : (

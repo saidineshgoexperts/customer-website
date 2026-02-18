@@ -487,11 +487,12 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
                               ₹{service.minFare}
                             </div> */}
 
-                            {/* Rating Badge */}
-                            <div className="absolute bottom-3 left-3 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center gap-1.5">
-                              <Star className="w-3.5 h-3.5 fill-[#04a99d] text-[#04a99d]" />
-                              <span className="text-white text-xs font-bold">{service.rating}</span>
-                              {/* <span className="text-white/60 text-[10px]">({service.totalOrders})</span> */}
+                            {/* Rating Badge - Bottom Left Flush */}
+                            <div className="absolute bottom-0 left-0 z-20">
+                              <div className="flex items-center gap-1 px-3 py-1.5 rounded-tr-xl bg-black/60 backdrop-blur-md border-t border-r border-white/10">
+                                <Star className="w-3.5 h-3.5 fill-[#04a99d] text-[#04a99d]" />
+                                <span className="text-white text-xs font-bold">{service.rating}</span>
+                              </div>
                             </div>
                           </div>
 
