@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { useRef } from 'react';
 
 // Safely convert any value (including nested objects) to a primitive for rendering
 const safeStr = (val, fallback = '') => {
@@ -29,7 +30,7 @@ const safeNum = (val, fallback = 0) => {
 
 function PGConfirmContent() {
     const router = useRouter();
-    const { cartData, cartItems, loading: cartLoading, addToCart } = useServiceCart();
+    const { cartData, cartItems, loading: cartLoading, cartError, fetchCart, addToCart } = useServiceCart();
     const { token, isAuthenticated } = useAuth();
 
     const [selectedAddress, setSelectedAddress] = useState(null);
@@ -65,10 +66,12 @@ function PGConfirmContent() {
     }, [isAuthenticated]);
 
     // Cart restoration if empty
+    const cartRestoredRef = useRef(false);
     useEffect(() => {
-        if (!isAuthenticated || cartLoading || cartItems.length > 0) return;
+        if (!isAuthenticated || cartLoading || cartItems.length > 0 || cartRestoredRef.current) return;
         const saved = sessionStorage.getItem('pg_booking_data');
         if (!saved) return;
+        cartRestoredRef.current = true;
         (async () => {
             try {
                 const { providerId, packageId, addons } = JSON.parse(saved);
@@ -94,35 +97,25 @@ function PGConfirmContent() {
         for (let i = (startFromTomorrow ? 1 : 0); i < 10 + (startFromTomorrow ? 1 : 0); i++) {
             const date = new Date();
             date.setDate(now.getDate() + i);
+
+            // BUG-R2-09 FIX: Use local date instead of UTC to avoid timezone shift
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const localDateStr = `${yyyy}-${mm}-${dd}`;
+
             dates.push({
-                value: date.toISOString().split('T')[0],
+                value: localDateStr,
                 dayName: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', { weekday: 'short' }),
-                dayNumber: date.getDate().toString().padStart(2, '0'),
+                dayNumber: dd,
                 month: date.toLocaleDateString('en-US', { month: 'short' }),
             });
         }
         return dates;
     };
 
-    const getAvailableTimes = (selectedDateValue) => {
-        const now = new Date();
-        const selectedDate = new Date(selectedDateValue);
-        const allTimeSlots = [
-            { label: '09:00 AM - 11:00 AM', value: '09:00', startHour: 9 },
-            { label: '11:00 AM - 01:00 PM', value: '11:00', startHour: 11 },
-            { label: '01:00 PM - 03:00 PM', value: '13:00', startHour: 13 },
-            { label: '03:00 PM - 05:00 PM', value: '15:00', startHour: 15 },
-            { label: '05:00 PM - 07:00 PM', value: '17:00', startHour: 17 },
-            { label: '07:00 PM - 09:00 PM', value: '19:00', startHour: 19 },
-        ];
-        if (selectedDate.toDateString() === now.toDateString()) {
-            const currentHour = now.getHours();
-            return allTimeSlots.filter(slot => slot.startHour > currentHour + 1);
-        }
-        return allTimeSlots;
-    };
-
     const availableDates = getAvailableDates();
+
 
     const handleCheckout = async () => {
         if (!isAuthenticated) {
@@ -140,7 +133,7 @@ function PGConfirmContent() {
                 serviceAddressId: selectedAddress._id,
                 bookedDate,
                 bookedTime: '10:00',
-                paymentMethod: 'ONLINE',
+                paymentMethod, // BUG-R2-02 FIX: Use state variable instead of hardcoded 'ONLINE'
                 sourceOfLead: 'website',
                 providerType: 'professional',
             };
@@ -160,11 +153,14 @@ function PGConfirmContent() {
             if (data.success) {
                 if (paymentMethod === 'ONLINE' && data.access_key) {
                     toast.success('Redirecting to payment gateway...');
-                    window.location.href = `https://testpay.easebuzz.in/pay/${data.access_key}`;
+                    window.location.href = `https://pay.easebuzz.in/pay/${data.access_key}`;
+                    // BUG-R2-05 FIX: Return here to prevent setLoading(false) in finally during redirect
+                    return;
                 } else {
                     sessionStorage.removeItem('pg_booking_data');
                     toast.success('Booking confirmed! Welcome to your new home.');
-                    router.push(`/pghostels/booking/success?date=${bookedDate}&time=${bookedTime}`);
+                    const bookingId = data.bookingId || data.orderId || data._id || '';
+                    router.push(`/pghostels/booking/success?date=${bookedDate}&time=10:00&bookingId=${bookingId}`);
                 }
             } else {
                 toast.error(data.message || 'Checkout failed');
@@ -184,6 +180,20 @@ function PGConfirmContent() {
         );
     }
 
+    if (cartError && cartItems.length === 0) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 gap-4">
+                <p className="text-gray-500 font-medium">Failed to load booking details.</p>
+                <button
+                    onClick={() => fetchCart()}
+                    className="px-6 py-2 bg-[#037166] text-white rounded-xl font-semibold hover:bg-[#025a51] transition-colors"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -197,7 +207,17 @@ function PGConfirmContent() {
                     <motion.button
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        onClick={() => router.push('/pghostels/booking/address')}
+                        onClick={() => {
+                            // BUG-R2-08 FIX: Preserve providerId on back navigation
+                            const saved = sessionStorage.getItem('pg_booking_data');
+                            let providerId = '';
+                            if (saved) {
+                                try {
+                                    providerId = JSON.parse(saved).providerId;
+                                } catch (e) { console.error(e); }
+                            }
+                            router.push(`/pghostels/booking/address${providerId ? `?providerId=${providerId}` : ''}`);
+                        }}
                         className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -513,7 +533,10 @@ function PGConfirmContent() {
                 isOpen={showAuthModal}
                 onClose={() => {
                     setShowAuthModal(false);
-                    if (!isAuthenticated) router.back();
+                    if (!isAuthenticated) {
+                        toast.error('Please login to continue your booking.');
+                        router.push('/pghostels');
+                    }
                 }}
             />
         </motion.div>

@@ -81,8 +81,8 @@ export default function ReligiousServiceDetailPage() {
                         address: store.address || 'Address provided upon booking',
                         rating: parseFloat(store.avgRating || 4.8).toFixed(1),
                         orders: store.totalOrders || 120,
-                        basePrice: store.BasePrice || 1100,
-                        monthlyPrice: store.BasePrice || 1100,
+                        basePrice: store.startingAt || 1100,
+                        monthlyPrice: store.startingAt || 1100,
                         logo: store.logo ? `https://api.doorstephub.com/${store.logo}` : 'https://images.unsplash.com/photo-1606293926075-69a00dbfde81?auto=format&fit=crop&q=80',
                         images: data.serviceImages && data.serviceImages.length > 0
                             ? data.serviceImages.map(img => `https://api.doorstephub.com${img}`)

@@ -137,8 +137,20 @@ function PGListingsContent() {
     const [searchQuery, setSearchQuery] = useState(searchParams.get('query') || '');
     const [filteredListings, setFilteredListings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(false);
     const [usingFallback, setUsingFallback] = useState(false);
     const [minRating, setMinRating] = useState(0);
+
+    // BUG-12 FIX: Restore last active tab from localStorage so back-navigation preserves the user's tab
+    const getInitialTab = () => {
+        if (searchParams.get('lat')) return 'nearby';
+        try {
+            const saved = localStorage.getItem('pg_listings_last_tab');
+            if (saved) return saved;
+        } catch { /* ignore */ }
+        return 'all';
+    };
+    const [activeTab, setActiveTab] = useState(getInitialTab);
 
     // PG Hostels Service ID (from PremiumHomePage) - You might want to move these to a config file
     const SERVICE_ID = '69524fb157bb211ca094e5ee';
@@ -245,19 +257,18 @@ function PGListingsContent() {
                     const mapped = data.professionalServices.map(mapApiResponseToListing);
                     setFilteredListings(mapped);
                     setUsingFallback(false);
+                    setFetchError(false);
                 } else {
-                    // Don't fallback to mock data on search, let EmptyState handle it
-                    if (searchQuery) {
-                        setFilteredListings([]);
-                    } else {
-                        setFilteredListings(mockListings);
-                    }
-                    setUsingFallback(true);
+                    // No results — show EmptyState instead of fake mock data
+                    setFilteredListings([]);
+                    setUsingFallback(false);
                 }
             } catch (error) {
                 console.error('Error fetching listings:', error);
-                setFilteredListings(mockListings);
-                setUsingFallback(true);
+                // On error — show EmptyState with error message, NOT fake Bangalore data
+                setFilteredListings([]);
+                setFetchError(true);
+                setUsingFallback(false);
             } finally {
                 setLoading(false);
             }
@@ -599,6 +610,19 @@ function PGListingsContent() {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 py-8">
+                {/* API error banner with retry */}
+                {fetchError && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between">
+                        <p className="text-red-700 text-sm font-medium">Failed to load PG listings. Please check your connection.</p>
+                        <button
+                            onClick={() => { setFetchError(false); setLoading(true); }}
+                            className="px-4 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
+
                 {/* Recommended Section */}
                 {sortedListings.length > 0 && !searchQuery && (
                     <motion.div
@@ -623,10 +647,12 @@ function PGListingsContent() {
 
                 {/* Tabs */}
                 <Tabs
-                    defaultValue={searchParams.get('lat') ? "nearby" : "all"}
+                    value={activeTab}
                     onValueChange={(value) => {
+                        // BUG-12 FIX: Persist selected tab
+                        try { localStorage.setItem('pg_listings_last_tab', value); } catch { /* ignore */ }
+                        setActiveTab(value);
                         if (value === 'nearby') {
-                            // Try to get location from localStorage
                             try {
                                 const storedLocation = localStorage.getItem('user_location_data');
                                 if (storedLocation) {
@@ -639,10 +665,9 @@ function PGListingsContent() {
                             } catch (e) {
                                 console.error("Error reading location for nearby tab", e);
                             }
-                            // Fallback if no storage or error
                             router.push('/pghostels/listings/nearby');
                         } else {
-                            router.push('/pghostels/listings/all');
+                            router.push(`/pghostels/listings/${value === 'all' ? 'all' : value}`);
                         }
                     }}
                     className="space-y-6 text-black shadow-sm"

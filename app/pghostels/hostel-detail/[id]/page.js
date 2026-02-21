@@ -40,6 +40,7 @@ export default function NewHostelDetailPage() {
 
     const [hostelData, setHostelData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(false);
     const [selectedPackage, setSelectedPackage] = useState(null);
     const [showAddonsModal, setShowAddonsModal] = useState(false);
     const [addonsData, setAddonsData] = useState(null);
@@ -126,6 +127,7 @@ export default function NewHostelDetailPage() {
                 }
             } catch (error) {
                 console.error("Error fetching hostel data:", error);
+                setFetchError(true);
             } finally {
                 setLoading(false);
             }
@@ -142,11 +144,31 @@ export default function NewHostelDetailPage() {
         );
     }
 
+    if (fetchError) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white gap-4 px-4">
+                <p className="text-gray-700 text-lg font-medium text-center">Failed to load hostel details.</p>
+                <p className="text-gray-400 text-sm text-center">Please check your connection and try again.</p>
+                <button
+                    onClick={() => { setFetchError(false); setLoading(true); }}
+                    className="px-6 py-3 bg-[#037166] text-white rounded-xl font-semibold hover:bg-[#025951] transition-colors"
+                >
+                    Retry
+                </button>
+                <button
+                    onClick={() => router.back()}
+                    className="text-sm text-gray-500 hover:text-gray-700 underline"
+                >
+                    Go Back
+                </button>
+            </div>
+        );
+    }
+
     const handleContinueToBook = async () => {
         if (!selectedPackage) {
-            alert("Please select a package from the Portfolio tab.");
+            toast.error("Please select a package first.");
             setActiveTab('portfolio');
-            // smooth scroll to tabs
             window.scrollTo({ top: 500, behavior: 'smooth' });
             return;
         }

@@ -21,6 +21,21 @@ function PGAddressContent() {
     const packageId = searchParams.get('packageId');
     const addons = searchParams.get('addons');
 
+    // BUG-11 FIX: Read user's city/state from stored location data
+    const getDefaultCityState = () => {
+        try {
+            const stored = localStorage.getItem('user_location_data');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                return {
+                    cityName: parsed.cityName || parsed.city || 'Hyderabad',
+                    stateName: parsed.stateName || parsed.state || 'Telangana',
+                };
+            }
+        } catch { /* ignore */ }
+        return { cityName: 'Hyderabad', stateName: 'Telangana' };
+    };
+
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState(null);
@@ -132,7 +147,11 @@ function PGAddressContent() {
         setLoading(true);
         try {
             sessionStorage.setItem('selected_address', JSON.stringify(selectedAddress));
-            router.push('/pghostels/booking/confirm');
+            // Pass providerId so confirm page can recover cart context if needed
+            const confirmUrl = providerId
+                ? `/pghostels/booking/confirm?providerId=${providerId}`
+                : '/pghostels/booking/confirm';
+            router.push(confirmUrl);
         } catch {
             toast.error('Failed to proceed. Please try again.');
         } finally {
@@ -282,10 +301,11 @@ function PGAddressContent() {
                         animate={{ opacity: 1, y: 0 }}
                         onClick={() => {
                             setEditingAddress(null);
+                            const { cityName, stateName } = getDefaultCityState();
                             setNewAddress({
                                 name: '', phone: '', type: 'Home', area: '', flat: '',
                                 postalCode: '', addressLineOne: '', addressLineTwo: '',
-                                stateName: 'Telangana', cityName: 'Hyderabad', defaultAddress: false
+                                stateName, cityName, defaultAddress: false
                             });
                             setShowAddForm(true);
                         }}

@@ -15,6 +15,7 @@ export const ServiceCartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
     const [cartData, setCartData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [cartError, setCartError] = useState(false);
 
     const fetchCart = useCallback(async () => {
         if (!isAuthenticated) return;
@@ -31,9 +32,13 @@ export const ServiceCartProvider = ({ children }) => {
             if (data.success) {
                 setCartItems(data.cart?.items || []);
                 setCartData(data.cart || null);
+                setCartError(false);
+            } else {
+                setCartError(true);
             }
         } catch (error) {
             console.error('Error fetching service cart:', error);
+            setCartError(true);
         } finally {
             setLoading(false);
         }
@@ -90,7 +95,7 @@ export const ServiceCartProvider = ({ children }) => {
         }
     };
 
-    const removeFromCart = async (itemId) => {
+    const removeFromCart = async (itemId, itemType = 'service') => {
         if (!isAuthenticated) return;
         try {
             const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/service-cart/remove', {
@@ -101,7 +106,7 @@ export const ServiceCartProvider = ({ children }) => {
                 },
                 body: JSON.stringify({
                     itemId,
-                    itemType: 'service'
+                    itemType
                 })
             });
             const data = await response.json();
@@ -131,7 +136,7 @@ export const ServiceCartProvider = ({ children }) => {
             }
         } catch (error) {
             console.error('Error clearing service cart:', error);
-            toast.error('Failed to clear cart');
+            if (!suppressToast) toast.error('Failed to clear cart');
         }
     };
 
@@ -140,6 +145,7 @@ export const ServiceCartProvider = ({ children }) => {
             cartItems,
             cartData,
             loading,
+            cartError,
             fetchCart,
             addToCart,
             removeFromCart,

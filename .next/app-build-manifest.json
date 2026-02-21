@@ -1,9 +1,10 @@
 {
   "pages": {
-    "/religious-services/booking/confirm/page": [
+    "/religious-services/service/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/booking/confirm/page.js"
+      "static/css/app/religious-services/service/[id]/page.css",
+      "static/chunks/app/religious-services/service/[id]/page.js"
     ],
     "/religious-services/layout": [
       "static/chunks/webpack.js",
@@ -26,16 +27,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/(landing)/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/page.js"
-    ],
-    "/(landing)/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/layout.js"
-    ],
     "/[slug]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -45,6 +36,21 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/[slug]/layout.js"
+    ],
+    "/religious-services/subcategory/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/religious-services/subcategory/[id]/page.js"
+    ],
+    "/(landing)/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(landing)/page.js"
+    ],
+    "/(landing)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(landing)/layout.js"
     ],
     "/pghostels/page": [
       "static/chunks/webpack.js",
@@ -77,30 +83,30 @@
       "static/chunks/main-app.js",
       "static/chunks/app/pghostels/booking/confirm/page.js"
     ],
-    "/pghostels/listings/[type]/page": [
+    "/appliances/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/pghostels/listings/[type]/page.js"
+      "static/chunks/app/appliances/page.js"
+    ],
+    "/appliances/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/appliances/layout.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/_not-found/page.js"
     ],
-    "/religious-services/page": [
+    "/appliances/address/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/page.js"
+      "static/chunks/app/appliances/address/page.js"
     ],
-    "/religious-services/category/[id]/page": [
+    "/appliances/booking/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/category/[id]/page.js"
-    ],
-    "/religious-services/subcategory/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/subcategory/[id]/page.js"
+      "static/chunks/app/appliances/booking/page.js"
     ]
   }
 }

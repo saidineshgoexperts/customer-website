@@ -1,16 +1,44 @@
 'use client';
 
+import { Suspense } from 'react';
 import { motion } from 'motion/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2, Home, Download, Share2 } from 'lucide-react';
 
-export default function SuccessPage() {
+function SuccessContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
 
-    const bookingId = `PG${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    // BUG-05 FIX: Read real booking ID from URL params set by confirm page
+    const bookingId = searchParams.get('bookingId') || 'Pending';
+    const moveInDate = searchParams.get('date') || '';
 
     const handleBackToHome = () => {
         router.push('/pghostels');
+    };
+
+    // BUG-06 FIX: Download triggers browser print dialog
+    const handleDownload = () => {
+        window.print();
+    };
+
+    // BUG-06 FIX: Share uses Web Share API, falls back to clipboard copy
+    const handleShare = async () => {
+        const shareData = {
+            title: 'My PG Booking – DoorstepHub',
+            text: `I just booked a PG! Booking ID: ${bookingId}${moveInDate ? `, Move-in: ${moveInDate}` : ''}.`,
+            url: window.location.href,
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+                alert('Booking details copied to clipboard!');
+            }
+        } catch {
+            // User cancelled share — do nothing
+        }
     };
 
     return (
@@ -44,14 +72,23 @@ export default function SuccessPage() {
                         {/* Booking ID Card */}
                         <div className="bg-gradient-to-br from-[#037166]/10 to-[#037166]/5 rounded-2xl p-6 mb-6 border border-[#037166]/20">
                             <div className="text-sm text-gray-600 mb-1">Booking ID</div>
-                            <div className="text-2xl font-bold text-[#037166] mb-4">{bookingId}</div>
+                            <div className="text-2xl font-bold text-[#037166] mb-1">{bookingId}</div>
+                            {moveInDate && (
+                                <div className="text-sm text-gray-500 mb-4">Move-in: {moveInDate}</div>
+                            )}
 
                             <div className="flex items-center justify-center space-x-3">
-                                <button className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                <button
+                                    onClick={handleDownload}
+                                    className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2"
+                                >
                                     <Download className="w-4 h-4" />
                                     <span>Download</span>
                                 </button>
-                                <button className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                <button
+                                    onClick={handleShare}
+                                    className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2"
+                                >
                                     <Share2 className="w-4 h-4" />
                                     <span>Share</span>
                                 </button>
@@ -105,11 +142,19 @@ export default function SuccessPage() {
                     className="mt-6 text-center text-sm text-gray-500"
                 >
                     Need help? Contact us at{' '}
-                    <a href="mailto:support@pghostels.com" className="text-[#037166] hover:underline">
-                        support@pghostels.com
+                    <a href="mailto:support@doorstephub.com" className="text-[#037166] hover:underline">
+                        support@doorstephub.com
                     </a>
                 </motion.div>
             </motion.div>
         </div>
+    );
+}
+
+export default function SuccessPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#037166]"></div></div>}>
+            <SuccessContent />
+        </Suspense>
     );
 }
