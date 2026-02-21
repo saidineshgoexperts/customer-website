@@ -158,14 +158,17 @@ function PGAddressContent() {
     };
 
     return (
-        <div className="min-h-screen pt-20 pb-32 bg-gray-50">
+        <div className="min-h-screen pt-[300px] md:pt-[280px] pb-32 bg-gray-50">
             {/* Header */}
-            <section className="sticky top-20 z-40 bg-gradient-to-r from-[#037166] via-teal-600 to-[#04a99d] border-b border-white/10 shadow-lg">
+            <section className="fixed top-20 left-0 right-0 z-40 bg-gradient-to-r from-[#037166] via-teal-600 to-[#04a99d] border-b border-white/10 shadow-lg">
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
                     <motion.button
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        onClick={() => router.back()}
+                        onClick={() => providerId
+                            ? router.push(`/pghostels/hostel-detail/${providerId}`)
+                            : router.back()
+                        }
                         className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
                     >
                         <ArrowLeft className="w-4 h-4" />

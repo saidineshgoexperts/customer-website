@@ -5,12 +5,27 @@ import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import {
     ArrowLeft, MapPin, Calendar, Clock, CreditCard, Wallet,
-    Truck, CheckCircle, Loader2, Building2
+    Truck, CheckCircle, Loader2, Building2, Info
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
+
+// Safely convert any value (including nested objects) to a primitive for rendering
+const safeStr = (val, fallback = '') => {
+    if (val === null || val === undefined) return fallback;
+    if (typeof val === 'string') return val || fallback;
+    if (typeof val === 'number') return val;
+    if (typeof val === 'object') return val.title || val.name || val.label || val.value || fallback;
+    return String(val) || fallback;
+};
+const safeNum = (val, fallback = 0) => {
+    if (val === null || val === undefined) return fallback;
+    if (typeof val === 'number') return val;
+    if (typeof val === 'object') return val.amount || val.value || fallback;
+    return parseFloat(val) || fallback;
+};
 
 function PGConfirmContent() {
     const router = useRouter();
@@ -19,8 +34,7 @@ function PGConfirmContent() {
 
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [bookedDate, setBookedDate] = useState('');
-    const [bookedTime, setBookedTime] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('COD');
+    const [paymentMethod, setPaymentMethod] = useState('ONLINE');
     const [loading, setLoading] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -69,7 +83,6 @@ function PGConfirmContent() {
         })();
     }, [isAuthenticated, cartLoading, cartItems.length]);
 
-    useEffect(() => { setBookedTime(''); }, [bookedDate]);
 
     const getAvailableDates = () => {
         const now = new Date();
@@ -110,7 +123,6 @@ function PGConfirmContent() {
     };
 
     const availableDates = getAvailableDates();
-    const availableTimesForSelectedDate = getAvailableTimes(bookedDate);
 
     const handleCheckout = async () => {
         if (!isAuthenticated) {
@@ -119,7 +131,7 @@ function PGConfirmContent() {
             return;
         }
         if (!selectedAddress) { toast.error('Please select an address'); return; }
-        if (!bookedDate || !bookedTime) { toast.error('Please select date and time'); return; }
+        if (!bookedDate) { toast.error('Please select a move-in date'); return; }
         if (cartItems.length === 0) { toast.error('Your cart is empty'); return; }
 
         setLoading(true);
@@ -127,8 +139,8 @@ function PGConfirmContent() {
             const payload = {
                 serviceAddressId: selectedAddress._id,
                 bookedDate,
-                bookedTime,
-                paymentMethod,
+                bookedTime: '10:00',
+                paymentMethod: 'ONLINE',
                 sourceOfLead: 'website',
                 providerType: 'professional',
             };
@@ -177,10 +189,10 @@ function PGConfirmContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="min-h-screen pt-20 pb-32 bg-gray-50"
+            className="min-h-screen pt-[300px] md:pt-[280px] pb-32 bg-gray-50"
         >
             {/* Header */}
-            <section className="sticky top-20 z-40 bg-gradient-to-r from-[#037166] via-teal-600 to-[#04a99d] border-b border-white/10 shadow-lg">
+            <section className="fixed top-20 left-0 right-0 z-40 bg-gradient-to-r from-[#037166] via-teal-600 to-[#04a99d] border-b border-white/10 shadow-lg">
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
                     <motion.button
                         initial={{ opacity: 0, x: -20 }}
@@ -199,7 +211,7 @@ function PGConfirmContent() {
                         className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3"
                     >
                         <Building2 className="w-8 h-8" />
-                        Confirm Booking
+                        Confirm Your Space In PG
                     </motion.h1>
                 </div>
 
@@ -247,7 +259,7 @@ function PGConfirmContent() {
                         >
                             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-[#037166]" />
-                                Select Date
+                                Move-in Date
                             </h3>
                             {availableDates.length === 0 ? (
                                 <p className="text-gray-500 text-sm">No dates available at this time</p>
@@ -272,35 +284,55 @@ function PGConfirmContent() {
                             )}
                         </motion.div>
 
-                        {/* Time Selection */}
+                        {/* Available Rooms */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
+                            transition={{ delay: 0.15 }}
                             className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
                         >
                             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <Clock className="w-5 h-5 text-[#037166]" />
-                                Select Time Slot
+                                <Building2 className="w-5 h-5 text-[#037166]" />
+                                Available Rooms
                             </h3>
-                            {availableTimesForSelectedDate.length === 0 ? (
-                                <p className="text-gray-500 text-sm">
-                                    {bookedDate ? 'No time slots available for selected date' : 'Please select a date first'}
-                                </p>
+                            {cartItems.length === 0 ? (
+                                <p className="text-gray-400 text-sm">No rooms in cart</p>
                             ) : (
-                                <div className="grid md:grid-cols-2 gap-3">
-                                    {availableTimesForSelectedDate.map((time) => (
-                                        <button
-                                            key={time.value}
-                                            onClick={() => setBookedTime(time.value)}
-                                            className={`p-4 rounded-xl font-medium transition-all ${bookedTime === time.value
-                                                ? 'bg-[#037166] text-white shadow-lg shadow-[#037166]/30'
-                                                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
-                                                }`}
-                                        >
-                                            {time.label}
-                                        </button>
-                                    ))}
+                                <div className="space-y-3">
+                                    {cartItems.map((item, idx) => {
+                                        const roomName = typeof item.itemName === 'object'
+                                            ? (item.itemName?.title || item.itemName?.name || 'Room')
+                                            : (item.itemName || item.name || 'Room');
+                                        const roomType = typeof item.itemType === 'object'
+                                            ? (item.itemType?.title || item.itemType?.name || 'Hostel Room')
+                                            : (item.itemType || 'Hostel Room');
+                                        const roomPrice = typeof item.itemPrice === 'object'
+                                            ? (item.itemPrice?.amount || 0)
+                                            : (item.itemPrice || item.price || 0);
+                                        return (
+                                            <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-[#037166]/5 border border-[#037166]/15">
+                                                <div className="w-10 h-10 rounded-lg bg-[#037166]/10 flex items-center justify-center flex-shrink-0">
+                                                    <Building2 className="w-5 h-5 text-[#037166]" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-semibold text-gray-900 truncate">{roomName}</p>
+                                                    <p className="text-sm text-gray-500">{roomType}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-bold text-[#037166]">₹{roomPrice}</p>
+                                                    <p className="text-[10px] text-gray-400">/month</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                    {bookedDate && (
+                                        <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
+                                            <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                                            <p className="text-xs text-green-700 font-medium">
+                                                Room available from <strong>{new Date(bookedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</strong>
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </motion.div>
@@ -312,28 +344,33 @@ function PGConfirmContent() {
                             transition={{ delay: 0.2 }}
                             className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
                         >
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <Wallet className="w-5 h-5 text-[#037166]" />
-                                Select Payment Method
+                            <h3 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+                                <CreditCard className="w-5 h-5 text-[#037166]" />
+                                Payment Method
                             </h3>
+                            <p className="text-xs text-gray-400 mb-4">Only online payment is accepted for PG bookings</p>
                             <div className="grid md:grid-cols-3 gap-3">
-                                {[
-                                    { id: 'COD', label: 'Pay at Hostel', icon: Truck },
-                                    { id: 'WALLET', label: 'Wallet Pay', icon: Wallet },
-                                    { id: 'ONLINE', label: 'Online Payment', icon: CreditCard },
-                                ].map((method) => (
-                                    <button
-                                        key={method.id}
-                                        onClick={() => setPaymentMethod(method.id)}
-                                        className={`p-5 rounded-xl flex flex-col items-center gap-2 transition-all ${paymentMethod === method.id
-                                            ? 'bg-[#037166] text-white shadow-lg'
-                                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
-                                            }`}
-                                    >
-                                        <method.icon className={`w-6 h-6 ${paymentMethod === method.id ? 'text-white' : 'text-[#037166]'}`} />
-                                        <span className="text-sm font-medium">{method.label}</span>
-                                    </button>
-                                ))}
+                                {/* Online - active */}
+                                <button
+                                    onClick={() => setPaymentMethod('ONLINE')}
+                                    className="p-5 rounded-xl flex flex-col items-center gap-2 transition-all bg-[#037166] text-white shadow-lg ring-2 ring-[#037166]/40"
+                                >
+                                    <CreditCard className="w-6 h-6 text-white" />
+                                    <span className="text-sm font-semibold">Online Payment</span>
+                                    <span className="text-[10px] bg-white/20 rounded-full px-2 py-0.5">Active</span>
+                                </button>
+                                {/* COD - disabled */}
+                                <div className="p-5 rounded-xl flex flex-col items-center gap-2 bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 relative overflow-hidden">
+                                    <Truck className="w-6 h-6" />
+                                    <span className="text-sm font-medium">Pay at Hostel</span>
+                                    <span className="text-[10px] bg-gray-200 text-gray-500 rounded-full px-2 py-0.5">Not available</span>
+                                </div>
+                                {/* Wallet - disabled */}
+                                <div className="p-5 rounded-xl flex flex-col items-center gap-2 bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 relative overflow-hidden">
+                                    <Wallet className="w-6 h-6" />
+                                    <span className="text-sm font-medium">Wallet Pay</span>
+                                    <span className="text-[10px] bg-gray-200 text-gray-500 rounded-full px-2 py-0.5">Not available</span>
+                                </div>
                             </div>
                         </motion.div>
 
@@ -350,9 +387,9 @@ function PGConfirmContent() {
                             </h3>
                             {selectedAddress ? (
                                 <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                                    <p className="text-gray-900 font-medium mb-1">{selectedAddress.name}</p>
-                                    <p className="text-gray-600">{selectedAddress.flat}, {selectedAddress.area}</p>
-                                    <p className="text-gray-500">{selectedAddress.cityName}, {selectedAddress.postalCode}</p>
+                                    <p className="text-gray-900 font-medium mb-1">{safeStr(selectedAddress.name)}</p>
+                                    <p className="text-gray-600">{safeStr(selectedAddress.flat)}, {safeStr(selectedAddress.area)}</p>
+                                    <p className="text-gray-500">{safeStr(selectedAddress.cityName)}, {safeStr(selectedAddress.postalCode)}</p>
                                 </div>
                             ) : (
                                 <div className="p-4 rounded-lg bg-gray-50">
@@ -385,29 +422,43 @@ function PGConfirmContent() {
                                         </div>
                                     </div>
                                     <div className="mt-2 space-y-1 pl-1">
-                                        {cartItems.map((item, idx) => (
-                                            <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                                                <div className="w-1 h-1 rounded-full bg-[#037166]" />
-                                                <span className="line-clamp-1">{item.itemName}</span>
-                                            </div>
-                                        ))}
+                                        {cartItems.map((item, idx) => {
+                                            const name = typeof item.itemName === 'object'
+                                                ? (item.itemName?.title || item.itemName?.name || 'Room')
+                                                : (item.itemName || item.name || 'Room');
+                                            return (
+                                                <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
+                                                    <div className="w-1 h-1 rounded-full bg-[#037166]" />
+                                                    <span className="line-clamp-1">{name}</span>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Service Cost</span>
-                                        <span className="text-gray-900 font-bold">₹{cartData?.totalServiceCost || 0}</span>
+                                        <span className="text-gray-500">Hostel Monthly Rent</span>
+                                        <span className="text-gray-900 font-bold">₹{safeNum(cartData?.totalServiceCost)}</span>
                                     </div>
-                                    {(cartData?.platformFee > 0) && (
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">Platform Fee</span>
-                                            <span className="text-gray-900 font-bold">₹{cartData.platformFee}</span>
-                                        </div>
+                                    {(safeNum(cartData?.platformFee) > 0) && (
+                                        <>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-500">Platform Fee</span>
+                                                <span className="text-gray-900 font-bold">₹{safeNum(cartData.platformFee)}</span>
+                                            </div>
+                                            {/* Info note */}
+                                            <div className="flex items-start gap-2 p-3 rounded-xl bg-[#037166]/8 border border-[#037166]/20">
+                                                <Info className="w-4 h-4 text-[#037166] flex-shrink-0 mt-0.5" />
+                                                <p className="text-xs text-[#037166] leading-snug">
+                                                    This is the <strong>only amount you pay now</strong> to confirm your booking. Monthly rent is paid directly at the hostel.
+                                                </p>
+                                            </div>
+                                        </>
                                     )}
-                                    {(cartData?.gstAmount > 0) && (
+                                    {(safeNum(cartData?.gstAmount) > 0) && (
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-500">GST</span>
-                                            <span className="text-gray-900 font-bold">₹{cartData.gstAmount}</span>
+                                            <span className="text-gray-900 font-bold">₹{safeNum(cartData.gstAmount)}</span>
                                         </div>
                                     )}
                                 </div>
@@ -415,15 +466,18 @@ function PGConfirmContent() {
 
                             {/* Total */}
                             <div className="p-4 rounded-2xl bg-[#037166]/5 border border-[#037166]/20 mb-6">
-                                <div className="flex justify-between mb-1">
-                                    <span className="text-gray-600 font-medium">Total Payable</span>
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-gray-600 font-medium">Total Payable Now</span>
                                     <span className="text-2xl font-black text-[#037166]">
-                                        ₹{(cartData?.finalAmount || cartData?.totalServiceCost || 0).toFixed(0)}
+                                        ₹{safeNum(cartData?.finalAmount || cartData?.totalServiceCost).toFixed(0)}
                                     </span>
                                 </div>
-                                <p className="text-[10px] text-[#037166] uppercase font-bold">
-                                    {paymentMethod === 'COD' ? 'Pay at Hostel' : paymentMethod === 'WALLET' ? 'via Wallet' : 'Online Payment'}
-                                </p>
+                                <div className="flex items-center gap-1.5 mt-1 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                                    <Info className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                                    <p className="text-[11px] text-amber-700 font-medium">
+                                        Monthly rent of ₹{safeNum(cartData?.totalServiceCost)} is <strong>Pay at Hostel</strong> — not charged now
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Confirm Button */}
@@ -431,8 +485,8 @@ function PGConfirmContent() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleCheckout}
-                                disabled={loading || !bookedDate || !bookedTime}
-                                className={`w-full px-6 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg ${loading || !bookedDate || !bookedTime
+                                disabled={loading || !bookedDate}
+                                className={`w-full px-6 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg ${loading || !bookedDate
                                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                                     : 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white hover:shadow-[#037166]/40'
                                     }`}

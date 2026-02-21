@@ -278,7 +278,7 @@ export default function ReligiousServicesPage() {
         </div>
 
         {/* Hero Content */}
-        <div className="container relative mx-auto px-4 py-20 z-10">
+        <div className="container relative mx-auto px-4 py-20 mt-10 z-10">
           <div className="max-w-4xl mx-auto text-center">
             {/* Trust Badge */}
             <motion.div

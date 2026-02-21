@@ -147,23 +147,45 @@ function PGListingsContent() {
 
     const mapApiResponseToListing = (item) => {
         if (!item) return null;
+        // Helper to safely extract a string from a value that might be an object
+        const str = (val, fallback = '') => {
+            if (!val) return fallback;
+            if (typeof val === 'string') return val || fallback;
+            if (typeof val === 'object') return val.title || val.name || val.label || fallback;
+            return String(val) || fallback;
+        };
+        const num = (val, fallback = 0) => {
+            if (!val) return fallback;
+            if (typeof val === 'number') return val;
+            if (typeof val === 'object') return val.amount || val.value || fallback;
+            return parseFloat(val) || fallback;
+        };
+        // Sanitize amenities: each item may be {_id, title, image} — extract the string
+        const rawAmenities = item?.amenities;
+        const amenities = Array.isArray(rawAmenities)
+            ? rawAmenities.map(a => str(a, '')).filter(Boolean)
+            : ['WiFi', 'Food', 'Laundry'];
         return {
-            id: item?._id || 'unknown',
-            name: item?.business_name || item?.hostelName || `${item?.firstName || ''} ${item?.lastName || ''}`.trim() || 'Professional Service',
-            location: item?.address || item?.cityName || 'Unknown Location',
-            rating: parseFloat(item?.rating) || 4.5,
-            orders: item?.totalOrders || 0,
-            basePrice: item?.startingAt || parseInt(item?.minFare) || 0,
-            monthlyPrice: item?.startingAt || parseInt(item?.minFare) || 6500, // startingAt is the monthly price
+            id: str(item?._id, 'unknown'),
+            name: str(item?.business_name || item?.hostelName) ||
+                `${str(item?.firstName)} ${str(item?.lastName)}`.trim() || 'Professional Service',
+            location: str(item?.address || item?.cityName, 'Unknown Location'),
+            rating: num(item?.rating) || 4.5,
+            orders: num(item?.totalOrders),
+            basePrice: num(item?.startingAt || item?.minFare),
+            monthlyPrice: num(item?.startingAt || item?.minFare) || 6500,
             image: item?.logo ? `https://api.doorstephub.com/${item.logo}` : mockListings[0]?.image,
-            distance: parseFloat(item?.distance?.replace(' km', '')) || 2.5,
-            matchScore: item?.matchScore || 90,
-            badges: item?.badges || ['Verified'],
-            amenities: item?.amenities?.length > 0 ? item.amenities : ['WiFi', 'Food', 'Laundry'],
+            distance: parseFloat(str(item?.distance, '2.5').replace(' km', '')) || 2.5,
+            matchScore: num(item?.matchScore) || 90,
+            badges: Array.isArray(item?.badges)
+                ? item.badges.map(b => str(b, '')).filter(Boolean)
+                : ['Verified'],
+            amenities: amenities.length > 0 ? amenities : ['WiFi', 'Food', 'Laundry'],
             availableBeds: 5,
-            description: item?.bio || ''
+            description: str(item?.bio, '')
         };
     };
+
 
     // Sync state with URL params on navigation
     useEffect(() => {
@@ -432,12 +454,12 @@ function PGListingsContent() {
                                 <TrendingUp className="w-4 h-4" />
                                 <span className="text-sm font-medium">{listing.orders} Orders</span>
                             </div>
-                            {listing.availableBeds <= 5 && (
+                            {/* {listing.availableBeds <= 5 && (
                                 <div className="flex items-center space-x-1 text-orange-600">
                                     <Sparkles className="w-4 h-4" />
                                     <span className="text-sm font-medium">{listing.availableBeds} beds left</span>
                                 </div>
-                            )}
+                            )} */}
                         </div>
 
                         {/* Amenities */}

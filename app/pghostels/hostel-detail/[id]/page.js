@@ -113,7 +113,7 @@ export default function NewHostelDetailPage() {
                         packages: data.provider_rate_cards || [],
                         about: data.aboutUs || store.bio || 'Premium PG accommodation with all modern amenities.',
                         rules: [
-                            { rule: 'Entry time: 11:00 PM', allowed: true },
+
                             { rule: 'No smoking inside premises', allowed: false },
                         ] // defaulting rules for now as not in API sample provided
                     };
