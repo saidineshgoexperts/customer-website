@@ -120,7 +120,19 @@ export function CategoryPage({ slug, initialData }) {
         const data = await response.json();
 
         if (data.success && Array.isArray(data.data)) {
-          setSubCategories(data.data);
+          let filteredData = data.data;
+
+          // Extra safety: If the API returns a huge list (> 20), it might be returning all subcategories.
+          // In that case, we should filter client-side if we have the category name or slug.
+          if (data.data.length > 20 && (data.categoryName || slug)) {
+            const targetName = data.categoryName || slug.replace(/-/g, ' ');
+            filteredData = data.data.filter(item =>
+              (item.categoryName && item.categoryName.toLowerCase() === targetName.toLowerCase()) ||
+              (item.categorySlug && item.categorySlug === slug)
+            );
+          }
+
+          setSubCategories(filteredData);
 
           // Set category metadata from API response
           if (data.image) {
@@ -130,7 +142,7 @@ export function CategoryPage({ slug, initialData }) {
           setCategoryMetadata({
             categoryName: data.categoryName || '',
             slug: data.slug || data.categorySlug || slug, // Use API slug if available, else prop
-            totalCount: data.totalCount || data.data.length,
+            totalCount: data.totalCount || filteredData.length,
             detectedCity: data.detectedCity
           });
         }

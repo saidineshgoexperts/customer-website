@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { ArrowLeft, Star, MapPin, Clock, DollarSign, Filter, X, Zap, RotateCcw, ChevronDown, ChevronRight, Folder } from 'lucide-react';
@@ -25,6 +25,10 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
   const [categorySubcats, setCategorySubcats] = useState({}); // Cache for subcategories
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [loadingSubcats, setLoadingSubcats] = useState({});
+  // Track which categories have been fetched to avoid duplicate API calls
+  const fetchedCatsRef = useRef(new Set());
+  // Track which category we've already auto-expanded to avoid loops
+  const autoExpandedForRef = useRef(null);
 
   // Metadata State (derived from props or API)
   const [pageTitle, setPageTitle] = useState(subCategory || '');
@@ -98,18 +102,13 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
         const servicesData = await servicesResponse.json();
 
         if (servicesData.success) {
-          // Fetch all services to get slugs for enrichment
-          const allRes = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
-          const allData = await allRes.json();
-          const allServices = allData.success && Array.isArray(allData.data) ? allData.data : [];
-
-          // Set the services with slugs enriched if missing
+          // Enrich services with slugs without an extra API call
           const enrichedServices = (servicesData.dhubServices || []).map(service => {
             if (service.slug) return service;
-            const matched = allServices.find(as => as._id === service._id);
-            // Ensure we have a valid slug string
-            const slug = (matched?.slug || service.name || service.itemName || 'service').toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-            return { ...service, slug };
+            // Generate slug from service name directly
+            const generatedSlug = (service.name || service.itemName || 'service')
+              .toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+            return { ...service, slug: generatedSlug };
           });
 
           setServices(enrichedServices);
@@ -185,17 +184,19 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
     fetchAllCategories();
   }, [location?.lat, location?.lng]);
 
-  // Helper to fetch subcategories
-  const fetchSubcategories = async (catId, slug) => {
-    // If already fetched or fetching, skip
-    if (categorySubcats[catId] || loadingSubcats[catId]) return;
+  // Helper to fetch subcategories - uses a ref to prevent duplicate calls
+  const fetchSubcategories = async (catId, catSlug) => {
+    // If already fetched, fetching, or in cache, skip
+    if (fetchedCatsRef.current.has(catId) || categorySubcats[catId]) return;
 
+    // Mark as fetching immediately to prevent concurrent calls
+    fetchedCatsRef.current.add(catId);
     setLoadingSubcats(prev => ({ ...prev, [catId]: true }));
     try {
       const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getsubcategorysbycategoryid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: slug })
+        body: JSON.stringify({ slug: catSlug })
       });
 
       const data = await response.json();
@@ -204,41 +205,33 @@ export function ServicesListingPage({ category, subCategory, subCategoryId, chil
       }
     } catch (error) {
       console.error("Error fetching subcategories:", error);
+      // Remove from fetched set on error so it can be retried
+      fetchedCatsRef.current.delete(catId);
     } finally {
       setLoadingSubcats(prev => ({ ...prev, [catId]: false }));
     }
   };
 
-  // Auto-expand active category and fetch subcategories
+  // Auto-expand active category and fetch subcategories - only runs once per category
   useEffect(() => {
-    if (allCategories.length > 0 && categoryName) {
-      const activeCat = allCategories.find(c => c.name === categoryName || c.slug === categoryName);
+    if (allCategories.length > 0 && category) {
+      // Use the `category` prop (from URL) directly - it's the category slug
+      const activeCat = allCategories.find(c => c.slug === category || c.name === category);
       if (activeCat) {
-        // If we found it by slug, update the display name to be the real name
-        if (activeCat.slug === categoryName) {
+        // Update display name from the real category name
+        if (categoryName !== activeCat.name) {
           setCategoryName(activeCat.name);
         }
 
-        // Auto-correct URL if slug doesn't match canonical slug (e.g. "AC Repair" vs "ac-repair")
-        // Check if we are on a nested route (where category prop is present)
-        if (category && activeCat.slug !== category) {
-          // We need to keep the subcategory part. 
-          // subCategory prop might be name too? No, it's usually slug from URL.
-          // But actually `slug` prop is the subcategory slug.
-          if (slug) {
-            router.replace(`/${activeCat.slug}/${slug}`);
-          }
-        }
-
-        // Only if not already manually interacted (simple check: if expanded is null or different? 
-        // Actually best to just enforce it matches current context on load/change)
-        if (expandedCategory !== activeCat._id) {
+        // Only auto-expand and fetch once per category to prevent loops
+        if (autoExpandedForRef.current !== activeCat._id) {
+          autoExpandedForRef.current = activeCat._id;
           setExpandedCategory(activeCat._id);
+          fetchSubcategories(activeCat._id, activeCat.slug);
         }
-        fetchSubcategories(activeCat._id, activeCat.slug);
       }
     }
-  }, [allCategories, categoryName]);
+  }, [allCategories, category]);
 
   const handleCategoryExpand = (catId) => {
     if (expandedCategory === catId) {

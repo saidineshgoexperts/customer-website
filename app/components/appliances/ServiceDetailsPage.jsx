@@ -6,6 +6,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Star, Clock, Shield, CheckCircle, Award, ThumbsUp, ChevronLeft, ChevronRight, ArrowRight, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
+import { useLocationContext } from '@/context/LocationContext';
 
 // Service-specific accent colors
 const serviceAccents = {
@@ -19,26 +20,6 @@ const serviceAccents = {
   'Plumbing Service': '#8b8a5a', // warm amber-teal
 };
 
-const relatedServices = [
-  {
-    id: 101,
-    title: 'Oven Deep Cleaning',
-    price: 29,
-    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400',
-  },
-  {
-    id: 102,
-    title: 'Appliance Maintenance',
-    price: 39,
-    image: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400',
-  },
-  {
-    id: 103,
-    title: 'Extended Warranty',
-    price: 49,
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400',
-  },
-];
 
 export function ServiceDetailsPage({
   serviceId,
@@ -134,18 +115,22 @@ export function ServiceDetailsPage({
                       foundCat = cat.name;
                       foundSub = sub.name;
                       foundSubId = sub._id;
+                      const catSlug = cat.slug;
+                      const subSlug = sub.slug;
+
+                      if (foundCat && foundSub && foundSubId) {
+                        const params = new URLSearchParams(window.location.search);
+                        params.set('category', foundCat);
+                        params.set('subCategory', foundSub);
+                        params.set('subCategoryId', foundSubId);
+                        if (catSlug) params.set('categorySlug', catSlug);
+                        if (subSlug) params.set('subCategorySlug', subSlug);
+                        router.replace(`${window.location.pathname}?${params.toString()}`);
+                      }
                       break;
                     }
                   }
                   if (foundCat) break;
-                }
-
-                if (foundCat && foundSub && foundSubId) {
-                  const params = new URLSearchParams(window.location.search);
-                  params.set('category', foundCat);
-                  params.set('subCategory', foundSub);
-                  params.set('subCategoryId', foundSubId);
-                  router.replace(`${window.location.pathname}?${params.toString()}`);
                 }
               }
             } catch (enrichError) {
@@ -163,6 +148,43 @@ export function ServiceDetailsPage({
 
     fetchServiceDetails();
   }, [serviceId, serviceSlug, category, subCategory, subCategoryId, router]);
+
+  // Fetch related services
+  const [relatedServices, setRelatedServices] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
+  const { location } = useLocationContext();
+
+  useEffect(() => {
+    const fetchRelated = async () => {
+      if (!subCategoryId || !location?.lat || !location?.lng) return;
+
+      setLoadingRelated(true);
+      try {
+        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/services_by_subcategory', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subcategoryId: subCategoryId,
+            lattitude: location.lat,
+            longitude: location.lng
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          // Filter out the current service if possible
+          const filtered = (data.dhubServices || []).filter(s => s._id !== serviceId && s.slug !== serviceSlug);
+          setRelatedServices(filtered.slice(0, 4)); // Show top 4
+        }
+      } catch (error) {
+        console.error("Error fetching related services:", error);
+      } finally {
+        setLoadingRelated(false);
+      }
+    };
+
+    fetchRelated();
+  }, [subCategoryId, location, serviceId, serviceSlug]);
 
   if (loading) {
     return (
@@ -264,12 +286,26 @@ export function ServiceDetailsPage({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={() => {
-              // Priority: Go back. Fallback: Appliances home
-              if (window.history.length > 1) {
-                router.back();
-              } else {
-                router.push('/appliances');
+              // Try to find the correct listing URL based on metadata in URL
+              const params = new URLSearchParams(window.location.search);
+              const catSlug = params.get('categorySlug');
+              const subCatSlug = params.get('subCategorySlug');
+
+              // If we have precise slugs, navigate to the specific subcategory listing
+              if (catSlug && subCatSlug) {
+                router.push(`/${catSlug}/${subCatSlug}`);
+                return;
               }
+
+              // Fallback to category listing if subcategory is missing
+              if (catSlug) {
+                router.push(`/${catSlug}`);
+                return;
+              }
+
+              // Final robust fallback to the home page requested by user
+              // This ensures if they went back from address page, they don't get stuck in history
+              router.push('/');
             }}
             className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all"
           >
@@ -282,9 +318,35 @@ export function ServiceDetailsPage({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-white/60 text-sm mb-6"
+            className="text-white/60 text-sm mb-6 flex items-center gap-2"
           >
-            {category} → {subCategory} → {storeData.name}
+            <button
+              onClick={() => {
+                const params = new URLSearchParams(window.location.search);
+                const catSlug = params.get('categorySlug');
+                if (catSlug) router.push(`/${catSlug}`);
+                else router.push('/');
+              }}
+              className="hover:text-[#04a99d] transition-colors"
+            >
+              {category}
+            </button>
+            <span>→</span>
+            <button
+              onClick={() => {
+                const params = new URLSearchParams(window.location.search);
+                const catSlug = params.get('categorySlug');
+                const subCatSlug = params.get('subCategorySlug');
+                if (catSlug && subCatSlug) router.push(`/${catSlug}/${subCatSlug}`);
+                else if (catSlug) router.push(`/${catSlug}`);
+                else router.push('/');
+              }}
+              className="hover:text-[#04a99d] transition-colors"
+            >
+              {subCategory}
+            </button>
+            <span>→</span>
+            <span className="text-white/40">{storeData?.name || 'Details'}</span>
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-8 items-start relative">
@@ -614,6 +676,69 @@ export function ServiceDetailsPage({
           </div>
         </div>
       </section>
+
+      {/* Related Services Section */}
+      {relatedServices.length > 0 && (
+        <section className="max-w-[1400px] mx-auto px-6 lg:px-8 py-16 border-t border-white/5">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-2">Related Services</h2>
+              <p className="text-white/60">Other popular services in {subCategory}</p>
+            </div>
+            <button
+              onClick={() => {
+                const params = new URLSearchParams(window.location.search);
+                const catSlug = params.get('categorySlug');
+                const subCatSlug = params.get('subCategorySlug');
+                if (catSlug && subCatSlug) router.push(`/${catSlug}/${subCatSlug}`);
+              }}
+              className="text-[#04a99d] font-semibold hover:underline flex items-center gap-2"
+            >
+              View All
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedServices.map((service, index) => (
+              <motion.div
+                key={service._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+                onClick={() => router.push(`/${service.slug}`)}
+                className="group cursor-pointer bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden hover:border-[#037166]/50 transition-all"
+              >
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src={service.mainImage ? `https://api.doorstephub.com/${service.mainImage}` : '/placeholder-service.jpg'}
+                    alt={service.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10">
+                    <Star className="w-3 h-3 fill-[#04a99d] text-[#04a99d]" />
+                    <span className="text-white text-[10px] font-bold">{service.rating || '4.8'}</span>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h4 className="text-white font-bold text-sm mb-1 group-hover:text-[#04a99d] transition-colors line-clamp-2">
+                    {service.name}
+                  </h4>
+                  <p className="text-white/40 text-[10px] line-clamp-1 mb-3">{service.subcategoryName}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#04a99d] font-bold">₹{service.serviceBookingCost || service.minFare || '---'}</span>
+                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#037166] transition-all">
+                      <ArrowRight className="w-4 h-4 text-white/40 group-hover:text-white" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Lightbox Modal */}
       <AnimatePresence>

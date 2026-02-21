@@ -32,7 +32,11 @@ export function CategoryOrListingPage({ slug }) {
 
                 const catData = await catResponse.json();
 
-                if (catData.success && Array.isArray(catData.data) && catData.data.length > 0) {
+                // If the API returns successfully but has a suspicious number of subcategories (e.g. > 15),
+                // it might be returning all subcategories instead of filtering by category.
+                // We'll trust it only if it's successful and has a reasonable count, 
+                // otherwise we'll double check against the hierarchical list.
+                if (catData.success && Array.isArray(catData.data) && catData.data.length > 0 && catData.data.length < 20) {
                     setCategoryData(catData);
                     setViewType('category');
                     return;
@@ -49,7 +53,12 @@ export function CategoryOrListingPage({ slug }) {
                     for (const cat of allData.data) {
                         // Check if it matches a category slug
                         if (cat.slug === slug || generateSlug(cat.name) === slug) {
-                            setCategoryData({ success: true, data: cat.subcategories || [] });
+                            setCategoryData({
+                                success: true,
+                                data: cat.subcategories || [],
+                                categoryName: cat.name,
+                                slug: cat.slug || slug
+                            });
                             setViewType('category');
                             return;
                         }
