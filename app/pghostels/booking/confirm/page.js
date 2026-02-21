@@ -1,160 +1,116 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MapPin, Calendar, Clock, CreditCard, Wallet, Truck, Sparkles, CheckCircle, User, Loader2 } from 'lucide-react';
+import {
+    ArrowLeft, MapPin, Calendar, Clock, CreditCard, Wallet,
+    Truck, CheckCircle, Loader2, Building2
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { useServiceCart } from '@/context/ServiceCartContext';
 import { useAuth } from '@/context/AuthContext';
 import { AuthModal } from '@/components/auth/AuthModal';
 
-export default function PGConfirmPage() {
+function PGConfirmContent() {
     const router = useRouter();
-    const { cartData, cartItems, loading: cartLoading } = useServiceCart();
+    const { cartData, cartItems, loading: cartLoading, addToCart } = useServiceCart();
     const { token, isAuthenticated } = useAuth();
 
-    // Address from session storage (selected in previous step)
     const [selectedAddress, setSelectedAddress] = useState(null);
-
     const [bookedDate, setBookedDate] = useState('');
     const [bookedTime, setBookedTime] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('COD');
     const [loading, setLoading] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
-    const [technicianPreference, setTechnicianPreference] = useState('any');
 
-    // Load address
+    // Service window: 9 AM to 9 PM
+    const SERVICE_END_HOUR = 21;
+
     useEffect(() => {
         const savedAddress = sessionStorage.getItem('selected_address');
         if (savedAddress) {
             setSelectedAddress(JSON.parse(savedAddress));
         } else {
-            // If no address, redirect back
-            toast.error("No address selected");
+            toast.error('No address selected');
             router.push('/pghostels/booking/address');
+        }
+
+        // Auto-select first available date
+        const initialDates = getAvailableDates();
+        if (initialDates.length > 0) {
+            setBookedDate(initialDates[0].value);
         }
     }, [router]);
 
-    // Check authentication on mount
     useEffect(() => {
-        // Delay slighty to let auth context settle
         const timer = setTimeout(() => {
-            if (!isAuthenticated) {
-                setShowAuthModal(true);
-            }
+            if (!isAuthenticated) setShowAuthModal(true);
         }, 500);
         return () => clearTimeout(timer);
     }, [isAuthenticated]);
 
-    // Service window: 9 AM to 9 PM (9:00 to 21:00)
-    const SERVICE_START_HOUR = 9;
-    const SERVICE_END_HOUR = 21;
-    const BUFFER_HOURS = 3;
+    // Cart restoration if empty
+    useEffect(() => {
+        if (!isAuthenticated || cartLoading || cartItems.length > 0) return;
+        const saved = sessionStorage.getItem('pg_booking_data');
+        if (!saved) return;
+        (async () => {
+            try {
+                const { providerId, packageId, addons } = JSON.parse(saved);
+                await addToCart(providerId, packageId, 'professional_service', 1, null, 'professional', true);
+                if (Array.isArray(addons)) {
+                    for (const addonId of addons) {
+                        await addToCart(providerId, addonId, 'professional_addon', 1, packageId, 'professional', true);
+                    }
+                }
+                toast.success('Booking details restored');
+            } catch { console.warn('Cart restoration failed'); }
+        })();
+    }, [isAuthenticated, cartLoading, cartItems.length]);
 
-    // Smart date availability logic
+    useEffect(() => { setBookedTime(''); }, [bookedDate]);
+
     const getAvailableDates = () => {
         const now = new Date();
         const dates = [];
-        let startDate = new Date(now);
+        const todayLimit = new Date();
+        todayLimit.setHours(SERVICE_END_HOUR - 1, 0, 0, 0);
+        const startFromTomorrow = now > todayLimit;
 
-        // Check if today is still available (current time + 3hr buffer < 9 PM)
-        const todayCutoff = new Date();
-        todayCutoff.setHours(SERVICE_END_HOUR - BUFFER_HOURS, 0, 0, 0); // 6 PM cutoff
-
-        if (now > todayCutoff) {
-            // Skip today, start from tomorrow
-            startDate.setDate(startDate.getDate() + 1);
-        }
-
-        for (let i = (now > todayCutoff ? 1 : 0); i < 7; i++) {
-            const date = new Date(startDate);
-            date.setDate(date.getDate() + i);
+        for (let i = (startFromTomorrow ? 1 : 0); i < 10 + (startFromTomorrow ? 1 : 0); i++) {
+            const date = new Date();
+            date.setDate(now.getDate() + i);
             dates.push({
                 value: date.toISOString().split('T')[0],
-                label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                }),
+                dayName: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : date.toLocaleDateString('en-US', { weekday: 'short' }),
+                dayNumber: date.getDate().toString().padStart(2, '0'),
+                month: date.toLocaleDateString('en-US', { month: 'short' }),
             });
         }
         return dates;
     };
 
-    // Smart time slot availability based on selected date
     const getAvailableTimes = (selectedDateValue) => {
         const now = new Date();
         const selectedDate = new Date(selectedDateValue);
-
-        // Time slots (2-hour windows)
         const allTimeSlots = [
-            { label: '09:00 AM - 11:00 AM', value: '09:00', startHour: 9, endHour: 11 },
-            { label: '11:00 AM - 01:00 PM', value: '11:00', startHour: 11, endHour: 13 },
-            { label: '01:00 PM - 03:00 PM', value: '13:00', startHour: 13, endHour: 15 },
-            { label: '03:00 PM - 05:00 PM', value: '15:00', startHour: 15, endHour: 17 },
-            { label: '05:00 PM - 07:00 PM', value: '17:00', startHour: 17, endHour: 19 },
-            { label: '07:00 PM - 09:00 PM', value: '19:00', startHour: 19, endHour: 21 },
+            { label: '09:00 AM - 11:00 AM', value: '09:00', startHour: 9 },
+            { label: '11:00 AM - 01:00 PM', value: '11:00', startHour: 11 },
+            { label: '01:00 PM - 03:00 PM', value: '13:00', startHour: 13 },
+            { label: '03:00 PM - 05:00 PM', value: '15:00', startHour: 15 },
+            { label: '05:00 PM - 07:00 PM', value: '17:00', startHour: 17 },
+            { label: '07:00 PM - 09:00 PM', value: '19:00', startHour: 19 },
         ];
-
-        // If today and past cutoff time, filter available slots
         if (selectedDate.toDateString() === now.toDateString()) {
             const currentHour = now.getHours();
-            const cutoffHour = SERVICE_END_HOUR - BUFFER_HOURS; // 6 PM cutoff
-
-            if (currentHour >= cutoffHour) {
-                return []; // No slots available today
-            }
-
-            return allTimeSlots.filter(slot => slot.startHour > currentHour);
+            return allTimeSlots.filter(slot => slot.startHour > currentHour + 1);
         }
-
         return allTimeSlots;
     };
 
     const availableDates = getAvailableDates();
     const availableTimesForSelectedDate = getAvailableTimes(bookedDate);
-
-    // Reset time when date changes
-    useEffect(() => {
-        setBookedTime('');
-    }, [bookedDate]);
-
-    // Cart Restoration Logic: If cart is empty but we have saved data (e.g. returned from payment)
-    useEffect(() => {
-        const restoreCart = async () => {
-            if (!isAuthenticated || cartLoading) return;
-
-            if (cartItems.length === 0) {
-                const savedData = sessionStorage.getItem('pg_booking_data');
-                if (savedData) {
-                    try {
-                        const { providerId, packageId, addons } = JSON.parse(savedData);
-                        console.log('🔄 Restoring Cart Items:', { providerId, packageId, addons });
-
-                        setLoading(true);
-                        // Add package
-                        await addToCart(providerId, packageId, 'professional_service', 1, null, 'professional', true);
-
-                        // Add addons
-                        if (Array.isArray(addons)) {
-                            for (const addonId of addons) {
-                                await addToCart(providerId, addonId, 'professional_addon', 1, packageId, 'professional', true);
-                            }
-                        }
-
-                        toast.success('Booking details restored');
-                    } catch (error) {
-                        console.error('Cart restoration failed:', error);
-                    } finally {
-                        setLoading(false);
-                    }
-                }
-            }
-        };
-
-        restoreCart();
-    }, [isAuthenticated, cartLoading, cartItems.length, addToCart]);
 
     const handleCheckout = async () => {
         if (!isAuthenticated) {
@@ -162,80 +118,46 @@ export default function PGConfirmPage() {
             setShowAuthModal(true);
             return;
         }
-        if (!selectedAddress) {
-            toast.error('Please select an address');
-            return;
-        }
-        if (!bookedDate) {
-            toast.error('Please select a date');
-            return;
-        }
-        if (!bookedTime) {
-            toast.error('Please select a time');
-            return;
-        }
-
-        if (cartItems.length === 0) {
-            toast.error('Your cart is empty');
-            return;
-        }
-
-        // Detect provider type from cart items
-        const isProfessional = cartItems.some(item => item.itemType === 'professional_service' || item.itemType === 'professional_addon');
-        const checkoutProviderType = isProfessional ? 'professional' : 'regular';
+        if (!selectedAddress) { toast.error('Please select an address'); return; }
+        if (!bookedDate || !bookedTime) { toast.error('Please select date and time'); return; }
+        if (cartItems.length === 0) { toast.error('Your cart is empty'); return; }
 
         setLoading(true);
         try {
-            let endpoint = '';
-            let payload = {
+            const payload = {
                 serviceAddressId: selectedAddress._id,
                 bookedDate,
                 bookedTime,
                 paymentMethod,
                 sourceOfLead: 'website',
-                providerType: checkoutProviderType
+                providerType: 'professional',
             };
 
-            if (paymentMethod === 'ONLINE') {
-                endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/initiate-payment';
-            } else if (paymentMethod === 'WALLET') {
-                endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
-            } else {
-                endpoint = 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
-            }
+            const endpoint = paymentMethod === 'ONLINE'
+                ? 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/initiate-payment'
+                : 'https://api.doorstephub.com/v1/dhubApi/app/service-cart/checkout';
 
-            console.log(`💳 Checkout [${paymentMethod}] Payload:`, payload);
-
-            const response = await fetch(endpoint, {
+            const res = await fetch(endpoint, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
             });
 
-            const data = await response.json();
-            console.log('💳 Checkout Response:', data);
+            const data = await res.json();
 
             if (data.success) {
                 if (paymentMethod === 'ONLINE' && data.access_key) {
-                    // Redirect to Easebuzz payment gateway
-                    const easebuzzUrl = `https://testpay.easebuzz.in/pay/${data.access_key}`;
                     toast.success('Redirecting to payment gateway...');
-                    window.location.href = easebuzzUrl;
+                    window.location.href = `https://testpay.easebuzz.in/pay/${data.access_key}`;
                 } else {
-                    // COD or Wallet payment successful
-                    toast.success('Booking created successfully!');
-                    // Clear booking data on success
                     sessionStorage.removeItem('pg_booking_data');
-                    router.push(`/services/thank-you?date=${bookedDate}&time=${bookedTime}`);
+                    toast.success('Booking confirmed! Welcome to your new home.');
+                    router.push(`/pghostels/booking/success?date=${bookedDate}&time=${bookedTime}`);
                 }
             } else {
                 toast.error(data.message || 'Checkout failed');
             }
-        } catch (error) {
-            console.error('Checkout error:', error);
+        } catch {
             toast.error('Failed to complete checkout');
         } finally {
             setLoading(false);
@@ -244,7 +166,7 @@ export default function PGConfirmPage() {
 
     if (cartLoading && cartItems.length === 0) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <Loader2 className="w-10 h-10 text-[#037166] animate-spin" />
             </div>
         );
@@ -255,19 +177,19 @@ export default function PGConfirmPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="min-h-screen pt-20 pb-32 bg-[#0a0a0a]"
+            className="min-h-screen pt-20 pb-32 bg-gray-50"
         >
             {/* Header */}
-            <section className="sticky top-20 z-40 bg-gradient-to-r from-[#025a51] via-[#037166] to-[#04a99d] border-b border-white/10 shadow-lg">
+            <section className="sticky top-20 z-40 bg-gradient-to-r from-[#037166] via-teal-600 to-[#04a99d] border-b border-white/10 shadow-lg">
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
                     <motion.button
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        onClick={() => router.push('/services/cart')}
+                        onClick={() => router.push('/pghostels/booking/address')}
                         className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all text-sm"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Cart
+                        Back to Address
                     </motion.button>
 
                     <motion.h1
@@ -276,25 +198,38 @@ export default function PGConfirmPage() {
                         transition={{ delay: 0.1 }}
                         className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3"
                     >
-                        <Sparkles className="w-8 h-8" />
-                        Confirm Your Booking
+                        <Building2 className="w-8 h-8" />
+                        Confirm Booking
                     </motion.h1>
                 </div>
 
                 {/* Progress Indicator */}
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 pb-6">
                     <div className="flex items-center gap-2">
-                        {['Selection', 'Address', 'Confirm & Pay'].map((step, index) => (
-                            <React.Fragment key={step}>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#037166] to-[#04a99d] flex items-center justify-center">
-                                        <CheckCircle className="w-5 h-5 text-white" />
+                        {['Select PG', 'Address', 'Confirm & Pay'].map((step, index) => {
+                            const isCompleted = index < 2;
+                            const isCurrent = index === 2;
+                            return (
+                                <React.Fragment key={step}>
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isCompleted ? 'bg-white shadow-md' : isCurrent ? 'bg-white ring-4 ring-white/30 scale-110 shadow-lg' : 'bg-white/30'
+                                            }`}>
+                                            {isCompleted ? (
+                                                <CheckCircle className="w-5 h-5 text-[#037166]" />
+                                            ) : (
+                                                <span className={`text-sm font-bold ${isCurrent ? 'text-[#037166]' : 'text-white/60'}`}>{index + 1}</span>
+                                            )}
+                                        </div>
+                                        <span className={`text-xs sm:text-sm font-medium transition-all ${isCurrent ? 'text-white font-bold' : 'text-white/70'
+                                            }`}>{step}</span>
                                     </div>
-                                    <span className="text-white/90 text-sm font-medium hidden sm:inline">{step}</span>
-                                </div>
-                                {index < 2 && <div className="h-0.5 flex-1 bg-white/30" />}
-                            </React.Fragment>
-                        ))}
+                                    {index < 2 && (
+                                        <div className={`h-0.5 flex-1 mx-2 transition-all ${isCompleted ? 'bg-white/80' : 'bg-white/20'
+                                            }`} />
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -303,30 +238,34 @@ export default function PGConfirmPage() {
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
+
                         {/* Date Selection */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
+                            className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-[#037166]" />
                                 Select Date
                             </h3>
                             {availableDates.length === 0 ? (
-                                <p className="text-white/60 text-sm">No dates available at this time</p>
+                                <p className="text-gray-500 text-sm">No dates available at this time</p>
                             ) : (
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {availableDates.map((date) => (
                                         <button
                                             key={date.value}
                                             onClick={() => setBookedDate(date.value)}
-                                            className={`p-4 rounded-xl font-medium transition-all ${bookedDate === date.value
-                                                ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg shadow-[#037166]/30'
-                                                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                                            className={`p-4 rounded-2xl flex flex-col items-center gap-0.5 transition-all border-2 ${bookedDate === date.value
+                                                ? 'bg-[#037166] border-[#037166] text-white shadow-lg'
+                                                : 'bg-white border-gray-100 text-gray-700 hover:border-[#037166]/30'
                                                 }`}
                                         >
-                                            {date.label}
+                                            <span className={`text-[10px] uppercase font-bold tracking-widest ${bookedDate === date.value ? 'text-white/80' : 'text-gray-400'}`}>
+                                                {date.dayName}
+                                            </span>
+                                            <span className="text-lg font-black tracking-tight">{date.dayNumber} {date.month}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -338,18 +277,15 @@ export default function PGConfirmPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
+                            className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-[#037166]" />
                                 Select Time Slot
                             </h3>
                             {availableTimesForSelectedDate.length === 0 ? (
-                                <p className="text-white/60 text-sm">
-                                    {bookedDate
-                                        ? 'No time slots available for selected date'
-                                        : 'Please select a date first'
-                                    }
+                                <p className="text-gray-500 text-sm">
+                                    {bookedDate ? 'No time slots available for selected date' : 'Please select a date first'}
                                 </p>
                             ) : (
                                 <div className="grid md:grid-cols-2 gap-3">
@@ -358,8 +294,8 @@ export default function PGConfirmPage() {
                                             key={time.value}
                                             onClick={() => setBookedTime(time.value)}
                                             className={`p-4 rounded-xl font-medium transition-all ${bookedTime === time.value
-                                                ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg shadow-[#037166]/30'
-                                                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                                                ? 'bg-[#037166] text-white shadow-lg shadow-[#037166]/30'
+                                                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
                                                 }`}
                                         >
                                             {time.label}
@@ -369,51 +305,20 @@ export default function PGConfirmPage() {
                             )}
                         </motion.div>
 
-                        {/* Technician Preference (Optional) */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
-                        >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <User className="w-5 h-5 text-[#037166]" />
-                                Visit Preference (Optional)
-                            </h3>
-                            <div className="grid md:grid-cols-3 gap-3">
-                                {[
-                                    { value: 'any', label: 'Any Available' },
-                                    { value: 'senior', label: 'Senior Staff' },
-                                    { value: 'contact', label: 'Call before visit' },
-                                ].map((option) => (
-                                    <button
-                                        key={option.value}
-                                        onClick={() => setTechnicianPreference(option.value)}
-                                        className={`p-4 rounded-xl font-medium transition-all ${technicianPreference === option.value
-                                            ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white'
-                                            : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-                                            }`}
-                                    >
-                                        {option.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </motion.div>
-
                         {/* Payment Method */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
+                            transition={{ delay: 0.2 }}
+                            className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-[#037166]" />
+                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                <Wallet className="w-5 h-5 text-[#037166]" />
                                 Select Payment Method
                             </h3>
                             <div className="grid md:grid-cols-3 gap-3">
                                 {[
-                                    { id: 'COD', label: 'Cash / Pay at Venue', icon: Truck },
+                                    { id: 'COD', label: 'Pay at Hostel', icon: Truck },
                                     { id: 'WALLET', label: 'Wallet Pay', icon: Wallet },
                                     { id: 'ONLINE', label: 'Online Payment', icon: CreditCard },
                                 ].map((method) => (
@@ -421,8 +326,8 @@ export default function PGConfirmPage() {
                                         key={method.id}
                                         onClick={() => setPaymentMethod(method.id)}
                                         className={`p-5 rounded-xl flex flex-col items-center gap-2 transition-all ${paymentMethod === method.id
-                                            ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg'
-                                            : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                                            ? 'bg-[#037166] text-white shadow-lg'
+                                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
                                             }`}
                                     >
                                         <method.icon className={`w-6 h-6 ${paymentMethod === method.id ? 'text-white' : 'text-[#037166]'}`} />
@@ -432,26 +337,26 @@ export default function PGConfirmPage() {
                             </div>
                         </motion.div>
 
-                        {/* Service Address */}
+                        {/* Booking Address */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 }}
-                            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
+                            transition={{ delay: 0.3 }}
+                            className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
                         >
-                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <MapPin className="w-5 h-5 text-[#037166]" />
                                 Booking Address
                             </h3>
                             {selectedAddress ? (
-                                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                                    <p className="text-white font-medium mb-1">{selectedAddress.name}</p>
-                                    <p className="text-white/70">{selectedAddress.flat}, {selectedAddress.area}</p>
-                                    <p className="text-white/50">{selectedAddress.cityName}, {selectedAddress.postalCode}</p>
+                                <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                                    <p className="text-gray-900 font-medium mb-1">{selectedAddress.name}</p>
+                                    <p className="text-gray-600">{selectedAddress.flat}, {selectedAddress.area}</p>
+                                    <p className="text-gray-500">{selectedAddress.cityName}, {selectedAddress.postalCode}</p>
                                 </div>
                             ) : (
-                                <div className="p-4 rounded-lg bg-white/5">
-                                    <p className="text-white/40">No address selected</p>
+                                <div className="p-4 rounded-lg bg-gray-50">
+                                    <p className="text-gray-400">No address selected</p>
                                 </div>
                             )}
                         </motion.div>
@@ -463,60 +368,63 @@ export default function PGConfirmPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="sticky top-48 p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10 shadow-lg"
+                            className="sticky top-48 p-6 rounded-3xl bg-white border border-gray-200 shadow-xl"
                         >
-                            <h3 className="text-xl font-bold text-white mb-6">Booking Summary</h3>
+                            <h3 className="text-xl font-bold text-gray-900 mb-6">Booking Summary</h3>
 
                             {/* Cart Items */}
-                            <div className="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2 scrollbar-thin">
-                                {cartItems.map((item) => (
-                                    <div key={item.itemId || item._id} className="flex justify-between text-sm">
-                                        <div className="flex-1">
-                                            <p className="text-white font-bold">{item.itemName}</p>
-                                            <p className="text-white/40 text-[10px]">Qty: {item.quantity || 1}</p>
+                            <div className="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
+                                <div className="flex flex-col gap-3 mb-4 pb-4 border-b border-gray-200">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-xl bg-[#037166]/10 flex items-center justify-center text-[#037166]">
+                                            <Building2 className="w-6 h-6" />
                                         </div>
-                                        <span className="text-white font-medium">₹{item.subtotal?.toFixed(2)}</span>
+                                        <div>
+                                            <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Items Selected</p>
+                                            <p className="text-gray-900 font-bold">{cartItems.length} {cartItems.length === 1 ? 'Item' : 'Items'}</p>
+                                        </div>
                                     </div>
-                                ))}
+                                    <div className="mt-2 space-y-1 pl-1">
+                                        {cartItems.map((item, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
+                                                <div className="w-1 h-1 rounded-full bg-[#037166]" />
+                                                <span className="line-clamp-1">{item.itemName}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-500">Service Cost</span>
+                                        <span className="text-gray-900 font-bold">₹{cartData?.totalServiceCost || 0}</span>
+                                    </div>
+                                    {(cartData?.platformFee > 0) && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-500">Platform Fee</span>
+                                            <span className="text-gray-900 font-bold">₹{cartData.platformFee}</span>
+                                        </div>
+                                    )}
+                                    {(cartData?.gstAmount > 0) && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-500">GST</span>
+                                            <span className="text-gray-900 font-bold">₹{cartData.gstAmount}</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
-                            <div className="h-px bg-white/10 mb-4" />
-
-                            {/* Pricing */}
-                            <div className="space-y-2 mb-4">
-                                <div className="flex justify-between text-white/70">
-                                    <span>Subtotal</span>
-                                    <span>₹{(cartData?.totalServiceCost || 0).toFixed(2)}</span>
+                            {/* Total */}
+                            <div className="p-4 rounded-2xl bg-[#037166]/5 border border-[#037166]/20 mb-6">
+                                <div className="flex justify-between mb-1">
+                                    <span className="text-gray-600 font-medium">Total Payable</span>
+                                    <span className="text-2xl font-black text-[#037166]">
+                                        ₹{(cartData?.finalAmount || cartData?.totalServiceCost || 0).toFixed(0)}
+                                    </span>
                                 </div>
-                                <div className="flex justify-between text-white/70">
-                                    <span>Platform Fee</span>
-                                    <span>₹{(cartData?.platformFee || 0).toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-white/70">
-                                    <span>GST</span>
-                                    <span>₹{(cartData?.gstAmount || 0).toFixed(2)}</span>
-                                </div>
+                                <p className="text-[10px] text-[#037166] uppercase font-bold">
+                                    {paymentMethod === 'COD' ? 'Pay at Hostel' : paymentMethod === 'WALLET' ? 'via Wallet' : 'Online Payment'}
+                                </p>
                             </div>
-
-                            <div className="h-px bg-white/10 mb-4" />
-
-                            <div className="flex justify-between text-xl font-bold text-[#037166] mb-6">
-                                <span>Total</span>
-                                <span>₹{(cartData?.finalAmount || 0).toFixed(2)}</span>
-                            </div>
-
-                            {/* Selected Date/Time Preview */}
-                            {bookedDate && bookedTime && (
-                                <div className="p-4 rounded-lg bg-[#037166]/10 border border-[#037166]/20 mb-6">
-                                    <p className="text-white/70 text-sm mb-2">Scheduled for:</p>
-                                    <p className="text-[#037166] font-bold">
-                                        {availableDates.find(d => d.value === bookedDate)?.label}
-                                    </p>
-                                    <p className="text-[#037166] font-bold">
-                                        {availableTimesForSelectedDate.find(t => t.value === bookedTime)?.label}
-                                    </p>
-                                </div>
-                            )}
 
                             {/* Confirm Button */}
                             <motion.button
@@ -524,36 +432,48 @@ export default function PGConfirmPage() {
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleCheckout}
                                 disabled={loading || !bookedDate || !bookedTime}
-                                className={`w-full px-6 py-4 rounded-xl font-medium text-lg transition-all ${loading || !bookedDate || !bookedTime
-                                    ? 'bg-white/10 text-white/40 cursor-not-allowed'
-                                    : 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white hover:shadow-lg hover:shadow-[#037166]/40'
+                                className={`w-full px-6 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg ${loading || !bookedDate || !bookedTime
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                                    : 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white hover:shadow-[#037166]/40'
                                     }`}
                             >
                                 {loading ? (
                                     <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        Processing...
+                                        Confirming...
                                     </div>
                                 ) : (
-                                    `Pay ₹${(cartData?.finalAmount || 0).toFixed(2)}`
+                                    'Confirm Booking'
                                 )}
                             </motion.button>
+
+                            <p className="mt-4 text-[10px] text-center text-gray-400">
+                                By booking, you agree to our Terms & Cancellation Policy.
+                            </p>
                         </motion.div>
                     </div>
                 </div>
             </div>
 
-            {/* Auth Modal */}
             <AuthModal
                 isOpen={showAuthModal}
                 onClose={() => {
                     setShowAuthModal(false);
-                    // Navigate back if user closes without logging in
-                    if (!isAuthenticated) {
-                        router.back();
-                    }
+                    if (!isAuthenticated) router.back();
                 }}
             />
         </motion.div>
+    );
+}
+
+export default function PGConfirmPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <Loader2 className="w-10 h-10 text-[#037166] animate-spin" />
+            </div>
+        }>
+            <PGConfirmContent />
+        </Suspense>
     );
 }

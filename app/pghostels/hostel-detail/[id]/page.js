@@ -78,13 +78,14 @@ export default function NewHostelDetailPage() {
                     const mappedData = {
                         id: id,
                         name: store.business_name || `${store.firstName} ${store.lastName}`,
+
                         location: store.address || 'Location not available',
                         address: store.address || 'Address not available',
                         rating: parseFloat(store.avgRating || 4.5).toFixed(1),
                         orders: store.totalOrders || 0,
-                        basePrice: store.BasePrice || 0,
-                        bookingCost: store.serviceBookingCost || 0,
-                        monthlyPrice: store.BasePrice * 30 || 5000, // Roughly estimating if not provided directly
+                        basePrice: store.startingAt || 0,
+                        bookingCost: store.startingAt || 0,
+                        monthlyPrice: store.startingAt || 0, // Roughly estimating if not provided directly
                         logo: store.logo ? `https://api.doorstephub.com/${store.logo}` : 'https://images.unsplash.com/photo-1730096081994-73f1fa5f189a?fit=max&fm=jpg&w=200',
                         images: data.serviceImages && data.serviceImages.length > 0
                             ? data.serviceImages.map(img => img.startsWith('/')

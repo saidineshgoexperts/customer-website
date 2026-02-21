@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLocationContext } from '@/context/LocationContext';
+import { ReligiousQuestionnaireModal } from '@/components/religious/ReligiousQuestionnaireModal';
 
 // Section wrapper with scroll reveal
 function SectionReveal({ children, delay = 0 }) {
@@ -41,6 +42,7 @@ export default function ReligiousServicesPage() {
   const { location, detectWithIP } = useLocationContext();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!location) {
@@ -100,19 +102,16 @@ export default function ReligiousServicesPage() {
           } catch (e) { console.log('Error parsing selectedService'); }
         }
 
-        // Fallback or specific ID if needed? 
-        // If serviceId is null, the API might fail or return default. 
-        // We should try to find "Religious" service if not found? 
-        // For now, let's proceed with what we have or a hardcoded fallback if we knew it.
-        // Assuming user navigated from Home, so ID is there.
+        // Only fetch if we have a valid serviceId — do NOT fallback to PG Hostels ID
+        if (!serviceId) {
+          setCategoriesLoading(false);
+          return;
+        }
 
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/categories', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            serviceId: serviceId || '69524fb157bb211ca094e5ee' // Fallback to PG or generic if allowed?
-            // Better to handle missing ID gracefully or generic fetch
-          })
+          body: JSON.stringify({ serviceId })
         });
         const data = await response.json();
         if (data.success && data.category) {
@@ -339,7 +338,7 @@ export default function ReligiousServicesPage() {
                 className="rounded-lg inline-block"
               >
                 <Button
-                  onClick={() => router.push('/religious-services/category')}
+                  onClick={() => setIsModalOpen(true)}
                   size="lg"
                   className="relative bg-gradient-to-r from-[var(--saffron)] via-[var(--warm-gold)] to-[var(--temple-red)] text-white hover:opacity-90 shadow-2xl px-10 py-6 text-lg font-semibold overflow-hidden group"
                 >
@@ -360,10 +359,7 @@ export default function ReligiousServicesPage() {
                 size="lg"
                 variant="outline"
                 className="border-2 border-[var(--saffron)] text-[var(--saffron)] hover:bg-[var(--saffron)]/10 px-10 py-6 text-lg font-semibold bg-white/80 backdrop-blur-sm"
-                onClick={() => {
-                  const element = document.getElementById('sacred-categories');
-                  element?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={() => router.push('/religious-services/category')}
               >
                 Explore Services
               </Button>
@@ -799,7 +795,12 @@ export default function ReligiousServicesPage() {
           </Button>
         </motion.div>
       </section>
+
+      {/* Religious Book Modal */}
+      <ReligiousQuestionnaireModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
-

@@ -9,6 +9,7 @@ export default function FAQPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeIndex, setActiveIndex] = useState(null);
+    const [globalSettings, setGlobalSettings] = useState(null);
 
     useEffect(() => {
         const fetchFAQs = async () => {
@@ -29,6 +30,21 @@ export default function FAQPage() {
         };
 
         fetchFAQs();
+    }, []);
+
+    useEffect(() => {
+        const fetchGlobalSettings = async () => {
+            try {
+                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/get_global_settings');
+                const data = await response.json();
+                if (data.success && data.policy) {
+                    setGlobalSettings(data.policy);
+                }
+            } catch (error) {
+                console.error("Error fetching global settings:", error);
+            }
+        };
+        fetchGlobalSettings();
     }, []);
 
     const toggleAccordion = (index) => {
@@ -93,8 +109,8 @@ export default function FAQPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
                             className={`border rounded-2xl overflow-hidden transition-all duration-300 ${activeIndex === index
-                                    ? 'bg-white/5 border-[#037166]/50 shadow-lg shadow-[#037166]/5'
-                                    : 'bg-transparent border-white/10 hover:border-white/20'
+                                ? 'bg-white/5 border-[#037166]/50 shadow-lg shadow-[#037166]/5'
+                                : 'bg-transparent border-white/10 hover:border-white/20'
                                 }`}
                         >
                             <button
@@ -139,10 +155,10 @@ export default function FAQPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <a
-                            href="mailto:help@doorstephub.com"
+                            href={`mailto:${globalSettings?.email || "help@doorstephub.com"}`}
                             className="px-8 py-3 bg-[#037166] hover:bg-[#04a99d] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#037166]/20"
                         >
-                            Email Support
+                            {globalSettings?.email || "Email Support"}
                         </a>
                         <a
                             href="/contact"

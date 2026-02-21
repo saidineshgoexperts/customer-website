@@ -153,8 +153,8 @@ function PGListingsContent() {
             location: item?.address || item?.cityName || 'Unknown Location',
             rating: parseFloat(item?.rating) || 4.5,
             orders: item?.totalOrders || 0,
-            basePrice: parseInt(item?.minFare) || 0,
-            monthlyPrice: item?.serviceBookingCost || parseInt(item?.minFare) || 6500, // Fallback price
+            basePrice: item?.startingAt || parseInt(item?.minFare) || 0,
+            monthlyPrice: item?.startingAt || parseInt(item?.minFare) || 6500, // startingAt is the monthly price
             image: item?.logo ? `https://api.doorstephub.com/${item.logo}` : mockListings[0]?.image,
             distance: parseFloat(item?.distance?.replace(' km', '')) || 2.5,
             matchScore: item?.matchScore || 90,

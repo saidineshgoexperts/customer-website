@@ -105,7 +105,7 @@ export function ResultsPage() {
                             price: service.startingAt || service.BasePrice || service.minFare || 0,
                             duration: '60 min',
                             distance: service.distance || distanceStr,
-                            availability: service.badges[0],
+                            availability: service.badges?.[0] || 'Available',
                             isNearby: true,
                             address: service.address
                         };

@@ -323,7 +323,7 @@ export function QuestionnaireModal({ isOpen, onClose, categoryName: initialCateg
                                         animate={{ opacity: 1, scale: 1 }}
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        onClick={handleComplete}
+                                        onClick={() => handleComplete(answers, selectedCat.id)}
                                         className="px-8 py-3 bg-gradient-to-r from-[#C06C84] to-[#6C5CE7] text-white rounded-lg font-medium hover:shadow-lg hover:shadow-[#C06C84]/50 transition-all flex items-center gap-2"
                                     >
                                         Show Results

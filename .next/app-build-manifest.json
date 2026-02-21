@@ -1,14 +1,14 @@
 {
   "pages": {
-    "/(landing)/page": [
+    "/(legal)/privacy-policy/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/page.js"
+      "static/chunks/app/(legal)/privacy-policy/page.js"
     ],
-    "/(landing)/layout": [
+    "/(legal)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(landing)/layout.js"
+      "static/chunks/app/(legal)/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -36,35 +36,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/[slug]/layout.js"
     ],
-    "/appliances/page": [
+    "/(landing)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/appliances/page.js"
+      "static/chunks/app/(landing)/page.js"
     ],
-    "/appliances/layout": [
+    "/(landing)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/appliances/layout.js"
+      "static/chunks/app/(landing)/layout.js"
     ],
-    "/[slug]/[subCategorySlug]/page": [
+    "/(legal)/faqs/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/[slug]/[subCategorySlug]/page.js"
+      "static/chunks/app/(legal)/faqs/page.js"
     ],
-    "/appliances/address/page": [
+    "/(legal)/terms-conditions/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/appliances/address/page.js"
-    ],
-    "/appliances/booking/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/appliances/booking/page.js"
-    ],
-    "/_not-found/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/(legal)/terms-conditions/page.js"
     ],
     "/spa-salon/page": [
       "static/chunks/webpack.js",
@@ -76,6 +66,26 @@
       "static/chunks/main-app.js",
       "static/chunks/app/spa-salon/layout.js"
     ],
+    "/spa-salon/results/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/results/page.js"
+    ],
+    "/spa-salon/detail/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/detail/[id]/page.js"
+    ],
+    "/spa-salon/booking/address/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/booking/address/page.js"
+    ],
+    "/spa-salon/booking/confirm/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/booking/confirm/page.js"
+    ],
     "/pghostels/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -86,6 +96,42 @@
       "static/chunks/main-app.js",
       "static/chunks/app/pghostels/layout.js"
     ],
+    "/pghostels/results/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pghostels/results/page.js"
+    ],
+    "/pghostels/hostel-detail/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/pghostels/hostel-detail/[id]/page.css",
+      "static/chunks/app/pghostels/hostel-detail/[id]/page.js"
+    ],
+    "/pghostels/booking/address/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pghostels/booking/address/page.js"
+    ],
+    "/pghostels/booking/confirm/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pghostels/booking/confirm/page.js"
+    ],
+    "/services/cart/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/cart/page.js"
+    ],
+    "/services/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/layout.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
+    ],
     "/religious-services/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -95,6 +141,37 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/religious-services/layout.js"
+    ],
+    "/[slug]/[subCategorySlug]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/[slug]/[subCategorySlug]/page.js"
+    ],
+    "/religious-services/category/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/religious-services/category/[id]/page.js"
+    ],
+    "/religious-services/subcategory/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/religious-services/subcategory/[id]/page.js"
+    ],
+    "/religious-services/service/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/religious-services/service/[id]/page.css",
+      "static/chunks/app/religious-services/service/[id]/page.js"
+    ],
+    "/religious-services/booking/address/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/religious-services/booking/address/page.js"
+    ],
+    "/religious-services/booking/confirm/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/religious-services/booking/confirm/page.js"
     ]
   }
 }
