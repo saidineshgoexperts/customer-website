@@ -68,7 +68,12 @@ function ThankYouContent() {
             cleanAddress = finalSegments.join(', ');
         }
 
-        const displayAddress = cleanAddress || (sessionAddress ? `${sessionAddress.flat}, ${sessionAddress.area}, ${sessionAddress.cityName}` : '');
+        // Use URL address if available (already cleaned), otherwise build from sessionStorage
+        const displayAddress = cleanAddress
+            ? cleanAddress
+            : sessionAddress
+                ? [sessionAddress.flat, sessionAddress.area, sessionAddress.cityName].filter(Boolean).join(', ')
+                : '';
 
         setBookingDetails({
             orderId: searchParams.get('orderId') || '',

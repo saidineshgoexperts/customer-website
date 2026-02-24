@@ -1,4 +1,5 @@
 import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
 export const metadata = {
     title: 'Religious & Spiritual Services | DoorstepHub',
@@ -19,10 +20,36 @@ export default function ReligiousServicesLayout({ children }) {
         isLight: true
     };
 
+    const footerTheme = {
+        bg: 'from-[#1c0a00] to-[#100500]',
+        borderTop: 'border-[#ff9933]/20',
+        accentGlow: '#ff9933',
+        accentColor: '#ff9933',
+        accentHover: '#ffb347',
+        accentGradientFrom: 'from-[#800000]',
+        accentGradientTo: 'to-[#ff9933]',
+        headingGradient: 'from-[#ff9933] via-[#fff5e6] to-[#ff9933]',
+        textMain: 'text-white',
+        textMuted: 'text-white/60',
+        textSubtle: 'text-white/40',
+        textLink: 'text-[#fff5e6]/70',
+        textLinkHover: 'hover:text-[#ffb347]',
+        groupNameColor: 'text-[#fff5e6]',
+        dividerColor: 'text-[#ff9933]/30',
+        socialBg: 'bg-white/5',
+        socialBorder: 'border-[#ff9933]/20',
+        tooltipBg: 'bg-[#1c0a00] border-[#ff9933]/50',
+        tooltipText: 'text-white',
+        iconBg: 'bg-white/5',
+        iconHoverBg: 'group-hover:bg-[#ff9933]/20',
+        isLight: false,
+    };
+
     return (
         <>
             <Header theme={religiousTheme} />
             {children}
+            <Footer theme={footerTheme} />
         </>
     );
 }

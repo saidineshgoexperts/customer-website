@@ -26,7 +26,7 @@ const footerLinks = {
     { name: 'Terms of Service', href: '/terms-conditions' },
     { name: 'Privacy Policy', href: '/privacy-policy' },
     { name: 'Help Center', href: '#' },
-    { name: 'All Services', href: '#' },
+    { name: 'All Services', href: '/services' },
   ],
 };
 
@@ -40,11 +40,46 @@ const socialLinks = [
 
 // Hardcoded additionalServices removed as it's now dynamic
 
-export function Footer() {
+export function Footer({ theme = {} }) {
   const router = useRouter();
+
+  // Default dark theme (landing page)
+  const defaultTheme = {
+    bg: 'from-[#0a0a0a] to-black',
+    borderTop: 'border-white/5',
+    accentGlow: '#037166',
+    accentColor: '#037166',
+    accentHover: '#04a99d',
+    accentGradientFrom: 'from-[#037166]',
+    accentGradientTo: 'to-[#04a99d]',
+    headingGradient: 'from-[#037166] via-white to-[#037166]',
+    textMain: 'text-white',
+    textMuted: 'text-white/60',
+    textSubtle: 'text-white/40',
+    textLink: 'text-white/70',
+    textLinkHover: 'hover:text-[#04a99d]',
+    groupNameColor: 'text-white',
+    dividerColor: 'text-white/20',
+    socialBg: 'bg-white/5',
+    socialBorder: 'border-white/10',
+    tooltipBg: 'bg-[#1a1a1a] border-[#037166]/50',
+    tooltipText: 'text-white',
+    iconBg: 'bg-white/5',
+    iconHoverBg: 'group-hover:bg-[#037166]/20',
+    isLight: false,
+  };
+
+  const t = { ...defaultTheme, ...theme };
+
   const [serviceGroups, setServiceGroups] = useState([]);
   const [professionalServices, setProfessionalServices] = useState([]);
   const [globalSettings, setGlobalSettings] = useState(null);
+  const [serviceSlugs, setServiceSlugs] = useState({
+    appliances: 'appliances',
+    religious: 'religious-services',
+    spa: 'spa-salon',
+    pg: 'pghostels'
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredSocial, setHoveredSocial] = useState(null);
 
@@ -103,6 +138,29 @@ export function Footer() {
           setGlobalSettings(globalData.policy);
         }
 
+        // Step 4: Fetch Service Slugs
+        const servicesToFetchSlugs = [
+          { id: '683daaa8f261c1548bdf7442', key: 'appliances' },
+          { id: '695250aa57bb211ca094e5fd', key: 'religious' },
+          { id: '69524f4a57bb211ca094e5e6', key: 'spa' },
+          { id: '69524fb157bb211ca094e5ee', key: 'pg' }
+        ];
+
+        const slugResults = await Promise.all(
+          servicesToFetchSlugs.map(s =>
+            fetch(`https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get_slugs_by_serviceId/${s.id}`)
+              .then(res => res.json())
+              .then(data => data.success && data.data?.home ? { [s.key]: data.data.home } : null)
+              .catch(() => null)
+          )
+        );
+
+        const newSlugs = { ...serviceSlugs };
+        slugResults.forEach(res => {
+          if (res) Object.assign(newSlugs, res);
+        });
+        setServiceSlugs(newSlugs);
+
       } catch (error) {
         console.error('Error fetching footer data:', error);
       } finally {
@@ -139,22 +197,24 @@ export function Footer() {
     const encodedSubName = encodeURIComponent(sub.name);
     const encodedCatName = category ? encodeURIComponent(category.name) : '';
 
-    if (serviceName.toLowerCase().includes('spa')) {
-      return `/spa-salon/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
+    const lowerService = serviceName.toLowerCase();
+
+    if (lowerService.includes('spa')) {
+      return `/${serviceSlugs.spa}/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
     }
-    if (serviceName.toLowerCase().includes('pg') || serviceName.toLowerCase().includes('hostel')) {
-      return `/pghostels/listings/${sub._id}?name=${encodedSubName}`;
+    if (lowerService.includes('pg') || lowerService.includes('hostel')) {
+      return `/${serviceSlugs.pg}/listings/${sub._id}?name=${encodedSubName}`;
     }
-    if (serviceName.toLowerCase().includes('religious')) {
-      return `/religious-services/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
+    if (lowerService.includes('religious')) {
+      return `/${serviceSlugs.religious}/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
     }
     return '#';
   };
 
   return (
-    <footer className="relative bg-gradient-to-b from-[#0a0a0a] to-black border-t border-white/5">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#037166]/5 to-transparent pointer-events-none" />
+    <footer className={`relative bg-gradient-to-b ${t.bg} border-t ${t.borderTop}`}>
+      {/* Background Gradient Glow */}
+      <div className="absolute inset-0 bg-gradient-to-t pointer-events-none" style={{ background: `linear-gradient(to top, ${t.accentGlow}08, transparent)` }} />
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-8 py-16">
         {/* Explore Services Dynamic Section */}
@@ -166,15 +226,15 @@ export function Footer() {
               viewport={{ once: true }}
               className="space-y-8"
             >
-              <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent w-fit">Appliance Services</h3>
+              <h3 className={`text-xl font-bold mb-6 bg-gradient-to-r ${t.headingGradient} bg-clip-text text-transparent w-fit`}>Appliance Services</h3>
               <div className="text-sm leading-8 text-gray-400">
                 {serviceGroups.map((group, groupIdx) => (
                   group.subcategories.length > 0 && (
                     <span key={group.id} className="inline mr-1">
                       {/* Group Name */}
                       <Link
-                        href={`/${group.slug}`}
-                        className="text-white font-bold hover:text-[#04a99d] transition-colors whitespace-nowrap mr-2"
+                        href={`/${serviceSlugs.appliances}`}
+                        className={`${t.groupNameColor} font-bold ${t.textLinkHover} transition-colors whitespace-nowrap mr-2`}
                       >
                         {group.name}:
                       </Link>
@@ -183,21 +243,21 @@ export function Footer() {
                       {group.subcategories.map((sub, idx) => (
                         <span key={sub._id} className="inline">
                           <Link
-                            href={`/appliances/listing/${sub.slug}?category=${encodeURIComponent(group.name)}&name=${encodeURIComponent(sub.name)}`}
-                            className="text-white/70 hover:text-[#04a99d] transition-colors"
+                            href={`/services/listing/${sub._id}?category=${encodeURIComponent(group.name)}&name=${encodeURIComponent(sub.name)}`}
+                            className={`${t.textLink} ${t.textLinkHover} transition-colors`}
                           >
                             {sub.name}
                           </Link>
                           {/* Separator between subcategories */}
                           {idx < group.subcategories.length - 1 && (
-                            <span className="mx-2 text-white/20">|</span>
+                            <span className={`mx-2 ${t.dividerColor}`}>|</span>
                           )}
                         </span>
                       ))}
 
                       {/* Separator between Groups - Render unless it's the last group */}
                       {groupIdx < serviceGroups.length - 1 && (
-                        <span className="mx-4 text-[#037166] opacity-50">||</span>
+                        <span className="mx-4 opacity-50" style={{ color: t.accentColor }}>||</span>
                       )}
                     </span>
                   )
@@ -222,12 +282,12 @@ export function Footer() {
                 viewport={{ once: true }}
                 className="space-y-6"
               >
-                <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-[#037166] via-white to-[#037166] bg-clip-text text-transparent w-fit">{displayTitle}</h3>
-                <div className="text-sm leading-8 text-gray-400">
+                <h3 className={`text-xl font-bold mb-6 bg-gradient-to-r ${t.headingGradient} bg-clip-text text-transparent w-fit`}>{displayTitle}</h3>
+                <div className={`text-sm leading-8 ${t.textMuted}`}>
                   {section.categories.map((catGroup, groupIdx) => (
                     <span key={catGroup.category._id} className="inline mr-1">
                       {/* Category Name */}
-                      <span className="text-white font-bold whitespace-nowrap mr-2">
+                      <span className={`${t.groupNameColor} font-bold whitespace-nowrap mr-2`}>
                         {catGroup.category.name}:
                       </span>
 
@@ -236,20 +296,20 @@ export function Footer() {
                         <span key={sub._id} className="inline">
                           <Link
                             href={getProfessionalLink(serviceName, sub, catGroup.category)}
-                            className="text-white/70 hover:text-[#04a99d] transition-colors"
+                            className={`${t.textLink} ${t.textLinkHover} transition-colors`}
                           >
                             {sub.name}
                           </Link>
                           {/* Separator between subcategories */}
                           {idx < catGroup.subcategories.length - 1 && (
-                            <span className="mx-2 text-white/20">|</span>
+                            <span className={`mx-2 ${t.dividerColor}`}>|</span>
                           )}
                         </span>
                       ))}
 
                       {/* Separator between Categories - Render unless it's the last category */}
                       {groupIdx < section.categories.length - 1 && (
-                        <span className="mx-4 text-[#037166] opacity-50">||</span>
+                        <span className="mx-4 opacity-50" style={{ color: t.accentColor }}>||</span>
                       )}
                     </span>
                   ))}
@@ -278,7 +338,7 @@ export function Footer() {
                   onClick={() => router.push('/')}
                 />
               </div>
-              <p className="text-white/60 mb-6 leading-relaxed max-w-sm">
+              <p className={`${t.textMuted} mb-6 leading-relaxed max-w-sm`}>
                 {globalSettings?.aboutus || "Your trusted partner for all home service needs. Connecting you with verified professionals for quick, reliable, and affordable solutions."}
               </p>
 
@@ -287,9 +347,9 @@ export function Footer() {
 
                 <a
                   href={`mailto:${globalSettings?.email}`}
-                  className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors group"
+                  className={`flex items-center gap-3 ${t.textMuted} ${t.textLinkHover} transition-colors group`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#037166]/20 transition-colors">
+                  <div className={`w-8 h-8 rounded-lg ${t.iconBg} flex items-center justify-center flex-shrink-0 ${t.iconHoverBg} transition-colors`}>
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="text-sm">{globalSettings?.email || "help@doorstephub.com"}</span>
@@ -301,9 +361,9 @@ export function Footer() {
 
                 <a
                   href={`mailto:${globalSettings?.email2}`}
-                  className="flex items-center gap-3 text-white/60 hover:text-[#04a99d] transition-colors group"
+                  className={`flex items-center gap-3 ${t.textMuted} ${t.textLinkHover} transition-colors group`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#037166]/20 transition-colors">
+                  <div className={`w-8 h-8 rounded-lg ${t.iconBg} flex items-center justify-center flex-shrink-0 ${t.iconHoverBg} transition-colors`}>
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="text-sm">{globalSettings?.email2 || "help@doorstephub.com"}</span>
@@ -342,7 +402,7 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            <h4 className="text-white font-bold mb-4">Quick Links</h4>
+            <h4 className={`${t.textMain} font-bold mb-4`}>Quick Links</h4>
             <ul className="space-y-3">
               {dynamicQuickLinks.map((link) => (
                 <li key={link.name}>
@@ -350,7 +410,7 @@ export function Footer() {
                     href={link.href}
                     target={link.href?.startsWith('http') ? "_blank" : undefined}
                     rel={link.href?.startsWith('http') ? "noopener noreferrer" : undefined}
-                    className="text-white/60 hover:text-[#04a99d] transition-colors text-sm block"
+                    className={`${t.textMuted} ${t.textLinkHover} transition-colors text-sm block`}
                   >
                     {link.name}
                   </a>
@@ -366,13 +426,13 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            <h4 className="text-white font-bold mb-4">More Info</h4>
+            <h4 className={`${t.textMain} font-bold mb-4`}>More Info</h4>
             <ul className="space-y-3">
               {footerLinks.Moreinfo.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-white/60 hover:text-[#04a99d] transition-colors text-sm block"
+                    className={`${t.textMuted} ${t.textLinkHover} transition-colors text-sm block`}
                   >
                     {link.name}
                   </a>
@@ -389,7 +449,7 @@ export function Footer() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-white/40 text-sm"
+            className={`${t.textSubtle} text-sm`}
           >
             © {new Date().getFullYear()} Doorstep Hub Pvt Ltd. All rights reserved.
           </motion.p>
@@ -409,11 +469,11 @@ export function Footer() {
                       initial={{ opacity: 0, scale: 0.8, y: 10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.8, y: 10 }}
-                      className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-[#1a1a1a] border border-[#037166]/50 rounded-lg text-white text-xs font-medium whitespace-nowrap shadow-xl flex flex-col items-center z-50 pointer-events-none"
+                      className={`absolute bottom-full mb-3 left-1/2 -translate-x-1/2 px-3 py-1.5 ${t.tooltipBg} border rounded-lg ${t.tooltipText} text-xs font-medium whitespace-nowrap shadow-xl flex flex-col items-center z-50 pointer-events-none`}
                     >
                       {social.label}
                       {/* Tooltip Arrow/Tail */}
-                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1a1a1a] border-r border-b border-[#037166]/50 rotate-45" />
+                      <div className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 ${t.tooltipBg} border-r border-b rotate-45`} />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -430,7 +490,8 @@ export function Footer() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-gradient-to-r hover:from-[#037166] hover:to-[#04a99d] border border-white/10 hover:border-[#037166]/50 flex items-center justify-center text-white/60 hover:text-white transition-all group"
+                  className={`w-10 h-10 rounded-full ${t.socialBg} ${t.socialBorder} border flex items-center justify-center ${t.textMuted} hover:text-white transition-all`}
+                  style={{ "--hover-from": t.accentColor }}
                 >
                   <social.icon className="w-5 h-5" />
                 </motion.a>
@@ -451,8 +512,8 @@ export function Footer() {
         </motion.div>
       </div>
 
-      {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#037166]/50 to-transparent" />
+      {/* Bottom Gradient Line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: `linear-gradient(to right, transparent, ${t.accentColor}80, transparent)` }} />
     </footer>
   );
 }

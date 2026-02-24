@@ -20,6 +20,7 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [resendTimer, setResendTimer] = useState(0);
     const fileInputRef = React.useRef(null);
+    const profileToastShown = React.useRef(false);
 
     // Timer logic for Resend OTP
     React.useEffect(() => {
@@ -111,12 +112,16 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
         }
     };
 
-    // Auto-enable edit mode for first-time users (no name)
+    // Auto-enable edit mode for first-time users (no name) and show toast
     React.useEffect(() => {
         if (isAuthenticated && user && step === 'profile') {
             const hasProfile = user.name || user.firstName || user.lastName;
             if (!hasProfile) {
                 setIsEditing(true);
+                if (!profileToastShown.current) {
+                    toast.info('Please complete your profile');
+                    profileToastShown.current = true;
+                }
             }
         }
     }, [user, isAuthenticated, step]);
@@ -352,6 +357,7 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                                 // Auto-enable edit mode if image is changed
                                                 setIsEditing(true);
                                             }
+
                                         }}
                                     />
                                     <button

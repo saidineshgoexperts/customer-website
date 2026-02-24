@@ -41,11 +41,12 @@ function CheckoutContent() {
             const date = bookingDetails.bookedDate || '';
             const time = bookingDetails.bookedTime || '';
 
-            // Format address string
+            // Format address string (exclude recipient name - that's a person, not address data)
             let addressStr = '';
             if (bookingDetails.address) {
                 const addr = bookingDetails.address;
-                addressStr = `${addr.name || ''}, ${addr.flat || ''}, ${addr.area || ''}, ${addr.cityName || ''}`;
+                const parts = [addr.flat, addr.area, addr.cityName].filter(Boolean);
+                addressStr = parts.join(', ');
             }
 
             const params = new URLSearchParams();

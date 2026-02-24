@@ -59,26 +59,17 @@ export default function ReligiousServicesPage() {
         const lat = locationData?.lat || 17.3850;
         const lng = locationData?.lng || 78.4867;
 
-        // Using a generic call or specific category if known. 
-        // Assuming "Religious" services might share the same endpoint.
-        // We might need a subcategoryId, but for now we fetch without it or use a placeholder if needed.
-        // PG used null/undefined and it worked or returned default.
         const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lattitude: lat,
-            longitude: lng,
-            // subcategoryId: 'RELIGIOUS_ID' // TODO: Need specific ID
-          })
+          body: JSON.stringify({ lattitude: lat, longitude: lng })
         });
         const data = await response.json();
-
         if (data.success && data.professionalServices) {
           setServices(data.professionalServices);
         }
       } catch (error) {
-        console.error("Error fetching religious services:", error);
+        console.error('Error fetching religious services:', error);
       } finally {
         setLoading(false);
       }
@@ -420,24 +411,37 @@ export default function ReligiousServicesPage() {
                     onClick={() => router.push(`/religious-services/category/${category._id}?name=${encodeURIComponent(category.name)}`)}
                     className="group cursor-pointer"
                   >
-                    <Card className="h-full border-2 border-transparent hover:border-[var(--saffron)]/30 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-[var(--soft-cream)]">
-                      <CardContent className="p-6">
-                        {/* Use category image if available, else icon placeholder */}
-                        <div className={`mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 p-3 group-hover:scale-110 transition-transform shadow-lg overflow-hidden`}>
-                          {category.image ? (
-                            <img src={`https://api.doorstephub.com/${category.image}`} alt={category.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <Sparkles className="h-full w-full text-white" />
-                          )}
+                    <Card className="h-full border-2 border-transparent hover:border-[var(--saffron)]/30 hover:shadow-xl transition-all duration-300 overflow-hidden">
+                      {/* Full image area */}
+                      <div className="relative h-44 overflow-hidden bg-gradient-to-br from-orange-100 to-red-50">
+                        {category.image ? (
+                          <img
+                            src={`https://api.doorstephub.com/${category.image}`}
+                            alt={category.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                          />
+                        ) : null}
+                        {/* Fallback gradient shown when no image or image fails */}
+                        <div
+                          className={`${category.image ? 'hidden' : 'flex'} absolute inset-0 items-center justify-center bg-gradient-to-br from-orange-500 to-red-600`}
+                        >
+                          <Sparkles className="h-14 w-14 text-white/80" />
                         </div>
-                        <h3 className="text-lg font-semibold text-[var(--deep-charcoal)] mb-2 group-hover:text-[var(--saffron)] transition-colors">
-                          {category.name}
-                        </h3>
-                        <p className="text-sm text-[var(--muted-foreground)] mb-4 line-clamp-2">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                        {/* Category name overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                          <h3 className="text-lg font-bold text-white drop-shadow-lg group-hover:text-[var(--saffron)] transition-colors">
+                            {category.name}
+                          </h3>
+                        </div>
+                      </div>
+                      <CardContent className="p-4">
+                        <p className="text-sm text-[var(--muted-foreground)] mb-3 line-clamp-2">
                           {category.description || 'Explore our sacred services'}
                         </p>
-                        <Button variant="ghost" className="text-[var(--saffron)] hover:text-[var(--temple-red)] p-0 h-auto font-medium pointer-events-none">
-                          View Services â†’
+                        <Button variant="ghost" className="text-[var(--saffron)] hover:text-[var(--temple-red)] p-0 h-auto font-medium pointer-events-none text-sm">
+                          View Services →
                         </Button>
                       </CardContent>
                     </Card>
@@ -456,7 +460,10 @@ export default function ReligiousServicesPage() {
       <SectionReveal delay={0.2}>
         <section className="py-20 bg-gradient-to-b from-[var(--soft-cream)] to-[var(--off-white)]">
           <div className="container mx-auto px-4">
-            <div className="mb-12 cursor-pointer group" onClick={() => router.push('/religious-services/astrology')}>
+            <div className="mb-12 cursor-pointer group" onClick={() => {
+              const el = document.getElementById('sacred-categories');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--deep-charcoal)] mb-4 group-hover:text-[var(--saffron)] transition-colors">
                 Astrology & Religious Consultation
                 <ArrowRight className="inline-block ml-2 h-8 w-8 group-hover:translate-x-2 transition-transform" />
@@ -483,7 +490,7 @@ export default function ReligiousServicesPage() {
                 >
                   <Card
                     className="h-full bg-white hover:shadow-lg transition-shadow cursor-pointer group"
-                    onClick={() => router.push('/religious-services/astrology')}
+                    onClick={() => setIsModalOpen(true)}
                   >
                     <CardContent className="p-6">
                       <div className="mb-4 h-12 w-12 rounded-xl bg-gradient-to-br from-[var(--saffron)]/10 to-[var(--temple-red)]/10 p-2.5 group-hover:scale-110 transition-transform">
@@ -563,7 +570,7 @@ export default function ReligiousServicesPage() {
                             {service.description || service.bio || 'Expert religious services.'}
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-2xl font-bold text-[var(--saffron)]">â‚¹{(service.BasePrice || service.minFare || 1000).toLocaleString()}</span>
+                            <span className="text-2xl font-bold text-[var(--saffron)]">₹{(service.BasePrice || service.minFare || 1000).toLocaleString()}</span>
                             <Button size="sm" className="bg-[var(--saffron)] hover:bg-[var(--temple-red)] text-white">
                               Book Now
                             </Button>
@@ -680,12 +687,12 @@ export default function ReligiousServicesPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { title: 'Diwali Lakshmi Pooja', category: 'Festival', price: 'â‚¹3,500' },
-                { title: 'Ganapathi Homam', category: 'Homam', price: 'â‚¹5,000' },
-                { title: 'Wedding Ceremony', category: 'Life Event', price: 'â‚¹15,000' },
-                { title: 'Satyanarayan Pooja', category: 'Pooja', price: 'â‚¹2,500' },
-                { title: 'Navagraha Pooja', category: 'Pooja', price: 'â‚¹4,000' },
-                { title: 'Vastu Shanti', category: 'Ceremony', price: 'â‚¹6,500' }
+                { title: 'Diwali Lakshmi Pooja', category: 'Festival', price: '₹3,500', img: 'https://images.unsplash.com/photo-1605289355680-75fb41239154?auto=format&fit=crop&w=600&q=80' },
+                { title: 'Ganapathi Homam', category: 'Homam', price: '₹5,000', img: 'https://images.unsplash.com/photo-1599030859770-940e6a970d4d?auto=format&fit=crop&w=600&q=80' },
+                { title: 'Wedding Ceremony', category: 'Life Event', price: '₹15,000', img: 'https://images.unsplash.com/photo-1583939411023-14783179e581?auto=format&fit=crop&w=600&q=80' },
+                { title: 'Satyanarayan Pooja', category: 'Pooja', price: '₹2,500', img: 'https://images.unsplash.com/photo-1604423882544-6f5e8a6e0b8c?auto=format&fit=crop&w=600&q=80' },
+                { title: 'Navagraha Pooja', category: 'Pooja', price: '₹4,000', img: 'https://images.unsplash.com/photo-1598618589929-b1433d05cfc6?auto=format&fit=crop&w=600&q=80' },
+                { title: 'Vastu Shanti', category: 'Ceremony', price: '₹6,500', img: 'https://images.unsplash.com/photo-1545987796-200677720281?auto=format&fit=crop&w=600&q=80' }
               ].map((ritual, index) => (
                 <motion.div
                   key={index}
@@ -695,9 +702,18 @@ export default function ReligiousServicesPage() {
                   viewport={{ once: true }}
                   whileHover={{ scale: 1.03 }}
                 >
-                  <Card className="overflow-hidden group cursor-pointer border-2 border-transparent hover:border-[var(--saffron)]/30 transition-all">
-                    <div className="h-40 bg-gradient-to-br from-[var(--warm-beige)] to-[var(--soft-cream)] flex items-center justify-center group-hover:from-[var(--saffron)]/10 group-hover:to-[var(--temple-red)]/10 transition-all">
-                      <Sparkles className="h-12 w-12 text-[var(--saffron)] group-hover:scale-110 transition-transform" />
+                  <Card className="overflow-hidden group cursor-pointer border-2 border-transparent hover:border-[var(--saffron)]/30 transition-all" onClick={() => setIsModalOpen(true)}>
+                    <div className="relative h-44 overflow-hidden">
+                      <img
+                        src={ritual.img}
+                        alt={ritual.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                      />
+                      <div className="hidden absolute inset-0 bg-gradient-to-br from-[var(--warm-beige)] to-[var(--soft-cream)] items-center justify-center">
+                        <Sparkles className="h-12 w-12 text-[var(--saffron)]" />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                     </div>
                     <CardContent className="p-5">
                       <Badge className="mb-3 bg-[var(--sacred-teal)]/10 text-[var(--sacred-teal)]">
@@ -709,7 +725,7 @@ export default function ReligiousServicesPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-bold text-[var(--saffron)]">{ritual.price}</span>
                         <Button size="sm" variant="ghost" className="text-[var(--saffron)] hover:text-[var(--temple-red)]">
-                          View Details â†’
+                          View Details →
                         </Button>
                       </div>
                     </CardContent>
@@ -789,7 +805,7 @@ export default function ReligiousServicesPage() {
           <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
             Connect with verified spiritual guides and experience authentic rituals performed with devotion
           </p>
-          <Button size="lg" className="bg-white text-[var(--temple-red)] hover:bg-white/90 shadow-2xl px-10 py-6 text-lg font-semibold">
+          <Button size="lg" onClick={() => setIsModalOpen(true)} className="bg-white text-[var(--temple-red)] hover:bg-white/90 shadow-2xl px-10 py-6 text-lg font-semibold">
             Book a Religious Service
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>

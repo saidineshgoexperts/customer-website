@@ -364,7 +364,7 @@ function ServiceCardsSection({ services, loading, activeIndex, serviceSlugs }) {
               variants={cardVariants}
               // ✅ FIXED: Pass full service object
               onClick={() => handleServiceClick(service)}
-              className={`group cursor-pointer w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-0.7rem)] md:w-[calc(25%-0.75rem)] lg:w-[calc(14.28%-0.9rem)] transition-all duration-500`}
+              className={`group cursor-pointer w-[calc(50%-0.6rem)] sm:w-[calc(33.333%-0.7rem)] md:w-[calc(25%-0.75rem)] lg:w-[calc(14.28%-0.9rem)] transition-all duration-500`}
             >
               <div
                 className={`
@@ -516,15 +516,16 @@ function HeroContent({ services = [], loading = false, error = null }) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-8"
+            className="inline-flex items-center space-x-2 px-4 py-2 bg-[#037166]/10 border border-[#037166]/30 rounded-full mb-8 max-w-full"
           >
-            <Sparkles className="w-4 h-4 text-[#037166]" />
-            <h6 className="text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium">We are Committed to Provide you a Safe Service Experience
+            <Sparkles className="w-4 h-4 text-[#037166] shrink-0" />
+            <h6 className="text-[10px] sm:text-xs md:text-sm bg-gradient-to-r from-[#037166] to-[#ff6b35] bg-clip-text text-transparent font-medium line-clamp-1 sm:line-clamp-none">
+              We are Committed to Provide you a Safe Service Experience
             </h6>
           </motion.div>
 
           {/* Main Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold mb-6 italic">
+          <h1 className="text-4xl sm:text-6xl lg:text-6xl font-bold mb-6 italic">
             {/* SVG Text for Stroke Animation */}
 
             <span className="block bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Everything You Need.</span>
