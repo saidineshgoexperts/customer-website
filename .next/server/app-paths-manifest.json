@@ -1,9 +1,10 @@
 {
-  "/pghostels/booking/address/page": "app/pghostels/booking/address/page.js",
-  "/[slug]/[subCategorySlug]/page": "app/[slug]/[subCategorySlug]/page.js",
-  "/appliances/address/page": "app/appliances/address/page.js",
-  "/appliances/booking/page": "app/appliances/booking/page.js",
-  "/pghostels/booking/confirm/page": "app/pghostels/booking/confirm/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/[slug]/page": "app/[slug]/page.js",
-  "/(landing)/page": "app/(landing)/page.js"
+  "/religious-services/page": "app/religious-services/page.js",
+  "/religious-services/subcategory/[id]/page": "app/religious-services/subcategory/[id]/page.js",
+  "/religious-services/category/[id]/page": "app/religious-services/category/[id]/page.js",
+  "/religious-services/service/[id]/page": "app/religious-services/service/[id]/page.js",
+  "/religious-services/booking/address/page": "app/religious-services/booking/address/page.js",
+  "/religious-services/booking/confirm/page": "app/religious-services/booking/confirm/page.js"
 }

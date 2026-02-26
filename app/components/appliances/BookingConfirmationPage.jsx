@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Calendar, Clock, MapPin, User, CheckCircle, Sparkles, CreditCard, Wallet, Truck, Info } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, CheckCircle, Sparkles, CreditCard, Info } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/context/AuthContext';
@@ -22,42 +22,14 @@ export function BookingConfirmationPage({
   const [selectedTime, setSelectedTime] = useState('');
   const [technicianPreference, setTechnicianPreference] = useState('any');
   const [isConfirming, setIsConfirming] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('online');
+  const [paymentMethod] = useState('online');
   const [directBookingItems, setDirectBookingItems] = useState(null);
-  const [walletBalance, setWalletBalance] = useState(0);
-  const [walletLoading, setWalletLoading] = useState(false);
 
   // Race condition protection
   const [isProcessing, setIsProcessing] = useState(false);
   const processingRef = useRef(false);
   const idempotencyKeyRef = useRef(null);
 
-  // Fetch Wallet Balance
-  useEffect(() => {
-    const fetchWalletBalance = async () => {
-      if (!token) return;
-      setWalletLoading(true);
-      try {
-        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/wallet/balance', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const data = await response.json();
-        if (data.success && data.wallet) {
-          setWalletBalance(data.wallet.currentBalance || 0);
-        }
-      } catch (error) {
-        console.error('Error fetching wallet balance:', error);
-      } finally {
-        setWalletLoading(false);
-      }
-    };
-
-    if (isAuthenticated) {
-      fetchWalletBalance();
-    }
-  }, [token, isAuthenticated]);
 
   React.useEffect(() => {
     const stored = localStorage.getItem('booking_package_details');
@@ -463,71 +435,18 @@ export function BookingConfirmationPage({
               transition={{ delay: 0.3 }}
               className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1a1a] to-[#0f1614] border border-white/10"
             >
-              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <h4 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-[#04a99d]" />
-                Select Payment Method
+                Payment Method
               </h4>
-              <div className="grid md:grid-cols-3 gap-3">
-                {[
-                  {
-                    id: 'COD',
-                    label: 'Cash on Service Delivery',
-                    icon: Truck,
-                    disabled: true,
-                    tooltip: 'For Premium Subscribers Only'
-                  },
-                  {
-                    id: 'wallet',
-                    label: 'Wallet Pay',
-                    icon: Wallet,
-                    disabled: true,
-                    tooltip: 'Redeemable after service completion only',
-                    showBalance: true
-                  },
-                  {
-                    id: 'online',
-                    label: 'Online Payment',
-                    icon: CreditCard,
-                    disabled: false
-                  },
-                ].map((method) => (
-                  <div key={method.id} className="relative group h-full">
-                    <button
-                      onClick={() => !method.disabled && setPaymentMethod(method.id)}
-                      disabled={method.disabled}
-                      className={`w-full h-full p-5 rounded-xl flex flex-col items-center justify-center gap-2 transition-all min-h-[140px] ${paymentMethod === method.id
-                        ? 'bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg'
-                        : method.disabled
-                          ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
-                          : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-                        }`}
-                    >
-                      <div className={`w-6 h-6 flex items-center justify-center ${paymentMethod === method.id ? 'text-white' : method.disabled ? 'text-white/10' : 'text-[#04a99d]'}`}>
-                        {method.id === 'wallet' && !walletLoading && walletBalance > 0 ? (
-                          <span className="text-sm font-bold">₹{walletBalance}</span>
-                        ) : (
-                          <method.icon className="w-6 h-6" />
-                        )}
-                      </div>
-
-                      <h6 className="text-sm font-medium">{method.label}</h6>
-
-                      {method.id === 'wallet' && (
-                        <i className="text-[9px] text-white/40 block mt-0.5 leading-tight">
-                          Wallet Usable After Service Completion Only
-                        </i>
-                      )}
-                    </button>
-
-                    {/* Simple Tooltip on Top */}
-                    {method.disabled && method.tooltip && (
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-48 px-2 py-1 bg-black/90 text-white text-[12px] rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center">
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-black/90 rotate-45 border-r border-b border-white/10" />
-                        {method.tooltip}
-                      </div>
-                    )}
-                  </div>
-                ))}
+              <p className="text-xs text-white/40 mb-4">Only online payment is accepted</p>
+              <div className="p-5 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg flex items-center gap-4">
+                <CreditCard className="w-6 h-6" />
+                <div>
+                  <p className="font-semibold">Online Payment</p>
+                  <p className="text-xs text-white/70">Secure payment via payment gateway</p>
+                </div>
+                <CheckCircle className="w-5 h-5 ml-auto" />
               </div>
             </motion.div>
 

@@ -367,28 +367,13 @@ function PGConfirmContent() {
                                 Payment Method
                             </h3>
                             <p className="text-xs text-gray-400 mb-4">Only online payment is accepted for PG bookings</p>
-                            <div className="grid md:grid-cols-3 gap-3">
-                                {/* Online - active */}
-                                <button
-                                    onClick={() => setPaymentMethod('ONLINE')}
-                                    className="p-5 rounded-xl flex flex-col items-center gap-2 transition-all bg-[#037166] text-white shadow-lg ring-2 ring-[#037166]/40"
-                                >
-                                    <CreditCard className="w-6 h-6 text-white" />
-                                    <span className="text-sm font-semibold">Online Payment</span>
-                                    <span className="text-[10px] bg-white/20 rounded-full px-2 py-0.5">Active</span>
-                                </button>
-                                {/* COD - disabled */}
-                                <div className="p-5 rounded-xl flex flex-col items-center gap-2 bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 relative overflow-hidden">
-                                    <Truck className="w-6 h-6" />
-                                    <span className="text-sm font-medium">Pay at Hostel</span>
-                                    <span className="text-[10px] bg-gray-200 text-gray-500 rounded-full px-2 py-0.5">Not available</span>
+                            <div className="p-5 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white shadow-lg flex items-center gap-4">
+                                <CreditCard className="w-6 h-6" />
+                                <div>
+                                    <p className="font-semibold">Online Payment</p>
+                                    <p className="text-xs text-white/70">Secure payment via payment gateway</p>
                                 </div>
-                                {/* Wallet - disabled */}
-                                <div className="p-5 rounded-xl flex flex-col items-center gap-2 bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 relative overflow-hidden">
-                                    <Wallet className="w-6 h-6" />
-                                    <span className="text-sm font-medium">Wallet Pay</span>
-                                    <span className="text-[10px] bg-gray-200 text-gray-500 rounded-full px-2 py-0.5">Not available</span>
-                                </div>
+                                <CheckCircle className="w-5 h-5 ml-auto" />
                             </div>
                         </motion.div>
 
