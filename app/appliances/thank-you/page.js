@@ -79,7 +79,8 @@ function ThankYouContent() {
             orderId: searchParams.get('orderId') || '',
             date: formattedDate,
             time: searchParams.get('time') || sessionStorage.getItem('last_booking_time') || '',
-            address: displayAddress
+            address: displayAddress,
+            referalCode: searchParams.get('referalCode') || ''
         });
     }, [searchParams]);
 

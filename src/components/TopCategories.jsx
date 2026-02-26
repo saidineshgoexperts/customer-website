@@ -43,7 +43,7 @@ const fallbackCategories = [
 export function TopCategories({ onCategoryClick, onViewAll }) {
   const [categories, setCategories] = useState(fallbackCategories);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -61,7 +61,7 @@ export function TopCategories({ onCategoryClick, onViewAll }) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
               const { latitude, longitude } = position.coords;
-              
+
               // Fetch categories from API
               const response = await fetch(
                 'https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/getallcategorys',
@@ -94,7 +94,7 @@ export function TopCategories({ onCategoryClick, onViewAll }) {
 
                 setCategories(mappedCategories);
               }
-              
+
               setIsLoading(false);
             },
             (error) => {
@@ -146,7 +146,7 @@ export function TopCategories({ onCategoryClick, onViewAll }) {
 
           setCategories(mappedCategories);
         }
-        
+
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching with default location:', error);
@@ -190,7 +190,7 @@ export function TopCategories({ onCategoryClick, onViewAll }) {
               Browse our most requested services
             </motion.p>
           </div>
-          
+
           <motion.button
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}

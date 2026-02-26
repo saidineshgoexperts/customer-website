@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Phone, ShieldCheck, Mail, User, LogOut, Camera, Chrome, Pencil, Check, ChevronRight } from 'lucide-react';
+import { X, Phone, ShieldCheck, Mail, User, LogOut, Camera, Chrome, Pencil, Check, ChevronRight, Gift } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
@@ -19,6 +19,16 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
     const [previewImage, setPreviewImage] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [resendTimer, setResendTimer] = useState(0);
+    const [referralCode, setReferralCode] = useState('');
+
+    // Auto-fill referral code from URL ?ref= param
+    React.useEffect(() => {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const ref = params.get('ref');
+            if (ref) setReferralCode(ref);
+        } catch (e) { }
+    }, []);
     const fileInputRef = React.useRef(null);
     const profileToastShown = React.useRef(false);
 
@@ -389,6 +399,9 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                                 if (selectedFile) {
                                                     formData.append('image', selectedFile);
                                                 }
+                                                if (referralCode.trim()) {
+                                                    formData.append('referalCode', referralCode.trim());
+                                                }
 
                                                 await updateProfile(formData);
                                                 setIsEditing(false);
@@ -434,6 +447,25 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                         className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none ${!isEditing && 'opacity-60 cursor-not-allowed'}`}
                                     />
                                 </div>
+
+                                {/* Referral Code — only shown on first-time profile completion */}
+                                {isFirstTimeUser && (
+                                    <div className="relative">
+                                        <Gift className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${t.textMain} opacity-40`} />
+                                        <input
+                                            type="text"
+                                            placeholder="Referral Code (optional)"
+                                            value={referralCode}
+                                            onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                                            className={`w-full pl-12 pr-4 py-4 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} placeholder:opacity-30 focus:border-opacity-100 transition-all outline-none font-mono tracking-widest`}
+                                        />
+                                        {referralCode && (
+                                            <span className={`absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30`}>
+                                                Applied
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {!isEditing && (

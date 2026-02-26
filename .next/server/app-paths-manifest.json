@@ -1,7 +1,7 @@
 {
-  "/religious-services/page": "app/religious-services/page.js",
-  "/pghostels/listings/[type]/page": "app/pghostels/listings/[type]/page.js",
-  "/religious-services/category/page": "app/religious-services/category/page.js",
-  "/religious-services/service/[id]/page": "app/religious-services/service/[id]/page.js",
-  "/religious-services/category/[id]/page": "app/religious-services/category/[id]/page.js"
+  "/(landing)/page": "app/(landing)/page.js",
+  "/[slug]/page": "app/[slug]/page.js",
+  "/[slug]/[subCategorySlug]/page": "app/[slug]/[subCategorySlug]/page.js",
+  "/appliances/thank-you/page": "app/appliances/thank-you/page.js",
+  "/appliances/page": "app/appliances/page.js"
 }

@@ -14,18 +14,18 @@ export function ThankYouPage({ bookingDetails }) {
     const [copied, setCopied] = useState(false);
     const [showSocials, setShowSocials] = useState(false);
     const [referAndEarnAmount, setReferAndEarnAmount] = useState('49');
+    const [registrationBonus, setRegistrationBonus] = useState('99');
 
     React.useEffect(() => {
         const fetchGlobalSettings = async () => {
             try {
-                const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/get_global_settings');
-                const data = await response.json();
-                if (data.success && data.policy?.customerReferedAmount) {
-                    setReferAndEarnAmount(data.policy.customerReferedAmount);
+                const res = await fetch('https://api.doorstephub.com/v1/dhubApi/app/get_global_settings');
+                const data = await res.json();
+                if (data.success && data.policy) {
+                    if (data.policy.customerReferedAmount) setReferAndEarnAmount(data.policy.customerReferedAmount);
+                    if (data.policy.referedAmount) setRegistrationBonus(data.policy.referedAmount);
                 }
-            } catch (error) {
-                console.error("Error fetching global settings:", error);
-            }
+            } catch (e) { /* use defaults */ }
         };
         fetchGlobalSettings();
     }, []);
@@ -247,57 +247,74 @@ export function ThankYouPage({ bookingDetails }) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="bg-gradient-to-br from-[#037166]/20 to-[#04a99d]/5 border border-[#037166]/30 rounded-2xl p-6 mb-8 relative group"
+                    className="relative rounded-2xl overflow-hidden mb-8 group"
                 >
-                    {/* Background Sparkle Effect */}
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Gift className="w-32 h-32 text-white -rotate-12" />
-                        </div>
+                    {/* Premium gradient background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#037166] via-[#025f56] to-[#013f39]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(4,169,157,0.3),transparent_60%)]" />
+                    <div className="absolute top-0 right-0 p-6 opacity-[0.07] pointer-events-none">
+                        <Gift className="w-40 h-40 text-white -rotate-12" />
                     </div>
 
-                    <div className="relative z-10 pr-4">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#037166] to-[#04a99d] flex items-center justify-center shadow-lg shadow-[#037166]/20">
-                                <Gift className="w-6 h-6 text-white" />
+                    <div className="relative z-10 p-6">
+                        {/* Header */}
+                        <div className="flex items-start justify-between mb-5">
+                            <div className="flex items-center gap-3">
+                                <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                                    <Gift className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <h4 className="text-lg font-bold text-white">Refer & Earn</h4>
+                                    <p className="text-white/60 text-xs">Share your link. Earn real rewards.</p>
+                                </div>
                             </div>
-                            <div>
-                                <h4 className="text-xl font-bold text-white">Refer & Earn ₹{referAndEarnAmount}</h4>
-                                <p className="text-[#04a99d] text-sm font-medium">Earn rewards after your friend's first successful booking</p>
+                            {/* Welcome Bonus Pill */}
+                            <div className="flex items-center gap-1.5 bg-yellow-400/20 border border-yellow-400/30 px-3 py-1.5 rounded-full">
+                                <Sparkles className="w-3 h-3 text-yellow-300" />
+                                <span className="text-yellow-300 text-[11px] font-bold">₹{registrationBonus} Welcome Bonus</span>
                             </div>
                         </div>
 
-                        <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/5 flex items-center justify-between gap-4">
-                            <div className="flex-1 overflow-hidden">
-                                <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1 font-bold">Your Unique Invite Link</p>
-                                <p className="text-white text-sm font-medium truncate">
-                                    {inviteLink}
-                                </p>
+                        {/* Dual Reward Tiles */}
+                        <div className="grid grid-cols-2 gap-3 mb-5">
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                                <p className="text-white/50 text-[10px] uppercase tracking-widest font-bold mb-1">You Earn</p>
+                                <p className="text-3xl font-extrabold text-white">₹{referAndEarnAmount}</p>
+                                <p className="text-white/60 text-[11px] mt-1">per referral, after 1st booking</p>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                                <p className="text-white/50 text-[10px] uppercase tracking-widest font-bold mb-1">Friend Gets</p>
+                                <p className="text-3xl font-extrabold text-yellow-300">₹{registrationBonus}</p>
+                                <p className="text-white/60 text-[11px] mt-1">on first registration</p>
+                            </div>
+                        </div>
+
+                        {/* Invite Link Row */}
+                        <div className="bg-black/30 backdrop-blur-md rounded-xl p-3.5 border border-white/10 flex items-center justify-between gap-3 mb-4">
+                            <div className="flex-1 overflow-hidden">
+                                <p className="text-white/40 text-[9px] uppercase tracking-widest mb-0.5 font-bold">Your Invite Link</p>
+                                <p className="text-white text-xs font-medium truncate">{inviteLink}</p>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
                                 <button
                                     onClick={handleCopyLink}
-                                    className="p-3 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-all active:scale-95 border border-white/10"
+                                    className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95 border border-white/10"
                                     title="Copy Link"
                                 >
-                                    {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+                                    {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                                 </button>
-                                <div className="h-10 w-px bg-white/10 mx-1" />
-
-                                {/* Share Button with Upward Social Icons */}
+                                <div className="h-8 w-px bg-white/10" />
                                 <div
                                     className="relative group/share"
                                     onMouseEnter={() => setShowSocials(true)}
                                     onMouseLeave={() => setShowSocials(false)}
                                 >
                                     <button
-                                        className="p-3 rounded-lg bg-[#037166]/20 hover:bg-[#037166]/30 text-[#037166] transition-all active:scale-95 border border-[#037166]/30"
+                                        className="p-2.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-all active:scale-95 border border-white/10"
                                         title="Share"
                                     >
-                                        <Share2 className="w-5 h-5" />
+                                        <Share2 className="w-4 h-4" />
                                     </button>
-
-                                    {/* Social Icons Popup (Upward) */}
                                     <AnimatePresence>
                                         {showSocials && (
                                             <motion.div
@@ -320,14 +337,12 @@ export function ThankYouPage({ bookingDetails }) {
                                                         >
                                                             <social.icon className="w-5 h-5" />
                                                         </button>
-                                                        {/* Custom Tooltip */}
                                                         <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-white text-black text-[10px] font-bold rounded shadow-xl opacity-0 translate-x-2 pointer-events-none group-hover/social:opacity-100 group-hover/social:translate-x-0 transition-all duration-200 whitespace-nowrap z-[100]">
                                                             {social.text}
                                                             <div className="absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-r-[6px] border-r-white" />
                                                         </div>
                                                     </motion.div>
                                                 ))}
-                                                {/* Tooltip Arrow */}
                                                 <div className="w-3 h-3 bg-[#037166] rotate-45 -mt-1.5 border-r border-b border-white/10 shadow-lg" />
                                             </motion.div>
                                         )}
@@ -336,9 +351,10 @@ export function ThankYouPage({ bookingDetails }) {
                             </div>
                         </div>
 
-                        <div className="mt-4 flex items-center gap-2 text-[11px] text-white/60">
-                            <Sparkles className="w-3 h-3 text-[#04a99d]" />
-                            <span>Rewards credited only after a successful service completion!</span>
+                        {/* Footer note */}
+                        <div className="flex items-center gap-2 text-[10px] text-white/40">
+                            <Sparkles className="w-3 h-3 text-[#04a99d] flex-shrink-0" />
+                            <span>Your reward of ₹{referAndEarnAmount} is credited after your friend completes their first booking successfully.</span>
                         </div>
                     </div>
                 </motion.div>

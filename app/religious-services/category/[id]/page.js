@@ -60,13 +60,25 @@ function ReligiousCategoryContent() {
                 const lat = locationData?.lat || 17.3850;
                 const lng = locationData?.lng || 78.4867;
 
+                // Get religious services serviceId from localStorage, fallback to hardcoded ID
+                const RELIGIOUS_SERVICE_ID = '695250aa57bb211ca094e5fd';
+                let serviceId = RELIGIOUS_SERVICE_ID;
+                try {
+                    const savedService = localStorage.getItem('selectedService');
+                    if (savedService) {
+                        const parsed = JSON.parse(savedService);
+                        if (parsed?.id) serviceId = parsed.id;
+                    }
+                } catch (e) { /* use fallback */ }
+
                 const servicesResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         lattitude: lat,
                         longitude: lng,
-                        categoryId: params.id
+                        categoryId: params.id,
+                        serviceId
                     })
                 });
 

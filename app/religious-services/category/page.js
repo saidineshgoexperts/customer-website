@@ -70,15 +70,23 @@ function ReligiousCategoryContent() {
                 const lat = locationData?.lat || 17.3850;
                 const lng = locationData?.lng || 78.4867;
 
-                // Fetch professional services filtered by location
-                // The questionnaire params are used as display/filter hints; the API returns
-                // all religious-service professionals and we display them filtered by serviceType tag.
+                // Get religious services serviceId from localStorage, fallback to hardcoded ID
+                const RELIGIOUS_SERVICE_ID = '695250aa57bb211ca094e5fd';
+                let serviceId = RELIGIOUS_SERVICE_ID;
+                try {
+                    const savedService = localStorage.getItem('selectedService');
+                    if (savedService) {
+                        const parsed = JSON.parse(savedService);
+                        if (parsed?.id) serviceId = parsed.id;
+                    }
+                } catch (e) { /* use fallback */ }
+
                 const response = await fetch(
                     'https://api.doorstephub.com/v1/dhubApi/app/professional-services-flow/public/professional-services',
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ lattitude: lat, longitude: lng }),
+                        body: JSON.stringify({ lattitude: lat, longitude: lng, serviceId }),
                     }
                 );
                 const data = await response.json();

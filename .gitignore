@@ -13,3 +13,7 @@ build
 .env.development.local
 .env.test.local
 .env.production.local
+*.zip
+node_modules/
+dist/
+build/

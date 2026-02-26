@@ -13,7 +13,11 @@ import {
   TrendingUp,
   Users,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Smartphone,
+  X,
+  Download,
+  TicketCheck
 } from 'lucide-react';
 
 // Default theme settings
@@ -61,11 +65,33 @@ export function CategoryPage({ category, categoryId }) {
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categoryImage, setCategoryImage] = useState(null);
+  const [showAppModal, setShowAppModal] = useState(false);
+  const [appLinks, setAppLinks] = useState({
+    android: 'https://play.google.com/store/apps/details?id=com.doorstephub.customer',
+    ios: 'https://apps.apple.com/in/app/doorstep-hub/id6475340236'
+  });
   const [categoryMetadata, setCategoryMetadata] = useState({
     categoryName: category,
     totalCount: 0,
     detectedCity: null
   });
+
+  // Fetch app links from global settings
+  useEffect(() => {
+    const fetchAppLinks = async () => {
+      try {
+        const res = await fetch('https://api.doorstephub.com/v1/dhubApi/app/get_global_settings');
+        const data = await res.json();
+        if (data.success && data.policy) {
+          setAppLinks({
+            android: data.policy.customerAndroidAppLink || appLinks.android,
+            ios: data.policy.customerIosAppLink || appLinks.ios
+          });
+        }
+      } catch (e) { /* use defaults */ }
+    };
+    fetchAppLinks();
+  }, []);
 
   // Use default theme settings
   const theme = defaultTheme;
@@ -135,6 +161,94 @@ export function CategoryPage({ category, categoryId }) {
       transition={{ duration: 0.4 }}
       className="relative min-h-screen pt-20 bg-gradient-to-b from-[#0a0a0a] via-[#0f1614] to-[#0a0a0a]"
     >
+      {/* App Download Modal */}
+      <AnimatePresence>
+        {showAppModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowAppModal(false)}
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-sm bg-gradient-to-b from-[#111] to-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+            >
+              {/* Top accent */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#037166] to-[#04a99d]" />
+              <button
+                onClick={() => setShowAppModal(false)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="p-8 text-center">
+                {/* Icon */}
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#037166] to-[#04a99d] flex items-center justify-center mx-auto mb-5 shadow-lg shadow-[#037166]/30">
+                  <TicketCheck className="w-10 h-10 text-white" />
+                </div>
+
+                <h3 className="text-2xl font-bold text-white mb-2">Get the App</h3>
+                <p className="text-white/60 text-sm mb-1 leading-relaxed">
+                  To <span className="text-[#04a99d] font-semibold">raise a support ticket</span> or <span className="text-[#04a99d] font-semibold">track your order</span>, please download the Doorstep Hub app.
+                </p>
+                <p className="text-white/40 text-xs mb-7">Available on Android & iOS</p>
+
+                {/* App Store Buttons */}
+                <div className="flex flex-col gap-3">
+                  <a
+                    href={appLinks.android}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-5 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 rounded-2xl transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-[#037166]/20 flex items-center justify-center flex-shrink-0">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-[#04a99d]">
+                        <path d="M3.18 23.76c.3.17.65.24 1.04.21l12.4-12.4L3.18.24C2.88.41 2.67.73 2.67 1.2v21.6c0 .47.21.79.51.96zM16.62 12l2.2 2.2-2.9 1.67L3.6 23.4l13.02-11.4zM16.62 12L3.6.6l12.32 7.53 2.9 1.67L16.62 12zM19.5 13.8l-1.24.71L16.62 12l1.64-1.51 1.24.71c.63.36.63 1.44 0 1.8z" />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-white/40 text-[10px] uppercase tracking-widest">Download on</p>
+                      <p className="text-white font-bold text-sm">Google Play</p>
+                    </div>
+                    <Download className="w-4 h-4 text-white/30 group-hover:text-[#04a99d] ml-auto transition-colors" />
+                  </a>
+
+                  <a
+                    href={appLinks.ios}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-5 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#037166]/50 rounded-2xl transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-[#037166]/20 flex items-center justify-center flex-shrink-0">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-[#04a99d]">
+                        <path d="M17.05 20.28c-.98.95-2.05 1.78-3.19 1.76-1.14-.02-1.5-.72-2.82-.72-1.32 0-1.74.7-2.82.74-1.14.04-2.26-.88-3.26-1.87-2.02-1.99-3.57-5.59-1.55-9.1C4.4 9.1 6.5 7.85 8.42 7.82c1.44-.03 2.8.96 3.68.96.88 0 2.54-1.2 4.26-1.03.72.03 2.73.29 4.02 2.18-.1.06-2.4 1.4-2.38 4.19.03 3.32 2.92 4.51 2.95 4.52-.02.05-.46 1.58-1.6 3.2v-.01zM12.03 7.25c-.02-2.3 2.12-4.26 4.38-4.25-.01 2.37-2.22 4.36-4.38 4.25z" />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-white/40 text-[10px] uppercase tracking-widest">Download on the</p>
+                      <p className="text-white font-bold text-sm">App Store</p>
+                    </div>
+                    <Download className="w-4 h-4 text-white/30 group-hover:text-[#04a99d] ml-auto transition-colors" />
+                  </a>
+                </div>
+
+                <p className="mt-5 text-white/30 text-[11px]">Free to download · Instant access to support</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Compact Hero Section with Breadcrumb */}
       <section className="relative py-12 overflow-hidden border-b border-white/5">
         {/* Category Image Background (if available from API) */}
@@ -422,12 +536,20 @@ export function CategoryPage({ category, categoryId }) {
                       </p>
                     </div>
                     <div className="flex gap-4">
-                      <button className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-[#037166]/50 transition-all whitespace-nowrap">
+                      <button
+                        onClick={() => setShowAppModal(true)}
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-[#037166]/50 transition-all whitespace-nowrap"
+                      >
+                        <TicketCheck className="w-4 h-4 text-[#04a99d]" />
                         Raise A Ticket
                       </button>
-                      {/* <button className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold hover:shadow-xl hover:shadow-[#037166]/30 transition-all whitespace-nowrap">
-                        View All Services
-                      </button> */}
+                      <button
+                        onClick={() => setShowAppModal(true)}
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#037166] to-[#04a99d] text-white font-semibold hover:shadow-lg hover:shadow-[#037166]/30 transition-all whitespace-nowrap"
+                      >
+                        <Smartphone className="w-4 h-4" />
+                        Track Order
+                      </button>
                     </div>
                   </div>
                 </div>
