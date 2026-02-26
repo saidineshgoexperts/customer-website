@@ -10,42 +10,42 @@ import Image from 'next/image';
 
 const MOCK_CATEGORIES = [
     {
-        _id: 'haircut',
+        _id: 'mock_haircut',
         name: 'Haircut & Styling',
         image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWlyJTIwc2Fsb24lMjBzdHlsaW5nfGVufDF8fHx8MTc2ODY1MjY4N3ww&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '✂️',
         description: 'Expert hair cutting & styling',
     },
     {
-        _id: 'facial',
+        _id: 'mock_facial',
         name: 'Facial & Skincare',
         image: 'https://images.unsplash.com/photo-1684014286330-ddbeb4a40c92?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNpYWwlMjB0cmVhdG1lbnQlMjBza2luY2FyZXxlbnwxfHx8fDE3Njg1NTQxNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '✨',
         description: 'Glowing skin treatments',
     },
     {
-        _id: 'massage',
+        _id: 'mock_massage',
         name: 'Massage & Relaxation',
         image: 'https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBtYXNzYWdlJTIwcmVsYXhhdGlvbnxlbnwxfHx8fDE3Njg2NTI2ODh8MA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '💆',
         description: 'Deep relaxation therapy',
     },
     {
-        _id: 'bridal',
+        _id: 'mock_bridal',
         name: 'Bridal & Makeup',
         image: 'https://images.unsplash.com/photo-1625139108082-48bb424c2333?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicmlkYWwlMjBtYWtldXAlMjBhcnRpc3R8ZW58MXx8fHwxNzY4NTQyNjYzfDA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '💐',
         description: 'Perfect bridal looks',
     },
     {
-        _id: 'manicure',
+        _id: 'mock_manicure',
         name: 'Manicure & Pedicure',
         image: 'https://images.unsplash.com/photo-1634235421135-16ebd88c13c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW5pY3VyZSUyMHBlZGljdXJlJTIwbmFpbHN8ZW58MXx8fHwxNzY4NTcwMDcwfDA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '💅',
         description: 'Beautiful nail care',
     },
     {
-        _id: 'waxing',
+        _id: 'mock_waxing',
         name: 'Waxing & Threading',
         image: 'https://images.unsplash.com/photo-1706973320004-98a2fe6ddb7c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWF1dHklMjBzYWxvbiUyMHdheGluZ3xlbnwxfHx8fDE3Njg2NTI2ODl8MA&ixlib=rb-4.1.0&q=80&w=1080',
         icon: '🌿',
@@ -247,8 +247,7 @@ export function HomePage() {
     }, [loadingFeatured, featuredPackages]); // Added loadingFeatured to dependency array
 
     const handleCategoryClick = (category) => {
-        setSelectedCategory(category);
-        setModalOpen(true);
+        router.push(`/spa-salon/category/${category._id || category.id}?name=${encodeURIComponent(category.name)}`);
     };
 
     return (

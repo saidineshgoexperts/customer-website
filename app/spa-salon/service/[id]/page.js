@@ -37,7 +37,7 @@ export default function SpaServiceDetailPage() {
 
     const [serviceData, setServiceData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [selectedPackage, setSelectedPackage] = useState(null);
+    const [selectedPackages, setSelectedPackages] = useState([]);
     const [showAddonsModal, setShowAddonsModal] = useState(false);
 
     const sliderSettings = {
@@ -76,7 +76,7 @@ export default function SpaServiceDetailPage() {
                         rules: [{ rule: 'Please provide water', allowed: true }]
                     };
                     setServiceData(mockData);
-                    setSelectedPackage(mockData.packages[0]);
+                    setSelectedPackages([mockData.packages[0]]);
                     setLoading(false);
                     return;
                 }
@@ -131,7 +131,7 @@ export default function SpaServiceDetailPage() {
 
                     setServiceData(mappedData);
                     if (mappedData.packages.length > 0) {
-                        setSelectedPackage(mappedData.packages[0]);
+                        setSelectedPackages([mappedData.packages[0]]);
                     }
                 }
             } catch (error) {
@@ -144,9 +144,22 @@ export default function SpaServiceDetailPage() {
         fetchServiceData();
     }, [id]);
 
+    const togglePackage = (pkg) => {
+        setSelectedPackages(prev => {
+            const isSelected = prev.some(p => p._id === pkg._id);
+            if (isSelected) {
+                return prev.filter(p => p._id !== pkg._id);
+            } else {
+                return [...prev, pkg];
+            }
+        });
+    };
+
+    const totalPrice = selectedPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.price) || 0), 0);
+
     const handleContinueToBook = () => {
-        if (!selectedPackage) {
-            alert("Please select a package/service.");
+        if (selectedPackages.length === 0) {
+            alert("Please select at least one service.");
             setActiveTab('portfolio');
             return;
         }
@@ -156,7 +169,8 @@ export default function SpaServiceDetailPage() {
     const handleAddonsContinue = (selectedAddons) => {
         setShowAddonsModal(false);
         const addonIds = selectedAddons.map(a => a._id).join(',');
-        router.push(`/spa-salon/booking/address?providerId=${id}&packageId=${selectedPackage._id}&addons=${addonIds}`);
+        const packageIds = selectedPackages.map(p => p._id).join(',');
+        router.push(`/spa-salon/booking/address?providerId=${id}&packageId=${packageIds}&addons=${addonIds}`);
     };
 
     if (loading) {
@@ -176,7 +190,7 @@ export default function SpaServiceDetailPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-32">
+        <div className="min-h-screen bg-gray-50 pb-32 pt-16">
             {/* Back Button */}
             <motion.button
                 initial={{ opacity: 0, x: -20 }}
@@ -188,22 +202,23 @@ export default function SpaServiceDetailPage() {
                         router.back();
                     }
                 }}
-                className="fixed top-24 left-4 z-50 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors border border-gray-200"
+                className="fixed top-[72px] left-4 z-50 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors border border-gray-200"
             >
                 <ArrowLeft className="w-5 h-5 text-gray-700" />
             </motion.button>
 
-            {/* Slider */}
+            {/* Banner Image Slider */}
             <motion.div
                 style={{ opacity: headerOpacity }}
-                className="relative h-[500px] overflow-hidden"
+                className="relative h-[380px] overflow-hidden"
             >
                 <Slider {...sliderSettings}>
                     {serviceData.images.map((image, index) => (
-                        <div key={index} className="relative h-[500px]">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center"
-                                style={{ backgroundImage: `url(${image})` }}
+                        <div key={index} className="relative h-[380px] outline-none">
+                            <img
+                                src={image}
+                                alt={`${serviceData.name} - ${index + 1}`}
+                                className="w-full h-[380px] object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                         </div>
@@ -261,13 +276,13 @@ export default function SpaServiceDetailPage() {
             {/* Tabs */}
             <div className="max-w-7xl mx-auto px-4 mt-8">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                    <div className="sticky top-20 z-40 bg-gray-50/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-2">
+                    <div className="sticky top-[72px] z-40 bg-gray-50/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-2">
                         <TabsList className="bg-transparent w-full grid grid-cols-4 gap-2">
                             {['Services', 'Reviews', 'Amenities', 'About'].map((tab) => (
                                 <TabsTrigger
                                     key={tab.toLowerCase()}
                                     value={tab === 'Services' ? 'portfolio' : tab.toLowerCase()}
-                                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white rounded-xl"
+                                    className="text-gray-900 font-medium data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#C06C84] data-[state=active]:to-[#6C5CE7] data-[state=active]:text-white rounded-xl"
                                 >
                                     {tab}
                                 </TabsTrigger>
@@ -281,13 +296,13 @@ export default function SpaServiceDetailPage() {
                                 {serviceData.packages.map((pkg, index) => (
                                     <div
                                         key={pkg._id || index}
-                                        onClick={() => setSelectedPackage(pkg)}
-                                        className={`bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer relative ${selectedPackage?._id === pkg._id
-                                            ? 'border-2 border-[#C06C84] ring-2 ring-[#C06C84]/10'
-                                            : 'border-gray-100'
+                                        onClick={() => togglePackage(pkg)}
+                                        className={`bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer relative ${selectedPackages.some(p => p._id === pkg._id)
+                                                ? 'border-2 border-[#C06C84] ring-2 ring-[#C06C84]/10'
+                                                : 'border-gray-100'
                                             }`}
                                     >
-                                        {selectedPackage?._id === pkg._id && (
+                                        {selectedPackages.some(p => p._id === pkg._id) && (
                                             <div className="absolute top-3 right-3 z-10 bg-[#C06C84] text-white p-1 rounded-full shadow-lg">
                                                 <Check className="w-4 h-4" />
                                             </div>
@@ -358,16 +373,14 @@ export default function SpaServiceDetailPage() {
             >
                 <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                     <div>
-                        <div className="text-xs text-gray-500 mb-1">Total Quote</div>
+                        <div className="text-xs text-gray-500 mb-1">
+                            {selectedPackages.length > 0 ? `${selectedPackages.length} service(s) selected` : 'No service selected'}
+                        </div>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-3xl font-bold text-gray-900">
-                                {selectedPackage
-                                    ? `₹${selectedPackage.price.toLocaleString()}`
-                                    : `₹${serviceData.basePrice.toLocaleString()}`}
+                                ₹{totalPrice > 0 ? totalPrice.toLocaleString() : serviceData.basePrice.toLocaleString()}
                             </span>
-                            <span className="text-sm text-gray-500">
-                                {selectedPackage ? `/${selectedPackage.priceUnit}` : '/service'}
-                            </span>
+                            <span className="text-sm text-gray-500">/total</span>
                         </div>
                     </div>
                     <button
@@ -383,7 +396,7 @@ export default function SpaServiceDetailPage() {
                 isOpen={showAddonsModal}
                 onClose={() => setShowAddonsModal(false)}
                 providerId={id}
-                selectedPackageId={selectedPackage?._id}
+                selectedPackageId={selectedPackages.map(p => p._id).join(',')}
                 onContinue={handleAddonsContinue}
             />
         </div>

@@ -193,22 +193,40 @@ export function Footer({ theme = {} }) {
     return social;
   });
 
+  // Used for SUBCATEGORY item links (shows services inside the subcategory)
   const getProfessionalLink = (serviceName, sub, category) => {
     const encodedSubName = encodeURIComponent(sub.name);
     const encodedCatName = category ? encodeURIComponent(category.name) : '';
-    const catId = category?._id || '';
 
     const lowerService = serviceName.toLowerCase();
 
     if (lowerService.includes('spa')) {
-      // Route to the category page (shows subcategories to pick from)
-      return `/${serviceSlugs.spa}/category/${catId}?name=${encodedCatName}`;
+      // Route to subcategory page (shows the services inside that subcategory)
+      return `/${serviceSlugs.spa}/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
     }
     if (lowerService.includes('pg') || lowerService.includes('hostel')) {
       return `/${serviceSlugs.pg}/listings/all`;
     }
     if (lowerService.includes('religious')) {
       return `/${serviceSlugs.religious}/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
+    }
+    return '#';
+  };
+
+  // Used for CATEGORY heading links (shows subcategories to pick from)
+  const getProfessionalCategoryLink = (serviceName, category) => {
+    const encodedCatName = category ? encodeURIComponent(category.name) : '';
+    const catId = category?._id || '';
+    const lowerService = serviceName.toLowerCase();
+
+    if (lowerService.includes('spa')) {
+      return `/${serviceSlugs.spa}/category/${catId}?name=${encodedCatName}`;
+    }
+    if (lowerService.includes('pg') || lowerService.includes('hostel')) {
+      return `/${serviceSlugs.pg}/listings/all`;
+    }
+    if (lowerService.includes('religious')) {
+      return `/${serviceSlugs.religious}`;
     }
     return '#';
   };
@@ -300,9 +318,9 @@ export function Footer({ theme = {} }) {
                 <div className={`text-sm leading-8 ${t.textMuted}`}>
                   {section.categories.map((catGroup, groupIdx) => (
                     <span key={catGroup.category._id} className="inline mr-1">
-                      {/* Category Name - links to that category page */}
+                      {/* Category Name - links to that category page (shows subcategories) */}
                       <Link
-                        href={getProfessionalLink(serviceName, catGroup.subcategories[0] || { _id: '' }, catGroup.category)}
+                        href={getProfessionalCategoryLink(serviceName, catGroup.category)}
                         className={`${t.groupNameColor} font-bold whitespace-nowrap mr-2 hover:opacity-80 transition-opacity`}
                       >
                         {catGroup.category.name}:

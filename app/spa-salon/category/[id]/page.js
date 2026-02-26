@@ -63,7 +63,7 @@ function SpaCategoryContent() {
     }, [location, params.id]);
 
     const handleSubCategoryClick = (subCat) => {
-        router.push(`/spa-salon/subcategory/${subCat._id}?category=${encodeURIComponent(categoryName)}&name=${encodeURIComponent(subCat.name)}`);
+        router.push(`/spa-salon/subcategory/${subCat._id}?category=${encodeURIComponent(categoryName)}&name=${encodeURIComponent(subCat.name)}&categoryId=${params.id}`);
     };
 
     if (loading) {
