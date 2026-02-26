@@ -276,23 +276,34 @@ export function AuthModal({ isOpen, onClose, theme = {} }) {
                                                 key={index}
                                                 id={`otp-${index}`}
                                                 type="text"
+                                                inputMode="numeric"
                                                 maxLength={1}
                                                 value={otp[index] || ''}
                                                 onChange={(e) => {
                                                     const val = e.target.value.replace(/\D/g, '');
-                                                    if (val) {
-                                                        const newOtp = otp.split('');
-                                                        newOtp[index] = val;
-                                                        const finalOtp = newOtp.join('').slice(0, 6);
-                                                        setOtp(finalOtp);
-                                                        if (index < 5) {
-                                                            document.getElementById(`otp-${index + 1}`).focus();
-                                                        }
+                                                    const newOtp = otp.split('');
+                                                    newOtp[index] = val ? val[val.length - 1] : '';
+                                                    const finalOtp = newOtp.join('').slice(0, 6);
+                                                    setOtp(finalOtp);
+                                                    if (val && index < 5) {
+                                                        document.getElementById(`otp-${index + 1}`).focus();
                                                     }
                                                 }}
                                                 onKeyDown={(e) => {
-                                                    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-                                                        document.getElementById(`otp-${index - 1}`).focus();
+                                                    if (e.key === 'Backspace') {
+                                                        if (otp[index]) {
+                                                            // Current box has a digit — clear it, stay here
+                                                            const newOtp = otp.split('');
+                                                            newOtp[index] = '';
+                                                            setOtp(newOtp.join(''));
+                                                        } else if (index > 0) {
+                                                            // Current box is empty — go back and clear previous
+                                                            const newOtp = otp.split('');
+                                                            newOtp[index - 1] = '';
+                                                            setOtp(newOtp.join(''));
+                                                            document.getElementById(`otp-${index - 1}`).focus();
+                                                        }
+                                                        e.preventDefault();
                                                     }
                                                 }}
                                                 className={`w-12 h-14 ${inputBg} border border-opacity-20 ${borderColor} rounded-xl ${t.textMain} text-center text-xl font-bold focus:border-opacity-100 outline-none transition-all`}

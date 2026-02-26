@@ -339,14 +339,6 @@ export default function NewHostelDetailPage() {
                                 <div className="text-xs text-gray-500 text-center">Rating</div>
                             </div>
 
-                            {/* Orders Card */}
-                            <div className="bg-gradient-to-br from-[#037166]/10 to-[#037166]/5 rounded-2xl p-4 border border-[#037166]/20 min-w-[120px]">
-                                <div className="flex items-center justify-center mb-1">
-                                    <TrendingUp className="w-5 h-5 text-[#037166] mr-1" />
-                                    <span className="text-2xl font-bold text-gray-900">{hostelData.orders}</span>
-                                </div>
-                                <div className="text-xs text-gray-500 text-center">Orders</div>
-                            </div>
 
                             {/* Base Price Card */}
                             <div className="bg-gradient-to-br from-[#037166]/10 to-[#037166]/5 rounded-2xl p-4 border border-[#037166]/20 min-w-[120px]">

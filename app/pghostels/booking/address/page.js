@@ -177,9 +177,9 @@ function PGAddressContent() {
     };
 
     return (
-        <div className="min-h-screen pt-[300px] md:pt-[280px] pb-32 bg-gray-50">
-            {/* Header */}
-            <section className="fixed top-20 left-0 right-0 z-40 bg-gradient-to-r from-[#037166] via-teal-600 to-[#04a99d] border-b border-white/10 shadow-lg">
+        <div className="min-h-screen bg-gray-50 overflow-x-hidden pb-32 pt-20">
+            {/* Header — inline, scrolls with page */}
+            <section className="bg-gradient-to-r from-[#037166] via-teal-600 to-[#04a99d] border-b border-white/10 shadow-lg overflow-x-hidden">
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-6">
                     <motion.button
                         initial={{ opacity: 0, x: -20 }}
@@ -363,19 +363,8 @@ function PGAddressContent() {
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
-
-            <AuthModal
-                isOpen={showAuthModal}
-                onClose={() => {
-                    setShowAuthModal(false);
-                    if (!isAuthenticated) router.back();
-                }}
-            />
-
-            {/* Fixed Bottom CTA */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
-                <div className="max-w-[1000px] mx-auto">
+                {/* Proceed to Booking — inline */}
+                <div className="mt-8">
                     <Button
                         onClick={handleContinue}
                         disabled={!selectedAddress || showAddForm || loading}
@@ -385,6 +374,14 @@ function PGAddressContent() {
                     </Button>
                 </div>
             </div>
+
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => {
+                    setShowAuthModal(false);
+                    if (!isAuthenticated) router.back();
+                }}
+            />
         </div>
     );
 }

@@ -89,18 +89,23 @@ function PGResultsContent() {
                     // map API data to our UI model
                     const mappedListings = data.professionalServices.map(service => ({
                         id: service._id,
-                        name: service.business_name || `${service.firstName} ${service.lastName}`,
-                        location: service.address, // simpler location for card
+                        name: service.business_name || `${service.firstName || ''} ${service.lastName || ''}`.trim(),
+                        location: service.address,
                         address: service.address,
-                        rating: service.rating || 4.5,
+                        rating: parseFloat(service.rating) || 4.5,
                         orders: service.totalOrders || 0,
-                        monthlyPrice: service.minFare || 5000, // Fallback if not available
+                        // startingAt is the real price; minFare is booking cost — use startingAt first
+                        monthlyPrice: parseFloat(service.startingAt || service.minFare) || 5000,
                         image: service.logo ? `https://api.doorstephub.com/${service.logo}` : 'https://images.unsplash.com/photo-1617430690223-3e165b390e25?auto=format&fit=crop&q=80',
-                        distance: 0.0, // Calculate if needed, or get from API if available
-                        matchScore: 90 + Math.floor(Math.random() * 10), // Mock match score for now
-                        badges: ['Verified'],
-                        amenities: service.amenities && service.amenities.length > 0 ? service.amenities : ['WiFi', 'Food', 'AC'],
-                        availableBeds: Math.floor(Math.random() * 5) + 1, // Mock
+                        distance: service.distance || 'N/A',
+                        matchScore: service.matchScore || 90,
+                        badges: Array.isArray(service.badges) && service.badges.length > 0
+                            ? service.badges.map(b => b.charAt(0).toUpperCase() + b.slice(1))
+                            : ['Verified'],
+                        amenities: service.amenities && service.amenities.length > 0
+                            ? service.amenities.map(a => typeof a === 'object' ? (a.title || 'Amenity') : a)
+                            : ['WiFi', 'Food', 'AC'],
+                        availableBeds: Math.floor(Math.random() * 5) + 1,
                         bio: service.bio
                     }));
                     setListings(mappedListings);
@@ -224,10 +229,7 @@ function PGResultsContent() {
                                 <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
                                 <span className="font-bold text-gray-900">{listing.rating.toFixed(1)}</span>
                             </div>
-                            <div className="flex items-center space-x-1 text-gray-600">
-                                <TrendingUp className="w-4 h-4" />
-                                <span className="text-sm font-medium">{listing.orders} Orders</span>
-                            </div>
+
                             {listing.availableBeds <= 5 && (
                                 <div className="flex items-center space-x-1 text-[#037166]">
                                     <Sparkles className="w-4 h-4" />
@@ -239,14 +241,15 @@ function PGResultsContent() {
                         {/* Amenities */}
                         <div className="flex flex-wrap gap-2 mb-4 h-8 overflow-hidden">
                             {listing.amenities.slice(0, 3).map((amenity, i) => {
-                                const Icon = amenityIcons[amenity] || Check;
+                                const amenityLabel = typeof amenity === 'object' ? (amenity.title || 'Amenity') : amenity;
+                                const Icon = amenityIcons[amenityLabel] || Check;
                                 return (
                                     <div
                                         key={i}
                                         className="px-3 py-1.5 bg-gray-100 rounded-lg flex items-center space-x-1.5 text-sm text-gray-700"
                                     >
                                         <Icon className="w-4 h-4" />
-                                        <span>{amenity}</span>
+                                        <span>{amenityLabel}</span>
                                     </div>
                                 );
                             })}
@@ -255,7 +258,7 @@ function PGResultsContent() {
                         {/* Price & CTA */}
                         <div className="flex items-end justify-between pt-4 border-t border-gray-100">
                             <div>
-                                <div className="text-sm text-gray-500 mb-1">Starting from</div>
+                                <div className="text-sm text-gray-500 mb-1">Starting at</div>
                                 <div className="flex items-baseline space-x-1">
                                     <span className="text-3xl font-bold text-gray-900">₹{listing.monthlyPrice.toLocaleString()}</span>
                                     {/* <span className="text-sm text-gray-500">/month</span> */}

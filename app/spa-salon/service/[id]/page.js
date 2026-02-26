@@ -106,12 +106,11 @@ export default function SpaServiceDetailPage() {
 
                         amenities: [
                             ...(Array.isArray(data.amenities) ? data.amenities : []),
-                            ...(data.otherAmenities ? data.otherAmenities.split(',').map(a => a.trim()) : ['Sanitized Tools', 'Disposable Hygeine Kit'])
-                        ].map(amenity => ({
-                            icon: amenityIcons[amenity] || Sparkles,
-                            label: amenity,
-                            available: true
-                        })),
+                            ...(data.otherAmenities ? data.otherAmenities.split(',').map(a => a.trim()) : ['Sanitized Tools', 'Disposable Hygiene Kit'])
+                        ].map(amenity => {
+                            const label = typeof amenity === 'object' ? (amenity.title || 'Amenity') : amenity;
+                            return { icon: amenityIcons[label] || Sparkles, label, available: true };
+                        }),
 
                         reviews: data.customerRatings ? data.customerRatings.map(review => ({
                             name: review.name || 'Client',

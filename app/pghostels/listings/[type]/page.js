@@ -461,10 +461,7 @@ function PGListingsContent() {
                                 <Star className="w-5 h-5 fill-[#F59E0B] text-[#F59E0B]" />
                                 <span className="font-bold text-gray-900">{listing.rating}</span>
                             </div>
-                            <div className="flex items-center space-x-1 text-gray-600">
-                                <TrendingUp className="w-4 h-4" />
-                                <span className="text-sm font-medium">{listing.orders} Orders</span>
-                            </div>
+
                             {/* {listing.availableBeds <= 5 && (
                                 <div className="flex items-center space-x-1 text-orange-600">
                                     <Sparkles className="w-4 h-4" />

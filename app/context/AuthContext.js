@@ -131,9 +131,9 @@ export const AuthProvider = ({ children }) => {
             const data = await response.json();
             if (data.success) {
                 setUser(data.data);
-            } else {
-                logout();
             }
+            // Note: do NOT logout on non-success profile responses — that would
+            // kick users out on temporary server errors. Only 401 (above) triggers logout.
         } catch (error) {
             console.error('Error fetching profile:', error);
             // Don't logout on network errors, only on auth errors
