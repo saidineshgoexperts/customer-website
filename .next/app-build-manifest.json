@@ -26,6 +26,22 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
+    "/spa-salon/service/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/spa-salon/service/[id]/page.css",
+      "static/chunks/app/spa-salon/service/[id]/page.js"
+    ],
+    "/spa-salon/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/spa-salon/layout.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
+    ],
     "/[slug]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -36,56 +52,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/[slug]/layout.js"
     ],
-    "/appliances/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/appliances/page.js"
-    ],
-    "/appliances/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/appliances/layout.js"
-    ],
-    "/religious-services/subcategory/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/subcategory/[id]/page.js"
-    ],
-    "/religious-services/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/layout.js"
-    ],
-    "/spa-salon/category/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/spa-salon/category/[id]/page.js"
-    ],
-    "/spa-salon/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/spa-salon/layout.js"
-    ],
     "/spa-salon/subcategory/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/spa-salon/subcategory/[id]/page.js"
     ],
-    "/spa-salon/page": [
+    "/religious-services/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/spa-salon/page.js"
+      "static/chunks/app/religious-services/page.js"
     ],
-    "/_not-found/page": [
+    "/religious-services/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
-    ],
-    "/spa-salon/service/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/spa-salon/service/[id]/page.css",
-      "static/chunks/app/spa-salon/service/[id]/page.js"
+      "static/chunks/app/religious-services/layout.js"
     ]
   }
 }

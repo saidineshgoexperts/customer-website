@@ -190,8 +190,8 @@ export default function SpaServiceDetailPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-32 pt-16">
-            {/* Back Button */}
+        <div className="min-h-screen bg-gray-50 pb-32">
+            {/* Back Button — sits just below the fixed site header */}
             <motion.button
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -202,32 +202,36 @@ export default function SpaServiceDetailPage() {
                         router.back();
                     }
                 }}
-                className="fixed top-[72px] left-4 z-50 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors border border-gray-200"
+                className="fixed top-20 left-4 z-50 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors border border-gray-200"
             >
                 <ArrowLeft className="w-5 h-5 text-gray-700" />
             </motion.button>
 
             {/* Banner Image Slider */}
             <motion.div
-                style={{ opacity: headerOpacity }}
-                className="relative h-[380px] overflow-hidden"
+                style={{ opacity: headerOpacity, height: '420px' }}
+                className="relative overflow-hidden"
             >
-                <Slider {...sliderSettings}>
-                    {serviceData.images.map((image, index) => (
-                        <div key={index} className="relative h-[380px] outline-none">
-                            <img
-                                src={image}
-                                alt={`${serviceData.name} - ${index + 1}`}
-                                className="w-full h-[380px] object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                        </div>
-                    ))}
-                </Slider>
+                <div style={{ height: '420px' }}>
+                    <Slider {...sliderSettings}>
+                        {serviceData.images.map((image, index) => (
+                            <div key={index} style={{ height: '420px', outline: 'none' }}>
+                                <div style={{ position: 'relative', height: '420px', overflow: 'hidden' }}>
+                                    <img
+                                        src={image}
+                                        alt={`${serviceData.name} - ${index + 1}`}
+                                        style={{ width: '100%', height: '420px', objectFit: 'cover', display: 'block' }}
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                                </div>
+                            </div>
+                        ))}
+                    </Slider>
+                </div>
             </motion.div>
 
             {/* Header Info */}
-            <div className="max-w-7xl mx-auto px-4 -mt-32 relative z-10">
+            <div className="max-w-7xl mx-auto px-4 -mt-16 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -261,20 +265,20 @@ export default function SpaServiceDetailPage() {
                                 </div>
                                 <div className="text-xs text-gray-500 text-center">Rating</div>
                             </div>
-                            <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100 min-w-[120px]">
+                            {/* <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100 min-w-[120px]">
                                 <div className="flex items-center justify-center mb-1">
                                     <DollarSign className="w-5 h-5 text-purple-600 mr-1" />
                                     <span className="text-2xl font-bold text-gray-900">₹{serviceData.basePrice}</span>
                                 </div>
                                 <div className="text-xs text-gray-500 text-center">Starts From</div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </motion.div>
-            </div>
+            </div >
 
             {/* Tabs */}
-            <div className="max-w-7xl mx-auto px-4 mt-8">
+            < div className="max-w-7xl mx-auto px-4 mt-8" >
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <div className="sticky top-[72px] z-40 bg-gray-50/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-2">
                         <TabsList className="bg-transparent w-full grid grid-cols-4 gap-2">
@@ -298,8 +302,8 @@ export default function SpaServiceDetailPage() {
                                         key={pkg._id || index}
                                         onClick={() => togglePackage(pkg)}
                                         className={`bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer relative ${selectedPackages.some(p => p._id === pkg._id)
-                                                ? 'border-2 border-[#C06C84] ring-2 ring-[#C06C84]/10'
-                                                : 'border-gray-100'
+                                            ? 'border-2 border-[#C06C84] ring-2 ring-[#C06C84]/10'
+                                            : 'border-gray-100'
                                             }`}
                                     >
                                         {selectedPackages.some(p => p._id === pkg._id) && (
@@ -363,10 +367,10 @@ export default function SpaServiceDetailPage() {
                         </div>
                     </TabsContent>
                 </Tabs>
-            </div>
+            </div >
 
             {/* Bottom CTA */}
-            <motion.div
+            < motion.div
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
                 className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 shadow-2xl z-50"
@@ -390,7 +394,7 @@ export default function SpaServiceDetailPage() {
                         Book Now
                     </button>
                 </div>
-            </motion.div>
+            </motion.div >
 
             <AddonsModal
                 isOpen={showAddonsModal}
@@ -399,6 +403,6 @@ export default function SpaServiceDetailPage() {
                 selectedPackageId={selectedPackages.map(p => p._id).join(',')}
                 onContinue={handleAddonsContinue}
             />
-        </div>
+        </div >
     );
 }
