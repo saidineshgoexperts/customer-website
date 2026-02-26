@@ -89,7 +89,7 @@ function SpaCategoryContent() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-white/10 backdrop-blur-md inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-white mb-6 cursor-pointer hover:bg-white/20 transition-colors"
-                        onClick={() => router.back()}
+                        onClick={() => router.push('/spa-salon')}
                     >
                         <ArrowLeft className="w-4 h-4" />
                         <span className="text-sm font-medium">Back to Services</span>
