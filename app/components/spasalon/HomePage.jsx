@@ -252,7 +252,7 @@ export function HomePage() {
     };
 
     return (
-        <div className="min-h-screen bg-white pt-16">
+        <div className="min-h-screen bg-white pt-20">
             {/* Hero Section */}
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-white via-[#FBEAF0] to-[#F4F3FF]">
                 {/* ... (Hero Content) ... */}

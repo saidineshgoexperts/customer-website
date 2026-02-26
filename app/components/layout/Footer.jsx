@@ -196,18 +196,28 @@ export function Footer({ theme = {} }) {
   const getProfessionalLink = (serviceName, sub, category) => {
     const encodedSubName = encodeURIComponent(sub.name);
     const encodedCatName = category ? encodeURIComponent(category.name) : '';
+    const catId = category?._id || '';
 
     const lowerService = serviceName.toLowerCase();
 
     if (lowerService.includes('spa')) {
-      return `/${serviceSlugs.spa}/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
+      // Route to the category page (shows subcategories to pick from)
+      return `/${serviceSlugs.spa}/category/${catId}?name=${encodedCatName}`;
     }
     if (lowerService.includes('pg') || lowerService.includes('hostel')) {
-      return `/${serviceSlugs.pg}/listings/${sub._id}?name=${encodedSubName}`;
+      return `/${serviceSlugs.pg}/listings/all`;
     }
     if (lowerService.includes('religious')) {
       return `/${serviceSlugs.religious}/subcategory/${sub._id}?name=${encodedSubName}&category=${encodedCatName}`;
     }
+    return '#';
+  };
+
+  const getProfessionalServiceHomeLink = (serviceName) => {
+    const lowerService = serviceName.toLowerCase();
+    if (lowerService.includes('spa')) return `/${serviceSlugs.spa}`;
+    if (lowerService.includes('pg') || lowerService.includes('hostel')) return `/${serviceSlugs.pg}`;
+    if (lowerService.includes('religious')) return `/${serviceSlugs.religious}`;
     return '#';
   };
 
@@ -282,14 +292,21 @@ export function Footer({ theme = {} }) {
                 viewport={{ once: true }}
                 className="space-y-6"
               >
-                <h3 className={`text-xl font-bold mb-6 bg-gradient-to-r ${t.headingGradient} bg-clip-text text-transparent w-fit`}>{displayTitle}</h3>
+                <h3 className={`text-xl font-bold mb-6 bg-gradient-to-r ${t.headingGradient} bg-clip-text text-transparent w-fit`}>
+                  <Link href={getProfessionalServiceHomeLink(serviceName)} className="hover:opacity-80 transition-opacity">
+                    {displayTitle}
+                  </Link>
+                </h3>
                 <div className={`text-sm leading-8 ${t.textMuted}`}>
                   {section.categories.map((catGroup, groupIdx) => (
                     <span key={catGroup.category._id} className="inline mr-1">
-                      {/* Category Name */}
-                      <span className={`${t.groupNameColor} font-bold whitespace-nowrap mr-2`}>
+                      {/* Category Name - links to that category page */}
+                      <Link
+                        href={getProfessionalLink(serviceName, catGroup.subcategories[0] || { _id: '' }, catGroup.category)}
+                        className={`${t.groupNameColor} font-bold whitespace-nowrap mr-2 hover:opacity-80 transition-opacity`}
+                      >
                         {catGroup.category.name}:
-                      </span>
+                      </Link>
 
                       {/* Subcategories */}
                       {catGroup.subcategories.map((sub, idx) => (

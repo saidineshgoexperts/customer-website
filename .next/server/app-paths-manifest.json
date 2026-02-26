@@ -1,7 +1,8 @@
 {
-  "/(landing)/page": "app/(landing)/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/spa-salon/subcategory/[id]/page": "app/spa-salon/subcategory/[id]/page.js",
   "/[slug]/page": "app/[slug]/page.js",
-  "/[slug]/[subCategorySlug]/page": "app/[slug]/[subCategorySlug]/page.js",
-  "/appliances/thank-you/page": "app/appliances/thank-you/page.js",
-  "/appliances/page": "app/appliances/page.js"
+  "/pghostels/listings/[type]/page": "app/pghostels/listings/[type]/page.js",
+  "/services/listing/[subCategoryId]/page": "app/services/listing/[subCategoryId]/page.js",
+  "/spa-salon/category/[id]/page": "app/spa-salon/category/[id]/page.js"
 }

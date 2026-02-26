@@ -146,7 +146,7 @@ export function PremiumHomePage() {
             </div>
 
             {/* Hero Section */}
-            <section ref={heroRef} className="relative min-h-screen flex items-center">
+            <section ref={heroRef} className="relative min-h-screen flex items-center pt-20">
                 <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[#037166]/5 to-transparent" />
 
                 <div className="max-w-7xl mx-auto px-4 py-20 grid md:grid-cols-2 gap-12 items-center relative z-10">

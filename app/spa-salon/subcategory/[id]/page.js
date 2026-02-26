@@ -65,7 +65,7 @@ function SpaSubCategoryContent() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-white shadow-sm sticky top-16 z-40">
+            <div className="bg-white shadow-sm sticky top-20 z-40">
                 <div className="container mx-auto px-4 py-4 flex items-center space-x-4">
                     <Button variant="ghost" size="icon" onClick={() => router.back()}>
                         <ArrowLeft className="h-5 w-5" />
