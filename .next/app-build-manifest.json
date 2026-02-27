@@ -1,14 +1,14 @@
 {
   "pages": {
-    "/religious-services/subcategory/[id]/page": [
+    "/(landing)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/subcategory/[id]/page.js"
+      "static/chunks/app/(landing)/page.js"
     ],
-    "/religious-services/layout": [
+    "/(landing)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/layout.js"
+      "static/chunks/app/(landing)/layout.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -26,11 +26,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/religious-services/service/[id]/page": [
+    "/appliances/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/religious-services/service/[id]/page.css",
-      "static/chunks/app/religious-services/service/[id]/page.js"
+      "static/chunks/app/appliances/page.js"
+    ],
+    "/appliances/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/appliances/layout.js"
     ],
     "/[slug]/page": [
       "static/chunks/webpack.js",
@@ -42,10 +46,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/[slug]/layout.js"
     ],
-    "/religious-services/page": [
+    "/[slug]/[subCategorySlug]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/religious-services/page.js"
+      "static/chunks/app/[slug]/[subCategorySlug]/page.js"
+    ],
+    "/appliances/address/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/appliances/address/page.js"
     ]
   }
 }

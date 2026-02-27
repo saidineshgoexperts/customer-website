@@ -26,7 +26,7 @@ const footerLinks = {
     { name: 'Terms of Service', href: '/terms-conditions' },
     { name: 'Privacy Policy', href: '/privacy-policy' },
     { name: 'Help Center', href: '#' },
-    { name: 'All Services', href: '/services' },
+    // { name: 'All Services', href: '/services' },
   ],
 };
 
@@ -80,6 +80,7 @@ export function Footer({ theme = {} }) {
     spa: 'spa-salon',
     pg: 'pghostels'
   });
+  const [showHomeScreen, setShowHomeScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredSocial, setHoveredSocial] = useState(null);
 
@@ -160,6 +161,12 @@ export function Footer({ theme = {} }) {
           if (res) Object.assign(newSlugs, res);
         });
         setServiceSlugs(newSlugs);
+
+        // Step 5: Fetch Screen Settings
+        const screenSettingsResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get-website-screen-settings');
+        const screenSettingsData = await screenSettingsResponse.json();
+        const isHomeEnabled = screenSettingsData.success && screenSettingsData.data?.homescreen;
+        setShowHomeScreen(isHomeEnabled);
 
       } catch (error) {
         console.error('Error fetching footer data:', error);
@@ -295,8 +302,8 @@ export function Footer({ theme = {} }) {
           </div>
         )}
 
-        {/* Dynamic Professional Services Sections */}
-        {!isLoading && professionalServices.map((section, sIdx) => {
+        {/* Dynamic Professional Services Sections - Shown based on homescreen setting */}
+        {!isLoading && showHomeScreen && professionalServices.map((section, sIdx) => {
           const serviceName = section.service.name;
           const displayTitle = serviceName.includes('Spa') ? 'Spa & Salon' :
             serviceName.includes('PG') ? 'PG & Hostels' :
@@ -318,7 +325,6 @@ export function Footer({ theme = {} }) {
                 <div className={`text-sm leading-8 ${t.textMuted}`}>
                   {section.categories.map((catGroup, groupIdx) => (
                     <span key={catGroup.category._id} className="inline mr-1">
-                      {/* Category Name - links to that category page (shows subcategories) */}
                       <Link
                         href={getProfessionalCategoryLink(serviceName, catGroup.category)}
                         className={`${t.groupNameColor} font-bold whitespace-nowrap mr-2 hover:opacity-80 transition-opacity`}
@@ -326,7 +332,6 @@ export function Footer({ theme = {} }) {
                         {catGroup.category.name}:
                       </Link>
 
-                      {/* Subcategories */}
                       {catGroup.subcategories.map((sub, idx) => (
                         <span key={sub._id} className="inline">
                           <Link
@@ -335,14 +340,12 @@ export function Footer({ theme = {} }) {
                           >
                             {sub.name}
                           </Link>
-                          {/* Separator between subcategories */}
                           {idx < catGroup.subcategories.length - 1 && (
                             <span className={`mx-2 ${t.dividerColor}`}>|</span>
                           )}
                         </span>
                       ))}
 
-                      {/* Separator between Categories - Render unless it's the last category */}
                       {groupIdx < section.categories.length - 1 && (
                         <span className="mx-4 opacity-50" style={{ color: t.accentColor }}>||</span>
                       )}
@@ -454,7 +457,6 @@ export function Footer({ theme = {} }) {
             </ul>
           </motion.div>
 
-          {/* Support Links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -473,6 +475,16 @@ export function Footer({ theme = {} }) {
                   </a>
                 </li>
               ))}
+              {showHomeScreen && (
+                <li>
+                  <a
+                    href="/services"
+                    className={`${t.textMuted} ${t.textLinkHover} transition-colors text-sm block`}
+                  >
+                    All Services
+                  </a>
+                </li>
+              )}
             </ul>
           </motion.div>
         </div>

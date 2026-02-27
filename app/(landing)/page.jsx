@@ -10,7 +10,27 @@ import { RecommendedReligious } from '@/components/landing/RecommendedReligious'
 import { AppDownload } from '@/components/landing/AppDownload';
 import { KnowledgeSection } from '@/components/landing/KnowledgeSection';
 
-export default function Home() {
+import { redirect } from 'next/navigation';
+
+export default async function Home() {
+    let showHomeScreen = false;
+
+    try {
+        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get-website-screen-settings', {
+            cache: 'no-store'
+        });
+        const data = await response.json();
+        if (data.success && data.data) {
+            showHomeScreen = data.data.homescreen;
+        }
+    } catch (error) {
+        console.error("Error fetching screen settings:", error);
+    }
+
+    if (!showHomeScreen) {
+        redirect('/appliance-repair-services');
+    }
+
     return (
         <div className="bg-[#0a0a0a] min-h-screen text-white overflow-x-hidden">
             <HeroSection />

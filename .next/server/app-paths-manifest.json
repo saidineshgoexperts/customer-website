@@ -1,5 +1,7 @@
 {
-  "/religious-services/service/[id]/page": "app/religious-services/service/[id]/page.js",
+  "/appliances/page": "app/appliances/page.js",
+  "/(landing)/page": "app/(landing)/page.js",
   "/[slug]/page": "app/[slug]/page.js",
-  "/religious-services/page": "app/religious-services/page.js"
+  "/[slug]/[subCategorySlug]/page": "app/[slug]/[subCategorySlug]/page.js",
+  "/appliances/address/page": "app/appliances/address/page.js"
 }

@@ -50,6 +50,7 @@ export function Header({ theme = {}, navItems = [] }) {
     spa: 'spa-salon',
     pg: 'pghostels'
   });
+  const [showHomeScreen, setShowHomeScreen] = useState(false);
 
   // Fetch Slugs and Services for Navigation
   useEffect(() => {
@@ -78,9 +79,11 @@ export function Header({ theme = {}, navItems = [] }) {
         });
         setServiceSlugs(newSlugs);
 
-        // 2. Fetch all services and map them using the new slugs
-        const response = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/all-services');
-        const data = await response.json();
+        // 3. Fetch Screen Settings
+        const screenSettingsResponse = await fetch('https://api.doorstephub.com/v1/dhubApi/app/applience-repairs-website/get-website-screen-settings');
+        const screenSettingsData = await screenSettingsResponse.json();
+        const isHomeEnabled = screenSettingsData.success && screenSettingsData.data?.homescreen;
+        setShowHomeScreen(isHomeEnabled);
 
         if (data.success && data.data) {
           const mappedItems = data.data.map(service => {
@@ -109,6 +112,7 @@ export function Header({ theme = {}, navItems = [] }) {
             return { name: formattedName, href, originalService: service };
           });
 
+          /*
           // Add 'More' dropdown
           mappedItems.push({
             name: 'More',
@@ -117,8 +121,16 @@ export function Header({ theme = {}, navItems = [] }) {
               { name: 'Share Ride', href: '#share-ride' }
             ]
           });
+          */
 
-          setApiNavItems(mappedItems);
+          // Filter based on home screen setting
+          if (isHomeEnabled) {
+            setApiNavItems(mappedItems);
+          } else {
+            setApiNavItems(mappedItems.filter(item =>
+              false // item.name.toLowerCase().includes('appliance') // || item.name === 'More'
+            ));
+          }
         }
       } catch (error) {
         console.error("Failed to fetch nav data:", error);
@@ -161,10 +173,13 @@ export function Header({ theme = {}, navItems = [] }) {
 
   // Default Navigation (Landing Page) - Moved inside to be dynamic
   const defaultNavItems = [
-    { name: 'Appliance Services', href: `/${serviceSlugs.appliances}` },
-    { name: 'Religious Services', href: `/${serviceSlugs.religious}` },
-    { name: 'Spa Saloon', href: `/${serviceSlugs.spa}` },
-    { name: 'PG Hostels', href: `/${serviceSlugs.pg}` },
+    // { name: 'Appliance Services', href: `/${serviceSlugs.appliances}` },
+    ...(showHomeScreen ? [
+      { name: 'Religious Services', href: `/${serviceSlugs.religious}` },
+      { name: 'Spa Saloon', href: `/${serviceSlugs.spa}` },
+      { name: 'PG Hostels', href: `/${serviceSlugs.pg}` },
+    ] : []),
+    /*
     {
       name: 'More',
       dropdown: [
@@ -172,6 +187,7 @@ export function Header({ theme = {}, navItems = [] }) {
         { name: 'Share Ride', href: '#share-ride' }
       ]
     }
+    */
   ];
 
   const menuItems = navItems.length > 0 ? navItems : (apiNavItems.length > 0 ? apiNavItems : defaultNavItems);
